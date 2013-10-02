@@ -1,4 +1,4 @@
-package com.twasyl.lat.scene.controls;
+package com.twasyl.lat.scene.controls.layout;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;

@@ -1,21 +1,24 @@
 package com.twasyl.lat.scene.controls;
 
 import com.twasyl.lat.app.LookAtThis;
+import com.twasyl.lat.scene.controls.layout.Layout;
+import com.twasyl.lat.scene.controls.slide.Slide;
+import com.twasyl.lat.scene.controls.slide.SlideElement;
 import javafx.beans.DefaultProperty;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.stage.Screen;
-
-import java.util.ArrayList;
 
 @DefaultProperty("slides")
 public class Presentation extends Group {
 
+    private final DoubleProperty presentationWidth = new SimpleDoubleProperty();
+    private final DoubleProperty presentationHeight = new SimpleDoubleProperty();
     private final StringProperty title = new SimpleStringProperty();
     private final StringProperty author = new SimpleStringProperty();
     private final ListProperty<Slide> slides = new SimpleListProperty<>();
@@ -39,6 +42,14 @@ public class Presentation extends Group {
             }
         });
     }
+
+    public DoubleProperty presentationWidthProperty() { return this.presentationWidth; }
+    public double getPresentationWidth() { return this.presentationWidthProperty().get(); }
+    public void setPresentationWidth(double presentationWidth) { this.presentationWidthProperty().set(presentationWidth); }
+
+    public DoubleProperty presentationHeightProperty() { return this.presentationHeight; }
+    public double getPresentationHeight() { return this.presentationHeightProperty().get(); }
+    public void setPresentationHeight(double presentationHeight) { this.presentationHeightProperty().set(presentationHeight); }
 
     public StringProperty titleProperty() { return this.title; }
     public String getTitle() { return this.titleProperty().get(); }
@@ -93,6 +104,7 @@ public class Presentation extends Group {
         getChildren().clear();
 
         if (getCurrentSlide() != null) {
+            setStyle(getCurrentSlide().getStyle());
             getChildren().add(getCurrentSlide());
 
             double displayWidth, displayHeight;
@@ -105,8 +117,8 @@ public class Presentation extends Group {
                 displayHeight = LookAtThis.getStage().getHeight();
             }
 
-            double slideWidth = getCurrentSlide().getPrefWidth();
-            double slideHeight = getCurrentSlide().getPrefHeight();
+            double slideWidth = getPresentationWidth();
+            double slideHeight = getPresentationHeight();
 
 
             double widthRatio = displayWidth / slideWidth;
@@ -126,11 +138,11 @@ public class Presentation extends Group {
             double centerX = (displayWidth / 2) - (slideWidth / 2);
             double centerY = (displayHeight / 2) - (slideHeight / 2);
 
-            setTranslateX(centerX);
-            setTranslateY(centerY);
+            getCurrentSlide().setTranslateX(centerX);
+            getCurrentSlide().setTranslateY(centerY);
 
-            setScaleX(scaleX);
-            setScaleY(scaleY);
+            getCurrentSlide().setScaleX(scaleX);
+            getCurrentSlide().setScaleY(scaleY);
         }
     }
 }

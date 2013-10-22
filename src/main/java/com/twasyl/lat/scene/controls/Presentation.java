@@ -101,11 +101,11 @@ public class Presentation extends Group {
     }
 
     private void showSlide() {
-        getChildren().clear();
-
         if (getCurrentSlide() != null) {
+            getChildren().clear();
+
             setStyle(getCurrentSlide().getStyle());
-            getChildren().add(getCurrentSlide());
+            getChildren().addAll(getCurrentSlide().buildSlide().get());
 
             double displayWidth, displayHeight;
             if(LookAtThis.getStage().isFullScreen()) {

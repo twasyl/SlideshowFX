@@ -1,14 +1,15 @@
 package com.twasyl.lat.scene.controls.slide;
 
+import com.twasyl.lat.scene.controls.layout.LayoutLabel;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Label;
 
-public class SlideLabel extends Label implements SlideElement<Label> {
+public class SlideLabel extends Label implements SlideElement<LayoutLabel> {
 
-    private final ObjectProperty<Label> referenceLayoutElement = new SimpleObjectProperty<>();
+    private final ObjectProperty<LayoutLabel> referenceLayoutElement = new SimpleObjectProperty<>();
 
     public SlideLabel() {
         referenceLayoutElementProperty().addListener(new ChangeListener<Label>() {
@@ -28,17 +29,17 @@ public class SlideLabel extends Label implements SlideElement<Label> {
     }
 
     @Override
-    public ObjectProperty<Label> referenceLayoutElementProperty() {
+    public ObjectProperty<LayoutLabel> referenceLayoutElementProperty() {
         return referenceLayoutElement;
     }
 
     @Override
-    public Label getReferenceLayoutElement() {
+    public LayoutLabel getReferenceLayoutElement() {
         return referenceLayoutElementProperty().get();
     }
 
     @Override
-    public void setReferenceLayoutElement(Label referenceLayoutElement) {
+    public void setReferenceLayoutElement(LayoutLabel referenceLayoutElement) {
         referenceLayoutElementProperty().set(referenceLayoutElement);
     }
 }

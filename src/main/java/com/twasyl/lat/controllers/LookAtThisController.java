@@ -28,20 +28,22 @@ public class LookAtThisController implements Initializable {
         if(presentationFile != null && presentationFile.exists()) {
             try {
                 final Presentation presentation = FXMLLoader.load(presentationFile.toPath().toUri().toURL());
+                presentation.start();
 
-                final Scene scene = new Scene(presentation);
+                final Scene scene = new Scene(presentation.showSlide());
                 scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
                     @Override
                     public void handle(KeyEvent keyEvent) {
                         if (keyEvent.getCode().equals(KeyCode.RIGHT)) {
                             presentation.next();
+                            scene.setRoot(presentation.showSlide());
                         } else if (keyEvent.getCode().equals(KeyCode.LEFT)) {
                             presentation.previous();
+                            scene.setRoot(presentation.showSlide());
                         }
                     }
                 });
 
-                presentation.start();
                 LookAtThis.getStage().setScene(scene);
             } catch (IOException e) {
             }

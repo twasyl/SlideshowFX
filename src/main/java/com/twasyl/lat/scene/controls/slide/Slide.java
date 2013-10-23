@@ -50,4 +50,9 @@ public class Slide extends AnchorPane {
 
         return completeSlide;
     }
+
+    public String getSlideStyle() {
+        if((getStyle() == null || getStyle().trim().isEmpty()) && getLayout() != null) return getLayout().getStyle();
+        else return getStyle();
+    }
 }

@@ -12,10 +12,13 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.Control;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 
 @DefaultProperty("slides")
-public class Presentation extends Group {
+public class Presentation extends Control {
 
     private final DoubleProperty presentationWidth = new SimpleDoubleProperty();
     private final DoubleProperty presentationHeight = new SimpleDoubleProperty();
@@ -100,12 +103,14 @@ public class Presentation extends Group {
         }
     }
 
-    private void showSlide() {
-        if (getCurrentSlide() != null) {
-            getChildren().clear();
+    public Parent showSlide() {
+        AnchorPane slide = null;
 
-            setStyle(getCurrentSlide().getStyle());
-            getChildren().addAll(getCurrentSlide().buildSlide().get());
+        if (getCurrentSlide() != null) {
+            slide = new AnchorPane();
+
+            slide.setStyle(getCurrentSlide().getSlideStyle());
+            slide.getChildren().addAll(getCurrentSlide().buildSlide().get());
 
             double displayWidth, displayHeight;
             if(LookAtThis.getStage().isFullScreen()) {
@@ -117,9 +122,12 @@ public class Presentation extends Group {
                 displayHeight = LookAtThis.getStage().getHeight();
             }
 
+            slide.setPrefSize(displayWidth, displayHeight);
+            slide.setMinSize(displayWidth, displayHeight);
+            slide.setMaxSize(displayWidth, displayHeight);
+
             double slideWidth = getPresentationWidth();
             double slideHeight = getPresentationHeight();
-
 
             double widthRatio = displayWidth / slideWidth;
             double heightRatio = displayHeight / slideHeight;
@@ -138,11 +146,13 @@ public class Presentation extends Group {
             double centerX = (displayWidth / 2) - (slideWidth / 2);
             double centerY = (displayHeight / 2) - (slideHeight / 2);
 
-            getCurrentSlide().setTranslateX(centerX);
-            getCurrentSlide().setTranslateY(centerY);
+            /* slide.setTranslateX(centerX);
+            slide.setTranslateY(centerY); */
 
-            getCurrentSlide().setScaleX(scaleX);
-            getCurrentSlide().setScaleY(scaleY);
+            slide.setScaleX(scaleX);
+            slide.setScaleY(scaleY);
         }
+
+        return slide;
     }
 }

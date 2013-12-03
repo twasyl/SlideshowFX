@@ -6,13 +6,30 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.web.WebView?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.lat.controllers.LookAtThisController">
     <top>
         <ToolBar>
-            <items>
-                <Button text="Play" onAction="#startSlideshow" />
-            </items>
+            <Button text="Open template" onAction="#loadTemplate" />
         </ToolBar>
     </top>
+    <center>
+        <WebView fx:id="browser" />
+    </center>
+
+    <right>
+        <VBox spacing="10">
+            <HBox spacing="10">
+                <Label text="JavaScript commands:" />
+                <TextArea fx:id="commands" prefColumnCount="50" prefRowCount="25" />
+            </HBox>
+            <HBox spacing="10">
+                <Button text="Execute" onAction="#executeJS" />
+                <Button text="Add slide" onAction="#addSlide" />
+                <Button text="Reload" onAction="#reload"  />
+                <Button text="Save" onAction="#save" />
+            </HBox>
+        </VBox>
+    </right>
 </BorderPane>
 

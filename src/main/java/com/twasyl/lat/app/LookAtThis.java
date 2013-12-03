@@ -1,6 +1,5 @@
 package com.twasyl.lat.app;
 
-import com.twasyl.lat.scene.controls.Presentation;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;

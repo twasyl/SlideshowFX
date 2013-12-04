@@ -100,7 +100,7 @@ public class LookAtThisController implements Initializable {
         Reader reader = null;
 
         try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File("./src/test/resources/template/slide1.html"))));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File("./src/test/resources/template/slides/template/title.html"))));
 
             VelocityContext context = new VelocityContext();
             context.put("slideNumber", ++numberOfSlides);

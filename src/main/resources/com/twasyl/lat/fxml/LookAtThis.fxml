@@ -23,9 +23,22 @@
                 <Label text="JavaScript commands:" />
                 <TextArea fx:id="commands" prefColumnCount="50" prefRowCount="25" />
             </HBox>
+            <VBox spacing="10">
+                <Label text="Set text:" />
+                 <HBox spacing="10">
+                     <Label text="Slide #:" />
+                     <TextField prefColumnCount="3" fx:id="slideNumber" />
+                     <Label text="Field:" />
+                     <TextField prefColumnCount="15" fx:id="fieldName" />
+                     <Label text="Value:" />
+                     <TextField fx:id="fieldValue" />
+                 </HBox>
+                <Button text="Define" onAction="#updateSlide" />
+            </VBox>
             <HBox spacing="10">
                 <Button text="Execute" onAction="#executeJS" />
                 <Button text="Add slide" onAction="#addSlide" />
+                <Button text="Add subslide" onAction="#addSubslide" />
                 <Button text="Reload" onAction="#reload"  />
                 <Button text="Save" onAction="#save" />
             </HBox>

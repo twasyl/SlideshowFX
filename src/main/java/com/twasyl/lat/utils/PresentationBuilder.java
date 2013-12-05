@@ -1,11 +1,14 @@
 package com.twasyl.lat.utils;
 
+import com.sun.org.apache.xerces.internal.util.DOMUtil;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -15,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public class PresentationBuilder {
 
@@ -25,9 +26,11 @@ public class PresentationBuilder {
      */
     public static class Slide {
         private int id;
+        private String slideNumber;
         private String name;
         private File file;
-        private String content;
+        private String text;
+        private List<Slide> slides = new ArrayList<>();
 
         public Slide() {
         }
@@ -47,8 +50,18 @@ public class PresentationBuilder {
         public File getFile() { return file; }
         public void setFile(File file) { this.file = file; }
 
-        public String getContent() { return content; }
-        public void setContent(String content) { this.content = content; }
+        public String getText() { return text; }
+        public void setText(String text) { this.text = text; }
+
+        public String getSlideNumber() { return slideNumber; }
+        public void setSlideNumber(String slideNumber) { this.slideNumber = slideNumber; }
+
+        public List<Slide> getSlides() { return slides; }
+        public void setSlides(List<Slide> slides) { this.slides = slides; }
+
+        public static void buildContent(StringBuffer buffer, Slide slide) throws IOException, SAXException, ParserConfigurationException {
+            if(slide.getSlides().isEmpty()) buffer.append(slide.getText());
+        }
     }
 
     /**
@@ -58,6 +71,7 @@ public class PresentationBuilder {
         protected static final String TEMPLATE_CONFIGURATION_NAME = "template-config.xml";
 
         private File folder;
+        private File configurationFile;
         private String name;
         private File file;
         private List<Slide> slides;
@@ -76,6 +90,9 @@ public class PresentationBuilder {
 
         public File getFolder() { return folder; }
         public void setFolder(File folder) { this.folder = folder; }
+
+        public File getConfigurationFile() { return configurationFile; }
+        public void setConfigurationFile(File configurationFile) { this.configurationFile = configurationFile; }
     }
 
     /**
@@ -95,25 +112,26 @@ public class PresentationBuilder {
     }
 
     private static final Logger LOGGER = Logger.getLogger(PresentationBuilder.class.getName());
-    private static final String VELOCITY_SLIDE_NUMBER_TOKEN = "${slideNumber}";
-    private static final String VELOCITY_SLIDES_TOKEN = "${slides}";
+    private static final String VELOCITY_SLIDE_NUMBER_TOKEN = "slideNumber";
+    private static final String VELOCITY_SLIDES_TOKEN = "slides";
 
     private Template template;
     private Presentation presentation;
     private File templateArchiveFile;
-
+    private File presentationArchiveFile;
 
     public PresentationBuilder() {
-        Velocity.init();
     }
 
     public PresentationBuilder(File template) {
-        this();
         this.templateArchiveFile = template;
     }
 
     public File getTemplateArchiveFile() { return this.templateArchiveFile; }
     public void setTemplateArchiveFile(File template) { this.templateArchiveFile = template; }
+
+    public File getPresentationArchiveFile() { return presentationArchiveFile; }
+    public void setPresentationArchiveFile(File presentationArchiveFile) { this.presentationArchiveFile = presentationArchiveFile; }
 
     public Presentation getPresentation() { return this.presentation; }
     public void setPresentation(Presentation presentationFile) { this.presentation = presentationFile; }
@@ -130,58 +148,24 @@ public class PresentationBuilder {
         if(!this.templateArchiveFile.exists()) throw new IllegalArgumentException("Can not load the template: file does not exist");
 
         this.template = new Template();
-
-        ZipInputStream zipReader = new ZipInputStream(new FileInputStream(this.templateArchiveFile));
-        ZipEntry zipEntry;
-        File extractedFile;
-        FileOutputStream extractedFileOutputStream;
-
         this.template.setFolder(new File(System.getProperty("java.io.tmpdir") + File.separator + "ifx-" + System.currentTimeMillis()));
+
         LOGGER.fine("The temporaryTemplateFolder is " + this.template.getFolder().getAbsolutePath());
 
-        this.template.getFolder().mkdir();
         this.template.getFolder().deleteOnExit();
 
         // Unzip the template into a temporary folder
-        LOGGER.fine("The temporaryTemplateFolder has been created: " + this.template.getFolder().exists());
         LOGGER.fine("Extracting the template ...");
 
-        while((zipEntry = zipReader.getNextEntry()) != null) {
-            extractedFile = new File(this.template.getFolder(), zipEntry.getName());
-
-            LOGGER.fine("Extracting file: " + extractedFile.getAbsolutePath());
-
-            if(zipEntry.isDirectory()) extractedFile.mkdirs();
-            else {
-                // Ensure to create the parents directories
-                extractedFile.getParentFile().mkdirs();
-
-                int length;
-                byte[] buffer = new byte[1024];
-
-                extractedFileOutputStream = new FileOutputStream(extractedFile);
-
-                while((length = zipReader.read(buffer)) > 0) {
-                    extractedFileOutputStream.write(buffer, 0, length);
-                }
-
-                extractedFileOutputStream.flush();
-                extractedFileOutputStream.close();
-            }
-        }
-
-        LOGGER.fine("Extraction done");
-
-        zipReader.closeEntry();
-        zipReader.close();
+        ZipUtils.unzip(this.templateArchiveFile, this.template.getFolder());
 
         // Read the configuration
         // Set the template information
         LOGGER.fine("Starting reading template configuration");
-        this.templateConfigurationFile = new File(this.template.getFolder(), Template.TEMPLATE_CONFIGURATION_NAME);
+        this.template.setConfigurationFile(new File(this.template.getFolder(), Template.TEMPLATE_CONFIGURATION_NAME));
 
         XPath xpath = XPathFactory.newInstance().newXPath();
-        InputSource configurationFileInput = new InputSource(this.templateConfigurationFile.getAbsolutePath());
+        InputSource configurationFileInput = new InputSource(this.template.getConfigurationFile().getAbsolutePath());
         String expression = "/impress-fx/template/name";
 
         try {
@@ -201,7 +185,7 @@ public class PresentationBuilder {
             File slidesDirectory = new File(this.template.getFolder(), xpath.evaluate(expression, configurationFileInput));
             LOGGER.fine("[Slide's configuration] directory = " + slidesDirectory.getAbsolutePath());
 
-            expression = "/impress-fx/slides/slide()";
+            expression = "/impress-fx/slides/slide";
             NodeList slidesXpath = null;
 
             slidesXpath = (NodeList) xpath.evaluate(expression, configurationFileInput, XPathConstants.NODESET);
@@ -239,21 +223,23 @@ public class PresentationBuilder {
         // Copy the template to the presentation file
         LOGGER.fine("Creating presentation file");
         this.presentation = new Presentation();
+        this.presentation.setSlides(new ArrayList<Slide>());
         this.presentation.setPresentationFile(new File(this.template.getFolder(), Presentation.PRESENTATION_FILE_NAME));
 
-        FileOutputStream presentationFileOutput = new FileOutputStream(this.presentation.getPresentationFile());
-        FileInputStream templateFileInput = new FileInputStream(this.template.getFile());
-        byte[] buffer = new byte[1024];
-        int length;
+        // Replacing the velocity token
+        final Reader templateReader = new FileReader(this.template.getFile());
+        final Writer presentationWriter = new FileWriter(this.presentation.getPresentationFile());
 
-        while((length = templateFileInput.read(buffer)) > 0) {
-            presentationFileOutput.write(buffer, 0, length);
-        }
+        Velocity.init();
+        VelocityContext context = new VelocityContext();
+        context.put(VELOCITY_SLIDES_TOKEN, "");
 
-        presentationFileOutput.flush();
-        presentationFileOutput.close();
+        Velocity.evaluate(context, presentationWriter, "", templateReader);
 
-        templateFileInput.close();
+        presentationWriter.flush();
+        presentationWriter.close();
+
+        templateReader.close();
 
         LOGGER.fine("Presentation file created at " + this.presentation.getPresentationFile().getAbsolutePath());
     }
@@ -268,39 +254,60 @@ public class PresentationBuilder {
      * @param template
      * @throws IOException
      */
-    public void addSlide(Slide template) throws IOException {
+    public void addSlide(Slide template, Slide parent) throws IOException, ParserConfigurationException, SAXException {
         if(template == null) throw new IllegalArgumentException("The template for creating a slide can not be null");
+        Velocity.init();
 
-        Slide slide = new Slide(template.getId(), template.getName(), template.getFile());
+        final Slide slide = new Slide(template.getId(), template.getName(), template.getFile());
+        if(parent == null) {
+            slide.setSlideNumber((this.presentation.getSlides().size() + 1) + "");
+            this.presentation.getSlides().add(slide);
+        } else {
+           slide.setSlideNumber(parent.getSlideNumber() + "." + parent.getSlides().size() + 1);
+        }
 
-        Reader slideFileReader = new FileReader(slide.getFile());
-        ByteArrayOutputStream slideContentByte = new ByteArrayOutputStream();
-        Writer slideContentWriter = new OutputStreamWriter(slideContentByte);
+        final Reader slideFileReader = new FileReader(slide.getFile());
+        final ByteArrayOutputStream slideContentByte = new ByteArrayOutputStream();
+        final Writer slideContentWriter = new OutputStreamWriter(slideContentByte);
 
         VelocityContext context = new VelocityContext();
-        context.put(VELOCITY_SLIDE_NUMBER_TOKEN, this.presentation.getSlides().size() + 1);
+        context.put(VELOCITY_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
 
         Velocity.evaluate(context, slideContentWriter, "", slideFileReader);
         slideContentWriter.flush();
+        slideContentWriter.close();
 
-        slide.setContent(new String(slideContentByte.toByteArray()));
-
-        this.presentation.getSlides().add(slide);
+        slide.setText(new String(slideContentByte.toByteArray()));
 
         // Saving the presentation file
         // Step 1: build the slides
-        StringBuffer slidesBuffer = new StringBuffer();
+        final StringBuffer slidesBuffer = new StringBuffer();
         for(Slide s : this.presentation.getSlides()) {
-            slidesBuffer.append(s.getContent());
+            Slide.buildContent(slidesBuffer, s);
         }
 
         // Step 2: rewrite from the template
+        final Reader templateReader = new FileReader(this.template.getFile());
+        final Writer presentationWriter = new FileWriter(this.presentation.getPresentationFile());
+
+        context = new VelocityContext();
+        context.put(VELOCITY_SLIDES_TOKEN, slidesBuffer.toString());
+
+        Velocity.evaluate(context, presentationWriter, "", templateReader);
+
+        templateReader.close();
+        presentationWriter.flush();
+        presentationWriter.close();
     }
 
     /**
      * Build the final presentation file by writing the complete package
      */
-    public void buildPresentation() {
-       // if(this.presentationFile == null) throw new IllegalArgumentException("The presentation file can not be null");
+    public void savePresentation(File presentationArchive) throws IOException {
+        if(presentationArchive == null) throw new IllegalArgumentException("The presentation archive can not be null");
+
+        LOGGER.fine("Compressing temporary file");
+        ZipUtils.zip(this.template.getFolder(), presentationArchive);
+        LOGGER.fine("Presentation saved");
     }
 }

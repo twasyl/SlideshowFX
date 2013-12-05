@@ -1,50 +1,58 @@
 package com.twasyl.lat.controllers;
 
+import com.twasyl.lat.utils.DOMUtils;
+import com.twasyl.lat.utils.PresentationBuilder;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import javax.xml.transform.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class LookAtThisController implements Initializable {
 
-    private int numberOfSlides = 0;
-    private List<String> slides = new ArrayList<>();
+    private final PresentationBuilder builder = new PresentationBuilder();
 
-    private File templateFile;
-    private File presentationFile = new File("./src/test/resources/template/result.html");
-
-    @FXML
-    private WebView browser;
-    @FXML
-    private javafx.scene.control.TextArea commands;
+    @FXML private WebView browser;
+    @FXML private TextArea commands;
+    @FXML private TextField slideNumber;
+    @FXML private TextField fieldName;
+    @FXML private TextField fieldValue;
 
     @FXML private void loadTemplate(ActionEvent event) {
         FileChooser chooser = new FileChooser();
-        this.templateFile = chooser.showOpenDialog(null);
+        File templateFile = chooser.showOpenDialog(null);
 
         try {
-            loadPresentation();
+            this.builder.loadTemplate(templateFile);
+            this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+    }
+
+    @FXML private void updateSlide(ActionEvent event) throws TransformerException, IOException {
+        int slideNumberInt = Integer.parseInt(this.slideNumber.getText());
+
+        String jsCommand = String.format("setField(%1$s, \"%2$s\", \"%3$s\");",
+                slideNumberInt,
+                this.fieldName.getText(),
+                this.fieldValue.getText());
+
+        this.browser.getEngine().executeScript(jsCommand);
+        Element slideElement = this.browser.getEngine().getDocument().getElementById("slide-" + slideNumberInt);
+
+        this.builder.getPresentation().getSlides().get(slideNumberInt-1).setText(DOMUtils.convertNodeToText(slideElement));
     }
 
     @FXML
@@ -59,7 +67,7 @@ public class LookAtThisController implements Initializable {
 
     @FXML
     private void save(ActionEvent event) {
-        if(this.presentationFile == null) throw new IllegalArgumentException("The presentation file can not be null");
+        /*if(this.presentationFile == null) throw new IllegalArgumentException("The presentation file can not be null");
 
         OutputStream out = null;
 
@@ -90,70 +98,51 @@ public class LookAtThisController implements Initializable {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }*/
+
+        File presentationArchive = null;
+        if(this.builder.getPresentationArchiveFile() == null) {
+            FileChooser chooser = new FileChooser();
+            presentationArchive = chooser.showSaveDialog(null);
+        } else {
+            presentationArchive = this.builder.getPresentationArchiveFile();
+        }
+
+        try {
+            this.builder.savePresentation(presentationArchive);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     @FXML
     private void addSlide(ActionEvent event) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Writer writer = new OutputStreamWriter(out);
-        Reader reader = null;
-
         try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File("./src/test/resources/template/slides/template/title.html"))));
-
-            VelocityContext context = new VelocityContext();
-            context.put("slideNumber", ++numberOfSlides);
-
-            Velocity.evaluate(context, writer, "", reader);
-            writer.flush();
-
-            slides.add(new String(out.toByteArray()));
-
-            loadPresentation();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            this.builder.addSlide(this.builder.getTemplate().getSlides().get(0), null);
+            this.browser.getEngine().reload();
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } finally {
-            try {
-                writer.close();
-                reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
+    }
 
+    @FXML private void addSubslide(ActionEvent event) {
+        try {
+            this.builder.addSlide(this.builder.getTemplate().getSlides().get(1), this.builder.getPresentation().getSlides().get(0));
+            this.browser.getEngine().reload();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Velocity.init();
-    }
-
-
-    private void loadPresentation() throws IOException {
-        if(this.templateFile == null) throw new IllegalArgumentException("The template file can not be null");
-        if(!this.templateFile.exists()) throw new IllegalArgumentException("The template file does not exist");
-
-        StringBuffer slidesHTML = new StringBuffer();
-
-        for(String slideContent : slides) {
-            slidesHTML.append(slideContent);
-            slidesHTML.append("\n");
-        }
-
-        VelocityContext context = new VelocityContext();
-        context.put("slides", slidesHTML.toString());
-
-        Reader reader = new InputStreamReader(new FileInputStream(templateFile));
-        Writer writer = new OutputStreamWriter(new FileOutputStream(presentationFile));
-
-        Velocity.evaluate(context, writer, "", reader);
-
-        writer.flush();
-        writer.close();
-
-        this.browser.getEngine().load(this.presentationFile.toURI().toASCIIString());
     }
 }

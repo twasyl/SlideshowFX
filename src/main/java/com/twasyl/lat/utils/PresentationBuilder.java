@@ -75,6 +75,8 @@ public class PresentationBuilder {
         private String name;
         private File file;
         private List<Slide> slides;
+        private String contentDefinerMethod;
+        private String jsObject;
 
         public Template() {
         }
@@ -93,6 +95,86 @@ public class PresentationBuilder {
 
         public File getConfigurationFile() { return configurationFile; }
         public void setConfigurationFile(File configurationFile) { this.configurationFile = configurationFile; }
+
+        public String getContentDefinerMethod() { return contentDefinerMethod; }
+        public void setContentDefinerMethod(String contentDefinerMethod) { this.contentDefinerMethod = contentDefinerMethod; }
+
+        public String getJsObject() { return jsObject; }
+        public void setJsObject(String jsObject) { this.jsObject = jsObject; }
+
+        /**
+         * Read the configuration of this template located in the <b>folder</b> attribute.
+         */
+        public void readFromFolder() {
+
+            // Set the template information
+            LOGGER.fine("Starting reading template configuration");
+            this.setConfigurationFile(new File(this.getFolder(), Template.TEMPLATE_CONFIGURATION_NAME));
+
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            InputSource configurationFileInput = new InputSource(this.getConfigurationFile().getAbsolutePath());
+            String expression = "/impress-fx/template/name";
+
+            try {
+                this.setName(xpath.evaluate(expression, configurationFileInput));
+                LOGGER.fine("[Template configuration] name = " + this.getName());
+
+                expression = "/impress-fx/template/file";
+                this.setFile(new File(this.getFolder(), xpath.evaluate(expression, configurationFileInput)));
+                LOGGER.fine("[Template configuration] file = " + this.getFile().getAbsolutePath());
+
+                expression = "/impress-fx/template/js-object";
+                this.setJsObject(xpath.evaluate(expression, configurationFileInput));
+                LOGGER.fine("[Template configuration] jsObject = " + this.getJsObject());
+
+                expression = "/impress-fx/template/methods/method[1]/name";
+                this.setContentDefinerMethod(xpath.evaluate(expression, configurationFileInput));
+                LOGGER.fine("[Template configuration] content definer method = " + this.getContentDefinerMethod());
+
+                // Setting the slides
+                this.setSlides(new ArrayList<Slide>());
+
+                LOGGER.fine("Reading slide's configuration");
+
+                expression = "/impress-fx/slides/directory";
+                File slidesDirectory = new File(this.getFolder(), xpath.evaluate(expression, configurationFileInput));
+                LOGGER.fine("[Slide's configuration] directory = " + slidesDirectory.getAbsolutePath());
+
+                expression = "/impress-fx/slides/slide";
+                NodeList slidesXpath = null;
+
+                slidesXpath = (NodeList) xpath.evaluate(expression, configurationFileInput, XPathConstants.NODESET);
+
+                if(slidesXpath != null && slidesXpath.getLength() > 0) {
+                    Node slideNode;
+                    Slide slide;
+
+                    for(int index = 0; index < slidesXpath.getLength(); index++) {
+                        slideNode = slidesXpath.item(index);
+                        slide = new Slide();
+
+                        expression = "id";
+                        slide.setId(((Number) xpath.evaluate(expression, slideNode, XPathConstants.NUMBER)).intValue());
+                        LOGGER.fine("[Slide configuration] id = " + slide.getId());
+
+                        expression = "name";
+                        slide.setName(xpath.evaluate(expression, slideNode));
+                        LOGGER.fine("[Slide configuration] name = " + slide.getName());
+
+                        expression = "file";
+                        slide.setFile(new File(slidesDirectory, xpath.evaluate(expression, slideNode)));
+                        LOGGER.fine("[Slide configuration] file = " + slide.getFile().getAbsolutePath());
+
+                        this.getSlides().add(slide);
+                    }
+                } else {
+                    LOGGER.fine("No slide's configurationfound");
+                }
+            } catch (XPathExpressionException e) {
+                LOGGER.log(Level.WARNING, "Error parsing the template configuration", e);
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -109,11 +191,38 @@ public class PresentationBuilder {
 
         public List<Slide> getSlides() { return slides; }
         public void setSlides(List<Slide> slides) { this.slides = slides; }
+
+        public void updateSlideText(String slideNumber, String content) {
+            if(slideNumber == null) throw new IllegalArgumentException("The slide number can not be null");
+
+            Slide slideToUpdate = null;
+            for (Slide s : getSlides()) {
+                if (slideNumber.equals(s.getSlideNumber())) {
+                    s.setText(content);
+                    LOGGER.finest("Slide's text updated");
+                    break;
+                }
+            }
+        }
     }
 
     private static final Logger LOGGER = Logger.getLogger(PresentationBuilder.class.getName());
     private static final String VELOCITY_SLIDE_NUMBER_TOKEN = "slideNumber";
     private static final String VELOCITY_SLIDES_TOKEN = "slides";
+    private static final String VELOCITY_IFX_CALLBACK_TOKEN = "ifxCallback";
+    private static final String VELOCITY_IFX_CONTENT_DEFINER_TOKEN = "ifxContentDefiner";
+
+    private static final String VELOCITY_IFX_CONTENT_DEFINER_VALUE = "function setField(slide, what, value) {\n" +
+            "\telement = document.getElementById(slide + \"-\" + what);\n" +
+            "\telement.innerHTML = value;\n" +
+            "}";
+    private static final String VELOCITY_IFX_CALLBACK_VALUE = "function sendInformationToImpressFX(source) {\n" +
+            "\tdashIndex = source.id.indexOf(\"-\");\n" +
+            "\tslideNumber = source.id.substring(0, dashIndex);\n" +
+            "\tfieldName = source.id.substring(dashIndex+1);\n" +
+            "\n" +
+            "\tifx.prefillContentDefinition(slideNumber, fieldName, source.innerHTML);\n" +
+            "}";
 
     private Template template;
     private Presentation presentation;
@@ -160,65 +269,7 @@ public class PresentationBuilder {
         ZipUtils.unzip(this.templateArchiveFile, this.template.getFolder());
 
         // Read the configuration
-        // Set the template information
-        LOGGER.fine("Starting reading template configuration");
-        this.template.setConfigurationFile(new File(this.template.getFolder(), Template.TEMPLATE_CONFIGURATION_NAME));
-
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        InputSource configurationFileInput = new InputSource(this.template.getConfigurationFile().getAbsolutePath());
-        String expression = "/impress-fx/template/name";
-
-        try {
-            this.template.setName(xpath.evaluate(expression, configurationFileInput));
-            LOGGER.fine("[Template configuration] name = " + this.template.getName());
-
-            expression = "/impress-fx/template/file";
-            this.template.setFile(new File(this.template.getFolder(), xpath.evaluate(expression, configurationFileInput)));
-            LOGGER.fine("[Template configuration] file = " + this.template.getFile().getAbsolutePath());
-
-            // Setting the slides
-            this.template.setSlides(new ArrayList<Slide>());
-
-            LOGGER.fine("Reading slide's configuration");
-
-            expression = "/impress-fx/slides/directory";
-            File slidesDirectory = new File(this.template.getFolder(), xpath.evaluate(expression, configurationFileInput));
-            LOGGER.fine("[Slide's configuration] directory = " + slidesDirectory.getAbsolutePath());
-
-            expression = "/impress-fx/slides/slide";
-            NodeList slidesXpath = null;
-
-            slidesXpath = (NodeList) xpath.evaluate(expression, configurationFileInput, XPathConstants.NODESET);
-
-            if(slidesXpath != null && slidesXpath.getLength() > 0) {
-                Node slideNode;
-                Slide slide;
-
-                for(int index = 0; index < slidesXpath.getLength(); index++) {
-                    slideNode = slidesXpath.item(index);
-                    slide = new Slide();
-
-                    expression = "id";
-                    slide.setId(((Number) xpath.evaluate(expression, slideNode, XPathConstants.NUMBER)).intValue());
-                    LOGGER.fine("[Slide configuration] id = " + slide.getId());
-
-                    expression = "name";
-                    slide.setName(xpath.evaluate(expression, slideNode));
-                    LOGGER.fine("[Slide configuration] name = " + slide.getName());
-
-                    expression = "file";
-                    slide.setFile(new File(slidesDirectory, xpath.evaluate(expression, slideNode)));
-                    LOGGER.fine("[Slide configuration] file = " + slide.getFile().getAbsolutePath());
-
-                    this.template.getSlides().add(slide);
-                }
-            } else {
-                LOGGER.fine("No slide's configurationfound");
-            }
-        } catch (XPathExpressionException e) {
-            LOGGER.log(Level.WARNING, "Error parsing the template configuration", e);
-            e.printStackTrace();
-        }
+        this.template.readFromFolder();
 
         // Copy the template to the presentation file
         LOGGER.fine("Creating presentation file");
@@ -226,12 +277,14 @@ public class PresentationBuilder {
         this.presentation.setSlides(new ArrayList<Slide>());
         this.presentation.setPresentationFile(new File(this.template.getFolder(), Presentation.PRESENTATION_FILE_NAME));
 
-        // Replacing the velocity token
+        // Replacing the velocity tokens
         final Reader templateReader = new FileReader(this.template.getFile());
         final Writer presentationWriter = new FileWriter(this.presentation.getPresentationFile());
 
         Velocity.init();
         VelocityContext context = new VelocityContext();
+        context.put(VELOCITY_IFX_CONTENT_DEFINER_TOKEN, VELOCITY_IFX_CONTENT_DEFINER_VALUE);
+        context.put(VELOCITY_IFX_CALLBACK_TOKEN, VELOCITY_IFX_CALLBACK_VALUE);
         context.put(VELOCITY_SLIDES_TOKEN, "");
 
         Velocity.evaluate(context, presentationWriter, "", templateReader);
@@ -259,6 +312,8 @@ public class PresentationBuilder {
         Velocity.init();
 
         final Slide slide = new Slide(template.getId(), template.getName(), template.getFile());
+        slide.setSlideNumber(template.getSlideNumber());
+
         if(parent == null) {
             slide.setSlideNumber((this.presentation.getSlides().size() + 1) + "");
             this.presentation.getSlides().add(slide);
@@ -279,6 +334,12 @@ public class PresentationBuilder {
 
         slide.setText(new String(slideContentByte.toByteArray()));
 
+        this.saveTemporaryPresentation();
+    }
+
+    public void saveTemporaryPresentation() throws ParserConfigurationException, SAXException, IOException {
+        Velocity.init();
+
         // Saving the presentation file
         // Step 1: build the slides
         final StringBuffer slidesBuffer = new StringBuffer();
@@ -290,7 +351,9 @@ public class PresentationBuilder {
         final Reader templateReader = new FileReader(this.template.getFile());
         final Writer presentationWriter = new FileWriter(this.presentation.getPresentationFile());
 
-        context = new VelocityContext();
+        VelocityContext context = new VelocityContext();
+        context.put(VELOCITY_IFX_CONTENT_DEFINER_TOKEN, VELOCITY_IFX_CONTENT_DEFINER_VALUE);
+        context.put(VELOCITY_IFX_CALLBACK_TOKEN, VELOCITY_IFX_CALLBACK_VALUE);
         context.put(VELOCITY_SLIDES_TOKEN, slidesBuffer.toString());
 
         Velocity.evaluate(context, presentationWriter, "", templateReader);

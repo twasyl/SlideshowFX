@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -11,6 +8,10 @@
     <top>
         <ToolBar>
             <Button text="Open template" onAction="#loadTemplate" />
+            <SplitMenuButton fx:id="addSlideButton" />
+            <Button text="Reload" onAction="#reload"  />
+            <Button text="Save" onAction="#save" />
+            <Button text="Slide show" onAction="#slideShow" />
         </ToolBar>
     </top>
     <center>
@@ -19,10 +20,7 @@
 
     <right>
         <VBox spacing="10">
-            <HBox spacing="10">
-                <Label text="JavaScript commands:" />
-                <TextArea fx:id="commands" prefColumnCount="50" prefRowCount="25" />
-            </HBox>
+
             <VBox spacing="10">
                 <Label text="Set text:" />
                  <HBox spacing="10">
@@ -30,18 +28,13 @@
                      <TextField prefColumnCount="3" fx:id="slideNumber" />
                      <Label text="Field:" />
                      <TextField prefColumnCount="15" fx:id="fieldName" />
-                     <Label text="Value:" />
-                     <TextField fx:id="fieldValue" />
                  </HBox>
+                <HBox spacing="10">
+                    <Label text="Value:" />
+                    <TextArea fx:id="fieldValue" prefColumnCount="50" prefRowCount="25" />
+                </HBox>
                 <Button text="Define" onAction="#updateSlide" />
             </VBox>
-            <HBox spacing="10">
-                <Button text="Execute" onAction="#executeJS" />
-                <Button text="Add slide" onAction="#addSlide" />
-                <Button text="Add subslide" onAction="#addSubslide" />
-                <Button text="Reload" onAction="#reload"  />
-                <Button text="Save" onAction="#save" />
-            </HBox>
         </VBox>
     </right>
 </BorderPane>

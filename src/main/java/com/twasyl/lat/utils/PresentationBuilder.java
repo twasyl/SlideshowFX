@@ -1,9 +1,5 @@
 package com.twasyl.lat.utils;
 
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONStyle;
-import net.minidev.json.JSONValue;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.w3c.dom.Node;
@@ -11,6 +7,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import javax.json.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -356,23 +353,25 @@ public class PresentationBuilder {
         // Reading the slides' configuration
         LOGGER.fine("Parsing presentation configuration");
 
-        JSONObject configuration = (JSONObject) JSONValue.parse(new FileInputStream(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME)));
-        JSONObject presentationJson = (JSONObject) configuration.get("presentation");
-        JSONArray slidesJson = (JSONArray) presentationJson.get("slides");
-        JSONObject slideJson;
+        JsonReader reader = Json.createReader(new FileInputStream(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME)));
+        JsonObject presentationJson = reader.readObject().getJsonObject("presentation");
+        JsonArray slidesJson = presentationJson.getJsonArray("slides");
+        JsonObject slideJson;
         Slide slide;
 
         LOGGER.fine("Reading slides configuration");
         for(int index = 0; index < slidesJson.size(); index++)  {
             slide = new Slide();
 
-            slideJson = (JSONObject) slidesJson.get(index);
-            slide.setSlideNumber((String) slideJson.get("number"));
-            slide.setId((Integer) slideJson.get("template-id"));
-            slide.setFile(new File(this.template.getSlidesPresentationDirectory(), (String) slideJson.get("file")));
+            slideJson = slidesJson.getJsonObject(index);
+            slide.setSlideNumber(slideJson.getString("number"));
+            slide.setId(slideJson.getInt("template-id"));
+            slide.setFile(new File(this.template.getSlidesPresentationDirectory(), slideJson.getString("file")));
 
             this.presentation.getSlides().add(slide);
         }
+
+        reader.close();
 
         // Fill the slides' content
         LOGGER.fine("Reading slides files");
@@ -511,27 +510,28 @@ public class PresentationBuilder {
         if(presentationArchive == null) throw new IllegalArgumentException("The presentation archive can not be null");
 
         LOGGER.fine("Creating the presentation configuration file");
-        JSONArray slidesJsonArray = new JSONArray();
-        JSONObject slideJson;
+        JsonArrayBuilder slidesJsonArray = Json.createArrayBuilder();
+        JsonObject slideJson;
 
         for(Slide slide : this.presentation.getSlides()) {
-            slideJson = new JSONObject();
-            slideJson.put("template-id", slide.getId());
-            slideJson.put("number", slide.getSlideNumber());
-            slideJson.put("file", slide.getSlideNumber() + ".html");
-            slidesJsonArray.add(slideJson);
+            slidesJsonArray.add(
+                    Json.createObjectBuilder()
+                        .add("template-id", slide.getId())
+                        .add("number", slide.getSlideNumber())
+                        .add("file", slide.getSlideNumber() + ".html")
+                        .build()
+            );
         }
 
-        JSONObject presentationJson = new JSONObject();
-        presentationJson.put("slides", slidesJsonArray);
+        JsonObject configuration = Json.createObjectBuilder()
+                .add("presentation",
+                        Json.createObjectBuilder()
+                                .add("slides", slidesJsonArray.build()))
+                .build();
 
-        JSONObject configuration = new JSONObject();
-        configuration.put("presentation", presentationJson);
-
-        PrintWriter writer = new PrintWriter(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME));
-        writer.print(configuration.toJSONString(JSONStyle.NO_COMPRESS));
-        writer.flush();
-        writer.close();
+        Json
+        JsonWriter writer = Json.createWriter(new FileOutputStream(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME)));
+        writer.writeObject(configuration);
 
         LOGGER.fine("Presentation configuration file created");
 

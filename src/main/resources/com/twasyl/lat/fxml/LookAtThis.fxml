@@ -8,6 +8,7 @@
     <top>
         <ToolBar>
             <Button text="Open template" onAction="#loadTemplate" />
+            <Button text="Open presentation" onAction="#openPresentation" />
             <SplitMenuButton fx:id="addSlideButton" />
             <Button text="Reload" onAction="#reload"  />
             <Button text="Save" onAction="#save" />

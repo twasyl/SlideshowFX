@@ -18,6 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import netscape.javascript.JSObject;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -84,6 +85,33 @@ public class LookAtThisController implements Initializable {
         }
     }
 
+    @FXML private void openPresentation(ActionEvent event) {
+        FileChooser chooser = new FileChooser();
+        File file = chooser.showOpenDialog(null);
+        try {
+            this.builder.openPresentation(file);
+            this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
+
+            this.addSlideButton.getItems().clear();
+            if(this.builder.getTemplate() != null) {
+                MenuItem item;
+
+                for(PresentationBuilder.Slide slide : this.builder.getTemplate().getSlides()) {
+                    item = new MenuItem();
+                    item.setText(slide.getName());
+                    item.setUserData(slide);
+                    item.setOnAction(addSlideActionEvent);
+                    this.addSlideButton.getItems().add(item);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
+    }
     @FXML private void updateSlide(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
 
         String jsCommand = String.format("%1$s(%2$s, \"%3$s\", \"%4$s\");",
@@ -135,9 +163,8 @@ public class LookAtThisController implements Initializable {
         stage.fullScreenProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean aBoolean2) {
-                if(!aBoolean2) {
-                    stage.close();
-                }
+                WindowEvent event = new WindowEvent(stage.getOwner(), WindowEvent.WINDOW_CLOSE_REQUEST);
+                stage.fireEvent(event);
             }
         });
     }

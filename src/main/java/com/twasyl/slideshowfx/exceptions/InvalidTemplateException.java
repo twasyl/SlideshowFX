@@ -1,4 +1,4 @@
-package com.twasyl.lat.exceptions;
+package com.twasyl.slideshowfx.exceptions;
 
 public class InvalidTemplateException extends Exception {
 

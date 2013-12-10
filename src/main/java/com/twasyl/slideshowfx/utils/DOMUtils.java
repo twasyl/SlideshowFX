@@ -1,4 +1,4 @@
-package com.twasyl.lat.utils;
+package com.twasyl.slideshowfx.utils;
 
 
 import org.w3c.dom.Node;

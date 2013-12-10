@@ -1,16 +1,15 @@
-package com.twasyl.lat.utils;
+package com.twasyl.slideshowfx.utils;
 
-import com.twasyl.lat.exceptions.InvalidPresentationConfigurationException;
-import com.twasyl.lat.exceptions.InvalidTemplateConfigurationException;
-import com.twasyl.lat.exceptions.InvalidTemplateException;
-import com.twasyl.lat.exceptions.PresentationException;
+import com.twasyl.slideshowfx.exceptions.InvalidPresentationConfigurationException;
+import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
+import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
+import com.twasyl.slideshowfx.exceptions.PresentationException;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.xml.sax.SAXException;
 
 import javax.json.*;
 import javax.json.stream.JsonGenerator;
-import javax.swing.text.html.parser.Parser;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.nio.charset.Charset;

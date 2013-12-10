@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 <?import javafx.scene.web.WebView?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.lat.controllers.LookAtThisController">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController">
     <top>
         <ToolBar>
             <Button text="Open template" onAction="#loadTemplate" />

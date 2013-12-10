@@ -1,11 +1,12 @@
-package com.twasyl.lat.controllers;
+package com.twasyl.slideshowfx.controllers;
 
-import com.twasyl.lat.exceptions.InvalidPresentationConfigurationException;
-import com.twasyl.lat.exceptions.InvalidTemplateConfigurationException;
-import com.twasyl.lat.exceptions.InvalidTemplateException;
-import com.twasyl.lat.exceptions.PresentationException;
-import com.twasyl.lat.utils.DOMUtils;
-import com.twasyl.lat.utils.PresentationBuilder;
+import com.twasyl.slideshowfx.exceptions.InvalidPresentationConfigurationException;
+import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
+import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
+import com.twasyl.slideshowfx.exceptions.PresentationException;
+import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
+import com.twasyl.slideshowfx.utils.DOMUtils;
+import com.twasyl.slideshowfx.utils.PresentationBuilder;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
@@ -14,7 +15,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.SubScene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TextArea;
@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class LookAtThisController implements Initializable {
+public class SlideshowFXController implements Initializable {
 
     private final PresentationBuilder builder = new PresentationBuilder();
 
@@ -45,8 +45,8 @@ public class LookAtThisController implements Initializable {
 
                 Object userData = ((MenuItem) actionEvent.getSource()).getUserData();
                 if(userData instanceof PresentationBuilder.Slide) {
-                    LookAtThisController.this.builder.addSlide((PresentationBuilder.Slide) userData, null);
-                    LookAtThisController.this.browser.getEngine().reload();
+                    SlideshowFXController.this.builder.addSlide((PresentationBuilder.Slide) userData, null);
+                    SlideshowFXController.this.browser.getEngine().reload();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -66,8 +66,8 @@ public class LookAtThisController implements Initializable {
 
     @FXML private void loadTemplate(ActionEvent event) {
         FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.TEMPLATE_FILTER);
         File templateFile = chooser.showOpenDialog(null);
-
 
         try {
             this.builder.loadTemplate(templateFile);
@@ -97,6 +97,7 @@ public class LookAtThisController implements Initializable {
 
     @FXML private void openPresentation(ActionEvent event) {
         FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
         File file = chooser.showOpenDialog(null);
 
         try {
@@ -152,6 +153,7 @@ public class LookAtThisController implements Initializable {
         File presentationArchive = null;
         if(this.builder.getPresentationArchiveFile() == null) {
             FileChooser chooser = new FileChooser();
+            chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
             presentationArchive = chooser.showSaveDialog(null);
         } else {
             presentationArchive = this.builder.getPresentationArchiveFile();
@@ -200,7 +202,7 @@ public class LookAtThisController implements Initializable {
             public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State state2) {
                 if(state2 == Worker.State.SUCCEEDED) {
                     JSObject window = (JSObject) browser.getEngine().executeScript("window");
-                    window.setMember(LookAtThisController.this.builder.getTemplate().getJsObject(), LookAtThisController.this);
+                    window.setMember(SlideshowFXController.this.builder.getTemplate().getJsObject(), SlideshowFXController.this);
                 }
             }
         });

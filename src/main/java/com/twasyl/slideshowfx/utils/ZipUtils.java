@@ -1,4 +1,4 @@
-package com.twasyl.lat.utils;
+package com.twasyl.slideshowfx.utils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -83,6 +83,7 @@ public class ZipUtils {
             LOGGER.fine("Compressing file: " + file.getAbsolutePath());
 
             entryName = file.getAbsolutePath().substring(prefixToDelete.length(), file.getAbsolutePath().length());
+            entryName = entryName.replaceAll("\\\\", "/");
             LOGGER.finest("Entry name: " + entryName);
 
             entry = new ZipEntry(entryName);

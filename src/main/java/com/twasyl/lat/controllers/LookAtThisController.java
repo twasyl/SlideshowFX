@@ -1,5 +1,9 @@
 package com.twasyl.lat.controllers;
 
+import com.twasyl.lat.exceptions.InvalidPresentationConfigurationException;
+import com.twasyl.lat.exceptions.InvalidTemplateConfigurationException;
+import com.twasyl.lat.exceptions.InvalidTemplateException;
+import com.twasyl.lat.exceptions.PresentationException;
 import com.twasyl.lat.utils.DOMUtils;
 import com.twasyl.lat.utils.PresentationBuilder;
 import javafx.beans.value.ChangeListener;
@@ -64,6 +68,7 @@ public class LookAtThisController implements Initializable {
         FileChooser chooser = new FileChooser();
         File templateFile = chooser.showOpenDialog(null);
 
+
         try {
             this.builder.loadTemplate(templateFile);
             this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
@@ -80,14 +85,20 @@ public class LookAtThisController implements Initializable {
                     this.addSlideButton.getItems().add(item);
                 }
             }
-        } catch (IOException e) {
+        } catch (InvalidTemplateException e) {
+            e.printStackTrace();
+        } catch (InvalidTemplateConfigurationException e) {
+            e.printStackTrace();
+        } catch (PresentationException e) {
             e.printStackTrace();
         }
+
     }
 
     @FXML private void openPresentation(ActionEvent event) {
         FileChooser chooser = new FileChooser();
         File file = chooser.showOpenDialog(null);
+
         try {
             this.builder.openPresentation(file);
             this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
@@ -104,13 +115,16 @@ public class LookAtThisController implements Initializable {
                     this.addSlideButton.getItems().add(item);
                 }
             }
-        } catch (IOException e) {
+        } catch (InvalidTemplateConfigurationException e) {
             e.printStackTrace();
-        } catch (ParserConfigurationException e) {
+        } catch (InvalidTemplateException e) {
             e.printStackTrace();
-        } catch (SAXException e) {
+        } catch (PresentationException e) {
+            e.printStackTrace();
+        } catch (InvalidPresentationConfigurationException e) {
             e.printStackTrace();
         }
+
     }
     @FXML private void updateSlide(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
 

@@ -1,13 +1,18 @@
 package com.twasyl.lat.io;
 
+import com.twasyl.lat.exceptions.InvalidTemplateConfigurationException;
+import com.twasyl.lat.exceptions.InvalidTemplateException;
+import com.twasyl.lat.exceptions.PresentationException;
 import com.twasyl.lat.utils.PresentationBuilder;
 import com.twasyl.lat.utils.ZipUtils;
+import junit.framework.Assert;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ZipTest {
@@ -27,8 +32,6 @@ public class ZipTest {
         LOGGER.fine("Template folder: " + templateFolder.getAbsolutePath());
         LOGGER.fine("Template file: " + templateFile.getAbsolutePath());
 
-       // Assert.assertTrue(templateFile.exists());
-
         builder = new PresentationBuilder();
     }
 
@@ -39,7 +42,12 @@ public class ZipTest {
 
     @Test
     public void unzipTemplate() throws IOException {
-        builder.loadTemplate(templateFile);
+        try {
+            builder.loadTemplate(templateFile);
+        } catch (InvalidTemplateException | InvalidTemplateConfigurationException | PresentationException e) {
+           LOGGER.log(Level.SEVERE, "Error while unzipping template", e);
+            Assert.assertTrue(false);
+        }
     }
 
     @Test

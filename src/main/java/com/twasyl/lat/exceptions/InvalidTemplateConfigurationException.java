@@ -1,6 +1,6 @@
 package com.twasyl.lat.exceptions;
 
-public class InvalidTemplateConfigurationException extends RuntimeException {
+public class InvalidTemplateConfigurationException extends Exception {
 
     public InvalidTemplateConfigurationException() {
         super();

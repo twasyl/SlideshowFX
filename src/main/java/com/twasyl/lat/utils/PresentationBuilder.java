@@ -1,21 +1,21 @@
 package com.twasyl.lat.utils;
 
+import com.twasyl.lat.exceptions.InvalidPresentationConfigurationException;
+import com.twasyl.lat.exceptions.InvalidTemplateConfigurationException;
+import com.twasyl.lat.exceptions.InvalidTemplateException;
+import com.twasyl.lat.exceptions.PresentationException;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.json.*;
+import javax.json.stream.JsonGenerator;
+import javax.swing.text.html.parser.Parser;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,8 +69,7 @@ public class PresentationBuilder {
      * Represents the template found in the template configuration file
      */
     public static class Template {
-        protected static final String TEMPLATE_CONFIGURATION_NAME = "template-config.xml";
-        private static final String TEMPLATE_ROOT = "/slideshow-fx";
+        protected static final String TEMPLATE_CONFIGURATION_NAME = "template-config.json";
 
         private File folder;
         private File configurationFile;
@@ -115,78 +114,60 @@ public class PresentationBuilder {
         /**
          * Read the configuration of this template located in the <b>folder</b> attribute.
          */
-        public void readFromFolder() {
+        public void readFromFolder() throws FileNotFoundException {
 
             // Set the template information
             LOGGER.fine("Starting reading template configuration");
             this.setConfigurationFile(new File(this.getFolder(), Template.TEMPLATE_CONFIGURATION_NAME));
 
-            XPath xpath = XPathFactory.newInstance().newXPath();
-            InputSource configurationFileInput = new InputSource(this.getConfigurationFile().getAbsolutePath());
-            String expression = TEMPLATE_ROOT + "/template/name";
+            JsonReader configurationReader = Json.createReader(new FileInputStream(this.getConfigurationFile()));
+            JsonObject templateJson = configurationReader.readObject().getJsonObject("template");
 
-            try {
-                this.setName(xpath.evaluate(expression, configurationFileInput));
-                LOGGER.fine("[Template configuration] name = " + this.getName());
+            this.setName(templateJson.getString("name"));
+            LOGGER.fine("[Template configuration] name = " + this.getName());
 
-                expression = TEMPLATE_ROOT + "/template/file";
-                this.setFile(new File(this.getFolder(), xpath.evaluate(expression, configurationFileInput)));
-                LOGGER.fine("[Template configuration] file = " + this.getFile().getAbsolutePath());
+            this.setFile(new File(this.getFolder(), templateJson.getString("file")));
+            LOGGER.fine("[Template configuration] file = " + this.getFile().getAbsolutePath());
 
-                expression = TEMPLATE_ROOT + "/template/js-object";
-                this.setJsObject(xpath.evaluate(expression, configurationFileInput));
-                LOGGER.fine("[Template configuration] jsObject = " + this.getJsObject());
+            this.setJsObject(templateJson.getString("js-object"));
+            LOGGER.fine("[Template configuration] jsObject = " + this.getJsObject());
 
-                expression = TEMPLATE_ROOT + "/template/methods/method[1]/name";
-                this.setContentDefinerMethod(xpath.evaluate(expression, configurationFileInput));
-                LOGGER.fine("[Template configuration] content definer method = " + this.getContentDefinerMethod());
+            JsonArray methodsJson = templateJson.getJsonArray("methods");
 
-                // Setting the slides
-                this.setSlides(new ArrayList<Slide>());
+            this.setContentDefinerMethod(methodsJson.getJsonObject(0).getString("name"));
+            LOGGER.fine("[Template configuration] content definer method = " + this.getContentDefinerMethod());
 
-                LOGGER.fine("Reading slide's configuration");
+            // Setting the slides
+            this.setSlides(new ArrayList<Slide>());
 
-                expression = TEMPLATE_ROOT + "/slides/template-directory";
-                this.setSlidesTemplateDirectory(new File(this.getFolder(), xpath.evaluate(expression, configurationFileInput)));
-                LOGGER.fine("[Slide's configuration] template directory = " + this.getSlidesTemplateDirectory().getAbsolutePath());
+            LOGGER.fine("Reading slide's configuration");
 
-                expression = TEMPLATE_ROOT + "/slides/presentation-directory";
-                this.setSlidesPresentationDirectory(new File(this.getFolder(), xpath.evaluate(expression, configurationFileInput)));
-                LOGGER.fine("[Slide's configuration] presentation directory = " + this.getSlidesPresentationDirectory().getAbsolutePath());
+            JsonObject slidesLocationsJson = templateJson.getJsonObject("slides-locations");
+            this.setSlidesTemplateDirectory(new File(this.getFolder(), slidesLocationsJson.getString("template-directory")));
+            LOGGER.fine("[Slide's configuration] template directory = " + this.getSlidesTemplateDirectory().getAbsolutePath());
 
-                expression = TEMPLATE_ROOT + "/slides/slide";
-                NodeList slidesXpath = null;
+            this.setSlidesPresentationDirectory(new File(this.getFolder(), slidesLocationsJson.getString("presentation-directory")));
+            LOGGER.fine("[Slide's configuration] presentation directory = " + this.getSlidesPresentationDirectory().getAbsolutePath());
 
-                slidesXpath = (NodeList) xpath.evaluate(expression, configurationFileInput, XPathConstants.NODESET);
+            JsonArray slidesJson = templateJson.getJsonArray("slides");
+            if (slidesJson != null && !slidesJson.isEmpty()) {
+                Slide slide;
 
-                if(slidesXpath != null && slidesXpath.getLength() > 0) {
-                    Node slideNode;
-                    Slide slide;
+                for (JsonObject slideJson : slidesJson.getValuesAs(JsonObject.class)) {
+                    slide = new Slide();
+                    slide.setId(slideJson.getInt("id"));
+                    LOGGER.fine("[Slide configuration] id = " + slide.getId());
 
-                    for(int index = 0; index < slidesXpath.getLength(); index++) {
-                        slideNode = slidesXpath.item(index);
-                        slide = new Slide();
+                    slide.setName(slideJson.getString("name"));
+                    LOGGER.fine("[Slide configuration] name = " + slide.getName());
 
-                        expression = "id";
-                        slide.setId(((Number) xpath.evaluate(expression, slideNode, XPathConstants.NUMBER)).intValue());
-                        LOGGER.fine("[Slide configuration] id = " + slide.getId());
+                    slide.setFile(new File(this.getSlidesTemplateDirectory(), slideJson.getString("file")));
+                    LOGGER.fine("[Slide configuration] file = " + slide.getFile().getAbsolutePath());
 
-                        expression = "name";
-                        slide.setName(xpath.evaluate(expression, slideNode));
-                        LOGGER.fine("[Slide configuration] name = " + slide.getName());
-
-                        expression = "file";
-                        slide.setFile(new File(this.getSlidesTemplateDirectory(), xpath.evaluate(expression, slideNode)));
-                        LOGGER.fine("[Slide configuration] file = " + slide.getFile().getAbsolutePath());
-
-                        this.getSlides().add(slide);
-                    }
-                } else {
-                    LOGGER.fine("No slide's configurationfound");
+                    this.getSlides().add(slide);
                 }
-            } catch (XPathExpressionException e) {
-                LOGGER.log(Level.WARNING, "Error parsing the template configuration", e);
-                e.printStackTrace();
+            } else {
+                LOGGER.fine("No slide's configurationfound");
             }
         }
     }
@@ -195,7 +176,7 @@ public class PresentationBuilder {
      * Represents a presentation
      */
     public static class Presentation {
-        protected static final String PRESENTATION_CONFIGURATION_NAME = "presentation-config.txt";
+        protected static final String PRESENTATION_CONFIGURATION_NAME = "presentation-config.json";
         protected static final String PRESENTATION_FILE_NAME = "presentation.html";
 
         private File presentationFile;
@@ -274,7 +255,7 @@ public class PresentationBuilder {
      *     <li>Load the template data</li>
      * </ul>
      */
-    private void prepareResources(File dataArchive) throws IOException {
+    private void prepareResources(File dataArchive) throws InvalidTemplateException, InvalidTemplateConfigurationException {
         if(dataArchive == null) throw new IllegalArgumentException("Can not prepare the resources: the dataArchive is null");
         if(!dataArchive.exists()) throw new IllegalArgumentException("Can not prepare the resources: dataArchive does not exist");
 
@@ -288,17 +269,25 @@ public class PresentationBuilder {
         // Unzip the template into a temporary folder
         LOGGER.fine("Extracting the template ...");
 
-        ZipUtils.unzip(dataArchive, this.template.getFolder());
+        try {
+            ZipUtils.unzip(dataArchive, this.template.getFolder());
+        } catch (IOException e) {
+            throw new InvalidTemplateException("Error while trying to unzip the template", e);
+        }
 
         // Read the configuration
-        this.template.readFromFolder();
+        try {
+            this.template.readFromFolder();
+        } catch (FileNotFoundException e) {
+            throw new InvalidTemplateConfigurationException("Can not read template's configuration");
+        }
     }
 
     /**
      * Load the current template defined by the templateArchiveFile attribute.
      * This creates a temporary file.
      */
-    public void loadTemplate() throws IOException {
+    public void loadTemplate() throws InvalidTemplateException, InvalidTemplateConfigurationException, PresentationException {
         this.prepareResources(this.templateArchiveFile);
 
         // Copy the template to the presentation file
@@ -308,8 +297,19 @@ public class PresentationBuilder {
         this.presentation.setPresentationFile(new File(this.template.getFolder(), Presentation.PRESENTATION_FILE_NAME));
 
         // Replacing the velocity tokens
-        final Reader templateReader = new FileReader(this.template.getFile());
-        final Writer presentationWriter = new FileWriter(this.presentation.getPresentationFile());
+        final Reader templateReader;
+        try {
+            templateReader = new FileReader(this.template.getFile());
+        } catch (FileNotFoundException e) {
+            throw new InvalidTemplateException("The template file is not found");
+        }
+
+        final Writer presentationWriter;
+        try {
+            presentationWriter = new FileWriter(this.presentation.getPresentationFile());
+        } catch (IOException e) {
+            throw new PresentationException("Can not create the presentation temporary file", e);
+        }
 
         Velocity.init();
         VelocityContext context = new VelocityContext();
@@ -319,10 +319,18 @@ public class PresentationBuilder {
 
         Velocity.evaluate(context, presentationWriter, "", templateReader);
 
-        presentationWriter.flush();
-        presentationWriter.close();
+        try {
+            presentationWriter.flush();
+            presentationWriter.close();
+        } catch (IOException e) {
+            throw new PresentationException("Can not create the presentation temporary file", e);
+        }
 
-        templateReader.close();
+        try {
+            templateReader.close();
+        } catch (IOException e) {
+            LOGGER.warning("Error while closing the template stream");
+        }
 
         LOGGER.fine("Presentation file created at " + this.presentation.getPresentationFile().getAbsolutePath());
     }
@@ -332,7 +340,7 @@ public class PresentationBuilder {
      * @param template
      * @throws IOException
      */
-    public void loadTemplate(File template) throws IOException {
+    public void loadTemplate(File template) throws InvalidTemplateException, InvalidTemplateConfigurationException, PresentationException {
         setTemplateArchiveFile(template);
         this.loadTemplate();
     }
@@ -340,7 +348,7 @@ public class PresentationBuilder {
     /**
      * Open a saved presentation
      */
-    public void openPresentation() throws IOException, ParserConfigurationException, SAXException {
+    public void openPresentation() throws InvalidTemplateException, InvalidTemplateConfigurationException, InvalidPresentationConfigurationException, PresentationException {
         this.prepareResources(this.templateArchiveFile);
         this.presentationArchiveFile = this.templateArchiveFile;
 
@@ -353,7 +361,12 @@ public class PresentationBuilder {
         // Reading the slides' configuration
         LOGGER.fine("Parsing presentation configuration");
 
-        JsonReader reader = Json.createReader(new FileInputStream(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME)));
+        JsonReader reader = null;
+        try {
+            reader = Json.createReader(new FileInputStream(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME)));
+        } catch (FileNotFoundException e) {
+            throw new InvalidPresentationConfigurationException("Can not read presentation configuration file", e);
+        }
         JsonObject presentationJson = reader.readObject().getJsonObject("presentation");
         JsonArray slidesJson = presentationJson.getJsonArray("slides");
         JsonObject slideJson;
@@ -395,7 +408,11 @@ public class PresentationBuilder {
             } finally {
                 if(slideContent != null) {
                     s.setText(new String(slideContent.toByteArray(), Charset.forName("UTF-8")));
-                    Slide.buildContent(slidesBuffer, s);
+                    try {
+                        Slide.buildContent(slidesBuffer, s);
+                    } catch (IOException | SAXException | ParserConfigurationException e) {
+                        LOGGER.log(Level.WARNING, "Can not set slide's text", e);
+                    }
 
                     try {
                         slideContent.close();
@@ -417,8 +434,18 @@ public class PresentationBuilder {
 
         // Replacing the velocity tokens
         LOGGER.fine("Building presentation file");
-        final Reader templateReader = new FileReader(this.template.getFile());
-        final Writer presentationWriter = new FileWriter(this.presentation.getPresentationFile());
+        Reader templateReader = null;
+        try {
+            templateReader = new FileReader(this.template.getFile());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        final Writer presentationWriter;
+        try {
+            presentationWriter = new FileWriter(this.presentation.getPresentationFile());
+        } catch (IOException e) {
+            throw new PresentationException("Can not create presentation temporary file", e);
+        }
 
         Velocity.init();
         VelocityContext context = new VelocityContext();
@@ -428,15 +455,23 @@ public class PresentationBuilder {
 
         Velocity.evaluate(context, presentationWriter, "", templateReader);
 
-        presentationWriter.flush();
-        presentationWriter.close();
+        try {
+            presentationWriter.flush();
+            presentationWriter.close();
+        } catch (IOException e) {
+            throw new PresentationException("Can not create presentation temporary file", e);
+        }
 
-        templateReader.close();
+        try {
+            templateReader.close();
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error while closing template stream", e);
+        }
 
         LOGGER.fine("Presentation file created at " + this.presentation.getPresentationFile().getAbsolutePath());
     }
 
-    public void openPresentation(File presentation) throws IOException, ParserConfigurationException, SAXException {
+    public void openPresentation(File presentation) throws InvalidTemplateConfigurationException, InvalidTemplateException, PresentationException, InvalidPresentationConfigurationException {
         setTemplateArchiveFile(presentation);
         openPresentation();
     }
@@ -529,8 +564,9 @@ public class PresentationBuilder {
                                 .add("slides", slidesJsonArray.build()))
                 .build();
 
-        Json
-        JsonWriter writer = Json.createWriter(new FileOutputStream(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME)));
+        HashMap<String, Object> writerConfiguration = new HashMap<>();
+        writerConfiguration.put(JsonGenerator.PRETTY_PRINTING, true);
+        JsonWriter writer = Json.createWriterFactory(writerConfiguration).createWriter(new FileOutputStream(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME)));
         writer.writeObject(configuration);
 
         LOGGER.fine("Presentation configuration file created");

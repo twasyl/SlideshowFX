@@ -30,11 +30,28 @@
                      <Label text="Field:" />
                      <TextField prefColumnCount="15" fx:id="fieldName" />
                  </HBox>
-                <HBox spacing="10">
-                    <Label text="Value:" />
-                    <TextArea fx:id="fieldValue" prefColumnCount="50" prefRowCount="25" />
-                </HBox>
-                <Button text="Define" onAction="#updateSlide" />
+                <TabPane>
+                    <tabs>
+                        <Tab text="Markdown">
+                            <content>
+                                <VBox spacing="10">
+                                    <TextArea fx:id="fieldValueMarkdown" prefColumnCount="50" prefRowCount="25" />
+                                    <Button text="Define" onAction="#updateSlideWithMarkdown" />
+                                </VBox>
+                            </content>
+                        </Tab>
+                        <Tab text="Text">
+                            <content>
+                                <VBox spacing="10">
+                                    <TextArea fx:id="fieldValueText" prefColumnCount="50" prefRowCount="25" />
+                                    <Button text="Define" onAction="#updateSlideWithText" />
+                                </VBox>
+                            </content>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+
+
             </VBox>
         </VBox>
     </right>

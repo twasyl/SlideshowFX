@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.controllers;
 
+import com.github.rjeschke.txtmark.Processor;
 import com.twasyl.slideshowfx.exceptions.InvalidPresentationConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
@@ -12,6 +13,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -19,6 +21,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -62,7 +66,8 @@ public class SlideshowFXController implements Initializable {
     @FXML private SplitMenuButton addSlideButton;
     @FXML private TextField slideNumber;
     @FXML private TextField fieldName;
-    @FXML private TextArea fieldValue;
+    @FXML private TextArea fieldValueMarkdown;
+    @FXML private TextArea fieldValueText;
 
     @FXML private void loadTemplate(ActionEvent event) {
         FileChooser chooser = new FileChooser();
@@ -127,13 +132,24 @@ public class SlideshowFXController implements Initializable {
         }
 
     }
-    @FXML private void updateSlide(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
+
+    @FXML private void updateSlideWithMarkdown(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
+
+        this.updateSlide(Processor.process("[$PROFILE$]: extended\n" + this.fieldValueMarkdown.getText()).replaceAll("\\n", ""));
+    }
+
+    @FXML private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
+
+        this.updateSlide(this.fieldValueText.getText().replaceAll("\\n", ""));
+    }
+
+    private void updateSlide(String content) throws TransformerException, IOException, ParserConfigurationException, SAXException {
 
         String jsCommand = String.format("%1$s(%2$s, \"%3$s\", \"%4$s\");",
                 this.builder.getTemplate().getContentDefinerMethod(),
                 this.slideNumber.getText(),
                 this.fieldName.getText(),
-                this.fieldValue.getText());
+               content);
 
         this.browser.getEngine().executeScript(jsCommand);
         Element slideElement = this.browser.getEngine().getDocument().getElementById("slide-" + this.slideNumber.getText());
@@ -141,8 +157,6 @@ public class SlideshowFXController implements Initializable {
         this.builder.getPresentation().updateSlideText(this.slideNumber.getText(), DOMUtils.convertNodeToText(slideElement));
         this.builder.saveTemporaryPresentation();
     }
-
-
     @FXML
     private void reload(ActionEvent event) {
         this.browser.getEngine().reload();
@@ -176,22 +190,27 @@ public class SlideshowFXController implements Initializable {
         stage.setScene(subScene);
         stage.setFullScreen(true);
         stage.show();
-        stage.fullScreenProperty().addListener(new ChangeListener<Boolean>() {
+
+        subScene.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean aBoolean2) {
-                WindowEvent event = new WindowEvent(stage.getOwner(), WindowEvent.WINDOW_CLOSE_REQUEST);
-                stage.fireEvent(event);
+            public void handle(KeyEvent keyEvent) {
+                if(keyEvent.getCode().equals(KeyCode.ESCAPE)) {
+                    keyEvent.consume();
+                    stage.close();
+                }
             }
         });
+
     }
 
     public void prefillContentDefinition(String slideNumber, String field, String value) {
         this.slideNumber.setText(slideNumber);
         this.fieldName.setText(field);
-        this.fieldValue.setText(value);
+        this.fieldValueText.setText(value);
+        this.fieldValueMarkdown.setText(value);
 
-        this.fieldValue.requestFocus();
-        this.fieldValue.selectAll();
+        this.fieldValueText.requestFocus();
+        this.fieldValueText.selectAll();
     }
 
     @Override

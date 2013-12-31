@@ -21,6 +21,10 @@ public class ZipTest {
 
     private static File revealjsTemplateFile;
     private static File reveljsTemplateFolder;
+
+    private static File presentationExampleFolder;
+    private static File presentationExampleFile;
+
     private static PresentationBuilder builder;
 
     @BeforeClass
@@ -28,6 +32,9 @@ public class ZipTest {
 
         reveljsTemplateFolder = new File("./src/test/resources/revealjs-template");
         revealjsTemplateFile = new File("./src/test/resources/revealjs-template.sfxt");
+
+        presentationExampleFolder = new File("./src/test/resources/iCode");
+        presentationExampleFile = new File("./src/test/resources/iCode.sfx");
 
         LOGGER.fine("Template folder: " + reveljsTemplateFolder.getAbsolutePath());
         LOGGER.fine("Template file: " + revealjsTemplateFile.getAbsolutePath());
@@ -53,5 +60,10 @@ public class ZipTest {
     @Test
     public void zipRevealjsTemplateFolder() throws IOException {
         ZipUtils.zip(reveljsTemplateFolder, revealjsTemplateFile);
+    }
+
+    @Test
+    public void zipPresentationExample() throws IOException {
+        ZipUtils.zip(presentationExampleFolder, presentationExampleFile);
     }
 }

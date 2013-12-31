@@ -1,6 +1,8 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.github.rjeschke.txtmark.Processor;
+import com.twasyl.slideshowfx.app.SlideshowFX;
+import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.exceptions.InvalidPresentationConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
@@ -184,23 +186,9 @@ public class SlideshowFXController implements Initializable {
         final WebView slideShowBrowser = new WebView();
         slideShowBrowser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
 
-        final Scene subScene = new Scene(slideShowBrowser);
+        final SlideShowScene subScene = new SlideShowScene(slideShowBrowser);
 
-        final Stage stage = new Stage();
-        stage.setScene(subScene);
-        stage.setFullScreen(true);
-        stage.show();
-
-        subScene.setOnKeyReleased(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent keyEvent) {
-                if(keyEvent.getCode().equals(KeyCode.ESCAPE)) {
-                    keyEvent.consume();
-                    stage.close();
-                }
-            }
-        });
-
+        SlideshowFX.setSlideShowScene(subScene);
     }
 
     public void prefillContentDefinition(String slideNumber, String field, String value) {

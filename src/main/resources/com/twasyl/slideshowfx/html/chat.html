@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SlideShowFX chat</title>
+
+    <script type="text/javascript">
+        var socket;
+
+        window.onload = function() {
+            socket = new WebSocket("ws://${slideshowfx_server_ip}:${slideshowfx_server_port}/slideshowfx/chat");
+
+            socket.onopen = function(event) {
+            };
+
+            socket.onclose = function(event) {
+                var messagesDiv = document.getElementById("messages");
+
+                messagesDiv.innerHTML = messagesDiv.innerHTML + "<div class=\"chat-ended\">Chat has ended</div>";
+            };
+
+            socket.onmessage = function(event) {
+                var messagesDiv = document.getElementById("messages");
+
+                messagesDiv.innerHTML = messagesDiv.innerHTML + event.data;
+            }
+        };
+
+        function sendMessage() {
+            var attendeeMessage = document.getElementById("attendee_message").value;
+            var attendeeName = document.getElementById("attendee_name").value;
+
+            if(attendeeName === "") {
+                attendeeName = "somebody";
+            }
+            var jsonMessage = "{ \"name\": \"" + attendeeName + "\", \"message\": \"" + attendeeMessage + "\"}";
+
+            socket.send(jsonMessage);
+        }
+    </script>
+
+    <style type="text/css">
+        #chat {
+            background-color: lightgray;
+            border: 1px solid gray;
+            width: 500px;
+        }
+        .chat_message {
+            background-color: white;
+            border-radius: 8px;
+            padding: 5px;
+            margin: 3px;
+        }
+        .author {
+            font-weight: bold;
+        }
+        .message_content {
+            font-style: italic;
+        }
+
+        .chat-ended {
+            font-style: italic;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<p>
+    <div id="chat">
+        <div id="messages"></div>
+        <div id="send_form">
+            <p>Name : <input type="text" id="attendee_name" /></p>
+            <p>
+                Message :<br />
+                <textarea id="attendee_message" rows="5" cols="55"></textarea><br />
+                <button onclick="javascript:sendMessage();">Send</button>
+            </p>
+        </div>
+    </div>
+</p>
+</body>
+</html>

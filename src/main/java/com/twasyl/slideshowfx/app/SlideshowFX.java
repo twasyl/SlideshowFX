@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.app;
 
 import com.leapmotion.leap.Controller;
+import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.leap.SlideController;
 import javafx.application.Application;
@@ -14,7 +15,29 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.Vertx;
+import org.vertx.java.core.VertxFactory;
+import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.http.HttpServer;
+import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.http.ServerWebSocket;
+import org.vertx.java.core.http.impl.WebSocketMatcher;
+import org.vertx.java.core.streams.Pump;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class SlideshowFX extends Application {
@@ -62,6 +85,28 @@ public class SlideshowFX extends Application {
                 }
             }
         });
+
+        // Start the embedded server for the chat
+        // Determine the IP address of the machine: any 192.xxx.xxx.xxx should be okay
+        final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        Enumeration<InetAddress> inetAddresses;
+        InetAddress inet;
+        String ipAddress = null;
+
+        while(interfaces.hasMoreElements() && ipAddress == null) {
+            inetAddresses = interfaces.nextElement().getInetAddresses();
+
+            while(inetAddresses.hasMoreElements() && ipAddress == null) {
+                inet = inetAddresses.nextElement();
+
+                if(inet.getHostAddress().startsWith("192.")) ipAddress = inet.getHostAddress();
+            }
+        }
+
+        if(ipAddress == null) ipAddress = "localhost";
+
+        LOGGER.fine("Embeded IP address: " + ipAddress);
+        Chat.create(ipAddress, 80);
     }
 
     @Override
@@ -85,6 +130,8 @@ public class SlideshowFX extends Application {
 
         LOGGER.info("Stopping the LeapMotion controller correctly");
         leapController.removeListener(slideController);
+
+        Chat.close();
     }
 
     public static ReadOnlyObjectProperty<Stage> stageProperty() { return stage; }

@@ -4,6 +4,7 @@ import com.leapmotion.leap.Controller;
 import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.leap.SlideController;
+import com.twasyl.slideshowfx.utils.NetworkUtils;
 import javafx.application.Application;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -87,24 +88,7 @@ public class SlideshowFX extends Application {
         });
 
         // Start the embedded server for the chat
-        // Determine the IP address of the machine: any 192.xxx.xxx.xxx should be okay
-        final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        Enumeration<InetAddress> inetAddresses;
-        InetAddress inet;
-        String ipAddress = null;
-
-        while(interfaces.hasMoreElements() && ipAddress == null) {
-            inetAddresses = interfaces.nextElement().getInetAddresses();
-
-            while(inetAddresses.hasMoreElements() && ipAddress == null) {
-                inet = inetAddresses.nextElement();
-
-                if(inet.getHostAddress().startsWith("192.")) ipAddress = inet.getHostAddress();
-            }
-        }
-
-        if(ipAddress == null) ipAddress = "localhost";
-
+        String ipAddress = NetworkUtils.getIP();
         LOGGER.fine("Embeded IP address: " + ipAddress);
         Chat.create(ipAddress, 80);
     }

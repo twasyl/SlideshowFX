@@ -2,6 +2,7 @@ package com.twasyl.slideshowfx.controllers;
 
 import com.github.rjeschke.txtmark.Processor;
 import com.twasyl.slideshowfx.app.SlideshowFX;
+import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.exceptions.InvalidPresentationConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
@@ -159,6 +160,7 @@ public class SlideshowFXController implements Initializable {
         this.builder.getPresentation().updateSlideText(this.slideNumber.getText(), DOMUtils.convertNodeToText(slideElement));
         this.builder.saveTemporaryPresentation();
     }
+
     @FXML
     private void reload(ActionEvent event) {
         this.browser.getEngine().reload();

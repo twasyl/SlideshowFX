@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SlideShowFX presenter chat</title>
+
+    <script type="text/javascript">
+        var socket;
+        var chatOpened = true;
+
+        window.onload = function() {
+            socket = new WebSocket("ws://${slideshowfx_server_ip}:${slideshowfx_server_port}/slideshowfx/chat/presenter");
+
+            socket.onopen = function(event) {
+            };
+
+            socket.onmessage = function(event) {
+                var messagesDiv = document.getElementById("messages");
+
+                messagesDiv.innerHTML = messagesDiv.innerHTML + event.data;
+            }
+        };
+
+        function openHideChat() {
+            chatOpened = !chatOpened;
+
+            scene.openChat(chatOpened);
+        }
+    </script>
+
+    <style type="text/css">
+        body {
+            margin: 0;
+            width: 530px;
+        }
+        #banner {
+            width: 100%;
+            height: 20px;
+            background-color: red;
+            color: white;
+
+            background-image: -webkit-linear-gradient(top, #81BEF7 0%, #2E9AFE 100%);
+            background-image:    -moz-linear-gradient(top, #81BEF7 0%, #2E9AFE 100%);
+            background-image:     -ms-linear-gradient(top, #81BEF7 0%, #2E9AFE 100%);
+            background-image:      -o-linear-gradienttop, #81BEF7 0%, #2E9AFE 100%);
+            background-image:         linear-gradient(top, #81BEF7 0%, #2E9AFE 100%);
+        }
+        #chat {
+            border-radius: 8px;
+            background-color: lightgray;
+            border: 1px solid gray;
+            width: 520px;
+            padding: 5px;
+        }
+        #messages {
+            margin-bottom: 5px;
+            height: 300px;
+            overflow: auto;
+        }
+
+        .chat-message {
+            background-color: white;
+            padding: 5px;
+            margin: 3px;
+        }
+        .author {
+            font-weight: bold;
+        }
+        .message-content {
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div id="banner" onclick="javascript:openHideChat();">Chat</div>
+    <div id="chat">
+        <div id="messages"></div>
+    </div>
+</body>
+</html>

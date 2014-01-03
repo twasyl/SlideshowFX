@@ -6,7 +6,31 @@
     <script type="text/javascript">
         var socket;
 
+        function getAttendeeNameFromCookie() {
+            // Check the cookie if it exists and update display
+            var cookieName = "attendeeName=";
+            var cookies =  document.cookie.split(';');
+
+            for(var index = 0; index < cookies.length; index++) {
+                var c = cookies[index].trim();
+
+                if (c.indexOf(cookieName) == 0) {
+                   return c.substring(cookieName.length, c.length);
+                }
+            }
+
+            return "";
+        }
+
         window.onload = function() {
+            // Check the cookie if it exists and update display
+            var attendeeName = getAttendeeNameFromCookie();
+
+            if(attendeeName != "") {
+                document.getElementById("connection-form").style.display = "none";
+                document.getElementById("chat").style.display = "block";
+            }
+
             socket = new WebSocket("ws://${slideshowfx_server_ip}:${slideshowfx_server_port}/slideshowfx/chat");
 
             socket.onopen = function(event) {
@@ -16,6 +40,7 @@
                 var messagesDiv = document.getElementById("messages");
 
                 messagesDiv.innerHTML = messagesDiv.innerHTML + "<div class=\"chat-ended\">Chat has ended</div>";
+                document.getElementById("send-form").style.display = "none";
             };
 
             socket.onmessage = function(event) {
@@ -26,37 +51,119 @@
         };
 
         function sendMessage() {
-            var attendeeMessage = document.getElementById("attendee_message").value;
-            var attendeeName = document.getElementById("attendee_name").value;
+            var attendeeMessage = document.getElementById("attendee-message-textarea").value;
 
-            if(attendeeName === "") {
-                attendeeName = "somebody";
+            if(attendeeMessage === "") {
+                alert("Enter a message");
+            } else {
+                var attendeeName = getAttendeeNameFromCookie();
+
+                if(attendeeName === "") {
+                    attendeeName = "somebody";
+                }
+                var jsonMessage = "{ \"message\" : { \"name\": \"" + attendeeName + "\", \"message\": \"" + attendeeMessage + "\"} }";
+
+                socket.send(jsonMessage);
+
+                document.getElementById("attendee-message-textarea").value = "";
             }
-            var jsonMessage = "{ \"name\": \"" + attendeeName + "\", \"message\": \"" + attendeeMessage + "\"}";
+        }
 
-            socket.send(jsonMessage);
+        function connectUser() {
+            var attendeeName = document.getElementById("attendee-name-text").value;
+            document.cookie = "attendeeName=" + attendeeName;
+
+            document.getElementById("connection-form").style.display = "none";
+            document.getElementById("chat").style.display = "block";
         }
     </script>
 
     <style type="text/css">
+        #connection-form {
+            border-radius: 8px;
+            background-color: darkgray;
+            float: left;
+            width: 520px;
+            text-align: center;
+        }
+        #attendee-name-text, #attendee-name-text:focus {
+            border-radius: 15px;
+            color: black;
+            border: none;
+            padding: 8px;
+            width: 480px;
+            margin: 10px;
+
+            background-image: -webkit-linear-gradient(top, gray 0%, lightgray 100%);
+            background-image:    -moz-linear-gradient(top, gray 0%, lightgray 100%);
+            background-image:     -ms-linear-gradient(top, gray 0%, lightgray 100%);
+            background-image:      -o-linear-gradient(top, gray 0%, lightgray 100%);
+            background-image:         linear-gradient(top, gray 0%, lightgray 100%);
+        }
+        #attendee-name-text::-webkit-input-placeholder {
+            color:    black;
+        }
+        #attendee-name-text:-moz-placeholder {
+            color:    black;
+        }
+        #attendee-name-text:-ms-input-placeholder{
+            color:    black;
+        }
+        #attendee-name-text::-moz-placeholder {
+            color:    black;
+        }
+        .connect-button {
+            color: white;
+            border-radius: 8px;
+            border: none;
+            padding: 8px;
+            width: 500px;
+            margin: 10px;
+
+            background-image: -webkit-linear-gradient(top, green 0%, darkgreen 100%);
+            background-image:    -moz-linear-gradient(top, green 0%, darkgreen 100%);
+            background-image:     -ms-linear-gradient(top, green 0%, darkgreen 100%);
+            background-image:      -o-linear-gradient(top, green 0%, darkgreen 100%);
+            background-image:         linear-gradient(top, green 0%, darkgreen 100%);
+        }
         #chat {
+            border-radius: 8px;
             background-color: lightgray;
             border: 1px solid gray;
+            width: 520px;
+            padding: 5px;
+        }
+        #messages {
+            margin-bottom: 5px;
+        }
+        #attendee-message-textarea {
             width: 500px;
         }
-        .chat_message {
-            background-color: white;
+        #send-message-button {
+            color: white;
             border-radius: 8px;
+            border: none;
+            width: 500px;
+            height: 30px;
+            margin-top: 10px;
+
+            background-image: -webkit-linear-gradient(top, #81BEF7 0%, #2E9AFE 100%);
+            background-image:    -moz-linear-gradient(top, #81BEF7 0%, #2E9AFE 100%);
+            background-image:     -ms-linear-gradient(top, #81BEF7 0%, #2E9AFE 100%);
+            background-image:      -o-linear-gradienttop, #81BEF7 0%, #2E9AFE 100%);
+            background-image:         linear-gradient(top, #81BEF7 0%, #2E9AFE 100%);
+        }
+        .chat-message {
+            background-color: white;
             padding: 5px;
             margin: 3px;
         }
         .author {
             font-weight: bold;
         }
-        .message_content {
+        .message-content {
             font-style: italic;
         }
-
         .chat-ended {
             font-style: italic;
             text-align: center;
@@ -64,18 +171,20 @@
     </style>
 </head>
 <body>
-<p>
-    <div id="chat">
+    <div id="connection-form">
+        <input type="text" id="attendee-name-text" placeholder="Enter your name">
+        <button class="connect-button" onclick="javascript:connectUser();">Connect</button>
+    </div>
+
+    <div id="chat" style="display:none;">
         <div id="messages"></div>
-        <div id="send_form">
-            <p>Name : <input type="text" id="attendee_name" /></p>
+        <div id="send-form">
             <p>
-                Message :<br />
-                <textarea id="attendee_message" rows="5" cols="55"></textarea><br />
-                <button onclick="javascript:sendMessage();">Send</button>
+                <textarea id="attendee-message-textarea" rows="5" cols="55" placeholder="Message"></textarea><br />
+                <button onclick="javascript:sendMessage();" id="send-message-button">Send</button>
             </p>
         </div>
     </div>
-</p>
+
 </body>
 </html>

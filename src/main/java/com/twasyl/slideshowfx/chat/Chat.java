@@ -32,8 +32,14 @@ public class Chat {
 
     private static final String VELOCITY_SERVER_IP = "slideshowfx_server_ip";
     private static final String VELOCITY_SERVER_PORT = "slideshowfx_server_port";
+    private static final String HTTP_CLIENT_CHAT_PATH = "/";
+    private static final String WS_CLIENT_CHAT = "/slideshowfx/chat";
+    private static final String HTTP_PRESENTER_CHAT = "/slideshowfx/chat/presenter";
+    private static final String WS_PRESENTER_CHAT = HTTP_PRESENTER_CHAT;
 
     private static final List<ServerWebSocket> clients = new ArrayList<>();
+    private static ServerWebSocket presenter;
+
     private static HttpServer server;
     private static String ip;
     private static int port;
@@ -67,30 +73,58 @@ public class Chat {
         server.requestHandler(new Handler<HttpServerRequest>() {
             @Override
             public void handle(HttpServerRequest httpServerRequest) {
-                // Read the chat HTML page, parse it and send it to the client
-                try {
-                    final File extractedChatFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "sfx-chatFile.html");
-                    LOGGER.fine("Chat HTML file generated: " + extractedChatFile.getAbsolutePath());
-                    final FileReader chatPageReader = new FileReader( new File(getClass().getResource("/com/twasyl/slideshowfx/html/chat.html").toURI()));
-                    final FileWriter writer = new FileWriter(extractedChatFile);
+                if(HTTP_CLIENT_CHAT_PATH.equals(httpServerRequest.path())) {
+                    // Read the chat HTML page, parse it and send it to the client
+                    try {
+                        final File extractedChatFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "sfx-chatFile.html");
+                        LOGGER.fine("Chat HTML file generated: " + extractedChatFile.getAbsolutePath());
+                        final FileReader chatPageReader = new FileReader( new File(getClass().getResource("/com/twasyl/slideshowfx/html/chat.html").toURI()));
+                        final FileWriter writer = new FileWriter(extractedChatFile);
 
-                    extractedChatFile.deleteOnExit();
+                        extractedChatFile.deleteOnExit();
 
-                    Velocity.init();
-                    final VelocityContext context = new VelocityContext();
-                    context.put(VELOCITY_SERVER_IP, ip);
-                    context.put(VELOCITY_SERVER_PORT, port);
+                        Velocity.init();
+                        final VelocityContext context = new VelocityContext();
+                        context.put(VELOCITY_SERVER_IP, ip);
+                        context.put(VELOCITY_SERVER_PORT, port);
 
-                    Velocity.evaluate(context, writer, "", chatPageReader);
+                        Velocity.evaluate(context, writer, "", chatPageReader);
 
-                    writer.flush();
-                    writer.close();
+                        writer.flush();
+                        writer.close();
 
-                    chatPageReader.close();
+                        chatPageReader.close();
 
-                    httpServerRequest.response().sendFile(extractedChatFile.getAbsolutePath());
-                } catch (Exception e) {
-                    LOGGER.log(Level.WARNING, "Error when a client tried to access the chat", e);
+                        httpServerRequest.response().sendFile(extractedChatFile.getAbsolutePath());
+                    } catch (Exception e) {
+                        LOGGER.log(Level.WARNING, "Error when a client tried to access the chat", e);
+                    }
+                } else if(HTTP_PRESENTER_CHAT.equals(httpServerRequest.path())) {
+                    // Read the chat presenter HTML page, parse it and send it to the client
+                    try {
+                        final File extractedChatFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "sfx-chatPresenterFile.html");
+                        LOGGER.fine("Chat HTML file generated: " + extractedChatFile.getAbsolutePath());
+                        final FileReader chatPageReader = new FileReader( new File(getClass().getResource("/com/twasyl/slideshowfx/html/presenter.html").toURI()));
+                        final FileWriter writer = new FileWriter(extractedChatFile);
+
+                        extractedChatFile.deleteOnExit();
+
+                        Velocity.init();
+                        final VelocityContext context = new VelocityContext();
+                        context.put(VELOCITY_SERVER_IP, ip);
+                        context.put(VELOCITY_SERVER_PORT, port);
+
+                        Velocity.evaluate(context, writer, "", chatPageReader);
+
+                        writer.flush();
+                        writer.close();
+
+                        chatPageReader.close();
+
+                        httpServerRequest.response().sendFile(extractedChatFile.getAbsolutePath());
+                    } catch (Exception e) {
+                        LOGGER.log(Level.WARNING, "Error when a client tried to access the chat", e);
+                    }
                 }
             }
         }).websocketHandler(new Handler<ServerWebSocket>() {
@@ -98,7 +132,7 @@ public class Chat {
 
             @Override
             public void handle(final ServerWebSocket serverWebSocket) {
-                if ("/slideshowfx/chat".equals(serverWebSocket.path())) {
+                if (WS_CLIENT_CHAT.equals(serverWebSocket.path())) {
                     Pump.createPump(serverWebSocket, serverWebSocket).start();
 
                     clients.add(serverWebSocket);
@@ -114,11 +148,11 @@ public class Chat {
                         @Override
                         public void handle(Buffer buffer) {
                             JsonReader reader = Json.createReader(new ByteArrayInputStream(buffer.getBytes()));
-                            JsonObject jsonMessage = reader.readObject();
+                            JsonObject jsonMessage = reader.readObject().getJsonObject("message");
 
                             for (ServerWebSocket socket : clients) {
 
-                                StringBuffer response = new StringBuffer("<div class=\"chat_message\"><span class=\"author\">");
+                                StringBuffer response = new StringBuffer("<div class=\"chat-message\"><span class=\"author\">");
 
                                 if (socket.remoteAddress().equals(serverWebSocket.remoteAddress())) {
                                     response.append("I ");
@@ -126,14 +160,24 @@ public class Chat {
                                     response.append(jsonMessage.getString("name")).append(" ");
                                 }
 
-                                response.append("said</span> :<br /><span class=\"message_content\">");
+                                response.append("said</span> :<br /><span class=\"message-content\">");
                                 response.append(jsonMessage.getString("message"));
                                 response.append("</span></div>");
 
                                 socket.writeTextFrame(response.toString());
                             }
+
+                            if (presenter != null) {
+                                StringBuffer response = new StringBuffer("<div class=\"chat-message\">");
+                                response.append("<span class=\"author\">").append(jsonMessage.getString("name")).append(" said :</span><br />");
+                                response.append("<span class=\"message-content\">").append(jsonMessage.getString("message")).append("</span></div>");
+
+                                presenter.writeTextFrame(response.toString());
+                            }
                         }
                     });
+                } else if (WS_PRESENTER_CHAT.equals(serverWebSocket.path())) {
+                    presenter = serverWebSocket;
                 } else {
                     serverWebSocket.reject();
                 }
@@ -142,4 +186,8 @@ public class Chat {
 
         }).listen(port, ip);
     }
+
+    public static String getIp() { return ip; }
+
+    public static int getPort() { return port; }
 }

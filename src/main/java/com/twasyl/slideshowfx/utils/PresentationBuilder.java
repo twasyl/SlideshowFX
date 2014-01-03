@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.utils;
 
+import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.exceptions.InvalidPresentationConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
@@ -206,6 +207,9 @@ public class PresentationBuilder {
     private static final String VELOCITY_SLIDES_TOKEN = "slides";
     private static final String VELOCITY_SFX_CALLBACK_TOKEN = "sfxCallback";
     private static final String VELOCITY_SFX_CONTENT_DEFINER_TOKEN = "sfxContentDefiner";
+    private static final String VELOCITY_CHAT_JS_TOKEN = "chat-js";
+    private static final String VELOCITY_CHAT_CSS_TOKEN = "chat-css";
+    private static final String VELOCITY_CHAT_CONTENT_TOKEN = "chat-content";
 
     private static final String VELOCITY_SFX_CONTENT_DEFINER_SCRIPT = "function setField(slide, what, value) {\n" +
             "\telement = document.getElementById(slide + \"-\" + what);\n" +
@@ -218,6 +222,52 @@ public class PresentationBuilder {
             "\n" +
             "\tsfx.prefillContentDefinition(slideNumber, fieldName, source.innerHTML);\n" +
             "}";
+
+    private static final String VELOCITY_CHAT_JS = "<script type=\"text/javascript\">\n" +
+            "\tvar socket;\n" +
+            "\n" +
+            "\twindow.onload = function() {\n" +
+            "\t\tsocket = new WebSocket(\"ws://%1$s:%2$s/slideshowfx/chat/presenter\");\n" +
+            "\n" +
+            "\t\tsocket.onopen = function(event) {\n" +
+            "\t\t};\n" +
+            "\n" +
+            "\t\tsocket.onmessage = function(event) {\n" +
+            "\t\t\tvar messagesDiv = document.getElementById(\"messages\");\n" +
+            "\n" +
+            "\t\t\tmessagesDiv.innerHTML = messagesDiv.innerHTML + event.data;\n" +
+            "\t\t}\n" +
+            "\t};\n" +
+            "</script>";
+
+    private static final String VELOCITY_CHAT_CSS = "<style type=\"text/css\">\n" +
+            "\t#chat {\n" +
+            "\t\tborder-radius: 8px;\n" +
+            "\t\tbackground-color: lightgray;\n" +
+            "\t\tborder: 1px solid gray;\n" +
+            "\t\twidth: 520px;\n" +
+            "\t\tpadding: 5px;\n" +
+            "\t}\n" +
+            "\t#messages {\n" +
+            "\t\tmargin-bottom: 5px;\n" +
+            "\t}\n" +
+            "\n" +
+            "\t.chat-message {\n" +
+            "\t\tbackground-color: white;\n" +
+            "\t\tpadding: 5px;\n" +
+            "\t\tmargin: 3px;\n" +
+            "\t}\n" +
+            "\t.author {\n" +
+            "\t\tfont-weight: bold;\n" +
+            "\t}\n" +
+            "\t.message-content {\n" +
+            "\t\tfont-style: italic;\n" +
+            "\t}\n" +
+            "</style>";
+
+    private static final String VELOCITY_CHAT_CONTENT = "<div id=\"chat\">\n" +
+            "\t<div id=\"messages\"></div>\n" +
+            "</div>";
 
     private static final String VELOCITY_SFX_CALLBACK_CALL = "sendInformationToSlideshowFX(this);";
 

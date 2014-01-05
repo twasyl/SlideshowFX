@@ -39,6 +39,7 @@ public class Chat {
 
     private static final List<ServerWebSocket> clients = new ArrayList<>();
     private static ServerWebSocket presenter;
+    private static final List<String> chatHistory = new ArrayList<>();
 
     private static HttpServer server;
     private static String ip;
@@ -137,7 +138,10 @@ public class Chat {
 
                     clients.add(serverWebSocket);
 
-                    serverWebSocket.closeHandler(new Handler<Void>() {
+                    // Send chat history
+                    for (String historyMessage : chatHistory) {
+                        serverWebSocket.writeTextFrame(historyMessage);
+                    }  serverWebSocket.closeHandler(new Handler<Void>() {
                         @Override
                         public void handle(Void aVoid) {
                             clients.remove(serverWebSocket);
@@ -155,29 +159,35 @@ public class Chat {
                                 StringBuffer response = new StringBuffer("<div class=\"chat-message\"><span class=\"author\">");
 
                                 if (socket.remoteAddress().equals(serverWebSocket.remoteAddress())) {
-                                    response.append("I ");
+                                    response.append("I say ");
                                 } else {
-                                    response.append(jsonMessage.getString("name")).append(" ");
+                                    response.append(jsonMessage.getString("name")).append(" says ");
                                 }
 
-                                response.append("said</span> :<br /><span class=\"message-content\">");
+                                response.append(":</span><br /><span class=\"message-content\">");
                                 response.append(jsonMessage.getString("message"));
                                 response.append("</span></div>");
 
                                 socket.writeTextFrame(response.toString());
                             }
 
-                            if (presenter != null) {
-                                StringBuffer response = new StringBuffer("<div class=\"chat-message\">");
-                                response.append("<span class=\"author\">").append(jsonMessage.getString("name")).append(" said :</span><br />");
-                                response.append("<span class=\"message-content\">").append(jsonMessage.getString("message")).append("</span></div>");
+                            StringBuffer response = new StringBuffer("<div class=\"chat-message\">");
+                            response.append("<span class=\"author\">").append(jsonMessage.getString("name")).append(" says :</span><br />");
+                            response.append("<span class=\"message-content\">").append(jsonMessage.getString("message")).append("</span></div>");
 
+                            chatHistory.add(response.toString());
+
+                            if (presenter != null) {
                                 presenter.writeTextFrame(response.toString());
                             }
                         }
                     });
                 } else if (WS_PRESENTER_CHAT.equals(serverWebSocket.path())) {
                     presenter = serverWebSocket;
+
+                    for (String historyMessage : chatHistory) {
+                        presenter.writeTextFrame(historyMessage);
+                    }
                 } else {
                     serverWebSocket.reject();
                 }

@@ -20,6 +20,8 @@ import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.util.Duration;
 import netscape.javascript.JSObject;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import java.util.logging.Logger;
 
@@ -50,18 +52,29 @@ public class SlideShowScene extends Scene {
             @Override
             public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State state2) {
                 if(state2 == Worker.State.SUCCEEDED) {
-                    JSObject window = (JSObject) chatBrowser.get().getEngine().executeScript("window");
+                    JSObject window = (JSObject) SlideShowScene.this.chatBrowser.get().getEngine().executeScript("window");
                     window.setMember("scene", SlideShowScene.this);
                 }
             }
         });
 
-        stackPane.getChildren().add(this.chatBrowser.get());
-
-        this.browser.get().getEngine().setOnAlert(new EventHandler<WebEvent<String>>() {
+        this.browser.get().getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
             @Override
-            public void handle(WebEvent<String> stringWebEvent) {
-                LOGGER.warning(stringWebEvent.getData());
+            public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State state2) {
+                if(state2 == Worker.State.SUCCEEDED) {
+                    Element chatIframe = SlideShowScene.this.browser.get().getEngine().getDocument().getElementById("chat-iframe");
+                    if(chatIframe != null) {
+                        chatIframe.setAttribute("src", String.format("http://%1$s:%2$s/slideshowfx/chat/presenter", Chat.getIp(), Chat.getPort()));
+                    }
+                }
+            }
+        });
+        // stackPane.getChildren().add(this.chatBrowser.get());
+
+        this.browser.get().getEngine().setOnError(new EventHandler<WebErrorEvent>() {
+            @Override
+            public void handle(WebErrorEvent webErrorEvent) {
+                System.out.println(webErrorEvent.toString());
             }
         });
 

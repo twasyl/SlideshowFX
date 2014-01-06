@@ -46,7 +46,34 @@
             socket.onmessage = function(event) {
                 var messagesDiv = document.getElementById("messages");
 
-                messagesDiv.innerHTML = messagesDiv.innerHTML + event.data;
+                var json = JSON.parse(event.data);
+
+                if(undefined != json.message) {
+                    var htmlMessage = "<div class=\"chat-message\" id=\"" + json.message.id + "\">"
+                                    + "<div id=\"" + json.message.id + "-check\" style=\"display: none; margin-right: 5px;\"><img src=\"http://${slideshowfx_server_ip}:${slideshowfx_server_port}/images/check.png\" width=\"10px\" /></div>"
+                                    + "<span class=\"author\">" + json.message.author + " ";
+
+                    if( json.message.author == "I") {
+                        htmlMessage = htmlMessage + "say";
+                    } else {
+                        htmlMessage = htmlMessage + "said";
+                    }
+
+                     htmlMessage = htmlMessage + " :" + "</span><br />"
+                                + "<span class=\"message-content\">" + json.message.content + "</span></div>";
+
+                    messagesDiv.innerHTML = messagesDiv.innerHTML + htmlMessage;
+                }
+
+                if(undefined != json.messageAction) {
+                    if(json.messageAction.action == "answered") {
+                        var messageDiv = document.getElementById(json.messageAction.id);
+                        messageDiv.className += " " + "question-answered";
+
+                        var imageDiv = document.getElementById(json.messageAction.id + "-check");
+                        imageDiv.style.display = "inline";
+                    }
+                }
             }
         };
 
@@ -61,7 +88,7 @@
                 if(attendeeName === "") {
                     attendeeName = "somebody";
                 }
-                var jsonMessage = "{ \"message\" : { \"name\": \"" + attendeeName + "\", \"message\": \"" + attendeeMessage + "\"} }";
+                var jsonMessage = "{ \"message\" : { \"author\": \"" + attendeeName + "\", \"content\": \"" + attendeeMessage + "\"} }";
 
                 socket.send(jsonMessage);
 
@@ -157,6 +184,9 @@
             background-color: white;
             padding: 5px;
             margin: 3px;
+        }
+        .question-answered {
+            background-color: #D0F5A9;
         }
         .author {
             font-weight: bold;

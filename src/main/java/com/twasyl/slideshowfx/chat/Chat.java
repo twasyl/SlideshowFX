@@ -9,14 +9,10 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.ServerWebSocket;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.streams.Pump;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +32,16 @@ public class Chat {
     private static final String WS_CLIENT_CHAT = "/slideshowfx/chat";
     private static final String HTTP_PRESENTER_CHAT = "/slideshowfx/chat/presenter";
     private static final String WS_PRESENTER_CHAT = HTTP_PRESENTER_CHAT;
+
+    private static final String JSON_MESSAGE_OBJECT = "message";
+    private static final String JSON_MESSAGE_ACTION_OBJECT = "messageAction";
+    private static final String JSON_MESSAGE_ID_ATTR = "id";
+    private static final String JSON_MESSAGE_AUTHOR_ATTR = "author";
+    private static final String JSON_MESSAGE_CONTENT_ATTR = "content";
+    private static final String JSON_MESSAGE_ACTION_ID_ATTR = "id";
+    private static final String JSON_MESSAGE_ACTION_ACTION_ATTR = "action";
+    private static final String JSON_MESSAGE_ACTION_ANSWERED_VALUE = "answered";
+    private static final String JSON_MESSAGE_ACTION_MARK_READ_VALUE = "mark-read";
 
     private static final List<ServerWebSocket> clients = new ArrayList<>();
     private static ServerWebSocket presenter;
@@ -126,6 +132,13 @@ public class Chat {
                     } catch (Exception e) {
                         LOGGER.log(Level.WARNING, "Error when a client tried to access the chat", e);
                     }
+                } else if("/images/check.png".equals(httpServerRequest.path())) {
+                    try {
+                        File checkImageFile = new File(Chat.class.getResource("/com/twasyl/slideshowfx/html/images/check.png").toURI());
+                        httpServerRequest.response().sendFile(checkImageFile.getAbsolutePath());
+                    } catch (URISyntaxException e) {
+                        LOGGER.log(Level.WARNING, "Can not send check images", e);
+                    }
                 }
             }
         }).websocketHandler(new Handler<ServerWebSocket>() {
@@ -141,7 +154,8 @@ public class Chat {
                     // Send chat history
                     for (String historyMessage : chatHistory) {
                         serverWebSocket.writeTextFrame(historyMessage);
-                    }  serverWebSocket.closeHandler(new Handler<Void>() {
+                    }
+                    serverWebSocket.closeHandler(new Handler<Void>() {
                         @Override
                         public void handle(Void aVoid) {
                             clients.remove(serverWebSocket);
@@ -151,39 +165,74 @@ public class Chat {
                     serverWebSocket.dataHandler(new Handler<Buffer>() {
                         @Override
                         public void handle(Buffer buffer) {
-                            JsonReader reader = Json.createReader(new ByteArrayInputStream(buffer.getBytes()));
-                            JsonObject jsonMessage = reader.readObject().getJsonObject("message");
+                            long timeStamp = System.currentTimeMillis();
 
-                            for (ServerWebSocket socket : clients) {
+                            JsonObject jsonRequest = new JsonObject(new String(buffer.getBytes()));
 
-                                StringBuffer response = new StringBuffer("<div class=\"chat-message\"><span class=\"author\">");
+                            // Handle a message
+                            if (jsonRequest.getObject(JSON_MESSAGE_OBJECT) != null) {
+                                JsonObject jsonRequestMessage = jsonRequest.getObject(JSON_MESSAGE_OBJECT);
+                                JsonObject jsonResponse;
+                                JsonObject jsonResponseMessage;
 
-                                if (socket.remoteAddress().equals(serverWebSocket.remoteAddress())) {
-                                    response.append("I say ");
-                                } else {
-                                    response.append(jsonMessage.getString("name")).append(" says ");
+                                for (ServerWebSocket socket : clients) {
+                                    jsonResponseMessage = new JsonObject();
+
+                                    jsonResponseMessage.putString(JSON_MESSAGE_ID_ATTR, "msg-" + timeStamp);
+
+                                    if (socket.remoteAddress().equals(serverWebSocket.remoteAddress())) {
+                                        jsonResponseMessage.putString(JSON_MESSAGE_AUTHOR_ATTR, "I");
+                                    } else {
+                                        jsonResponseMessage.putString(JSON_MESSAGE_AUTHOR_ATTR, jsonRequestMessage.getString(JSON_MESSAGE_AUTHOR_ATTR));
+                                    }
+
+                                    jsonResponseMessage.putString(JSON_MESSAGE_CONTENT_ATTR, jsonRequestMessage.getString(JSON_MESSAGE_CONTENT_ATTR));
+
+                                    jsonResponse = new org.vertx.java.core.json.JsonObject();
+                                    jsonResponse.putObject(JSON_MESSAGE_OBJECT, jsonResponseMessage);
+                                    socket.writeTextFrame(jsonResponse.toString());
                                 }
 
-                                response.append(":</span><br /><span class=\"message-content\">");
-                                response.append(jsonMessage.getString("message"));
-                                response.append("</span></div>");
+                                jsonResponseMessage = new JsonObject();
+                                jsonResponseMessage.putString(JSON_MESSAGE_ID_ATTR, "msg-" + timeStamp);
+                                jsonResponseMessage.putString(JSON_MESSAGE_AUTHOR_ATTR, jsonRequestMessage.getString(JSON_MESSAGE_AUTHOR_ATTR));
+                                jsonResponseMessage.putString(JSON_MESSAGE_CONTENT_ATTR, jsonRequestMessage.getString(JSON_MESSAGE_CONTENT_ATTR));
 
-                                socket.writeTextFrame(response.toString());
-                            }
+                                jsonResponse = new JsonObject();
+                                jsonResponse.putObject(JSON_MESSAGE_OBJECT, jsonResponseMessage);
 
-                            StringBuffer response = new StringBuffer("<div class=\"chat-message\">");
-                            response.append("<span class=\"author\">").append(jsonMessage.getString("name")).append(" says :</span><br />");
-                            response.append("<span class=\"message-content\">").append(jsonMessage.getString("message")).append("</span></div>");
+                                chatHistory.add(jsonResponse.toString());
 
-                            chatHistory.add(response.toString());
-
-                            if (presenter != null) {
-                                presenter.writeTextFrame(response.toString());
+                                if (presenter != null) {
+                                    presenter.writeTextFrame(jsonResponse.toString());
+                                }
                             }
                         }
                     });
                 } else if (WS_PRESENTER_CHAT.equals(serverWebSocket.path())) {
                     presenter = serverWebSocket;
+
+                    presenter.dataHandler(new Handler<Buffer>() {
+                        @Override
+                        public void handle(Buffer buffer) {
+                            JsonObject jsonRequest = new JsonObject(new String(buffer.getBytes()));
+
+                            if (jsonRequest.getObject(JSON_MESSAGE_ACTION_OBJECT) != null) {
+                                JsonObject jsonMessageAction = jsonRequest.getObject(JSON_MESSAGE_ACTION_OBJECT);
+
+                                JsonObject jsonResponse = new JsonObject();
+                                jsonResponse.putString(JSON_MESSAGE_ACTION_ID_ATTR, jsonMessageAction.getString(JSON_MESSAGE_ACTION_ID_ATTR));
+                                jsonResponse.putString(JSON_MESSAGE_ACTION_ACTION_ATTR, JSON_MESSAGE_ACTION_ANSWERED_VALUE);
+
+                                JsonObject jsonMessageActionResponse = new JsonObject();
+                                jsonMessageActionResponse.putObject(JSON_MESSAGE_ACTION_OBJECT, jsonResponse);
+
+                                for (ServerWebSocket client : clients) {
+                                    client.writeTextFrame(jsonMessageActionResponse.toString());
+                                }
+                            }
+                        }
+                    });
 
                     for (String historyMessage : chatHistory) {
                         presenter.writeTextFrame(historyMessage);

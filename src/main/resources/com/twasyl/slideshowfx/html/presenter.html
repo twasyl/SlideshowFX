@@ -16,8 +16,22 @@
             socket.onmessage = function(event) {
                 var messagesDiv = document.getElementById("messages");
 
-                messagesDiv.innerHTML = messagesDiv.innerHTML + event.data;
-            }
+                var json = JSON.parse(event.data);
+
+                var htmlMessage = "<div class=\"chat-message\" id=\"" + json.message.id + "\">"
+                                + "<span class=\"author\">" + json.message.author + " said :</span><br />"
+                                + "<span class=\"message-content\">" + json.message.content + "</span></div>";
+
+                messagesDiv.innerHTML = messagesDiv.innerHTML + htmlMessage;
+
+                var msgDiv = document.getElementById(json.message.id);
+
+                msgDiv.ondblclick = function(event) {
+                    var json = "{ \"messageAction\" : { \"id\" : \"" + event.target.id + "\", \"action\" : \"mark-read\" } }";
+                    socket.send(json);
+                };
+
+            };
         };
 
         function openHideChat() {

@@ -5,6 +5,7 @@
 
     <script type="text/javascript">
         var socket;
+        var opened = true;
 
         window.onload = function() {
             socket = new WebSocket("ws://${slideshowfx_server_ip}:${slideshowfx_server_port}/slideshowfx/chat/presenter");
@@ -34,16 +35,8 @@
         };
 
         function openHideChat() {
-            var chatDiv = document.getElementById("chat");
-            var bannerDiv = document.getElementById("banner");
-
-            if(chatDiv.style.display != "block") {
-                chatDiv.style.display = "block";
-                banner.style.top = "0";
-            } else {
-                chatDiv.style.display = "none";
-                banner.style.top = chatDiv.height;
-            }
+            opened = !opened;
+            scene.displayChat(opened);
         }
     </script>
 
@@ -88,9 +81,12 @@
     </style>
 </head>
 <body>
-    <div id="banner" onclick="javascript:openHideChat();">Chat @ ${slideshowfx_server_ip}:${slideshowfx_server_port}</div>
-    <div id="chat">
-        <div id="messages"></div>
+    <div id="slideshowfx-chat">
+        <div id="banner" onclick="javascript:openHideChat();">Chat @ ${slideshowfx_server_ip}:${slideshowfx_server_port}</div>
+        <div id="chat">
+            <div id="messages"></div>
+        </div>
     </div>
+
 </body>
 </html>

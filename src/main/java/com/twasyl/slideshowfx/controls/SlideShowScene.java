@@ -36,45 +36,19 @@ public class SlideShowScene extends Scene {
         super(new StackPane());
         this.browser.set(browser);
 
-        final StackPane stackPane = (StackPane) getRoot();
-        stackPane.setAlignment(Pos.BOTTOM_LEFT);
-        stackPane.getChildren().add(this.browser.get());
+        chatBrowser.set(new WebView());
+        chatBrowser.get().setPrefSize(500, 320);
+        chatBrowser.get().setMaxSize(500, 320);
+        chatBrowser.get().setMinSize(500, 320);
+        chatBrowser.get().getEngine().load(String.format("http://%1$s:%2$s/slideshowfx/chat/presenter", Chat.getIp(), Chat.getPort()));
 
-        this.chatBrowser.set(new WebView());
-
-        this.chatBrowser.get().setPrefSize(530, 320);
-        this.chatBrowser.get().setMinSize(530, 320);
-        this.chatBrowser.get().setMaxSize(530, 320);
-        this.chatBrowser.get().getEngine().load(String.format("http://%1$s:%2$s/slideshowfx/chat/presenter", Chat.getIp(), Chat.getPort()));
-
-        // Make this scene available to JavaScript
-        this.chatBrowser.get().getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
+        chatBrowser.get().getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
             @Override
             public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State state2) {
-                if(state2 == Worker.State.SUCCEEDED) {
-                    JSObject window = (JSObject) SlideShowScene.this.chatBrowser.get().getEngine().executeScript("window");
+                if (state2 == Worker.State.SUCCEEDED) {
+                    JSObject window = (JSObject) chatBrowser.get().getEngine().executeScript("window");
                     window.setMember("scene", SlideShowScene.this);
                 }
-            }
-        });
-
-        this.browser.get().getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
-            @Override
-            public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State state2) {
-                if(state2 == Worker.State.SUCCEEDED) {
-                    Element chatIframe = SlideShowScene.this.browser.get().getEngine().getDocument().getElementById("chat-iframe");
-                    if(chatIframe != null) {
-                        chatIframe.setAttribute("src", String.format("http://%1$s:%2$s/slideshowfx/chat/presenter", Chat.getIp(), Chat.getPort()));
-                    }
-                }
-            }
-        });
-        // stackPane.getChildren().add(this.chatBrowser.get());
-
-        this.browser.get().getEngine().setOnError(new EventHandler<WebErrorEvent>() {
-            @Override
-            public void handle(WebErrorEvent webErrorEvent) {
-                System.out.println(webErrorEvent.toString());
             }
         });
 
@@ -88,6 +62,10 @@ public class SlideShowScene extends Scene {
                 }
             }
         });
+
+        final StackPane root = (StackPane) getRoot();
+        root.setAlignment(Pos.BOTTOM_LEFT);
+        root.getChildren().addAll(this.browser.get(), this.chatBrowser.get());
     }
 
     public ObjectProperty<WebView> browserProperty() { return browser; }
@@ -104,20 +82,12 @@ public class SlideShowScene extends Scene {
         });
     }
 
-    public void openChat(final boolean open) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                TranslateTransition translation = new TranslateTransition(Duration.millis(500), chatBrowser.get());
+    public void displayChat(boolean open) {
+        TranslateTransition translation = new TranslateTransition(Duration.millis(500), chatBrowser.get());
 
-                if(open) {
-                    translation.setByY(-300);
-                } else {
-                    translation.setByY(300);
-                }
+        if(open) translation.setByY(-300);
+        else translation.setByY(300);
 
-                translation.play();
-            }
-        });
+        translation.play();
     }
 }

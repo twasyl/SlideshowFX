@@ -15,13 +15,9 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
-import javafx.scene.web.WebErrorEvent;
-import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.util.Duration;
 import netscape.javascript.JSObject;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import java.util.logging.Logger;
 

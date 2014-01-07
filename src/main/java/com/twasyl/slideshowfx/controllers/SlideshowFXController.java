@@ -77,30 +77,31 @@ public class SlideshowFXController implements Initializable {
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.TEMPLATE_FILTER);
         File templateFile = chooser.showOpenDialog(null);
 
-        try {
-            this.builder.loadTemplate(templateFile);
-            this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
+        if(templateFile != null) {
+            try {
+                this.builder.loadTemplate(templateFile);
+                this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
 
-            this.addSlideButton.getItems().clear();
-            if(this.builder.getTemplate() != null) {
-                MenuItem item;
+                this.addSlideButton.getItems().clear();
+                if(this.builder.getTemplate() != null) {
+                    MenuItem item;
 
-                for(PresentationBuilder.Slide slide : this.builder.getTemplate().getSlides()) {
-                    item = new MenuItem();
-                    item.setText(slide.getName());
-                    item.setUserData(slide);
-                    item.setOnAction(addSlideActionEvent);
-                    this.addSlideButton.getItems().add(item);
+                    for(PresentationBuilder.Slide slide : this.builder.getTemplate().getSlides()) {
+                        item = new MenuItem();
+                        item.setText(slide.getName());
+                        item.setUserData(slide);
+                        item.setOnAction(addSlideActionEvent);
+                        this.addSlideButton.getItems().add(item);
+                    }
                 }
+            } catch (InvalidTemplateException e) {
+                e.printStackTrace();
+            } catch (InvalidTemplateConfigurationException e) {
+                e.printStackTrace();
+            } catch (PresentationException e) {
+                e.printStackTrace();
             }
-        } catch (InvalidTemplateException e) {
-            e.printStackTrace();
-        } catch (InvalidTemplateConfigurationException e) {
-            e.printStackTrace();
-        } catch (PresentationException e) {
-            e.printStackTrace();
         }
-
     }
 
     @FXML private void openPresentation(ActionEvent event) {
@@ -108,32 +109,33 @@ public class SlideshowFXController implements Initializable {
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
         File file = chooser.showOpenDialog(null);
 
-        try {
-            this.builder.openPresentation(file);
-            this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
+        if(file != null) {
+            try {
+                this.builder.openPresentation(file);
+                this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
 
-            this.addSlideButton.getItems().clear();
-            if(this.builder.getTemplate() != null) {
-                MenuItem item;
+                this.addSlideButton.getItems().clear();
+                if(this.builder.getTemplate() != null) {
+                    MenuItem item;
 
-                for(PresentationBuilder.Slide slide : this.builder.getTemplate().getSlides()) {
-                    item = new MenuItem();
-                    item.setText(slide.getName());
-                    item.setUserData(slide);
-                    item.setOnAction(addSlideActionEvent);
-                    this.addSlideButton.getItems().add(item);
+                    for(PresentationBuilder.Slide slide : this.builder.getTemplate().getSlides()) {
+                        item = new MenuItem();
+                        item.setText(slide.getName());
+                        item.setUserData(slide);
+                        item.setOnAction(addSlideActionEvent);
+                        this.addSlideButton.getItems().add(item);
+                    }
                 }
+            } catch (InvalidTemplateConfigurationException e) {
+                e.printStackTrace();
+            } catch (InvalidTemplateException e) {
+                e.printStackTrace();
+            } catch (PresentationException e) {
+                e.printStackTrace();
+            } catch (InvalidPresentationConfigurationException e) {
+                e.printStackTrace();
             }
-        } catch (InvalidTemplateConfigurationException e) {
-            e.printStackTrace();
-        } catch (InvalidTemplateException e) {
-            e.printStackTrace();
-        } catch (PresentationException e) {
-            e.printStackTrace();
-        } catch (InvalidPresentationConfigurationException e) {
-            e.printStackTrace();
         }
-
     }
 
     @FXML private void updateSlideWithMarkdown(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
@@ -185,12 +187,16 @@ public class SlideshowFXController implements Initializable {
     }
 
     @FXML private void slideShow(ActionEvent event) {
-        final WebView slideShowBrowser = new WebView();
-        slideShowBrowser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
+        if(this.builder.getPresentation() != null
+                && this.builder.getPresentation().getPresentationFile() != null
+                && this.builder.getPresentation().getPresentationFile().exists()) {
+            final WebView slideShowBrowser = new WebView();
+            slideShowBrowser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
 
-        final SlideShowScene subScene = new SlideShowScene(slideShowBrowser);
+            final SlideShowScene subScene = new SlideShowScene(slideShowBrowser);
 
-        SlideshowFX.setSlideShowScene(subScene);
+            SlideshowFX.setSlideShowScene(subScene);
+        }
     }
 
     public void prefillContentDefinition(String slideNumber, String field, String value) {

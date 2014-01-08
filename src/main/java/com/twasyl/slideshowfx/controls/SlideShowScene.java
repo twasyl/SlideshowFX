@@ -32,22 +32,23 @@ public class SlideShowScene extends Scene {
         super(new StackPane());
         this.browser.set(browser);
 
-        chatBrowser.set(new WebView());
-        chatBrowser.get().setPrefSize(500, 320);
-        chatBrowser.get().setMaxSize(500, 320);
-        chatBrowser.get().setMinSize(500, 320);
-        chatBrowser.get().getEngine().load(String.format("http://%1$s:%2$s/slideshowfx/chat/presenter", Chat.getIp(), Chat.getPort()));
+        if(Chat.isOpened()) {
+            chatBrowser.set(new WebView());
+            chatBrowser.get().setPrefSize(500, 320);
+            chatBrowser.get().setMaxSize(500, 320);
+            chatBrowser.get().setMinSize(500, 320);
+            chatBrowser.get().getEngine().load(String.format("http://%1$s:%2$s/slideshowfx/chat/presenter", Chat.getIp(), Chat.getPort()));
 
-        chatBrowser.get().getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
-            @Override
-            public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State state2) {
-                if (state2 == Worker.State.SUCCEEDED) {
-                    JSObject window = (JSObject) chatBrowser.get().getEngine().executeScript("window");
-                    window.setMember("scene", SlideShowScene.this);
+            chatBrowser.get().getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
+                @Override
+                public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State state2) {
+                    if (state2 == Worker.State.SUCCEEDED) {
+                        JSObject window = (JSObject) chatBrowser.get().getEngine().executeScript("window");
+                        window.setMember("scene", SlideShowScene.this);
+                    }
                 }
-            }
-        });
-
+            });
+        }
         this.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
@@ -61,7 +62,11 @@ public class SlideShowScene extends Scene {
 
         final StackPane root = (StackPane) getRoot();
         root.setAlignment(Pos.BOTTOM_LEFT);
-        root.getChildren().addAll(this.browser.get(), this.chatBrowser.get());
+        root.getChildren().add(this.browser.get());
+
+        if(Chat.isOpened()) {
+            root.getChildren().add(this.chatBrowser.get());
+        }
     }
 
     public ObjectProperty<WebView> browserProperty() { return browser; }

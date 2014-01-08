@@ -4,15 +4,92 @@
 <?import javafx.scene.layout.*?>
 
 <?import javafx.scene.web.WebView?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import java.lang.Double?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController">
+    <fx:define>
+        <Double fx:id="TOOLBAR_ICON_WIDTH" fx:value="20" />
+        <Double fx:id="TOOLBAR_ICON_HEIGHT" fx:value="20" />
+    </fx:define>
+
     <top>
         <ToolBar>
-            <Button text="Open template" onAction="#loadTemplate" />
-            <Button text="Open presentation" onAction="#openPresentation" />
-            <SplitMenuButton fx:id="addSlideButton" />
-            <Button text="Reload" onAction="#reload"  />
-            <Button text="Save" onAction="#save" />
-            <Button text="Slide show" onAction="#slideShow" />
+            <Button onAction="#loadTemplate">
+                <tooltip>
+                    <Tooltip text="New presentation" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/new.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <Button onAction="#openPresentation">
+                <tooltip>
+                    <Tooltip text="Open presentation" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/open.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <Button onAction="#save">
+                <tooltip>
+                    <Tooltip text="Save" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/save.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <Separator />
+
+            <SplitMenuButton fx:id="addSlideButton" text="Add slide ..." />
+
+            <Button onAction="#reload">
+                <tooltip>
+                    <Tooltip text="Reload" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/reload.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <Button  onAction="#slideShow">
+                <tooltip>
+                    <Tooltip text="Slideshow" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/slideshow.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <Separator />
+
+            <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                <Image url="@/com/twasyl/slideshowfx/images/chat.png"  smooth="true" />
+            </ImageView>
+
+            <TextField prefColumnCount="8" promptText="IP address" fx:id="chatIpAddress" />
+            <TextField prefColumnCount="3" promptText="Port" fx:id="chatPort" />
+
+            <Button onAction="#startChat">
+                <graphic>
+                    <ImageView fitWidth="$TOOLBAR_ICON_WIDTH" fitHeight="$TOOLBAR_ICON_HEIGHT">
+                        <Image url="@/com/twasyl/slideshowfx/images/start.png" preserveRatio="true" smooth="true" />
+                    </ImageView>
+                </graphic>
+            </Button>
         </ToolBar>
     </top>
     <center>

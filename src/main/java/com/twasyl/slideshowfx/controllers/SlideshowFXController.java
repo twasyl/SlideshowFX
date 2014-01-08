@@ -10,26 +10,20 @@ import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
 import com.twasyl.slideshowfx.exceptions.PresentationException;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.utils.DOMUtils;
+import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.PresentationBuilder;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SplitMenuButton;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import netscape.javascript.JSObject;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -71,6 +65,8 @@ public class SlideshowFXController implements Initializable {
     @FXML private TextField fieldName;
     @FXML private TextArea fieldValueMarkdown;
     @FXML private TextArea fieldValueText;
+    @FXML private TextField chatIpAddress;
+    @FXML private TextField chatPort;
 
     @FXML private void loadTemplate(ActionEvent event) {
         FileChooser chooser = new FileChooser();
@@ -197,6 +193,35 @@ public class SlideshowFXController implements Initializable {
 
             SlideshowFX.setSlideShowScene(subScene);
         }
+    }
+
+    @FXML private void startChat(ActionEvent event) {
+        Image icon;
+
+        if(Chat.isOpened()) {
+            Chat.close();
+
+            icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/start.png"));
+        } else {
+            String ip = this.chatIpAddress.getText();
+            if(ip == null || ip.isEmpty()) {
+                ip = NetworkUtils.getIP();
+            }
+
+            int port = 80;
+            if(this.chatPort.getText() != null && !this.chatPort.getText().isEmpty()) {
+                port = Integer.parseInt(this.chatPort.getText());
+            }
+
+            this.chatIpAddress.setText(ip);
+            this.chatPort.setText(port + "");
+
+            Chat.create(ip, port);
+
+            icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/shutdown.png"));
+        }
+
+        ((ImageView) ((Button) event.getSource()).getGraphic()).setImage(icon);
     }
 
     public void prefillContentDefinition(String slideNumber, String field, String value) {

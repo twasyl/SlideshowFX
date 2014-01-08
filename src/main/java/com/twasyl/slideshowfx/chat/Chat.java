@@ -47,6 +47,7 @@ public class Chat {
     private static ServerWebSocket presenter;
     private static final List<String> chatHistory = new ArrayList<>();
 
+    private static Vertx vertx;
     private static HttpServer server;
     private static String ip;
     private static int port;
@@ -65,16 +66,36 @@ public class Chat {
     }
 
     public static void close() {
+        for(ServerWebSocket client : clients) {
+            client.close();
+        }
         clients.clear();
-        server.close();
+
+        if(presenter != null) {
+            presenter.close();
+            presenter = null;
+        }
+
+        if(server != null) {
+            server.close();
+            server = null;
+        }
+
+        if(vertx != null) {
+            vertx.stop();
+            vertx = null;
+        }
     }
 
+    public static boolean isOpened() {
+        return server != null;
+    }
     /**
      * Initialize the embedded web server
      */
     private static void init() {
 
-        Vertx vertx = VertxFactory.newVertx();
+        vertx = VertxFactory.newVertx();
         server = vertx.createHttpServer();
 
         server.requestHandler(new Handler<HttpServerRequest>() {

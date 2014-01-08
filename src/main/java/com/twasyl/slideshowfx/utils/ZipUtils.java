@@ -86,17 +86,22 @@ public class ZipUtils {
             entryName = entryName.replaceAll("\\\\", "/");
             LOGGER.finest("Entry name: " + entryName);
 
-            entry = new ZipEntry(entryName);
-            zipOutput.putNextEntry(entry);
+            if(file.isDirectory()) {
+                entry = new ZipEntry(entryName + "/");
+                zipOutput.putNextEntry(entry);
+            } else {
+                entry = new ZipEntry(entryName);
+                zipOutput.putNextEntry(entry);
 
-            try {
-                fileInput = new FileInputStream(file);
+                try {
+                    fileInput = new FileInputStream(file);
 
-                while((length = fileInput.read(buffer)) > 0) {
-                    zipOutput.write(buffer, 0, length);
+                    while((length = fileInput.read(buffer)) > 0) {
+                        zipOutput.write(buffer, 0, length);
+                    }
+                } finally {
+                    fileInput.close();
                 }
-            } finally {
-                fileInput.close();
             }
         }
 
@@ -109,11 +114,23 @@ public class ZipUtils {
 
     private static void makeFileList(List<File> list, File file) {
 
-        if(file.isFile()) {
-            list.add(file);
-        } else {
+        if(list.isEmpty() && file.isDirectory()) {
             for(File subFile : file.listFiles()) {
                 makeFileList(list, subFile);
+            }
+        } else {
+            if(file.isFile()) {
+                list.add(file);
+            } else if(file.isDirectory()) {
+                File[] listFiles = file.listFiles();
+
+                if(listFiles.length == 0) {
+                    list.add(file);
+                } else {
+                    for(File subFile : file.listFiles()) {
+                        makeFileList(list, subFile);
+                    }
+                }
             }
         }
     }

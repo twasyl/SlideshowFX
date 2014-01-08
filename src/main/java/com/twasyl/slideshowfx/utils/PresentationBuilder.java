@@ -80,6 +80,7 @@ public class PresentationBuilder {
         private String jsObject;
         private File slidesTemplateDirectory;
         private File slidesPresentationDirectory;
+        private File resourcesDirectory;
 
         public Template() {
         }
@@ -111,6 +112,9 @@ public class PresentationBuilder {
         public File getSlidesPresentationDirectory() { return slidesPresentationDirectory; }
         public void setSlidesPresentationDirectory(File slidesPresentationDirectory) { this.slidesPresentationDirectory = slidesPresentationDirectory; }
 
+        public File getResourcesDirectory() { return resourcesDirectory; }
+        public void setResourcesDirectory(File resourcesDirectory) { this.resourcesDirectory = resourcesDirectory; }
+
         /**
          * Read the configuration of this template located in the <b>folder</b> attribute.
          */
@@ -131,6 +135,9 @@ public class PresentationBuilder {
 
             this.setJsObject(templateJson.getString("js-object"));
             LOGGER.fine("[Template configuration] jsObject = " + this.getJsObject());
+
+            this.setResourcesDirectory(new File(this.getFolder(), templateJson.getString("resources-directory")));
+            LOGGER.fine("[Template configuration] resources-directory = " + this.getResourcesDirectory().getAbsolutePath());
 
             JsonArray methodsJson = templateJson.getJsonArray("methods");
 

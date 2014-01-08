@@ -98,7 +98,18 @@
 
     <right>
         <VBox spacing="10">
-
+            <ToolBar>
+                <Button onAction="#insertImage">
+                    <tooltip>
+                        <Tooltip text="Insert image" />
+                    </tooltip>
+                    <graphic>
+                         <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                             <Image url="@/com/twasyl/slideshowfx/images/image.png" />
+                         </ImageView>
+                    </graphic>
+                </Button>
+            </ToolBar>
             <VBox spacing="10">
                 <Label text="Set text:" />
                  <HBox spacing="10">

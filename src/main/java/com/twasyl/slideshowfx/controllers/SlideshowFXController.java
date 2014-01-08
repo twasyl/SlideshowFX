@@ -33,6 +33,9 @@ import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ResourceBundle;
 
 public class SlideshowFXController implements Initializable {
@@ -136,17 +139,20 @@ public class SlideshowFXController implements Initializable {
 
     @FXML private void updateSlideWithMarkdown(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
 
-        this.updateSlide(Processor.process("[$PROFILE$]: extended\n" + this.fieldValueMarkdown.getText()).replaceAll("\\n", ""));
+        this.updateSlide(Processor.process("[$PROFILE$]: extended\n" + this.fieldValueMarkdown.getText()).replaceAll("\\n", "")
+                .replaceAll("\\\\", "&#92;"));
     }
 
     @FXML private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
 
-        this.updateSlide(this.fieldValueText.getText().replaceAll("\\n", ""));
+        this.updateSlide(this.fieldValueText.getText().replaceAll("\\n", "")
+                //.replaceAll("\"","\"\"")
+                .replaceAll("\\\\", "&#92;"));
     }
 
     private void updateSlide(String content) throws TransformerException, IOException, ParserConfigurationException, SAXException {
 
-        String jsCommand = String.format("%1$s(%2$s, \"%3$s\", \"%4$s\");",
+        String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",
                 this.builder.getTemplate().getContentDefinerMethod(),
                 this.slideNumber.getText(),
                 this.fieldName.getText(),
@@ -222,6 +228,35 @@ public class SlideshowFXController implements Initializable {
         }
 
         ((ImageView) ((Button) event.getSource()).getGraphic()).setImage(icon);
+    }
+
+    @FXML private void insertImage(ActionEvent event) {
+        FileChooser chooser = new FileChooser();
+        File imageFile = chooser.showOpenDialog(null);
+
+        if(imageFile != null) {
+            File targetFile;
+            if(imageFile.exists()) {
+                // If the file exists, add a timestamp to the source
+                targetFile = new File(this.builder.getTemplate().getResourcesDirectory(), System.currentTimeMillis() + imageFile.getName());
+            } else {
+                targetFile = new File(this.builder.getTemplate().getResourcesDirectory(), imageFile.getName());
+            }
+
+            try {
+                Files.copy(imageFile.toPath(), targetFile.toPath());
+
+                // Get the relative path of the resources folder from the template directory
+                final Path relativePath = this.builder.getTemplate().getFolder().toPath().relativize(this.builder.getTemplate().getResourcesDirectory().toPath());
+
+                final String imgMarkup = String.format("<img src=\"%1$s/%2$s\" />", relativePath.toString(), targetFile.getName());
+
+                this.fieldValueMarkdown.setText(this.fieldValueMarkdown.getText() + imgMarkup);
+                this.fieldValueText.setText(this.fieldValueText.getText() + imgMarkup);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void prefillContentDefinition(String slideNumber, String field, String value) {

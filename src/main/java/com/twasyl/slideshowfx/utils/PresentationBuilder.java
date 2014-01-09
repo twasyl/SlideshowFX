@@ -14,9 +14,7 @@ import javax.json.stream.JsonGenerator;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,10 +75,12 @@ public class PresentationBuilder {
         private File file;
         private List<Slide> slides;
         private String contentDefinerMethod;
+        private String getCurrentSlideMethod;
         private String jsObject;
         private File slidesTemplateDirectory;
         private File slidesPresentationDirectory;
         private File resourcesDirectory;
+        private String slideIdPrefix;
 
         public Template() {
         }
@@ -103,6 +103,9 @@ public class PresentationBuilder {
         public String getContentDefinerMethod() { return contentDefinerMethod; }
         public void setContentDefinerMethod(String contentDefinerMethod) { this.contentDefinerMethod = contentDefinerMethod; }
 
+        public String getGetCurrentSlideMethod() { return getCurrentSlideMethod; }
+        public void setGetCurrentSlideMethod(String getCurrentSlideMethod) { this.getCurrentSlideMethod = getCurrentSlideMethod; }
+
         public String getJsObject() { return jsObject; }
         public void setJsObject(String jsObject) { this.jsObject = jsObject; }
 
@@ -114,6 +117,9 @@ public class PresentationBuilder {
 
         public File getResourcesDirectory() { return resourcesDirectory; }
         public void setResourcesDirectory(File resourcesDirectory) { this.resourcesDirectory = resourcesDirectory; }
+
+        public String getSlideIdPrefix() { return slideIdPrefix; }
+        public void setSlideIdPrefix(String slideIdPrefix) { this.slideIdPrefix = slideIdPrefix; }
 
         /**
          * Read the configuration of this template located in the <b>folder</b> attribute.
@@ -139,10 +145,24 @@ public class PresentationBuilder {
             this.setResourcesDirectory(new File(this.getFolder(), templateJson.getString("resources-directory")));
             LOGGER.fine("[Template configuration] resources-directory = " + this.getResourcesDirectory().getAbsolutePath());
 
+            this.setSlideIdPrefix(templateJson.getString("slide-id-prefix"));
+            LOGGER.fine("[Template configuration] slideIdPrefix = " + this.getSlideIdPrefix());
+
             JsonArray methodsJson = templateJson.getJsonArray("methods");
 
-            this.setContentDefinerMethod(methodsJson.getJsonObject(0).getString("name"));
-            LOGGER.fine("[Template configuration] content definer method = " + this.getContentDefinerMethod());
+            if(methodsJson != null && methodsJson.size() > 0) {
+                for(JsonValue method : methodsJson) {
+                    if(method.getValueType().equals(JsonValue.ValueType.OBJECT)) {
+                        if("CONTENT_DEFINER".equals(((JsonObject) method).getString("type"))) {
+                            this.setContentDefinerMethod(((JsonObject) method).getString("name"));
+                            LOGGER.fine("[Template configuration] content definer method = " + this.getContentDefinerMethod());
+                        } else if("GET_CURRENT_SLIDE".equals(((JsonObject) method).getString("type"))) {
+                            this.setGetCurrentSlideMethod(((JsonObject) method).getString("name"));
+                            LOGGER.fine("[Template configuration] get current slide method = " + this.getGetCurrentSlideMethod());
+                        }
+                    }
+                }
+            }
 
             // Setting the slides
             this.setSlides(new ArrayList<Slide>());
@@ -537,19 +557,35 @@ public class PresentationBuilder {
      * @param template
      * @throws IOException
      */
-    public void addSlide(Slide template, Slide parent) throws IOException, ParserConfigurationException, SAXException {
+    public void addSlide(Slide template, String afterSlideNumber) throws IOException, ParserConfigurationException, SAXException {
         if(template == null) throw new IllegalArgumentException("The template for creating a slide can not be null");
         Velocity.init();
 
         final Slide slide = new Slide(template.getId(), template.getName(), template.getFile());
         slide.setSlideNumber(template.getSlideNumber());
 
-        if(parent == null) {
-            slide.setSlideNumber((this.presentation.getSlides().size() + 1) + "");
+        slide.setSlideNumber(System.currentTimeMillis() + "");
+
+        if(afterSlideNumber == null) {
             this.presentation.getSlides().add(slide);
         } else {
-           slide.setSlideNumber(parent.getSlideNumber() + "." + parent.getSlides().size() + 1);
+            ListIterator<Slide> slidesIterator = this.getPresentation().getSlides().listIterator();
+
+            int index = -1;
+            while(slidesIterator.hasNext()) {
+                if(slidesIterator.next().getSlideNumber().equals(afterSlideNumber)) {
+                    index = slidesIterator.nextIndex();
+                    break;
+                }
+            }
+
+            if(index > -1) {
+                this.presentation.getSlides().add(index, slide);
+            } else {
+                this.presentation.getSlides().add(slide);
+            }
         }
+
 
         final Reader slideFileReader = new FileReader(slide.getFile());
         final ByteArrayOutputStream slideContentByte = new ByteArrayOutputStream();
@@ -564,6 +600,25 @@ public class PresentationBuilder {
         slideContentWriter.close();
 
         slide.setText(new String(slideContentByte.toByteArray()));
+
+        this.saveTemporaryPresentation();
+    }
+
+    /**
+     * Delete the slide with the slideNumber and save the presentation
+     * @param slideNumber
+     */
+    public void deleteSlide(String slideNumber) throws IOException, SAXException, ParserConfigurationException {
+        if(slideNumber == null) throw new IllegalArgumentException("Slide number can not be null");
+
+        ListIterator<Slide> slidesIterator = this.presentation.getSlides().listIterator();
+
+        while(slidesIterator.hasNext()) {
+            if(slidesIterator.next().getSlideNumber().equals(slideNumber)) {
+                slidesIterator.remove();
+                break;
+            }
+        }
 
         this.saveTemporaryPresentation();
     }
@@ -629,6 +684,13 @@ public class PresentationBuilder {
 
         LOGGER.fine("Creating slides files");
         if(!this.template.getSlidesPresentationDirectory().exists()) this.template.getSlidesPresentationDirectory().mkdirs();
+        else {
+            for(File slideFile : this.template.getSlidesPresentationDirectory().listFiles()) {
+                if(slideFile.isFile()) {
+                    slideFile.delete();
+                }
+            }
+        }
 
         PrintWriter slideWriter = null;
         for(Slide slide : this.presentation.getSlides()) {

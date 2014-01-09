@@ -52,6 +52,17 @@
 
             <SplitMenuButton fx:id="addSlideButton" text="Add slide ..." />
 
+            <Button onAction="#deleteSlide">
+                <tooltip>
+                    <Tooltip text="Delete slide" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/trash.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+
             <Button onAction="#reload">
                 <tooltip>
                     <Tooltip text="Reload" />

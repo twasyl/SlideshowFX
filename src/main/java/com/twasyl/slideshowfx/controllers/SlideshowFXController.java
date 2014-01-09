@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ResourceBundle;
 
 public class SlideshowFXController implements Initializable {
@@ -49,7 +48,14 @@ public class SlideshowFXController implements Initializable {
 
                 Object userData = ((MenuItem) actionEvent.getSource()).getUserData();
                 if(userData instanceof PresentationBuilder.Slide) {
-                    SlideshowFXController.this.builder.addSlide((PresentationBuilder.Slide) userData, null);
+                    final String slideId = (String) SlideshowFXController.this.browser.getEngine().executeScript(SlideshowFXController.this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
+                    String slideNumber = null;
+
+                    if(slideId != null && !slideId.isEmpty()) {
+                        slideNumber = slideId.substring(SlideshowFXController.this.builder.getTemplate().getSlideIdPrefix().length());
+                    }
+
+                    SlideshowFXController.this.builder.addSlide((PresentationBuilder.Slide) userData, slideNumber);
                     SlideshowFXController.this.browser.getEngine().reload();
                 }
             } catch (IOException e) {
@@ -159,10 +165,25 @@ public class SlideshowFXController implements Initializable {
                content);
 
         this.browser.getEngine().executeScript(jsCommand);
-        Element slideElement = this.browser.getEngine().getDocument().getElementById("slide-" + this.slideNumber.getText());
+        Element slideElement = this.browser.getEngine().getDocument().getElementById(this.builder.getTemplate().getSlideIdPrefix() + this.slideNumber.getText());
 
         this.builder.getPresentation().updateSlideText(this.slideNumber.getText(), DOMUtils.convertNodeToText(slideElement));
         this.builder.saveTemporaryPresentation();
+    }
+
+    @FXML private void deleteSlide(ActionEvent event) {
+        String slideId = this.browser.getEngine().executeScript(this.builder.getTemplate().getGetCurrentSlideMethod() + "();").toString();
+
+        if(slideId != null && !slideId.isEmpty()) {
+            String slideNumber = slideId.substring(this.builder.getTemplate().getSlideIdPrefix().length());
+
+            try {
+                this.builder.deleteSlide(slideNumber);
+                SlideshowFXController.this.browser.getEngine().reload();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
@@ -281,5 +302,7 @@ public class SlideshowFXController implements Initializable {
                 }
             }
         });
+
+        this.browser.getEngine().setJavaScriptEnabled(true);
     }
 }

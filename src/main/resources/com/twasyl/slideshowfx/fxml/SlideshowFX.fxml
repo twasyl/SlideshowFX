@@ -52,6 +52,8 @@
 
             <SplitMenuButton fx:id="addSlideButton" text="Add slide ..." />
 
+            <SplitMenuButton fx:id="moveSlideButton" text="Move slide ..." />
+
             <Button onAction="#deleteSlide">
                 <tooltip>
                     <Tooltip text="Delete slide" />

@@ -3,6 +3,7 @@ package com.twasyl.slideshowfx.controllers;
 import com.github.rjeschke.txtmark.Processor;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.chat.Chat;
+import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.exceptions.InvalidPresentationConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
@@ -19,9 +20,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import netscape.javascript.JSObject;
@@ -35,7 +38,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ListIterator;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
 
 public class SlideshowFXController implements Initializable {
 
@@ -55,8 +60,10 @@ public class SlideshowFXController implements Initializable {
                         slideNumber = slideId.substring(SlideshowFXController.this.builder.getTemplate().getSlideIdPrefix().length());
                     }
 
-                    SlideshowFXController.this.builder.addSlide((PresentationBuilder.Slide) userData, slideNumber);
+                    PresentationBuilder.Slide addedSlide = SlideshowFXController.this.builder.addSlide((PresentationBuilder.Slide) userData, slideNumber);
                     SlideshowFXController.this.browser.getEngine().reload();
+
+                    SlideshowFXController.this.updateSlideSplitMenu();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -68,8 +75,46 @@ public class SlideshowFXController implements Initializable {
         }
     };
 
+    private final EventHandler<ActionEvent> moveSlideActionEvent = new EventHandler<ActionEvent>() {
+        @Override
+        public void handle(ActionEvent actionEvent) {
+            final SlideMenuItem menunItem = (SlideMenuItem) actionEvent.getSource();
+
+            final String slideId = (String) SlideshowFXController.this.browser.getEngine().executeScript(SlideshowFXController.this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
+            final String slideNumber = slideId.substring(SlideshowFXController.this.builder.getTemplate().getSlideIdPrefix().length());
+
+            PresentationBuilder.Slide slideToMove = SlideshowFXController.this.builder.getPresentation().getSlide(slideNumber);
+
+            SlideshowFXController.this.builder.getPresentation().getSlides().remove(slideToMove);
+
+            int index = -1;
+            for(int i = 0; i < SlideshowFXController.this.builder.getPresentation().getSlides().size(); i++) {
+                if(SlideshowFXController.this.builder.getPresentation().getSlides().get(i).getSlideNumber().equals(menunItem.getSlide().getSlideNumber())) {
+                    index = i;
+                    break;
+                }
+            }
+
+            SlideshowFXController.this.builder.getPresentation().getSlides().add(index, slideToMove);
+
+            try {
+                SlideshowFXController.this.builder.saveTemporaryPresentation();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            SlideshowFXController.this.browser.getEngine().reload();
+            SlideshowFXController.this.updateSlideSplitMenu();
+        }
+    };
+
     @FXML private WebView browser;
     @FXML private SplitMenuButton addSlideButton;
+    @FXML private SplitMenuButton moveSlideButton;
     @FXML private TextField slideNumber;
     @FXML private TextField fieldName;
     @FXML private TextArea fieldValueMarkdown;
@@ -131,6 +176,8 @@ public class SlideshowFXController implements Initializable {
                         this.addSlideButton.getItems().add(item);
                     }
                 }
+
+                this.updateSlideSplitMenu();
             } catch (InvalidTemplateConfigurationException e) {
                 e.printStackTrace();
             } catch (InvalidTemplateException e) {
@@ -145,30 +192,38 @@ public class SlideshowFXController implements Initializable {
 
     @FXML private void updateSlideWithMarkdown(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
 
-        this.updateSlide(Processor.process("[$PROFILE$]: extended\n" + this.fieldValueMarkdown.getText()).replaceAll("\\n", "")
-                .replaceAll("\\\\", "&#92;"));
+        this.updateSlide(Processor.process("[$PROFILE$]: extended\n" + this.fieldValueMarkdown.getText()));
     }
 
     @FXML private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
 
-        this.updateSlide(this.fieldValueText.getText().replaceAll("\\n", "")
-                //.replaceAll("\"","\"\"")
-                .replaceAll("\\\\", "&#92;"));
+        this.updateSlide(this.fieldValueText.getText());
     }
 
     private void updateSlide(String content) throws TransformerException, IOException, ParserConfigurationException, SAXException {
+
+        String clearedContent = content.replaceAll("\\n", "")
+                .replaceAll("\\\\", "&#92;")
+                .replace("\'", "&#39;")
+                ;
 
         String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",
                 this.builder.getTemplate().getContentDefinerMethod(),
                 this.slideNumber.getText(),
                 this.fieldName.getText(),
-               content);
+               clearedContent);
 
         this.browser.getEngine().executeScript(jsCommand);
         Element slideElement = this.browser.getEngine().getDocument().getElementById(this.builder.getTemplate().getSlideIdPrefix() + this.slideNumber.getText());
 
         this.builder.getPresentation().updateSlideText(this.slideNumber.getText(), DOMUtils.convertNodeToText(slideElement));
         this.builder.saveTemporaryPresentation();
+
+        // Take a thumbnail of the slide
+        WritableImage thumbnail = this.browser.snapshot(null, null);
+        this.builder.getPresentation().updateSlideThumbnail(this.slideNumber.getText(), thumbnail);
+
+        updateSlideSplitMenu();
     }
 
     @FXML private void deleteSlide(ActionEvent event) {
@@ -277,6 +332,16 @@ public class SlideshowFXController implements Initializable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void updateSlideSplitMenu() {
+        SlideshowFXController.this.moveSlideButton.getItems().clear();
+        SlideMenuItem menuItem;
+        for(PresentationBuilder.Slide slide : SlideshowFXController.this.builder.getPresentation().getSlides()) {
+            menuItem = new SlideMenuItem(slide);
+            menuItem.setOnAction(SlideshowFXController.this.moveSlideActionEvent);
+            SlideshowFXController.this.moveSlideButton.getItems().add(menuItem);
         }
     }
 

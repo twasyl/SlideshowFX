@@ -5,10 +5,15 @@ import com.twasyl.slideshowfx.exceptions.InvalidPresentationConfigurationExcepti
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
 import com.twasyl.slideshowfx.exceptions.PresentationException;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.xml.sax.SAXException;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
 import javax.json.*;
 import javax.json.stream.JsonGenerator;
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,6 +35,7 @@ public class PresentationBuilder {
         private File file;
         private String text;
         private List<Slide> slides = new ArrayList<>();
+        private Image thumbnail;
 
         public Slide() {
         }
@@ -58,6 +64,9 @@ public class PresentationBuilder {
         public List<Slide> getSlides() { return slides; }
         public void setSlides(List<Slide> slides) { this.slides = slides; }
 
+        public Image getThumbnail() { return thumbnail; }
+        public void setThumbnail(Image thumbnail) { this.thumbnail = thumbnail; }
+
         public static void buildContent(StringBuffer buffer, Slide slide) throws IOException, SAXException, ParserConfigurationException {
             if(slide.getSlides().isEmpty()) buffer.append(slide.getText());
         }
@@ -79,6 +88,7 @@ public class PresentationBuilder {
         private String jsObject;
         private File slidesTemplateDirectory;
         private File slidesPresentationDirectory;
+        private File slidesThumbnailDirectory;
         private File resourcesDirectory;
         private String slideIdPrefix;
 
@@ -118,6 +128,9 @@ public class PresentationBuilder {
         public File getResourcesDirectory() { return resourcesDirectory; }
         public void setResourcesDirectory(File resourcesDirectory) { this.resourcesDirectory = resourcesDirectory; }
 
+        public File getSlidesThumbnailDirectory() { return slidesThumbnailDirectory; }
+        public void setSlidesThumbnailDirectory(File slidesThumbnailDirectory) { this.slidesThumbnailDirectory = slidesThumbnailDirectory; }
+
         public String getSlideIdPrefix() { return slideIdPrefix; }
         public void setSlideIdPrefix(String slideIdPrefix) { this.slideIdPrefix = slideIdPrefix; }
 
@@ -145,9 +158,6 @@ public class PresentationBuilder {
             this.setResourcesDirectory(new File(this.getFolder(), templateJson.getString("resources-directory")));
             LOGGER.fine("[Template configuration] resources-directory = " + this.getResourcesDirectory().getAbsolutePath());
 
-            this.setSlideIdPrefix(templateJson.getString("slide-id-prefix"));
-            LOGGER.fine("[Template configuration] slideIdPrefix = " + this.getSlideIdPrefix());
-
             JsonArray methodsJson = templateJson.getJsonArray("methods");
 
             if(methodsJson != null && methodsJson.size() > 0) {
@@ -166,35 +176,47 @@ public class PresentationBuilder {
 
             // Setting the slides
             this.setSlides(new ArrayList<Slide>());
+            JsonObject slidesJson = templateJson.getJsonObject("slides");
 
-            LOGGER.fine("Reading slide's configuration");
+            if (slidesJson != null) {
+                LOGGER.fine("Reading slide's configuration");
+                JsonObject slidesConfigurationJson = slidesJson.getJsonObject("configuration");
 
-            JsonObject slidesLocationsJson = templateJson.getJsonObject("slides-locations");
-            this.setSlidesTemplateDirectory(new File(this.getFolder(), slidesLocationsJson.getString("template-directory")));
-            LOGGER.fine("[Slide's configuration] template directory = " + this.getSlidesTemplateDirectory().getAbsolutePath());
+                this.setSlidesTemplateDirectory(new File(this.getFolder(), slidesConfigurationJson.getString("template-directory")));
+                LOGGER.fine("[Slide's configuration] template directory = " + this.getSlidesTemplateDirectory().getAbsolutePath());
 
-            this.setSlidesPresentationDirectory(new File(this.getFolder(), slidesLocationsJson.getString("presentation-directory")));
-            LOGGER.fine("[Slide's configuration] presentation directory = " + this.getSlidesPresentationDirectory().getAbsolutePath());
+                this.setSlidesPresentationDirectory(new File(this.getFolder(), slidesConfigurationJson.getString("presentation-directory")));
+                LOGGER.fine("[Slide's configuration] presentation directory = " + this.getSlidesPresentationDirectory().getAbsolutePath());
 
-            JsonArray slidesJson = templateJson.getJsonArray("slides");
-            if (slidesJson != null && !slidesJson.isEmpty()) {
-                Slide slide;
+                this.setSlidesThumbnailDirectory(new File(this.getFolder(), slidesConfigurationJson.getString("thumbnail-directory")));
+                LOGGER.fine("[Slide's configuration] slides thumbnail directory = " + this.getSlidesThumbnailDirectory().getAbsolutePath());
 
-                for (JsonObject slideJson : slidesJson.getValuesAs(JsonObject.class)) {
-                    slide = new Slide();
-                    slide.setId(slideJson.getInt("id"));
-                    LOGGER.fine("[Slide configuration] id = " + slide.getId());
+                this.setSlideIdPrefix(slidesConfigurationJson.getString("slide-id-prefix"));
+                LOGGER.fine("[Template configuration] slideIdPrefix = " + this.getSlideIdPrefix());
 
-                    slide.setName(slideJson.getString("name"));
-                    LOGGER.fine("[Slide configuration] name = " + slide.getName());
+                JsonArray slidesDefinition = slidesJson.getJsonArray("slides-definition");
 
-                    slide.setFile(new File(this.getSlidesTemplateDirectory(), slideJson.getString("file")));
-                    LOGGER.fine("[Slide configuration] file = " + slide.getFile().getAbsolutePath());
+                if(slidesDefinition != null && !slidesDefinition.isEmpty()) {
+                    Slide slide;
 
-                    this.getSlides().add(slide);
+                    for (JsonObject slideJson : slidesDefinition.getValuesAs(JsonObject.class)) {
+                        slide = new Slide();
+                        slide.setId(slideJson.getInt("id"));
+                        LOGGER.fine("[Slide definition] id = " + slide.getId());
+
+                        slide.setName(slideJson.getString("name"));
+                        LOGGER.fine("[Slide definition] name = " + slide.getName());
+
+                        slide.setFile(new File(this.getSlidesTemplateDirectory(), slideJson.getString("file")));
+                        LOGGER.fine("[Slide definition] file = " + slide.getFile().getAbsolutePath());
+
+                        this.getSlides().add(slide);
+                    }
+                } else {
+                    LOGGER.fine("No slide's definition found");
                 }
             } else {
-                LOGGER.fine("No slide's configurationfound");
+                LOGGER.fine("No slide's configuration found");
             }
         }
     }
@@ -226,6 +248,32 @@ public class PresentationBuilder {
                     break;
                 }
             }
+        }
+
+        public void updateSlideThumbnail(String slideNumber, Image image) {
+            if(slideNumber == null) throw new IllegalArgumentException("The slide number can not be null");
+
+            Slide slideToUpdate = null;
+            for (Slide s : getSlides()) {
+                if (slideNumber.equals(s.getSlideNumber())) {
+                    s.setThumbnail(image);
+                    LOGGER.finest("Slide's thumbnail updated");
+                    break;
+                }
+            }
+        }
+
+        public Slide getSlide(String slideNumber) {
+            Slide slide = null;
+
+            for(Slide s : slides) {
+                if(s.getSlideNumber().equals(slideNumber)) {
+                    slide = s;
+                    break;
+                }
+            }
+
+            return slide;
         }
     }
 
@@ -457,6 +505,11 @@ public class PresentationBuilder {
             slide.setId(slideJson.getInt("template-id"));
             slide.setFile(new File(this.template.getSlidesPresentationDirectory(), slideJson.getString("file")));
 
+            try {
+                slide.setThumbnail(SwingFXUtils.toFXImage(ImageIO.read(new File(this.template.getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png"))), null));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             this.presentation.getSlides().add(slide);
         }
 
@@ -557,7 +610,7 @@ public class PresentationBuilder {
      * @param template
      * @throws IOException
      */
-    public void addSlide(Slide template, String afterSlideNumber) throws IOException, ParserConfigurationException, SAXException {
+    public Slide addSlide(Slide template, String afterSlideNumber) throws IOException, ParserConfigurationException, SAXException {
         if(template == null) throw new IllegalArgumentException("The template for creating a slide can not be null");
         Velocity.init();
 
@@ -602,6 +655,8 @@ public class PresentationBuilder {
         slide.setText(new String(slideContentByte.toByteArray()));
 
         this.saveTemporaryPresentation();
+
+        return slide;
     }
 
     /**
@@ -702,6 +757,22 @@ public class PresentationBuilder {
         }
 
         LOGGER.fine("Slides files created");
+
+        LOGGER.fine("Create slides thumbnails");
+        if(!this.template.getSlidesThumbnailDirectory().exists()) this.template.getSlidesThumbnailDirectory().mkdirs();
+        else {
+            for(File slideFile : this.template.getSlidesThumbnailDirectory().listFiles()) {
+                if(slideFile.isFile()) {
+                    slideFile.delete();
+                }
+            }
+        }
+
+        for(Slide slide : this.presentation.getSlides()) {
+            LOGGER.fine("Creating thumbnail file: " + this.template.getSlidesThumbnailDirectory().getAbsolutePath() + File.separator + slide.getSlideNumber() + ".png");
+
+            ImageIO.write(SwingFXUtils.fromFXImage(slide.getThumbnail(), null), "png", new File(this.getTemplate().getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png")));
+        }
 
         LOGGER.fine("Compressing temporary file");
         ZipUtils.zip(this.template.getFolder(), presentationArchive);

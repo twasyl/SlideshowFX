@@ -226,6 +226,30 @@ public class SlideshowFXController implements Initializable {
         updateSlideSplitMenu();
     }
 
+    @FXML private void copySlide(ActionEvent event) {
+        final String slideId = (String) this.browser.getEngine().executeScript(this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
+        final String slideNumber = slideId.substring(this.builder.getTemplate().getSlideIdPrefix().length());
+
+        PresentationBuilder.Slide slideToCopy = this.builder.getPresentation().getSlide(slideNumber);
+        PresentationBuilder.Slide copy = this.builder.duplicateSlide(slideToCopy);
+
+        int index = this.builder.getPresentation().getSlides().indexOf(slideToCopy);
+        if(index != -1) this.builder.getPresentation().getSlides().add(index, copy);
+
+        try {
+            this.builder.saveTemporaryPresentation();
+            this.updateSlideSplitMenu();
+
+            this.browser.getEngine().reload();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @FXML private void deleteSlide(ActionEvent event) {
         String slideId = this.browser.getEngine().executeScript(this.builder.getTemplate().getGetCurrentSlideMethod() + "();").toString();
 

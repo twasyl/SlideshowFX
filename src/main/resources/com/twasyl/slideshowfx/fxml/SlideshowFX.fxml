@@ -50,9 +50,38 @@
 
             <Separator />
 
-            <SplitMenuButton fx:id="addSlideButton" text="Add slide ..." />
+            <SplitMenuButton fx:id="addSlideButton">
+                <tooltip>
+                    <Tooltip text="Add slide" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/add.png" />
+                    </ImageView>
+                </graphic>
+            </SplitMenuButton>
 
-            <SplitMenuButton fx:id="moveSlideButton" text="Move slide ..." />
+            <Button onAction="#copySlide">
+                <tooltip>
+                    <Tooltip text="Copy slide" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/copy.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <SplitMenuButton fx:id="moveSlideButton">
+                <tooltip>
+                    <Tooltip  text="Move slide" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/move.png" />
+                    </ImageView>
+                </graphic>
+            </SplitMenuButton>
 
             <Button onAction="#deleteSlide">
                 <tooltip>
@@ -60,10 +89,12 @@
                 </tooltip>
                 <graphic>
                     <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/trash.png" />
+                        <Image url="@/com/twasyl/slideshowfx/images/delete.png" />
                     </ImageView>
                 </graphic>
             </Button>
+
+            <Separator />
 
             <Button onAction="#reload">
                 <tooltip>

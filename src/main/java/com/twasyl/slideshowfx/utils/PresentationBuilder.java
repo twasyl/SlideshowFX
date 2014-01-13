@@ -282,9 +282,7 @@ public class PresentationBuilder {
     private static final String VELOCITY_SLIDES_TOKEN = "slides";
     private static final String VELOCITY_SFX_CALLBACK_TOKEN = "sfxCallback";
     private static final String VELOCITY_SFX_CONTENT_DEFINER_TOKEN = "sfxContentDefiner";
-    private static final String VELOCITY_CHAT_JS_TOKEN = "chat-js";
-    private static final String VELOCITY_CHAT_CSS_TOKEN = "chat-css";
-    private static final String VELOCITY_CHAT_CONTENT_TOKEN = "chat-content";
+    private static final String VELOCITY_SLIDE_ID_PREFIX_TOKEN = "slideIdPrefix";
 
     private static final String VELOCITY_SFX_CONTENT_DEFINER_SCRIPT = "function setField(slide, what, value) {\n" +
             "\telement = document.getElementById(slide + \"-\" + what);\n" +
@@ -297,52 +295,6 @@ public class PresentationBuilder {
             "\n" +
             "\tsfx.prefillContentDefinition(slideNumber, fieldName, source.innerHTML);\n" +
             "}";
-
-    private static final String VELOCITY_CHAT_JS = "<script type=\"text/javascript\">\n" +
-            "\tvar socket;\n" +
-            "\n" +
-            "\twindow.onload = function() {\n" +
-            "\t\tsocket = new WebSocket(\"ws://%1$s:%2$s/slideshowfx/chat/presenter\");\n" +
-            "\n" +
-            "\t\tsocket.onopen = function(event) {\n" +
-            "\t\t};\n" +
-            "\n" +
-            "\t\tsocket.onmessage = function(event) {\n" +
-            "\t\t\tvar messagesDiv = document.getElementById(\"messages\");\n" +
-            "\n" +
-            "\t\t\tmessagesDiv.innerHTML = messagesDiv.innerHTML + event.data;\n" +
-            "\t\t}\n" +
-            "\t};\n" +
-            "</script>";
-
-    private static final String VELOCITY_CHAT_CSS = "<style type=\"text/css\">\n" +
-            "\t#chat {\n" +
-            "\t\tborder-radius: 8px;\n" +
-            "\t\tbackground-color: lightgray;\n" +
-            "\t\tborder: 1px solid gray;\n" +
-            "\t\twidth: 520px;\n" +
-            "\t\tpadding: 5px;\n" +
-            "\t}\n" +
-            "\t#messages {\n" +
-            "\t\tmargin-bottom: 5px;\n" +
-            "\t}\n" +
-            "\n" +
-            "\t.chat-message {\n" +
-            "\t\tbackground-color: white;\n" +
-            "\t\tpadding: 5px;\n" +
-            "\t\tmargin: 3px;\n" +
-            "\t}\n" +
-            "\t.author {\n" +
-            "\t\tfont-weight: bold;\n" +
-            "\t}\n" +
-            "\t.message-content {\n" +
-            "\t\tfont-style: italic;\n" +
-            "\t}\n" +
-            "</style>";
-
-    private static final String VELOCITY_CHAT_CONTENT = "<div id=\"chat\">\n" +
-            "\t<div id=\"messages\"></div>\n" +
-            "</div>";
 
     private static final String VELOCITY_SFX_CALLBACK_CALL = "sendInformationToSlideshowFX(this);";
 
@@ -645,6 +597,7 @@ public class PresentationBuilder {
         final Writer slideContentWriter = new OutputStreamWriter(slideContentByte);
 
         VelocityContext context = new VelocityContext();
+        context.put(VELOCITY_SLIDE_ID_PREFIX_TOKEN, this.template.getSlideIdPrefix());
         context.put(VELOCITY_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
         context.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_CALL);
 
@@ -676,6 +629,23 @@ public class PresentationBuilder {
         }
 
         this.saveTemporaryPresentation();
+    }
+
+    /**
+     * Duplicates the given slide
+     */
+    public Slide duplicateSlide(Slide slide) {
+        if(slide == null) throw new IllegalArgumentException("The slide to duplicate can not be null");
+
+        Slide copy =  new Slide();
+        copy.setName(slide.getName());
+        copy.setId(slide.getId());
+        copy.setSlideNumber(System.currentTimeMillis() + "");
+        copy.setText(slide.getText());
+        copy.setFile(slide.getFile());
+        copy.setThumbnail(slide.getThumbnail());
+
+        return copy;
     }
 
     public void saveTemporaryPresentation() throws ParserConfigurationException, SAXException, IOException {
@@ -771,7 +741,8 @@ public class PresentationBuilder {
         for(Slide slide : this.presentation.getSlides()) {
             LOGGER.fine("Creating thumbnail file: " + this.template.getSlidesThumbnailDirectory().getAbsolutePath() + File.separator + slide.getSlideNumber() + ".png");
 
-            ImageIO.write(SwingFXUtils.fromFXImage(slide.getThumbnail(), null), "png", new File(this.getTemplate().getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png")));
+            if(slide.getThumbnail() != null)
+                ImageIO.write(SwingFXUtils.fromFXImage(slide.getThumbnail(), null), "png", new File(this.getTemplate().getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png")));
         }
 
         LOGGER.fine("Compressing temporary file");

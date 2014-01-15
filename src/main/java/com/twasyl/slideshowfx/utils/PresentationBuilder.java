@@ -34,8 +34,8 @@ public class PresentationBuilder {
         private String name;
         private File file;
         private String text;
-        private List<Slide> slides = new ArrayList<>();
         private Image thumbnail;
+        private String[] dynamicIds;
 
         public Slide() {
         }
@@ -61,14 +61,14 @@ public class PresentationBuilder {
         public String getSlideNumber() { return slideNumber; }
         public void setSlideNumber(String slideNumber) { this.slideNumber = slideNumber; }
 
-        public List<Slide> getSlides() { return slides; }
-        public void setSlides(List<Slide> slides) { this.slides = slides; }
-
         public Image getThumbnail() { return thumbnail; }
         public void setThumbnail(Image thumbnail) { this.thumbnail = thumbnail; }
 
+        public String[] getDynamicIds() { return dynamicIds; }
+        public void setDynamicIds(String[] dynamicIds) { this.dynamicIds = dynamicIds; }
+
         public static void buildContent(StringBuffer buffer, Slide slide) throws IOException, SAXException, ParserConfigurationException {
-            if(slide.getSlides().isEmpty()) buffer.append(slide.getText());
+            buffer.append(slide.getText());
         }
     }
 
@@ -198,6 +198,7 @@ public class PresentationBuilder {
 
                 if(slidesDefinition != null && !slidesDefinition.isEmpty()) {
                     Slide slide;
+                    JsonArray dynamicIdsJson;
 
                     for (JsonObject slideJson : slidesDefinition.getValuesAs(JsonObject.class)) {
                         slide = new Slide();
@@ -209,6 +210,15 @@ public class PresentationBuilder {
 
                         slide.setFile(new File(this.getSlidesTemplateDirectory(), slideJson.getString("file")));
                         LOGGER.fine("[Slide definition] file = " + slide.getFile().getAbsolutePath());
+
+                        dynamicIdsJson = slideJson.getJsonArray("dynamic-ids");
+                        if(dynamicIdsJson != null && !dynamicIdsJson.isEmpty()) {
+                            slide.setDynamicIds(new String[dynamicIdsJson.size()]);
+
+                            for(int index = 0; index < dynamicIdsJson.size(); index++) {
+                                slide.getDynamicIds()[index] = dynamicIdsJson.getString(index);
+                            }
+                        }
 
                         this.getSlides().add(slide);
                     }

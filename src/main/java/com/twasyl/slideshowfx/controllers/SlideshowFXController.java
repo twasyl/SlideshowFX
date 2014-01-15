@@ -202,7 +202,7 @@ public class SlideshowFXController implements Initializable {
 
     private void updateSlide(String content) throws TransformerException, IOException, ParserConfigurationException, SAXException {
 
-        String clearedContent = content.replaceAll("\\n", "")
+        String clearedContent = content.replaceAll("\\n", "&#10;")
                 .replaceAll("\\\\", "&#92;")
                 .replace("\'", "&#39;")
                 ;

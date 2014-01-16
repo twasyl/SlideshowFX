@@ -1,27 +1,37 @@
 package com.twasyl.slideshowfx.utils;
 
-import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.exceptions.InvalidPresentationConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
 import com.twasyl.slideshowfx.exceptions.PresentationException;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
 import javax.json.*;
 import javax.json.stream.JsonGenerator;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PresentationBuilder {
 
@@ -134,6 +144,18 @@ public class PresentationBuilder {
         public String getSlideIdPrefix() { return slideIdPrefix; }
         public void setSlideIdPrefix(String slideIdPrefix) { this.slideIdPrefix = slideIdPrefix; }
 
+        public Slide getSlide(int slideId) {
+            Slide searchedSlide = null;
+
+            for(Slide slide : getSlides()) {
+                if(slideId == slide.getId()) {
+                    searchedSlide = slide;
+                    break;
+                }
+            }
+
+            return searchedSlide;
+        }
         /**
          * Read the configuration of this template located in the <b>folder</b> attribute.
          */
@@ -465,6 +487,10 @@ public class PresentationBuilder {
             slideJson = slidesJson.getJsonObject(index);
             slide.setSlideNumber(slideJson.getString("number"));
             slide.setId(slideJson.getInt("template-id"));
+
+            Slide templateSlide = this.template.getSlide(slide.getId());
+            slide.setName(templateSlide.getName());
+            slide.setDynamicIds(templateSlide.getDynamicIds());
             slide.setFile(new File(this.template.getSlidesPresentationDirectory(), slideJson.getString("file")));
 
             try {
@@ -578,7 +604,7 @@ public class PresentationBuilder {
 
         final Slide slide = new Slide(template.getId(), template.getName(), template.getFile());
         slide.setSlideNumber(template.getSlideNumber());
-
+        slide.setDynamicIds(template.getDynamicIds());
         slide.setSlideNumber(System.currentTimeMillis() + "");
 
         if(afterSlideNumber == null) {
@@ -647,13 +673,60 @@ public class PresentationBuilder {
     public Slide duplicateSlide(Slide slide) {
         if(slide == null) throw new IllegalArgumentException("The slide to duplicate can not be null");
 
-        Slide copy =  new Slide();
+        final Slide copy =  new Slide();
         copy.setName(slide.getName());
         copy.setId(slide.getId());
         copy.setSlideNumber(System.currentTimeMillis() + "");
         copy.setText(slide.getText());
         copy.setFile(slide.getFile());
         copy.setThumbnail(slide.getThumbnail());
+        copy.setDynamicIds(slide.getDynamicIds());
+
+        // Apply the template engine for replacing dynamic elements
+        final VelocityContext originalContext = new VelocityContext();
+        originalContext.put(VELOCITY_SLIDE_ID_PREFIX_TOKEN, this.template.getSlideIdPrefix());
+        originalContext.put(VELOCITY_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
+
+        final VelocityContext copyContext = new VelocityContext();
+        copyContext.put(VELOCITY_SLIDE_ID_PREFIX_TOKEN, this.template.getSlideIdPrefix());
+        copyContext.put(VELOCITY_SLIDE_NUMBER_TOKEN, copy.getSlideNumber());
+
+        ByteArrayOutputStream byteOutput = null;
+        Writer writer = null;
+        try {
+            byteOutput = new ByteArrayOutputStream();
+            writer = new OutputStreamWriter(byteOutput);
+
+            String oldId, newId;
+
+            /**
+             * For each ID:
+             * 1- Look for the original ID ; ie with the original slide number
+             * 2- Replace each original ID by the ID of the new slide
+             */
+            for(String dynamicId : slide.getDynamicIds()) {
+                Velocity.evaluate(originalContext, writer, "", dynamicId);
+                writer.flush();
+
+                oldId = new String(byteOutput.toByteArray());
+                byteOutput.reset();
+
+                if(copy.getText().contains(String.format("id=\"%1$s\"", oldId))) {
+                    Velocity.evaluate(copyContext, writer, "", dynamicId);
+                    writer.flush();
+
+                    newId = new String(byteOutput.toByteArray());
+                    byteOutput.reset();
+
+                    copy.setText(copy.getText().replaceAll(String.format("id=\"%1$s\"", oldId), String.format("id=\"%1$s\"", newId)));
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+
+        }
 
         return copy;
     }

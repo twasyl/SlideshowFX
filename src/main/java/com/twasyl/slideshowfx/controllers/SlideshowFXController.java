@@ -234,7 +234,13 @@ public class SlideshowFXController implements Initializable {
         PresentationBuilder.Slide copy = this.builder.duplicateSlide(slideToCopy);
 
         int index = this.builder.getPresentation().getSlides().indexOf(slideToCopy);
-        if(index != -1) this.builder.getPresentation().getSlides().add(index, copy);
+        if(index != -1) {
+            if(index == this.builder.getPresentation().getSlides().size() - 1) {
+                this.builder.getPresentation().getSlides().add(copy);
+            } else {
+                this.builder.getPresentation().getSlides().add(index + 1, copy);
+            }
+        }
 
         try {
             this.builder.saveTemporaryPresentation();

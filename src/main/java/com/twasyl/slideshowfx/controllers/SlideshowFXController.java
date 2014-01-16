@@ -388,5 +388,17 @@ public class SlideshowFXController implements Initializable {
         });
 
         this.browser.getEngine().setJavaScriptEnabled(true);
+
+        this.addSlideButton.setGraphic(
+                new ImageView(
+                    new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/add.png"), 20d, 20d, true, true)
+                )
+        );
+
+        this.moveSlideButton.setGraphic(
+                new ImageView(
+                        new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/move.png"), 20d, 20d, true, true)
+                )
+        );
     }
 }

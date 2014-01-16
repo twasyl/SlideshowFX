@@ -54,11 +54,6 @@
                 <tooltip>
                     <Tooltip text="Add slide" />
                 </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/add.png" />
-                    </ImageView>
-                </graphic>
             </SplitMenuButton>
 
             <Button onAction="#copySlide">
@@ -76,11 +71,6 @@
                 <tooltip>
                     <Tooltip  text="Move slide" />
                 </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/move.png" />
-                    </ImageView>
-                </graphic>
             </SplitMenuButton>
 
             <Button onAction="#deleteSlide">

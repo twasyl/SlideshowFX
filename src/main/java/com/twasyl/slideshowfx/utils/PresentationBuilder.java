@@ -36,21 +36,57 @@ import java.util.regex.Pattern;
 public class PresentationBuilder {
 
     /**
-     * Represents a slide defined by a template
+     * Represents a slide of the presentation
      */
     public static class Slide {
-        private int id;
+
+        private SlideTemplate template;
         private String slideNumber;
-        private String name;
-        private File file;
         private String text;
         private Image thumbnail;
-        private String[] dynamicIds;
 
         public Slide() {
         }
 
-        public Slide(int id, String name, File file) {
+        public Slide(String slideNumber) {
+            this.slideNumber = slideNumber;
+        }
+
+        public Slide(SlideTemplate template, String slideNumber) {
+            this.template = template;
+            this.slideNumber = slideNumber;
+        }
+
+        public SlideTemplate getTemplate() { return template; }
+        public void setTemplate(SlideTemplate template) { this.template = template; }
+
+        public String getText() { return text; }
+        public void setText(String text) { this.text = text; }
+
+        public String getSlideNumber() { return slideNumber; }
+        public void setSlideNumber(String slideNumber) { this.slideNumber = slideNumber; }
+
+        public Image getThumbnail() { return thumbnail; }
+        public void setThumbnail(Image thumbnail) { this.thumbnail = thumbnail; }
+
+        public static void buildContent(StringBuffer buffer, Slide slide) throws IOException, SAXException, ParserConfigurationException {
+            buffer.append(slide.getText());
+        }
+    }
+
+    /**
+     * Represents a slide defined by the template
+     */
+    public static class SlideTemplate {
+        private int id;
+        private String name;
+        private File file;
+        private String[] dynamicIds;
+
+        public SlideTemplate() {
+        }
+
+        public SlideTemplate(int id, String name, File file) {
             this.id = id;
             this.name = name;
             this.file = file;
@@ -64,15 +100,6 @@ public class PresentationBuilder {
 
         public File getFile() { return file; }
         public void setFile(File file) { this.file = file; }
-
-        public String getText() { return text; }
-        public void setText(String text) { this.text = text; }
-
-        public String getSlideNumber() { return slideNumber; }
-        public void setSlideNumber(String slideNumber) { this.slideNumber = slideNumber; }
-
-        public Image getThumbnail() { return thumbnail; }
-        public void setThumbnail(Image thumbnail) { this.thumbnail = thumbnail; }
 
         public String[] getDynamicIds() { return dynamicIds; }
         public void setDynamicIds(String[] dynamicIds) { this.dynamicIds = dynamicIds; }
@@ -92,7 +119,7 @@ public class PresentationBuilder {
         private File configurationFile;
         private String name;
         private File file;
-        private List<Slide> slides;
+        private List<SlideTemplate> slideTemplates;
         private String contentDefinerMethod;
         private String getCurrentSlideMethod;
         private String jsObject;
@@ -111,8 +138,8 @@ public class PresentationBuilder {
         public File getFile() { return file;  }
         public void setFile(File file) { this.file = file; }
 
-        public List<Slide> getSlides() { return slides; }
-        public void setSlides(List<Slide> slides) { this.slides = slides; }
+        public List<SlideTemplate> getSlideTemplates() { return slideTemplates; }
+        public void setSlideTemplates(List<SlideTemplate> slideTemplates) { this.slideTemplates = slideTemplates; }
 
         public File getFolder() { return folder; }
         public void setFolder(File folder) { this.folder = folder; }
@@ -144,17 +171,17 @@ public class PresentationBuilder {
         public String getSlideIdPrefix() { return slideIdPrefix; }
         public void setSlideIdPrefix(String slideIdPrefix) { this.slideIdPrefix = slideIdPrefix; }
 
-        public Slide getSlide(int slideId) {
-            Slide searchedSlide = null;
+        public SlideTemplate getSlideTemplate(int slideId) {
+            SlideTemplate searchedTemplate = null;
 
-            for(Slide slide : getSlides()) {
-                if(slideId == slide.getId()) {
-                    searchedSlide = slide;
+            for(SlideTemplate slideTemplate : getSlideTemplates()) {
+                if(slideId == slideTemplate.getId()) {
+                    searchedTemplate = slideTemplate;
                     break;
                 }
             }
 
-            return searchedSlide;
+            return searchedTemplate;
         }
         /**
          * Read the configuration of this template located in the <b>folder</b> attribute.
@@ -197,7 +224,7 @@ public class PresentationBuilder {
             }
 
             // Setting the slides
-            this.setSlides(new ArrayList<Slide>());
+            this.setSlideTemplates(new ArrayList<SlideTemplate>());
             JsonObject slidesJson = templateJson.getJsonObject("slides");
 
             if (slidesJson != null) {
@@ -219,30 +246,30 @@ public class PresentationBuilder {
                 JsonArray slidesDefinition = slidesJson.getJsonArray("slides-definition");
 
                 if(slidesDefinition != null && !slidesDefinition.isEmpty()) {
-                    Slide slide;
+                    SlideTemplate slideTemplate;
                     JsonArray dynamicIdsJson;
 
                     for (JsonObject slideJson : slidesDefinition.getValuesAs(JsonObject.class)) {
-                        slide = new Slide();
-                        slide.setId(slideJson.getInt("id"));
-                        LOGGER.fine("[Slide definition] id = " + slide.getId());
+                        slideTemplate = new SlideTemplate();
+                        slideTemplate.setId(slideJson.getInt("id"));
+                        LOGGER.fine("[Slide definition] id = " + slideTemplate.getId());
 
-                        slide.setName(slideJson.getString("name"));
-                        LOGGER.fine("[Slide definition] name = " + slide.getName());
+                        slideTemplate.setName(slideJson.getString("name"));
+                        LOGGER.fine("[Slide definition] name = " + slideTemplate.getName());
 
-                        slide.setFile(new File(this.getSlidesTemplateDirectory(), slideJson.getString("file")));
-                        LOGGER.fine("[Slide definition] file = " + slide.getFile().getAbsolutePath());
+                        slideTemplate.setFile(new File(this.getSlidesTemplateDirectory(), slideJson.getString("file")));
+                        LOGGER.fine("[Slide definition] file = " + slideTemplate.getFile().getAbsolutePath());
 
                         dynamicIdsJson = slideJson.getJsonArray("dynamic-ids");
                         if(dynamicIdsJson != null && !dynamicIdsJson.isEmpty()) {
-                            slide.setDynamicIds(new String[dynamicIdsJson.size()]);
+                            slideTemplate.setDynamicIds(new String[dynamicIdsJson.size()]);
 
                             for(int index = 0; index < dynamicIdsJson.size(); index++) {
-                                slide.getDynamicIds()[index] = dynamicIdsJson.getString(index);
+                                slideTemplate.getDynamicIds()[index] = dynamicIdsJson.getString(index);
                             }
                         }
 
-                        this.getSlides().add(slide);
+                        this.getSlideTemplates().add(slideTemplate);
                     }
                 } else {
                     LOGGER.fine("No slide's definition found");
@@ -486,12 +513,7 @@ public class PresentationBuilder {
 
             slideJson = slidesJson.getJsonObject(index);
             slide.setSlideNumber(slideJson.getString("number"));
-            slide.setId(slideJson.getInt("template-id"));
-
-            Slide templateSlide = this.template.getSlide(slide.getId());
-            slide.setName(templateSlide.getName());
-            slide.setDynamicIds(templateSlide.getDynamicIds());
-            slide.setFile(new File(this.template.getSlidesPresentationDirectory(), slideJson.getString("file")));
+            slide.setTemplate(this.template.getSlideTemplate(slideJson.getInt("template-id")));
 
             try {
                 slide.setThumbnail(SwingFXUtils.toFXImage(ImageIO.read(new File(this.template.getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png"))), null));
@@ -510,11 +532,13 @@ public class PresentationBuilder {
         byte[] buffer = new byte[1024];
         int length;
         StringBuffer slidesBuffer = new StringBuffer();
+        File slideFile;
 
         for(Slide s : this.presentation.getSlides()) {
-            LOGGER.fine("Reading slide file: " + s.getFile().getAbsolutePath());
+            slideFile = new File(this.template.getSlidesPresentationDirectory(), s.getSlideNumber().concat(".html"));
+            LOGGER.fine("Reading slide file: " + slideFile.getAbsolutePath());
             try {
-                slideInput = new FileInputStream(s.getFile());
+                slideInput = new FileInputStream(slideFile);
                 slideContent = new ByteArrayOutputStream();
 
                 while((length = slideInput.read(buffer)) > 0) {
@@ -598,14 +622,11 @@ public class PresentationBuilder {
      * @param template
      * @throws IOException
      */
-    public Slide addSlide(Slide template, String afterSlideNumber) throws IOException, ParserConfigurationException, SAXException {
+    public Slide addSlide(SlideTemplate template, String afterSlideNumber) throws IOException, ParserConfigurationException, SAXException {
         if(template == null) throw new IllegalArgumentException("The template for creating a slide can not be null");
         Velocity.init();
 
-        final Slide slide = new Slide(template.getId(), template.getName(), template.getFile());
-        slide.setSlideNumber(template.getSlideNumber());
-        slide.setDynamicIds(template.getDynamicIds());
-        slide.setSlideNumber(System.currentTimeMillis() + "");
+        final Slide slide = new Slide(template, System.currentTimeMillis() + "");
 
         if(afterSlideNumber == null) {
             this.presentation.getSlides().add(slide);
@@ -628,7 +649,7 @@ public class PresentationBuilder {
         }
 
 
-        final Reader slideFileReader = new FileReader(slide.getFile());
+        final Reader slideFileReader = new FileReader(template.getFile());
         final ByteArrayOutputStream slideContentByte = new ByteArrayOutputStream();
         final Writer slideContentWriter = new OutputStreamWriter(slideContentByte);
 
@@ -673,14 +694,9 @@ public class PresentationBuilder {
     public Slide duplicateSlide(Slide slide) {
         if(slide == null) throw new IllegalArgumentException("The slide to duplicate can not be null");
 
-        final Slide copy =  new Slide();
-        copy.setName(slide.getName());
-        copy.setId(slide.getId());
-        copy.setSlideNumber(System.currentTimeMillis() + "");
+        final Slide copy = new Slide(slide.getTemplate(), System.currentTimeMillis() + "");
         copy.setText(slide.getText());
-        copy.setFile(slide.getFile());
         copy.setThumbnail(slide.getThumbnail());
-        copy.setDynamicIds(slide.getDynamicIds());
 
         // Apply the template engine for replacing dynamic elements
         final VelocityContext originalContext = new VelocityContext();
@@ -704,7 +720,7 @@ public class PresentationBuilder {
              * 1- Look for the original ID ; ie with the original slide number
              * 2- Replace each original ID by the ID of the new slide
              */
-            for(String dynamicId : slide.getDynamicIds()) {
+            for(String dynamicId : slide.getTemplate().getDynamicIds()) {
                 Velocity.evaluate(originalContext, writer, "", dynamicId);
                 writer.flush();
 
@@ -770,9 +786,8 @@ public class PresentationBuilder {
         for(Slide slide : this.presentation.getSlides()) {
             slidesJsonArray.add(
                     Json.createObjectBuilder()
-                        .add("template-id", slide.getId())
+                        .add("template-id", slide.getTemplate().getId())
                         .add("number", slide.getSlideNumber())
-                        .add("file", slide.getSlideNumber() + ".html")
                         .build()
             );
         }

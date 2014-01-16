@@ -20,7 +20,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -38,9 +37,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ListIterator;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
 
 public class SlideshowFXController implements Initializable {
 
@@ -52,7 +49,7 @@ public class SlideshowFXController implements Initializable {
             try {
 
                 Object userData = ((MenuItem) actionEvent.getSource()).getUserData();
-                if(userData instanceof PresentationBuilder.Slide) {
+                if(userData instanceof PresentationBuilder.SlideTemplate) {
                     final String slideId = (String) SlideshowFXController.this.browser.getEngine().executeScript(SlideshowFXController.this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
                     String slideNumber = null;
 
@@ -60,7 +57,7 @@ public class SlideshowFXController implements Initializable {
                         slideNumber = slideId.substring(SlideshowFXController.this.builder.getTemplate().getSlideIdPrefix().length());
                     }
 
-                    PresentationBuilder.Slide addedSlide = SlideshowFXController.this.builder.addSlide((PresentationBuilder.Slide) userData, slideNumber);
+                    PresentationBuilder.Slide addedSlide = SlideshowFXController.this.builder.addSlide((PresentationBuilder.SlideTemplate) userData, slideNumber);
                     SlideshowFXController.this.browser.getEngine().reload();
 
                     SlideshowFXController.this.updateSlideSplitMenu();
@@ -132,18 +129,7 @@ public class SlideshowFXController implements Initializable {
                 this.builder.loadTemplate(templateFile);
                 this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
 
-                this.addSlideButton.getItems().clear();
-                if(this.builder.getTemplate() != null) {
-                    MenuItem item;
-
-                    for(PresentationBuilder.Slide slide : this.builder.getTemplate().getSlides()) {
-                        item = new MenuItem();
-                        item.setText(slide.getName());
-                        item.setUserData(slide);
-                        item.setOnAction(addSlideActionEvent);
-                        this.addSlideButton.getItems().add(item);
-                    }
-                }
+                this.updateSlideTemplatesSplitMenu();
             } catch (InvalidTemplateException e) {
                 e.printStackTrace();
             } catch (InvalidTemplateConfigurationException e) {
@@ -164,19 +150,7 @@ public class SlideshowFXController implements Initializable {
                 this.builder.openPresentation(file);
                 this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
 
-                this.addSlideButton.getItems().clear();
-                if(this.builder.getTemplate() != null) {
-                    MenuItem item;
-
-                    for(PresentationBuilder.Slide slide : this.builder.getTemplate().getSlides()) {
-                        item = new MenuItem();
-                        item.setText(slide.getName());
-                        item.setUserData(slide);
-                        item.setOnAction(addSlideActionEvent);
-                        this.addSlideButton.getItems().add(item);
-                    }
-                }
-
+                this.updateSlideTemplatesSplitMenu();
                 this.updateSlideSplitMenu();
             } catch (InvalidTemplateConfigurationException e) {
                 e.printStackTrace();
@@ -361,6 +335,21 @@ public class SlideshowFXController implements Initializable {
                 this.fieldValueText.setText(this.fieldValueText.getText() + imgMarkup);
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private void updateSlideTemplatesSplitMenu() {
+        this.addSlideButton.getItems().clear();
+        if(this.builder.getTemplate() != null) {
+            MenuItem item;
+
+            for(PresentationBuilder.SlideTemplate slideTemplate : this.builder.getTemplate().getSlideTemplates()) {
+                item = new MenuItem();
+                item.setText(slideTemplate.getName());
+                item.setUserData(slideTemplate);
+                item.setOnAction(addSlideActionEvent);
+                this.addSlideButton.getItems().add(item);
             }
         }
     }

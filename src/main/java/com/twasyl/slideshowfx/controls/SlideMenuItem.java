@@ -27,7 +27,7 @@ public class SlideMenuItem extends MenuItem {
 
             graphic = view;
         } else {
-            Label text = new Label(String.format("%1$s #%2$s", slide.getName(), slide.getSlideNumber()));
+            Label text = new Label(String.format("%1$s #%2$s", slide.getTemplate().getName(), slide.getSlideNumber()));
 
             graphic = text;
         }

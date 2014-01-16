@@ -143,8 +143,22 @@
                          </ImageView>
                     </graphic>
                 </Button>
+                <Button onAction="#insertQuote">
+                    <tooltip>
+                        <Tooltip text="Insert quote" />
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                            <Image url="@/com/twasyl/slideshowfx/images/quote.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
             </ToolBar>
             <VBox spacing="10">
+                <fx:define>
+                    <ToggleGroup fx:id="valueTypeToggleGroup"/>
+                </fx:define>
+
                 <Label text="Set text:" />
                  <HBox spacing="10">
                      <Label text="Slide #:" />
@@ -152,28 +166,15 @@
                      <Label text="Field:" />
                      <TextField prefColumnCount="15" fx:id="fieldName" />
                  </HBox>
-                <TabPane>
-                    <tabs>
-                        <Tab text="Markdown">
-                            <content>
-                                <VBox spacing="10">
-                                    <TextArea fx:id="fieldValueMarkdown" prefColumnCount="50" prefRowCount="25" />
-                                    <Button text="Define" onAction="#updateSlideWithMarkdown" />
-                                </VBox>
-                            </content>
-                        </Tab>
-                        <Tab text="Text">
-                            <content>
-                                <VBox spacing="10">
-                                    <TextArea fx:id="fieldValueText" prefColumnCount="50" prefRowCount="25" />
-                                    <Button text="Define" onAction="#updateSlideWithText" />
-                                </VBox>
-                            </content>
-                        </Tab>
-                    </tabs>
-                </TabPane>
-
-
+                <HBox spacing="10">
+                    <Label text="Content:" />
+                    <RadioButton fx:id="htmlContent" text="HTML" selected="true" toggleGroup="$valueTypeToggleGroup" />
+                    <RadioButton fx:id="markdownContent" text="Markdown" selected="false" toggleGroup="$valueTypeToggleGroup" />
+                </HBox>
+                <VBox spacing="10">
+                    <TextArea fx:id="fieldValueText" prefColumnCount="50" prefRowCount="25" />
+                    <Button text="Define" onAction="#updateSlideWithText" />
+                </VBox>
             </VBox>
         </VBox>
     </right>

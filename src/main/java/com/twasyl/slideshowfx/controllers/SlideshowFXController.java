@@ -114,7 +114,8 @@ public class SlideshowFXController implements Initializable {
     @FXML private SplitMenuButton moveSlideButton;
     @FXML private TextField slideNumber;
     @FXML private TextField fieldName;
-    @FXML private TextArea fieldValueMarkdown;
+    @FXML private RadioButton htmlContent;
+    @FXML private RadioButton markdownContent;
     @FXML private TextArea fieldValueText;
     @FXML private TextField chatIpAddress;
     @FXML private TextField chatPort;
@@ -164,14 +165,12 @@ public class SlideshowFXController implements Initializable {
         }
     }
 
-    @FXML private void updateSlideWithMarkdown(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
-
-        this.updateSlide(Processor.process("[$PROFILE$]: extended\n" + this.fieldValueMarkdown.getText()));
-    }
-
     @FXML private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
-
-        this.updateSlide(this.fieldValueText.getText());
+        if(this.markdownContent.isSelected()) {
+            this.updateSlide(Processor.process("[$PROFILE$]: extended\n" + this.fieldValueText.getText()));
+        } else {
+            this.updateSlide(this.fieldValueText.getText());
+        }
     }
 
     private void updateSlide(String content) throws TransformerException, IOException, ParserConfigurationException, SAXException {
@@ -331,12 +330,19 @@ public class SlideshowFXController implements Initializable {
 
                 final String imgMarkup = String.format("<img src=\"%1$s/%2$s\" />", relativePath.toString(), targetFile.getName());
 
-                this.fieldValueMarkdown.setText(this.fieldValueMarkdown.getText() + imgMarkup);
                 this.fieldValueText.setText(this.fieldValueText.getText() + imgMarkup);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    @FXML private void insertQuote(ActionEvent event) {
+        String quoteMarkup = "<blockquote></blockquote>";
+        this.fieldValueText.setText(this.fieldValueText.getText() + quoteMarkup);
+
+        this.fieldValueText.requestFocus();
+        this.fieldValueText.positionCaret(this.fieldValueText.getText().length() - 13);
     }
 
     private void updateSlideTemplatesSplitMenu() {
@@ -368,7 +374,6 @@ public class SlideshowFXController implements Initializable {
         this.slideNumber.setText(slideNumber);
         this.fieldName.setText(field);
         this.fieldValueText.setText(value);
-        this.fieldValueMarkdown.setText(value);
 
         this.fieldValueText.requestFocus();
         this.fieldValueText.selectAll();
@@ -391,7 +396,7 @@ public class SlideshowFXController implements Initializable {
 
         this.addSlideButton.setGraphic(
                 new ImageView(
-                    new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/add.png"), 20d, 20d, true, true)
+                        new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/add.png"), 20d, 20d, true, true)
                 )
         );
 

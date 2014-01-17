@@ -128,6 +128,14 @@
             <TextField prefColumnCount="8" promptText="IP address" fx:id="chatIpAddress" />
             <TextField prefColumnCount="3" promptText="Port" fx:id="chatPort" />
 
+            <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                <Image url="@/com/twasyl/slideshowfx/images/twitter.png"  smooth="true" />
+            </ImageView>
+
+            <TextField prefColumnCount="10" promptText="Username" fx:id="twitterUsername" />
+            <PasswordField prefColumnCount="10" promptText="Password" fx:id="twitterPassword" />
+            <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" />
+
             <Button onAction="#startChat">
                 <graphic>
                     <ImageView fitWidth="$TOOLBAR_ICON_WIDTH" fitHeight="$TOOLBAR_ICON_HEIGHT">

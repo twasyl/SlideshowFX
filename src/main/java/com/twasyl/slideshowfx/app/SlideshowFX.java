@@ -90,7 +90,8 @@ public class SlideshowFX extends Application {
         // Start the embedded server for the chat
         String ipAddress = NetworkUtils.getIP();
         LOGGER.fine("Embeded IP address: " + ipAddress);
-        // Chat.create(ipAddress, 80);
+
+        Chat.checkTwitter();
     }
 
     @Override

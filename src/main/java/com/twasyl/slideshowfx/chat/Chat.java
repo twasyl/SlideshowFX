@@ -2,15 +2,22 @@ package com.twasyl.slideshowfx.chat;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.scribe.builder.ServiceBuilder;
+import org.scribe.builder.api.LinkedInApi;
+import org.scribe.builder.api.TwitterApi;
+import org.scribe.model.*;
+import org.scribe.oauth.OAuthService;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.VertxFactory;
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.http.HttpClientResponse;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.ServerWebSocket;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.streams.Pump;
+import sun.net.www.http.HttpClient;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -270,4 +277,47 @@ public class Chat {
     public static String getIp() { return ip; }
 
     public static int getPort() { return port; }
+
+    public static void checkTwitter() {
+        OAuthService service = new ServiceBuilder()
+                .provider(TwitterApi.SSL.class)
+                .apiKey("5luxVGxswd42RgTfbF02g")
+                .apiSecret("winWDhMbeJZ4m66gABqpohkclLDixnyeOINuVtPWs")
+                .callback("oob")
+                .build();
+
+        Token requestToken = service.getRequestToken();
+
+        String authUrl = service.getAuthorizationUrl(requestToken);
+
+        Vertx v = VertxFactory.newVertx();
+        org.vertx.java.core.http.HttpClient client = v.createHttpClient();
+
+        client.getNow(authUrl, new Handler<HttpClientResponse>() {
+            @Override
+            public void handle(final HttpClientResponse httpClientResponse) {
+                httpClientResponse.endHandler(new Handler<Void>() {
+                    @Override
+                    public void handle(Void aVoid) {
+                         httpClientResponse.cookies();
+                    }
+                });
+            }
+        }).exceptionHandler(new Handler<Throwable>() {
+            @Override
+            public void handle(Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        });
+
+
+       /* Verifier verifier = new Verifier("lFi19ETevodjMmbFmwdJ0DnOEj85nImfJc85UTBx04");
+        Token accessToken = service.getAccessToken(requestToken, v); // the requestToken you had from step 2
+
+        OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.twitter.com/1/account/verify_credentials.xml");
+        service.signRequest(accessToken, request); // the access token from step 4
+        Response response = request.send();
+        System.out.println(response.getBody());      */
+
+    }
 }

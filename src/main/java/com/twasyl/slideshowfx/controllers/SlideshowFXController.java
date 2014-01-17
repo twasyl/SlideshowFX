@@ -15,11 +15,17 @@ import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.PresentationBuilder;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.print.PageOrientation;
+import javafx.print.Paper;
+import javafx.print.Printer;
+import javafx.print.PrinterJob;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -264,6 +270,20 @@ public class SlideshowFXController implements Initializable {
             this.builder.savePresentation(presentationArchive);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void print(ActionEvent event) {
+        PrinterJob job = PrinterJob.createPrinterJob();
+
+        if (job != null) {
+            if(job.showPrintDialog(null)) {
+                this.browser.getEngine().print(job);
+                job.endJob();
+            } else {
+                job.cancelJob();
+            }
         }
     }
 

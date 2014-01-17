@@ -48,6 +48,17 @@
                 </graphic>
             </Button>
 
+            <Button onAction="#print">
+                <tooltip>
+                    <Tooltip text="Print" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/print.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+
             <Separator />
 
             <SplitMenuButton fx:id="addSlideButton">

@@ -77,8 +77,8 @@ public class SlideShowScene extends Scene {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                if(keyCode.equals(KeyCode.LEFT)) browser.get().getEngine().executeScript(String.format("slideShowFXCalling(%1$s)", 37));
-                else if(keyCode.equals(KeyCode.RIGHT)) browser.get().getEngine().executeScript(String.format("slideShowFXCalling(%1$s)", 39));
+                if(keyCode.equals(KeyCode.LEFT)) browser.get().getEngine().executeScript(String.format("slideshowFXLeap('%1$s')", "LEFT"));
+                else if(keyCode.equals(KeyCode.RIGHT)) browser.get().getEngine().executeScript(String.format("slideshowFXLeap('%1$s')", "RIGHT"));
             }
         });
     }

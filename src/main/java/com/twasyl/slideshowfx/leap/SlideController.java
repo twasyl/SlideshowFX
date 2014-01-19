@@ -47,45 +47,47 @@ public class SlideController extends Listener {
 
         final Frame frame = controller.frame();
 
-        if(!frame.hands().isEmpty()) {
-            final Hand hand = frame.hands().get(0);
+        // Get a swipe
+        boolean swipeFound = false;
+        Gesture gesture = null;
+        Iterator<Gesture> gesturesIterator = frame.gestures().iterator();
 
-            if(hand.isValid()) {
+        while(gesturesIterator.hasNext() && !swipeFound) {
+            gesture = gesturesIterator.next();
+            swipeFound = gesture.isValid() && gesture.type() == Gesture.Type.TYPE_SWIPE;
+        }
 
-                // Only allow index and major fingers
-                if(!hand.fingers().isEmpty() && hand.fingers().count() == 2) {
-                    boolean swipeValid = true;
+        if(swipeFound) {
+            SwipeGesture swipe = new SwipeGesture(gesture);
 
-                    Iterator<Finger> fingerIterator = hand.fingers().iterator();
+            // The gesture is finished
+            if(swipe.state() == Gesture.State.STATE_STOP) {
+                System.out.println("Gesture finished");
+                if(!frame.hands().isEmpty() && frame.hands().count() == 1) {
+                    final Hand hand = frame.hands().get(0);
 
-                    // Check that each finger is valid
-                    while(fingerIterator.hasNext() && swipeValid) {
-                        swipeValid = fingerIterator.next().isValid();
-                    }
-                           // vers la gauche INFO: Swipe direction: (-0.680289, 0.091465, 0.727215)
-                                  // vers la droite: INFO: Swipe direction: (0.978042, -0.0252404, -0.206874)
-                    if(swipeValid) {
-                        // Check the gesture is a swipe and determine direction
-                        if(!frame.gestures().isEmpty()) {
+                    if(hand.isValid()) {
 
-                            // Get a swipe
-                            boolean swipeFound = false;
-                            Gesture gesture = null;
-                            Iterator<Gesture> gesturesIterator = frame.gestures().iterator();
+                        // Only allow index and major fingers
+                        if(!hand.fingers().isEmpty() && hand.fingers().count() == 2) {
+                            boolean swipeValid = true;
 
-                            while(gesturesIterator.hasNext() && !swipeFound) {
-                                gesture = gesturesIterator.next();
-                                swipeFound = gesture.isValid() && gesture.type() == Gesture.Type.TYPE_SWIPE;
+                            Iterator<Finger> fingerIterator = hand.fingers().iterator();
+
+                            // Check that each finger is valid
+                            while(fingerIterator.hasNext() && swipeValid) {
+                                swipeValid = fingerIterator.next().isValid();
                             }
 
-                            if(swipeFound) {
-                                SwipeGesture swipe = new SwipeGesture(gesture);
+                            if(swipeValid) {
 
+                                // Check the gesture is a swipe and determine direction
                                 if(swipe.direction().getX() > 0) {
-                                    SlideshowFX.getSlideShowScene().sendKey(KeyCode.LEFT);
+                                   SlideshowFX.getSlideShowScene().sendKey(KeyCode.LEFT);
                                 } else if(swipe.direction().getX() < 0) {
-                                    SlideshowFX.getSlideShowScene().sendKey(KeyCode.RIGHT);
+                                   SlideshowFX.getSlideShowScene().sendKey(KeyCode.RIGHT);
                                 }
+
                             }
                         }
                     }

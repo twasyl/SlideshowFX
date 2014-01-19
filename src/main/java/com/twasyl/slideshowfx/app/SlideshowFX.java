@@ -91,7 +91,7 @@ public class SlideshowFX extends Application {
         String ipAddress = NetworkUtils.getIP();
         LOGGER.fine("Embeded IP address: " + ipAddress);
 
-        Chat.checkTwitter();
+        // Chat.checkTwitter();
     }
 
     @Override

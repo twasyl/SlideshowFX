@@ -145,7 +145,6 @@ public class Chat {
                             JsonObject jsonResponseMessage;
 
                             while ((resultLine = reader.readLine()) != null && !resultLine.isEmpty()) {
-                                System.out.println(resultLine);
                                 JsonObject tweetJson = new JsonObject(resultLine);
 
                                 resultLine = null;

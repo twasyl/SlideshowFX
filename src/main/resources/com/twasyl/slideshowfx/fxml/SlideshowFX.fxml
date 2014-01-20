@@ -132,8 +132,6 @@
                 <Image url="@/com/twasyl/slideshowfx/images/twitter.png"  smooth="true" />
             </ImageView>
 
-            <TextField prefColumnCount="10" promptText="Username" fx:id="twitterUsername" />
-            <PasswordField prefColumnCount="10" promptText="Password" fx:id="twitterPassword" />
             <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" />
 
             <Button onAction="#startChat">

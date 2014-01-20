@@ -125,6 +125,7 @@ public class SlideshowFXController implements Initializable {
     @FXML private TextArea fieldValueText;
     @FXML private TextField chatIpAddress;
     @FXML private TextField chatPort;
+    @FXML private TextField twitterHashtag;
 
     @FXML private void loadTemplate(ActionEvent event) {
         FileChooser chooser = new FileChooser();
@@ -321,7 +322,7 @@ public class SlideshowFXController implements Initializable {
             this.chatIpAddress.setText(ip);
             this.chatPort.setText(port + "");
 
-            Chat.create(ip, port);
+            Chat.create(ip, port, this.twitterHashtag.getText());
 
             icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/shutdown.png"));
         }

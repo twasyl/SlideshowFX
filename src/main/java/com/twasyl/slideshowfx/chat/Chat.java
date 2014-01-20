@@ -1,9 +1,19 @@
 package com.twasyl.slideshowfx.chat;
 
+import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
+import javafx.scene.Scene;
+import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.scribe.builder.ServiceBuilder;
-import org.scribe.builder.api.LinkedInApi;
 import org.scribe.builder.api.TwitterApi;
 import org.scribe.model.*;
 import org.scribe.oauth.OAuthService;
@@ -16,13 +26,16 @@ import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.ServerWebSocket;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.json.impl.Json;
 import org.vertx.java.core.streams.Pump;
-import sun.net.www.http.HttpClient;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +45,142 @@ import java.util.logging.Logger;
 public class Chat {
 
     private static final Logger LOGGER = Logger.getLogger(Chat.class.getName());
+
+    private static class Twitter {
+        private final StringProperty hashtag = new SimpleStringProperty();
+        private final BooleanProperty authenticated = new SimpleBooleanProperty(false);
+
+        private Thread streamTwitterThread;
+        private OAuthService service;
+        private Token accessToken;
+        private Twitter(String hashtag) {
+            this.hashtag.set(hashtag);
+        }
+
+        public StringProperty hashtagProperty() { return this.hashtag; }
+        public String getHashtag() { return this.hashtagProperty().get(); }
+        public void setHashtag(String hashtag) { this.hashtagProperty().set(hashtag); }
+
+        public BooleanProperty authenticatedProperty() { return this.authenticated; }
+        public boolean isAuthenticated() { return this.authenticatedProperty().get(); }
+        public void setAuthenticated(boolean authenticated) { this.authenticatedProperty().set(authenticated); }
+
+        /**
+         * Connect a user to twitter
+         */
+        private void connect() {
+            if(accessToken == null) {
+                this.service = new ServiceBuilder()
+                        .provider(TwitterApi.SSL.class)
+                        .apiKey("5luxVGxswd42RgTfbF02g")
+                        .apiSecret("winWDhMbeJZ4m66gABqpohkclLDixnyeOINuVtPWs")
+                        .callback("oob")
+                        .build();
+
+                final Token requestToken = this.service.getRequestToken();
+
+                final String authUrl = this.service.getAuthorizationUrl(requestToken);
+
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        final WebView twitterBrowser = new WebView();
+                        final Scene scene = new Scene(twitterBrowser);
+                        final Stage stage = new Stage();
+
+                        twitterBrowser.getEngine().load(authUrl);
+
+                        twitterBrowser.getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
+                            @Override
+                            public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State state2) {
+                                if(state2 == Worker.State.SUCCEEDED) {
+                                    if (twitterBrowser.getEngine().getDocument().getDocumentURI().equals("https://api.twitter.com/oauth/authorize")) {
+                                        String pinCode = twitterBrowser.getEngine().getDocument().getElementsByTagName("kbd").item(0).getTextContent();
+
+                                        Verifier verifier = new Verifier(pinCode);
+                                        Twitter.this.accessToken = Twitter.this.service.getAccessToken(requestToken, verifier);
+
+                                        Twitter.this.setAuthenticated(true);
+
+                                        stage.close();
+                                    }
+                                }
+                            }
+                        });
+
+                        stage.setScene(scene);
+                        stage.show();
+                    }
+                });
+            }
+        }
+
+        public void disconnect() {
+            if(this.accessToken != null) {
+                this.service = null;
+            }
+        }
+
+        public void streamTweets() {
+            if(isAuthenticated()) {
+                Runnable streamTwitterRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        LOGGER.fine("Start looking for tweets");
+
+                        OAuthRequest request = new OAuthRequest(Verb.POST, "https://stream.twitter.com/1/statuses/filter.json");
+                        request.addQuerystringParameter("track", Twitter.this.hashtag.get());
+                        request.setConnectionKeepAlive(true);
+
+                        Twitter.this.service.signRequest(Twitter.this.accessToken, request);
+
+                        Response response = request.send();
+
+                        String resultLine = null;
+                        BufferedReader reader = null;
+
+                        try {
+                            reader = new BufferedReader(new InputStreamReader(response.getStream()));
+                            JsonObject jsonResponse;
+                            JsonObject jsonResponseMessage;
+
+                            while ((resultLine = reader.readLine()) != null && !resultLine.isEmpty()) {
+                                System.out.println(resultLine);
+                                JsonObject tweetJson = new JsonObject(resultLine);
+
+                                resultLine = null;
+
+                                jsonResponseMessage = new JsonObject();
+                                jsonResponseMessage.putString(JSON_MESSAGE_ID_ATTR, "msg-" + System.currentTimeMillis());
+                                jsonResponseMessage.putString(JSON_MESSAGE_AUTHOR_ATTR, "@" + tweetJson.getObject("user").getString("screen_name"));
+                                jsonResponseMessage.putString(JSON_MESSAGE_CONTENT_ATTR, Chat.formatChatMessage(tweetJson.getString("text")));
+
+                                jsonResponse = new JsonObject();
+                                jsonResponse.putObject(JSON_MESSAGE_OBJECT, jsonResponseMessage);
+
+                                chatHistory.add(jsonResponse.toString());
+
+                                for(ServerWebSocket client : Chat.clients) {
+                                    client.writeTextFrame(jsonResponse.toString());
+                                }
+                            }
+                        } catch (IOException ex) {
+                            LOGGER.log(Level.WARNING, "Warning: error while reading the stream from twitter", ex);
+                        }
+                    }
+                };
+
+                this.streamTwitterThread = new Thread(streamTwitterRunnable);
+                this.streamTwitterThread.start();
+            }
+        }
+
+        public void stopStreeamTweets() {
+            if(this.streamTwitterThread != null && !this.streamTwitterThread.isAlive()) {
+                this.streamTwitterThread.interrupt();
+            }
+        }
+    }
 
     private static final String VELOCITY_SERVER_IP = "slideshowfx_server_ip";
     private static final String VELOCITY_SERVER_PORT = "slideshowfx_server_port";
@@ -58,16 +207,17 @@ public class Chat {
     private static HttpServer server;
     private static String ip;
     private static int port;
+    private static Twitter twitter;
 
     public Chat(String ipAddress, int port) {
-
 
         init();
     }
 
-    public static void create(String ip, int port) {
+    public static void create(String ip, int port, String twitterHashtag) {
         Chat.ip = ip;
         Chat.port = port;
+        Chat.twitter = new Twitter(twitterHashtag);
 
         init();
     }
@@ -91,6 +241,12 @@ public class Chat {
         if(vertx != null) {
             vertx.stop();
             vertx = null;
+        }
+
+        if(Chat.twitter != null) {
+            Chat.twitter.stopStreeamTweets();
+
+            Chat.twitter.disconnect();
         }
     }
 
@@ -214,7 +370,7 @@ public class Chat {
                                         jsonResponseMessage.putString(JSON_MESSAGE_AUTHOR_ATTR, jsonRequestMessage.getString(JSON_MESSAGE_AUTHOR_ATTR));
                                     }
 
-                                    jsonResponseMessage.putString(JSON_MESSAGE_CONTENT_ATTR, jsonRequestMessage.getString(JSON_MESSAGE_CONTENT_ATTR));
+                                    jsonResponseMessage.putString(JSON_MESSAGE_CONTENT_ATTR, Chat.formatChatMessage(jsonRequestMessage.getString(JSON_MESSAGE_CONTENT_ATTR)));
 
                                     jsonResponse = new org.vertx.java.core.json.JsonObject();
                                     jsonResponse.putObject(JSON_MESSAGE_OBJECT, jsonResponseMessage);
@@ -224,7 +380,7 @@ public class Chat {
                                 jsonResponseMessage = new JsonObject();
                                 jsonResponseMessage.putString(JSON_MESSAGE_ID_ATTR, "msg-" + timeStamp);
                                 jsonResponseMessage.putString(JSON_MESSAGE_AUTHOR_ATTR, jsonRequestMessage.getString(JSON_MESSAGE_AUTHOR_ATTR));
-                                jsonResponseMessage.putString(JSON_MESSAGE_CONTENT_ATTR, jsonRequestMessage.getString(JSON_MESSAGE_CONTENT_ATTR));
+                                jsonResponseMessage.putString(JSON_MESSAGE_CONTENT_ATTR, Chat.formatChatMessage(jsonRequestMessage.getString(JSON_MESSAGE_CONTENT_ATTR)));
 
                                 jsonResponse = new JsonObject();
                                 jsonResponse.putObject(JSON_MESSAGE_OBJECT, jsonResponseMessage);
@@ -272,52 +428,28 @@ public class Chat {
 
 
         }).listen(port, ip);
+
+        // Twitter initialization
+        if(Chat.twitter.getHashtag() != null && !Chat.twitter.getHashtag().isEmpty()) {
+            twitter.connect();
+            twitter.authenticatedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean aBoolean2) {
+                    if(aBoolean2) {
+                        twitter.streamTweets();
+                    }
+                }
+            });
+        }
     }
 
     public static String getIp() { return ip; }
 
     public static int getPort() { return port; }
 
-    public static void checkTwitter() {
-        OAuthService service = new ServiceBuilder()
-                .provider(TwitterApi.SSL.class)
-                .apiKey("5luxVGxswd42RgTfbF02g")
-                .apiSecret("winWDhMbeJZ4m66gABqpohkclLDixnyeOINuVtPWs")
-                .callback("oob")
-                .build();
-
-        Token requestToken = service.getRequestToken();
-
-        String authUrl = service.getAuthorizationUrl(requestToken);
-
-        Vertx v = VertxFactory.newVertx();
-        org.vertx.java.core.http.HttpClient client = v.createHttpClient();
-
-        client.getNow(authUrl, new Handler<HttpClientResponse>() {
-            @Override
-            public void handle(final HttpClientResponse httpClientResponse) {
-                httpClientResponse.endHandler(new Handler<Void>() {
-                    @Override
-                    public void handle(Void aVoid) {
-                         httpClientResponse.cookies();
-                    }
-                });
-            }
-        }).exceptionHandler(new Handler<Throwable>() {
-            @Override
-            public void handle(Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        });
-
-
-       /* Verifier verifier = new Verifier("lFi19ETevodjMmbFmwdJ0DnOEj85nImfJc85UTBx04");
-        Token accessToken = service.getAccessToken(requestToken, v); // the requestToken you had from step 2
-
-        OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.twitter.com/1/account/verify_credentials.xml");
-        service.signRequest(accessToken, request); // the access token from step 4
-        Response response = request.send();
-        System.out.println(response.getBody());      */
-
+    private static String formatChatMessage(final String message) {
+        return message.replaceAll("\\n", "&#10;")
+                .replaceAll("\\\\", "&#92;")
+                .replace("\'", "&#39;");
     }
 }

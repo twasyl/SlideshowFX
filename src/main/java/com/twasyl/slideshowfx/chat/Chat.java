@@ -162,6 +162,10 @@ public class Chat {
                                 for(ServerWebSocket client : Chat.clients) {
                                     client.writeTextFrame(jsonResponse.toString());
                                 }
+
+                                if(Chat.presenter != null) {
+                                    Chat.presenter.writeTextFrame(jsonResponse.toString());
+                                }
                             }
                         } catch (IOException ex) {
                             LOGGER.log(Level.WARNING, "Warning: error while reading the stream from twitter", ex);

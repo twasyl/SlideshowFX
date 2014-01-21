@@ -49,33 +49,46 @@
                 var json = JSON.parse(event.data);
 
                 if(undefined != json.message) {
-                    var htmlMessage = "<div class=\"chat-message\" id=\"" + json.message.id + "\">"
+
+                    var htmlMessage = document.getElementById(json.message.id);
+
+                    // New message
+                    if(undefined == htmlMessage) {
+                        htmlMessage = "<div class=\"chat-message\" id=\"" + json.message.id + "\">"
                                     + "<div id=\"" + json.message.id + "-check\" style=\"display: none; margin-right: 5px;\"><img src=\"http://${slideshowfx_server_ip}:${slideshowfx_server_port}/images/check.png\" width=\"10px\" /></div>"
                                     + "<span class=\"author\">" + json.message.author + " ";
 
-                    if( json.message.author == "I") {
-                        htmlMessage = htmlMessage + "say";
-                    } else {
-                        htmlMessage = htmlMessage + "said";
+                        if( json.message.author == "I") {
+                            htmlMessage = htmlMessage + "say";
+                        } else {
+                            htmlMessage = htmlMessage + "said";
+                        }
+
+                        htmlMessage = htmlMessage + " :" + "</span><br />"
+                                    + "<span class=\"message-content\">" + json.message.content + "</span></div>";
+
+                        messagesDiv.innerHTML = messagesDiv.innerHTML + htmlMessage;
+
+                        updateMessage(json);
                     }
-
-                     htmlMessage = htmlMessage + " :" + "</span><br />"
-                                + "<span class=\"message-content\">" + json.message.content + "</span></div>";
-
-                    messagesDiv.innerHTML = messagesDiv.innerHTML + htmlMessage;
-                }
-
-                if(undefined != json.messageAction) {
-                    if(json.messageAction.action == "answered") {
-                        var messageDiv = document.getElementById(json.messageAction.id);
-                        messageDiv.className += " " + "question-answered";
-
-                        var imageDiv = document.getElementById(json.messageAction.id + "-check");
-                        imageDiv.style.display = "inline";
+                    // Existing message : update it
+                    else {
+                        updateMessage(json);
                     }
                 }
             }
         };
+
+        function updateMessage(json) {
+            var htmlMessage = document.getElementById(json.message.id);
+
+            if("answered" == json.message.status) {
+                htmlMessage.className += " " + "question-answered";
+
+                var imageDiv = document.getElementById(json.message.id + "-check");
+                imageDiv.style.display = "inline";
+            }
+        }
 
         function sendMessage() {
             var attendeeMessage = document.getElementById("attendee-message-textarea").value;

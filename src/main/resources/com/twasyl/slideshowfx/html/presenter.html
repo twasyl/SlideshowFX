@@ -27,7 +27,7 @@
                 var msgDiv = document.getElementById(json.message.id);
 
                 msgDiv.ondblclick = function(event) {
-                    var json = "{ \"messageAction\" : { \"id\" : \"" + event.target.id + "\", \"action\" : \"mark-read\" } }";
+                    var json = "{ \"message\" : { \"id\" : \"" + event.target.id + "\", \"action\" : \"mark-read\" } }";
                     socket.send(json);
                 };
 

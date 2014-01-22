@@ -126,6 +126,7 @@ public class SlideshowFXController implements Initializable {
     @FXML private TextField chatIpAddress;
     @FXML private TextField chatPort;
     @FXML private TextField twitterHashtag;
+    @FXML private CheckBox leapMotionEnabled;
 
     @FXML private void loadTemplate(ActionEvent event) {
         FileChooser chooser = new FileChooser();
@@ -184,8 +185,9 @@ public class SlideshowFXController implements Initializable {
 
         String clearedContent = content.replaceAll("\\n", "&#10;")
                 .replaceAll("\\\\", "&#92;")
-                .replace("\'", "&#39;")
-                ;
+                .replaceAll("\'", "&#39;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
 
         String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",
                 this.builder.getTemplate().getContentDefinerMethod(),
@@ -426,5 +428,8 @@ public class SlideshowFXController implements Initializable {
                         new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/move.png"), 20d, 20d, true, true)
                 )
         );
+
+        this.leapMotionEnabled.selectedProperty().bindBidirectional(SlideshowFX.leapMotionAllowedProperty());
+        this.leapMotionEnabled.setSelected(true);
     }
 }

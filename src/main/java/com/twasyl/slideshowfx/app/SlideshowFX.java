@@ -6,6 +6,8 @@ import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.leap.SlideController;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -25,6 +27,7 @@ import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.ServerWebSocket;
 import org.vertx.java.core.http.impl.WebSocketMatcher;
 import org.vertx.java.core.streams.Pump;
+import org.w3c.dom.ls.LSOutput;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -48,6 +51,7 @@ public class SlideshowFX extends Application {
     private static final ReadOnlyObjectProperty<Scene> presentationBuilderScene = new SimpleObjectProperty<>();
     private static final ObjectProperty<SlideShowScene> slideShowScene = new SimpleObjectProperty<>();
     private static final BooleanProperty slideShowActive = new SimpleBooleanProperty(false);
+    private static final BooleanProperty leapMotionAllowed = new SimpleBooleanProperty();
 
     private static Controller leapController;
     private static SlideController slideController;
@@ -74,11 +78,25 @@ public class SlideshowFX extends Application {
             }
         });
 
+        // LeapMotion controller should track gestures if it is enabled by the application and the slideshow is active
+
+        BooleanBinding leapMotionTracking = Bindings.and(slideShowActiveProperty(), leapMotionAllowedProperty());
+        leapMotionTracking.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean aBoolean2) {
+                LOGGER.finest("Changed");
+                if(aBoolean2 != null) {
+                    slideController.setTracking(aBoolean2);
+                    LOGGER.finest(String.format("LeapMotion tracking has changed to %1$s", aBoolean2));
+                }
+            }
+        });
+
         // Init the slideshow scene
         slideShowSceneProperty().addListener(new ChangeListener<SlideShowScene>() {
             @Override
             public void changed(ObservableValue<? extends SlideShowScene> observableValue, SlideShowScene scene, SlideShowScene scene2) {
-                if(scene2 != null) {
+                if (scene2 != null) {
                     getStage().setScene(scene2);
                     getStage().setFullScreen(true);
 
@@ -86,10 +104,6 @@ public class SlideshowFX extends Application {
                 }
             }
         });
-
-        // Start the embedded server for the chat
-        String ipAddress = NetworkUtils.getIP();
-        LOGGER.fine("Embeded IP address: " + ipAddress);
     }
 
     @Override
@@ -123,6 +137,10 @@ public class SlideshowFX extends Application {
     public static final BooleanProperty slideShowActiveProperty() { return slideShowActive; }
     public static final Boolean isSlideShowActive() { return slideShowActiveProperty().get(); }
     public static final void setSlideShowActive(boolean active) { slideShowActiveProperty().set(active); }
+
+    public static BooleanProperty leapMotionAllowedProperty() { return leapMotionAllowed; }
+    public static boolean isLeapMotionAllowed() { return leapMotionAllowedProperty().get(); }
+    public static void setLeapMotionAllowed(boolean leapMotionAllowed) { leapMotionAllowedProperty().set(leapMotionAllowed); }
 
     public static final ObjectProperty<SlideShowScene> slideShowSceneProperty() { return slideShowScene; }
     public static final SlideShowScene getSlideShowScene() { return slideShowSceneProperty().get(); }

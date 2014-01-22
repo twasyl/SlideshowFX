@@ -119,6 +119,17 @@
                 </graphic>
             </Button>
 
+            <CheckBox fx:id="leapMotionEnabled">
+                <tooltip>
+                    <Tooltip text="LeapMotion controller" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/leap.png" />
+                    </ImageView>
+                </graphic>
+            </CheckBox>
+
             <Separator />
 
             <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
@@ -189,7 +200,7 @@
                     <RadioButton fx:id="markdownContent" text="Markdown" selected="false" toggleGroup="$valueTypeToggleGroup" />
                 </HBox>
                 <VBox spacing="10">
-                    <TextArea fx:id="fieldValueText" prefColumnCount="50" prefRowCount="25" />
+                    <TextArea fx:id="fieldValueText" prefColumnCount="50" prefRowCount="25" wrapText="true" />
                     <Button text="Define" onAction="#updateSlideWithText" />
                 </VBox>
             </VBox>

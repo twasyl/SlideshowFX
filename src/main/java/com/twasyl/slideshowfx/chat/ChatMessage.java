@@ -53,7 +53,9 @@ public class ChatMessage {
     private String getFormattedContent() {
         return getContent().replaceAll("\\n", "&#10;")
                 .replaceAll("\\\\", "&#92;")
-                .replace("\'", "&#39;");
+                .replaceAll("\'", "&#39;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
     }
 
     /**

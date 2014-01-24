@@ -116,6 +116,7 @@ public class SlideshowFXController implements Initializable {
     };
 
     @FXML private WebView browser;
+    @FXML private SplitMenuButton saveButton;
     @FXML private SplitMenuButton addSlideButton;
     @FXML private SplitMenuButton moveSlideButton;
     @FXML private TextField slideNumber;
@@ -185,9 +186,7 @@ public class SlideshowFXController implements Initializable {
 
         String clearedContent = content.replaceAll("\\n", "&#10;")
                 .replaceAll("\\\\", "&#92;")
-                .replaceAll("\'", "&#39;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;");
+                .replaceAll("\'", "&#39;");
 
         String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",
                 this.builder.getTemplate().getContentDefinerMethod(),
@@ -270,6 +269,21 @@ public class SlideshowFXController implements Initializable {
         }
 
         try {
+            this.builder.savePresentation(presentationArchive);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void saveAs(ActionEvent event) {
+        File presentationArchive = null;
+        FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
+        presentationArchive = chooser.showSaveDialog(null);
+
+        try {
+            this.builder.setPresentationArchiveFile(presentationArchive);
             this.builder.savePresentation(presentationArchive);
         } catch (IOException e) {
             e.printStackTrace();
@@ -416,6 +430,12 @@ public class SlideshowFXController implements Initializable {
         });
 
         this.browser.getEngine().setJavaScriptEnabled(true);
+
+        this.saveButton.setGraphic(
+                new ImageView(
+                        new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/save.png"), 20d, 20d, true, true)
+                )
+        );
 
         this.addSlideButton.setGraphic(
                 new ImageView(

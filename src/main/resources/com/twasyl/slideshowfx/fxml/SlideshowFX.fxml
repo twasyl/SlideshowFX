@@ -37,16 +37,14 @@
                 </graphic>
             </Button>
 
-            <Button onAction="#save">
+            <SplitMenuButton fx:id="saveButton" onAction="#save">
                 <tooltip>
                     <Tooltip text="Save" />
                 </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/save.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
+                <items>
+                    <MenuItem text="Save as ..." onAction="#saveAs" />
+                </items>
+            </SplitMenuButton>
 
             <Button onAction="#print">
                 <tooltip>

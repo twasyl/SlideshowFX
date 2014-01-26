@@ -449,7 +449,7 @@ public class SlideshowFXController implements Initializable {
                 )
         );
 
-        this.leapMotionEnabled.selectedProperty().bindBidirectional(SlideshowFX.leapMotionAllowedProperty());
+        SlideshowFX.leapMotionAllowedProperty().bind(this.leapMotionEnabled.selectedProperty());
         this.leapMotionEnabled.setSelected(true);
     }
 }

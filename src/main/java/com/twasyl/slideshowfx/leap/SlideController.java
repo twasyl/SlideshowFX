@@ -3,8 +3,14 @@ package com.twasyl.slideshowfx.leap;
 import com.leapmotion.leap.*;
 import com.sun.javafx.scene.input.KeyCodeMap;
 import com.twasyl.slideshowfx.app.SlideshowFX;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventDispatchChain;
+import javafx.event.EventTarget;
+import javafx.scene.Cursor;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.MouseEvent;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -16,7 +22,7 @@ public class SlideController extends Listener {
 
     private static final Logger LOGGER = Logger.getLogger(SlideController.class.getName());
 
-    private boolean tracking;
+    private boolean tracking = false;
 
     public boolean isTracking() { return tracking; }
     public void setTracking(boolean tracking) { this.tracking = tracking; }
@@ -47,53 +53,62 @@ public class SlideController extends Listener {
     }
 
     @Override
-    public void onFrame(Controller controller) {
+    public void onFrame(final Controller controller) {
         super.onFrame(controller);
 
         if(isTracking()) {
             final Frame frame = controller.frame();
 
             // Get a swipe
-            boolean swipeFound = false;
             Gesture gesture = null;
             Iterator<Gesture> gesturesIterator = frame.gestures().iterator();
 
-            while(gesturesIterator.hasNext() && !swipeFound) {
+            while(gesturesIterator.hasNext()) {
                 gesture = gesturesIterator.next();
-                swipeFound = gesture.isValid() && gesture.type() == Gesture.Type.TYPE_SWIPE;
+
+                if(gesture.isValid()) {
+                    switch(gesture.type()) {
+                        case TYPE_SWIPE:
+                            changeSlide(controller, gesture);
+                            break;
+                    }
+                }
+
             }
+        }
+    }
 
-            if(swipeFound) {
-                SwipeGesture swipe = new SwipeGesture(gesture);
+    private void changeSlide(final Controller controller, final Gesture gesture) {
+        final Frame frame = controller.frame();
 
-                // The gesture is finished
-                if(swipe.state() == Gesture.State.STATE_STOP) {
-                    System.out.println("Gesture finished");
-                    if(!frame.hands().isEmpty() && frame.hands().count() == 1) {
-                        final Hand hand = frame.hands().get(0);
+        SwipeGesture swipe = new SwipeGesture(gesture);
 
-                        if(hand.isValid()) {
+        // The gesture is finished
+        if(swipe.state() == Gesture.State.STATE_STOP) {
 
-                            // Only allow index and major fingers
-                            if(!hand.fingers().isEmpty() && hand.fingers().count() == 2) {
-                                boolean swipeValid = true;
+            if(!frame.hands().isEmpty() && frame.hands().count() == 1) {
+                final Hand hand = frame.hands().get(0);
 
-                                Iterator<Finger> fingerIterator = hand.fingers().iterator();
+                if(hand.isValid()) {
 
-                                // Check that each finger is valid
-                                while(fingerIterator.hasNext() && swipeValid) {
-                                    swipeValid = fingerIterator.next().isValid();
-                                }
+                    // Only allow index and major fingers
+                    if(!hand.fingers().isEmpty() && hand.fingers().count() == 2) {
+                        boolean swipeValid = true;
 
-                                if(swipeValid) {
+                        Iterator<Finger> fingerIterator = hand.fingers().iterator();
 
-                                    // Check the gesture is a swipe and determine direction
-                                    if(swipe.direction().getX() > 0) {
-                                       SlideshowFX.getSlideShowScene().sendKey(KeyCode.LEFT);
-                                    } else if(swipe.direction().getX() < 0) {
-                                       SlideshowFX.getSlideShowScene().sendKey(KeyCode.RIGHT);
-                                    }
-                                }
+                        // Check that each finger is valid
+                        while(fingerIterator.hasNext() && swipeValid) {
+                            swipeValid = fingerIterator.next().isValid();
+                        }
+
+                        if(swipeValid) {
+
+                            // Check the gesture is a swipe and determine direction
+                            if(swipe.direction().getX() > 0) {
+                                SlideshowFX.getSlideShowScene().sendKey(KeyCode.LEFT);
+                            } else if(swipe.direction().getX() < 0) {
+                                SlideshowFX.getSlideShowScene().sendKey(KeyCode.RIGHT);
                             }
                         }
                     }

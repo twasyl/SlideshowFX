@@ -56,7 +56,6 @@ public class SlideshowFX extends Application {
     private static Controller leapController;
     private static SlideController slideController;
 
-
     @Override
     public void init() throws Exception {
         // Init LeapMotion
@@ -67,7 +66,7 @@ public class SlideshowFX extends Application {
         slideShowActiveProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean aBoolean2) {
-                if(aBoolean2) {
+                if (aBoolean2) {
                     leapController.addListener(slideController);
                 } else {
                     leapController.removeListener(slideController);
@@ -79,16 +78,11 @@ public class SlideshowFX extends Application {
         });
 
         // LeapMotion controller should track gestures if it is enabled by the application and the slideshow is active
-
-        BooleanBinding leapMotionTracking = Bindings.and(slideShowActiveProperty(), leapMotionAllowedProperty());
-        leapMotionTracking.addListener(new ChangeListener<Boolean>() {
+        leapMotionAllowedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean aBoolean2) {
-                LOGGER.finest("Changed");
-                if(aBoolean2 != null) {
-                    slideController.setTracking(aBoolean2);
-                    LOGGER.finest(String.format("LeapMotion tracking has changed to %1$s", aBoolean2));
-                }
+                slideController.setTracking(aBoolean2);
+                LOGGER.finest(String.format("LeapMotion tracking has changed to %1$s", aBoolean2));
             }
         });
 

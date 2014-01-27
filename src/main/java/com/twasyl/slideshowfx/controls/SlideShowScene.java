@@ -12,9 +12,12 @@ import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
 import javafx.util.Duration;
 import netscape.javascript.JSObject;
@@ -27,10 +30,14 @@ public class SlideShowScene extends Scene {
 
     private final ObjectProperty<WebView> browser = new SimpleObjectProperty<>();
     private final ObjectProperty<WebView> chatBrowser = new SimpleObjectProperty<>();
+    private final ObjectProperty<Canvas> canvas = new SimpleObjectProperty<>();
 
     public SlideShowScene(WebView browser) {
         super(new StackPane());
         this.browser.set(browser);
+        this.canvas.set(new Canvas());
+        this.canvas.get().widthProperty().bind(this.widthProperty());
+        this.canvas.get().heightProperty().bind(this.heightProperty());
 
         if(Chat.isOpened()) {
             chatBrowser.set(new WebView());
@@ -62,7 +69,7 @@ public class SlideShowScene extends Scene {
 
         final StackPane root = (StackPane) getRoot();
         root.setAlignment(Pos.BOTTOM_LEFT);
-        root.getChildren().add(this.browser.get());
+        root.getChildren().addAll(this.browser.get(), this.canvas.get());
 
         if(Chat.isOpened()) {
             root.getChildren().add(this.chatBrowser.get());
@@ -90,5 +97,31 @@ public class SlideShowScene extends Scene {
         else translation.setByY(300);
 
         translation.play();
+    }
+
+    public void drawOnScene(double x, double y) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                GraphicsContext ctx = SlideShowScene.this.canvas.get().getGraphicsContext2D();
+                LOGGER.finest(String.format("Drawing on scene at X = %1$s - Y = %2$s", x, y));
+
+                ctx.setFill(new Color(1, 0, 0, 0.5));
+                ctx.fillOval(x, y, 10, 10);
+            }
+        });
+
+    }
+
+    public void clearScene() {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                SlideShowScene.this.canvas.get().getGraphicsContext2D().clearRect(0, 0,
+                        SlideShowScene.this.canvas.get().getWidth(),
+                        SlideShowScene.this.canvas.get().getHeight());
+            }
+        });
+
     }
 }

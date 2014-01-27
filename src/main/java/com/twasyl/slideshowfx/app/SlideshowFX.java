@@ -92,7 +92,7 @@ public class SlideshowFX extends Application {
             public void changed(ObservableValue<? extends SlideShowScene> observableValue, SlideShowScene scene, SlideShowScene scene2) {
                 if (scene2 != null) {
                     getStage().setScene(scene2);
-                    //getStage().setFullScreen(true);
+                    getStage().setFullScreen(true);
 
                     SlideshowFX.setSlideShowActive(true);
                 }

@@ -16,16 +16,12 @@ public class SlideController extends Listener {
 
     private boolean tracking = false;
     private boolean pointerEnabled = false;
-    private boolean slideChangeEnabled = false;
 
     public boolean isTracking() { return tracking; }
     public void setTracking(boolean tracking) { this.tracking = tracking; }
 
     public boolean isPointerEnabled() { return pointerEnabled; }
     public void setPointerEnabled(boolean pointerEnabled) { this.pointerEnabled = pointerEnabled; }
-
-    public boolean isSlideChangeEnabled() { return slideChangeEnabled; }
-    public void setSlideChangeEnabled(boolean slideChangeEnabled) { this.slideChangeEnabled = slideChangeEnabled; }
 
     @Override
     public void onInit(Controller controller) {
@@ -86,39 +82,37 @@ public class SlideController extends Listener {
     }
 
     private void manageSwipe(final Controller controller, final Gesture gesture) {
-        if(this.isSlideChangeEnabled()) {
-            final Frame frame = controller.frame();
+        final Frame frame = controller.frame();
 
-            SwipeGesture swipe = new SwipeGesture(gesture);
+        SwipeGesture swipe = new SwipeGesture(gesture);
 
-            // The gesture is finished
-            if(swipe.state() == Gesture.State.STATE_STOP) {
+        // The gesture is finished
+        if(swipe.state() == Gesture.State.STATE_STOP) {
 
-                if(!frame.hands().isEmpty() && frame.hands().count() == 1) {
-                    final Hand hand = frame.hands().get(0);
+            if(!frame.hands().isEmpty() && frame.hands().count() == 1) {
+                final Hand hand = frame.hands().get(0);
 
-                    if(hand.isValid()) {
-                        // Only allow index and major fingers
-                        if(!hand.fingers().isEmpty() && hand.fingers().count() == 2) {
-                            boolean swipeValid = true;
+                if(hand.isValid()) {
+                    // Only allow index and major fingers
+                    if(!hand.fingers().isEmpty() && hand.fingers().count() == 2) {
+                        boolean swipeValid = true;
 
-                            Iterator<Finger> fingerIterator = hand.fingers().iterator();
+                        Iterator<Finger> fingerIterator = hand.fingers().iterator();
 
-                            // Check that each finger is valid
-                            while(fingerIterator.hasNext() && swipeValid) {
-                                swipeValid = fingerIterator.next().isValid();
-                            }
+                        // Check that each finger is valid
+                        while(fingerIterator.hasNext() && swipeValid) {
+                            swipeValid = fingerIterator.next().isValid();
+                        }
 
-                            if(swipeValid) {
+                        if(swipeValid) {
 
-                                // Check the gesture is a swipe and determine direction
-                                if(swipe.direction().getX() > 0) {
-                                    SlideshowFX.getSlideShowScene().clearScene();
-                                    SlideshowFX.getSlideShowScene().sendKey(KeyCode.LEFT);
-                                } else if(swipe.direction().getX() < 0) {
-                                    SlideshowFX.getSlideShowScene().clearScene();
-                                    SlideshowFX.getSlideShowScene().sendKey(KeyCode.RIGHT);
-                                }
+                            // Check the gesture is a swipe and determine direction
+                            if(swipe.direction().getX() > 0) {
+                                SlideshowFX.getSlideShowScene().clearScene();
+                                SlideshowFX.getSlideShowScene().sendKey(KeyCode.LEFT);
+                            } else if(swipe.direction().getX() < 0) {
+                                SlideshowFX.getSlideShowScene().clearScene();
+                                SlideshowFX.getSlideShowScene().sendKey(KeyCode.RIGHT);
                             }
                         }
                     }
@@ -140,20 +134,6 @@ public class SlideController extends Listener {
                     if(hand.fingers().count() == 1 && hand.fingers().get(0).isValid()) {
                         if(gesture.state().equals(Gesture.State.STATE_STOP)) {
                             this.setPointerEnabled(!this.isPointerEnabled());
-                        }
-                    }
-                    // Enable/disable slide changing
-                    else if(hand.fingers().count() == 2) {
-                        if(gesture.state().equals(Gesture.State.STATE_STOP)) {
-
-                            boolean allFingersValid = true;
-                            Iterator<Finger> fingerIterator = hand.fingers().iterator();
-
-                            while(allFingersValid && fingerIterator.hasNext()) {
-                                allFingersValid = fingerIterator.next().isValid();
-                            }
-
-                            if(allFingersValid) this.setSlideChangeEnabled(!this.isSlideChangeEnabled());
                         }
                     }
                     // Clear the scene

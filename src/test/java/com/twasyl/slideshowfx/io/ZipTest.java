@@ -3,7 +3,7 @@ package com.twasyl.slideshowfx.io;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
 import com.twasyl.slideshowfx.exceptions.PresentationException;
-import com.twasyl.slideshowfx.utils.PresentationBuilder;
+import com.twasyl.slideshowfx.builder.PresentationBuilder;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import junit.framework.Assert;
 import org.junit.AfterClass;
@@ -22,6 +22,9 @@ public class ZipTest {
     private static File revealjsTemplateFile;
     private static File reveljsTemplateFolder;
 
+    private static File impressjsTemplateFile;
+    private static File impressjsTemplateFolder;
+
     private static File presentationExampleFolder;
     private static File presentationExampleFile;
 
@@ -32,6 +35,9 @@ public class ZipTest {
 
         reveljsTemplateFolder = new File("./src/test/resources/revealjs-template");
         revealjsTemplateFile = new File("./src/test/resources/revealjs-template.sfxt");
+
+        impressjsTemplateFolder = new File("./src/test/resources/impress.js-template");
+        impressjsTemplateFile = new File("./src/test/resources/impress.js-template.sfxt");
 
         presentationExampleFolder = new File("./src/test/resources/iCode");
         presentationExampleFile = new File("./src/test/resources/iCode.sfx");
@@ -60,6 +66,21 @@ public class ZipTest {
     @Test
     public void zipRevealjsTemplateFolder() throws IOException {
         ZipUtils.zip(reveljsTemplateFolder, revealjsTemplateFile);
+    }
+
+    @Test
+    public void unzipImpressjsTemplate() throws IOException {
+        try {
+            builder.loadTemplate(impressjsTemplateFile);
+        } catch (InvalidTemplateException | InvalidTemplateConfigurationException | PresentationException e) {
+            LOGGER.log(Level.SEVERE, "Error while unzipping template", e);
+            Assert.assertTrue(false);
+        }
+    }
+
+    @Test
+    public void zipImpressjsTemplateFolder() throws IOException {
+        ZipUtils.zip(impressjsTemplateFolder, impressjsTemplateFile);
     }
 
     @Test

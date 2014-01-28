@@ -1,340 +1,32 @@
-package com.twasyl.slideshowfx.utils;
+package com.twasyl.slideshowfx.builder;
 
+import com.twasyl.slideshowfx.builder.template.DynamicAttribute;
+import com.twasyl.slideshowfx.builder.template.SlideTemplate;
+import com.twasyl.slideshowfx.builder.template.Template;
 import com.twasyl.slideshowfx.exceptions.InvalidPresentationConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
 import com.twasyl.slideshowfx.exceptions.PresentationException;
+import com.twasyl.slideshowfx.utils.ZipUtils;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.Image;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
 import javax.json.*;
 import javax.json.stream.JsonGenerator;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.ListIterator;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PresentationBuilder {
-
-    /**
-     * Represents a slide of the presentation
-     */
-    public static class Slide {
-
-        private SlideTemplate template;
-        private String slideNumber;
-        private String text;
-        private Image thumbnail;
-
-        public Slide() {
-        }
-
-        public Slide(String slideNumber) {
-            this.slideNumber = slideNumber;
-        }
-
-        public Slide(SlideTemplate template, String slideNumber) {
-            this.template = template;
-            this.slideNumber = slideNumber;
-        }
-
-        public SlideTemplate getTemplate() { return template; }
-        public void setTemplate(SlideTemplate template) { this.template = template; }
-
-        public String getText() { return text; }
-        public void setText(String text) { this.text = text; }
-
-        public String getSlideNumber() { return slideNumber; }
-        public void setSlideNumber(String slideNumber) { this.slideNumber = slideNumber; }
-
-        public Image getThumbnail() { return thumbnail; }
-        public void setThumbnail(Image thumbnail) { this.thumbnail = thumbnail; }
-
-        public static void buildContent(StringBuffer buffer, Slide slide) throws IOException, SAXException, ParserConfigurationException {
-            buffer.append(slide.getText());
-        }
-    }
-
-    /**
-     * Represents a slide defined by the template
-     */
-    public static class SlideTemplate {
-        private int id;
-        private String name;
-        private File file;
-        private String[] dynamicIds;
-
-        public SlideTemplate() {
-        }
-
-        public SlideTemplate(int id, String name, File file) {
-            this.id = id;
-            this.name = name;
-            this.file = file;
-        }
-
-        public int getId() { return id; }
-        public void setId(int id) { this.id = id; }
-
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-
-        public File getFile() { return file; }
-        public void setFile(File file) { this.file = file; }
-
-        public String[] getDynamicIds() { return dynamicIds; }
-        public void setDynamicIds(String[] dynamicIds) { this.dynamicIds = dynamicIds; }
-
-        public static void buildContent(StringBuffer buffer, Slide slide) throws IOException, SAXException, ParserConfigurationException {
-            buffer.append(slide.getText());
-        }
-    }
-
-    /**
-     * Represents the template found in the template configuration file
-     */
-    public static class Template {
-        protected static final String TEMPLATE_CONFIGURATION_NAME = "template-config.json";
-
-        private File folder;
-        private File configurationFile;
-        private String name;
-        private File file;
-        private List<SlideTemplate> slideTemplates;
-        private String contentDefinerMethod;
-        private String getCurrentSlideMethod;
-        private String jsObject;
-        private File slidesTemplateDirectory;
-        private File slidesPresentationDirectory;
-        private File slidesThumbnailDirectory;
-        private File resourcesDirectory;
-        private String slideIdPrefix;
-
-        public Template() {
-        }
-
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-
-        public File getFile() { return file;  }
-        public void setFile(File file) { this.file = file; }
-
-        public List<SlideTemplate> getSlideTemplates() { return slideTemplates; }
-        public void setSlideTemplates(List<SlideTemplate> slideTemplates) { this.slideTemplates = slideTemplates; }
-
-        public File getFolder() { return folder; }
-        public void setFolder(File folder) { this.folder = folder; }
-
-        public File getConfigurationFile() { return configurationFile; }
-        public void setConfigurationFile(File configurationFile) { this.configurationFile = configurationFile; }
-
-        public String getContentDefinerMethod() { return contentDefinerMethod; }
-        public void setContentDefinerMethod(String contentDefinerMethod) { this.contentDefinerMethod = contentDefinerMethod; }
-
-        public String getGetCurrentSlideMethod() { return getCurrentSlideMethod; }
-        public void setGetCurrentSlideMethod(String getCurrentSlideMethod) { this.getCurrentSlideMethod = getCurrentSlideMethod; }
-
-        public String getJsObject() { return jsObject; }
-        public void setJsObject(String jsObject) { this.jsObject = jsObject; }
-
-        public File getSlidesTemplateDirectory() { return slidesTemplateDirectory; }
-        public void setSlidesTemplateDirectory(File slidesTemplateDirectory) { this.slidesTemplateDirectory = slidesTemplateDirectory; }
-
-        public File getSlidesPresentationDirectory() { return slidesPresentationDirectory; }
-        public void setSlidesPresentationDirectory(File slidesPresentationDirectory) { this.slidesPresentationDirectory = slidesPresentationDirectory; }
-
-        public File getResourcesDirectory() { return resourcesDirectory; }
-        public void setResourcesDirectory(File resourcesDirectory) { this.resourcesDirectory = resourcesDirectory; }
-
-        public File getSlidesThumbnailDirectory() { return slidesThumbnailDirectory; }
-        public void setSlidesThumbnailDirectory(File slidesThumbnailDirectory) { this.slidesThumbnailDirectory = slidesThumbnailDirectory; }
-
-        public String getSlideIdPrefix() { return slideIdPrefix; }
-        public void setSlideIdPrefix(String slideIdPrefix) { this.slideIdPrefix = slideIdPrefix; }
-
-        public SlideTemplate getSlideTemplate(int slideId) {
-            SlideTemplate searchedTemplate = null;
-
-            for(SlideTemplate slideTemplate : getSlideTemplates()) {
-                if(slideId == slideTemplate.getId()) {
-                    searchedTemplate = slideTemplate;
-                    break;
-                }
-            }
-
-            return searchedTemplate;
-        }
-        /**
-         * Read the configuration of this template located in the <b>folder</b> attribute.
-         */
-        public void readFromFolder() throws FileNotFoundException {
-
-            // Set the template information
-            LOGGER.fine("Starting reading template configuration");
-            this.setConfigurationFile(new File(this.getFolder(), Template.TEMPLATE_CONFIGURATION_NAME));
-
-            JsonReader configurationReader = Json.createReader(new FileInputStream(this.getConfigurationFile()));
-            JsonObject templateJson = configurationReader.readObject().getJsonObject("template");
-
-            this.setName(templateJson.getString("name"));
-            LOGGER.fine("[Template configuration] name = " + this.getName());
-
-            this.setFile(new File(this.getFolder(), templateJson.getString("file")));
-            LOGGER.fine("[Template configuration] file = " + this.getFile().getAbsolutePath());
-
-            this.setJsObject(templateJson.getString("js-object"));
-            LOGGER.fine("[Template configuration] jsObject = " + this.getJsObject());
-
-            this.setResourcesDirectory(new File(this.getFolder(), templateJson.getString("resources-directory")));
-            LOGGER.fine("[Template configuration] resources-directory = " + this.getResourcesDirectory().getAbsolutePath());
-
-            JsonArray methodsJson = templateJson.getJsonArray("methods");
-
-            if(methodsJson != null && methodsJson.size() > 0) {
-                for(JsonValue method : methodsJson) {
-                    if(method.getValueType().equals(JsonValue.ValueType.OBJECT)) {
-                        if("CONTENT_DEFINER".equals(((JsonObject) method).getString("type"))) {
-                            this.setContentDefinerMethod(((JsonObject) method).getString("name"));
-                            LOGGER.fine("[Template configuration] content definer method = " + this.getContentDefinerMethod());
-                        } else if("GET_CURRENT_SLIDE".equals(((JsonObject) method).getString("type"))) {
-                            this.setGetCurrentSlideMethod(((JsonObject) method).getString("name"));
-                            LOGGER.fine("[Template configuration] get current slide method = " + this.getGetCurrentSlideMethod());
-                        }
-                    }
-                }
-            }
-
-            // Setting the slides
-            this.setSlideTemplates(new ArrayList<SlideTemplate>());
-            JsonObject slidesJson = templateJson.getJsonObject("slides");
-
-            if (slidesJson != null) {
-                LOGGER.fine("Reading slide's configuration");
-                JsonObject slidesConfigurationJson = slidesJson.getJsonObject("configuration");
-
-                this.setSlidesTemplateDirectory(new File(this.getFolder(), slidesConfigurationJson.getString("template-directory")));
-                LOGGER.fine("[Slide's configuration] template directory = " + this.getSlidesTemplateDirectory().getAbsolutePath());
-
-                this.setSlidesPresentationDirectory(new File(this.getFolder(), slidesConfigurationJson.getString("presentation-directory")));
-                LOGGER.fine("[Slide's configuration] presentation directory = " + this.getSlidesPresentationDirectory().getAbsolutePath());
-
-                this.setSlidesThumbnailDirectory(new File(this.getFolder(), slidesConfigurationJson.getString("thumbnail-directory")));
-                LOGGER.fine("[Slide's configuration] slides thumbnail directory = " + this.getSlidesThumbnailDirectory().getAbsolutePath());
-
-                this.setSlideIdPrefix(slidesConfigurationJson.getString("slide-id-prefix"));
-                LOGGER.fine("[Template configuration] slideIdPrefix = " + this.getSlideIdPrefix());
-
-                JsonArray slidesDefinition = slidesJson.getJsonArray("slides-definition");
-
-                if(slidesDefinition != null && !slidesDefinition.isEmpty()) {
-                    SlideTemplate slideTemplate;
-                    JsonArray dynamicIdsJson;
-
-                    for (JsonObject slideJson : slidesDefinition.getValuesAs(JsonObject.class)) {
-                        slideTemplate = new SlideTemplate();
-                        slideTemplate.setId(slideJson.getInt("id"));
-                        LOGGER.fine("[Slide definition] id = " + slideTemplate.getId());
-
-                        slideTemplate.setName(slideJson.getString("name"));
-                        LOGGER.fine("[Slide definition] name = " + slideTemplate.getName());
-
-                        slideTemplate.setFile(new File(this.getSlidesTemplateDirectory(), slideJson.getString("file")));
-                        LOGGER.fine("[Slide definition] file = " + slideTemplate.getFile().getAbsolutePath());
-
-                        dynamicIdsJson = slideJson.getJsonArray("dynamic-ids");
-                        if(dynamicIdsJson != null && !dynamicIdsJson.isEmpty()) {
-                            slideTemplate.setDynamicIds(new String[dynamicIdsJson.size()]);
-
-                            for(int index = 0; index < dynamicIdsJson.size(); index++) {
-                                slideTemplate.getDynamicIds()[index] = dynamicIdsJson.getString(index);
-                            }
-                        }
-
-                        this.getSlideTemplates().add(slideTemplate);
-                    }
-                } else {
-                    LOGGER.fine("No slide's definition found");
-                }
-            } else {
-                LOGGER.fine("No slide's configuration found");
-            }
-        }
-    }
-
-    /**
-     * Represents a presentation
-     */
-    public static class Presentation {
-        protected static final String PRESENTATION_CONFIGURATION_NAME = "presentation-config.json";
-        protected static final String PRESENTATION_FILE_NAME = "presentation.html";
-
-        private File presentationFile;
-        private List<Slide> slides;
-
-        public File getPresentationFile() { return presentationFile; }
-        public void setPresentationFile(File presentationFile) { this.presentationFile = presentationFile; }
-
-        public List<Slide> getSlides() { return slides; }
-        public void setSlides(List<Slide> slides) { this.slides = slides; }
-
-        public void updateSlideText(String slideNumber, String content) {
-            if(slideNumber == null) throw new IllegalArgumentException("The slide number can not be null");
-
-            Slide slideToUpdate = null;
-            for (Slide s : getSlides()) {
-                if (slideNumber.equals(s.getSlideNumber())) {
-                    s.setText(content);
-                    LOGGER.finest("Slide's text updated");
-                    break;
-                }
-            }
-        }
-
-        public void updateSlideThumbnail(String slideNumber, Image image) {
-            if(slideNumber == null) throw new IllegalArgumentException("The slide number can not be null");
-
-            Slide slideToUpdate = null;
-            for (Slide s : getSlides()) {
-                if (slideNumber.equals(s.getSlideNumber())) {
-                    s.setThumbnail(image);
-                    LOGGER.finest("Slide's thumbnail updated");
-                    break;
-                }
-            }
-        }
-
-        public Slide getSlide(String slideNumber) {
-            Slide slide = null;
-
-            for(Slide s : slides) {
-                if(s.getSlideNumber().equals(slideNumber)) {
-                    slide = s;
-                    break;
-                }
-            }
-
-            return slide;
-        }
-    }
 
     private static final Logger LOGGER = Logger.getLogger(PresentationBuilder.class.getName());
     private static final String VELOCITY_SLIDE_NUMBER_TOKEN = "slideNumber";
@@ -657,6 +349,22 @@ public class PresentationBuilder {
         context.put(VELOCITY_SLIDE_ID_PREFIX_TOKEN, this.template.getSlideIdPrefix());
         context.put(VELOCITY_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
         context.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_CALL);
+
+        if(!template.getDynamicAttributes().isEmpty()) {
+            Scanner scanner = new Scanner(System.in);
+            String value;
+
+            for(DynamicAttribute attribute : template.getDynamicAttributes()) {
+                System.out.print(attribute.getPromptMessage() + " ");
+                value = scanner.nextLine();
+
+                if(value == null || value.trim().isEmpty()) {
+                    context.put(attribute.getTemplateExpression(), "");
+                } else {
+                    context.put(attribute.getTemplateExpression(), String.format("%1$s=\"%2$s\"", attribute.getAttribute(), value.trim()));
+                }
+            }
+        }
 
         Velocity.evaluate(context, slideContentWriter, "", slideFileReader);
         slideContentWriter.flush();

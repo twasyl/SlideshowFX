@@ -2,6 +2,9 @@ package com.twasyl.slideshowfx.controllers;
 
 import com.github.rjeschke.txtmark.Processor;
 import com.twasyl.slideshowfx.app.SlideshowFX;
+import com.twasyl.slideshowfx.builder.PresentationBuilder;
+import com.twasyl.slideshowfx.builder.Slide;
+import com.twasyl.slideshowfx.builder.template.SlideTemplate;
 import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
@@ -12,19 +15,13 @@ import com.twasyl.slideshowfx.exceptions.PresentationException;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.utils.DOMUtils;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
-import com.twasyl.slideshowfx.utils.PresentationBuilder;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.print.PageOrientation;
-import javafx.print.Paper;
-import javafx.print.Printer;
 import javafx.print.PrinterJob;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -55,7 +52,7 @@ public class SlideshowFXController implements Initializable {
             try {
 
                 Object userData = ((MenuItem) actionEvent.getSource()).getUserData();
-                if(userData instanceof PresentationBuilder.SlideTemplate) {
+                if(userData instanceof SlideTemplate) {
                     final String slideId = (String) SlideshowFXController.this.browser.getEngine().executeScript(SlideshowFXController.this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
                     String slideNumber = null;
 
@@ -63,7 +60,7 @@ public class SlideshowFXController implements Initializable {
                         slideNumber = slideId.substring(SlideshowFXController.this.builder.getTemplate().getSlideIdPrefix().length());
                     }
 
-                    PresentationBuilder.Slide addedSlide = SlideshowFXController.this.builder.addSlide((PresentationBuilder.SlideTemplate) userData, slideNumber);
+                    Slide addedSlide = SlideshowFXController.this.builder.addSlide((SlideTemplate) userData, slideNumber);
                     SlideshowFXController.this.browser.getEngine().reload();
 
                     SlideshowFXController.this.updateSlideSplitMenu();
@@ -86,7 +83,7 @@ public class SlideshowFXController implements Initializable {
             final String slideId = (String) SlideshowFXController.this.browser.getEngine().executeScript(SlideshowFXController.this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
             final String slideNumber = slideId.substring(SlideshowFXController.this.builder.getTemplate().getSlideIdPrefix().length());
 
-            PresentationBuilder.Slide slideToMove = SlideshowFXController.this.builder.getPresentation().getSlide(slideNumber);
+            Slide slideToMove = SlideshowFXController.this.builder.getPresentation().getSlide(slideNumber);
 
             SlideshowFXController.this.builder.getPresentation().getSlides().remove(slideToMove);
 
@@ -211,8 +208,8 @@ public class SlideshowFXController implements Initializable {
         final String slideId = (String) this.browser.getEngine().executeScript(this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
         final String slideNumber = slideId.substring(this.builder.getTemplate().getSlideIdPrefix().length());
 
-        PresentationBuilder.Slide slideToCopy = this.builder.getPresentation().getSlide(slideNumber);
-        PresentationBuilder.Slide copy = this.builder.duplicateSlide(slideToCopy);
+        Slide slideToCopy = this.builder.getPresentation().getSlide(slideNumber);
+        Slide copy = this.builder.duplicateSlide(slideToCopy);
 
         int index = this.builder.getPresentation().getSlides().indexOf(slideToCopy);
         if(index != -1) {
@@ -387,7 +384,7 @@ public class SlideshowFXController implements Initializable {
         if(this.builder.getTemplate() != null) {
             MenuItem item;
 
-            for(PresentationBuilder.SlideTemplate slideTemplate : this.builder.getTemplate().getSlideTemplates()) {
+            for(SlideTemplate slideTemplate : this.builder.getTemplate().getSlideTemplates()) {
                 item = new MenuItem();
                 item.setText(slideTemplate.getName());
                 item.setUserData(slideTemplate);
@@ -400,7 +397,7 @@ public class SlideshowFXController implements Initializable {
     private void updateSlideSplitMenu() {
         SlideshowFXController.this.moveSlideButton.getItems().clear();
         SlideMenuItem menuItem;
-        for(PresentationBuilder.Slide slide : SlideshowFXController.this.builder.getPresentation().getSlides()) {
+        for(Slide slide : SlideshowFXController.this.builder.getPresentation().getSlides()) {
             menuItem = new SlideMenuItem(slide);
             menuItem.setOnAction(SlideshowFXController.this.moveSlideActionEvent);
             SlideshowFXController.this.moveSlideButton.getItems().add(menuItem);

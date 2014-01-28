@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.controls;
 
-import com.twasyl.slideshowfx.utils.PresentationBuilder;
+import com.twasyl.slideshowfx.builder.PresentationBuilder;
+import com.twasyl.slideshowfx.builder.Slide;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
@@ -10,9 +11,9 @@ import javafx.scene.image.ImageView;
 
 public class SlideMenuItem extends MenuItem {
 
-    private final ObjectProperty<PresentationBuilder.Slide> slide = new SimpleObjectProperty<>();
+    private final ObjectProperty<Slide> slide = new SimpleObjectProperty<>();
 
-    public SlideMenuItem(PresentationBuilder.Slide slide) {
+    public SlideMenuItem(Slide slide) {
         if(slide == null) throw new IllegalArgumentException("The slide can not be null");
 
         this.slide.set(slide);
@@ -35,7 +36,7 @@ public class SlideMenuItem extends MenuItem {
        setGraphic(graphic);
     }
 
-    public ObjectProperty<PresentationBuilder.Slide> slideProperty() { return slide; }
-    public PresentationBuilder.Slide getSlide() { return slideProperty().get(); }
-    public void setSlide(PresentationBuilder.Slide slide) { this.slideProperty().set(slide); }
+    public ObjectProperty<Slide> slideProperty() { return slide; }
+    public Slide getSlide() { return slideProperty().get(); }
+    public void setSlide(Slide slide) { this.slideProperty().set(slide); }
 }

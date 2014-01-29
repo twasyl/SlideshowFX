@@ -10,29 +10,26 @@ import java.util.logging.Logger;
 /**
  * @author Thierry Wasylczenko
  */
-public class SlideController extends Listener {
+public class SlideshowFXLeapListener extends Listener {
 
-    private static final Logger LOGGER = Logger.getLogger(SlideController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SlideshowFXLeapListener.class.getName());
 
     private boolean tracking = false;
-    private boolean pointerEnabled = false;
+    private SwipeGesture lastSwipeGesture;
 
     public boolean isTracking() { return tracking; }
     public void setTracking(boolean tracking) { this.tracking = tracking; }
 
-    public boolean isPointerEnabled() { return pointerEnabled; }
-    public void setPointerEnabled(boolean pointerEnabled) { this.pointerEnabled = pointerEnabled; }
-
     @Override
     public void onInit(Controller controller) {
         super.onInit(controller);
-        LOGGER.finest("SlideController - onInit");
+        LOGGER.finest("SlideshowFXLeapListener - onInit");
     }
 
     @Override
     public void onExit(Controller controller) {
         super.onExit(controller);
-        LOGGER.finest("SlideController - onExit");
+        LOGGER.finest("SlideshowFXLeapListener - onExit");
     }
 
     @Override
@@ -53,8 +50,15 @@ public class SlideController extends Listener {
     public void onFrame(final Controller controller) {
         super.onFrame(controller);
 
+        final Frame frame = controller.frame();
+
+        if(frame.isValid()) {
+            if(frame.pointables().isEmpty()) {
+                SlideshowFX.getSlideShowScene().hidePointer();
+            }
+        }
+
         if(isTracking()) {
-            final Frame frame = controller.frame();
 
             // Manage gestures
             if(!frame.gestures().isEmpty()) {
@@ -76,7 +80,7 @@ public class SlideController extends Listener {
                     }
                 }
             } else {
-                highlight(controller);
+                movePointer(controller);
             }
         }
     }
@@ -84,40 +88,55 @@ public class SlideController extends Listener {
     private void manageSwipe(final Controller controller, final Gesture gesture) {
         final Frame frame = controller.frame();
 
-        SwipeGesture swipe = new SwipeGesture(gesture);
+        final SwipeGesture swipe = new SwipeGesture(gesture);
 
         // The gesture is finished
         if(swipe.state() == Gesture.State.STATE_STOP) {
 
-            if(!frame.hands().isEmpty() && frame.hands().count() == 1) {
-                final Hand hand = frame.hands().get(0);
+            // Only compute the swipe if it executed more than 1 second after the previous one
+            boolean computeGesture = this.lastSwipeGesture == null;
+            if(!computeGesture) {
+                // Timestamp are in microseconds
+                long lastSwipeTimestamp = this.lastSwipeGesture.frame().timestamp();
+                long currentTimestamp = swipe.frame().timestamp();
 
-                if(hand.isValid()) {
-                    // Only allow index and major fingers
-                    if(!hand.fingers().isEmpty() && hand.fingers().count() == 2) {
-                        boolean swipeValid = true;
+                computeGesture = (lastSwipeTimestamp + 1000000l) <= currentTimestamp;
+            }
 
-                        Iterator<Finger> fingerIterator = hand.fingers().iterator();
 
-                        // Check that each finger is valid
-                        while(fingerIterator.hasNext() && swipeValid) {
-                            swipeValid = fingerIterator.next().isValid();
-                        }
+            if(computeGesture) {
+                if(!frame.hands().isEmpty() && frame.hands().count() == 1) {
+                    final Hand hand = frame.hands().get(0);
 
-                        if(swipeValid) {
+                    if(hand.isValid()) {
+                        // Only allow index and major fingers
+                        if(!hand.fingers().isEmpty() && hand.fingers().count() == 2) {
+                            boolean swipeValid = true;
 
-                            // Check the gesture is a swipe and determine direction
-                            if(swipe.direction().getX() > 0) {
-                                SlideshowFX.getSlideShowScene().clearScene();
-                                SlideshowFX.getSlideShowScene().sendKey(KeyCode.LEFT);
-                            } else if(swipe.direction().getX() < 0) {
-                                SlideshowFX.getSlideShowScene().clearScene();
-                                SlideshowFX.getSlideShowScene().sendKey(KeyCode.RIGHT);
+                            Iterator<Finger> fingerIterator = hand.fingers().iterator();
+
+                            // Check that each finger is valid
+                            while(fingerIterator.hasNext() && swipeValid) {
+                                swipeValid = fingerIterator.next().isValid();
+                            }
+
+                            if(swipeValid) {
+
+                                // Check the gesture is a swipe and determine direction
+                                if(swipe.direction().getX() > 0) {
+                                    SlideshowFX.getSlideShowScene().hidePointer();
+                                    SlideshowFX.getSlideShowScene().sendKey(KeyCode.LEFT);
+                                } else if(swipe.direction().getX() < 0) {
+                                    SlideshowFX.getSlideShowScene().hidePointer();
+                                    SlideshowFX.getSlideShowScene().sendKey(KeyCode.RIGHT);
+                                }
                             }
                         }
                     }
                 }
             }
+
+            this.lastSwipeGesture = swipe;
         }
     }
 
@@ -131,13 +150,7 @@ public class SlideController extends Listener {
 
                 if(hand.isValid() && !hand.fingers().isEmpty()) {
                     // Enable/disable highlighting
-                    if(hand.fingers().count() == 1 && hand.fingers().get(0).isValid()) {
-                        if(gesture.state().equals(Gesture.State.STATE_STOP)) {
-                            this.setPointerEnabled(!this.isPointerEnabled());
-                        }
-                    }
-                    // Clear the scene
-                    else if(hand.fingers().count() == 5) {
+                    if(hand.fingers().count() == 5) {
                         if(gesture.state().equals(Gesture.State.STATE_STOP)) {
 
                             boolean allFingersValid = true;
@@ -147,7 +160,7 @@ public class SlideController extends Listener {
                                 allFingersValid = fingerIterator.next().isValid();
                             }
 
-                            if(allFingersValid) SlideshowFX.getSlideShowScene().clearScene();
+                            if(allFingersValid) SlideshowFX.getSlideShowScene().hidePointer();
                         }
                     }
                 }
@@ -156,8 +169,7 @@ public class SlideController extends Listener {
 
     }
 
-    private void highlight(final Controller controller) {
-        if(this.isPointerEnabled()) {
+    private void movePointer(final Controller controller) {
             final Frame frame = controller.frame();
 
             if(!frame.hands().isEmpty() && frame.hands().count() == 1) {
@@ -165,7 +177,7 @@ public class SlideController extends Listener {
 
                 if(hand.isValid()) {
 
-                    // Only highlight if one finger
+                    // Only movePointer if one finger
                     if(!hand.fingers().isEmpty() && hand.fingers().count() == 1) {
                         final Finger finger = hand.fingers().get(0);
 
@@ -179,11 +191,10 @@ public class SlideController extends Listener {
                             double computedX = normalizedPosition.getX() * screenWidth;
                             double computedY = screenHeight - (normalizedPosition.getY() * screenHeight);
 
-                            SlideshowFX.getSlideShowScene().drawOnScene(computedX, computedY);
+                            SlideshowFX.getSlideShowScene().showPointer(computedX, computedY);
                         }
                     }
                 }
             }
-        }
     }
 }

@@ -350,7 +350,7 @@ public class PresentationBuilder {
         context.put(VELOCITY_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
         context.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_CALL);
 
-        if(!template.getDynamicAttributes().isEmpty()) {
+        if(template.getDynamicAttributes() != null && template.getDynamicAttributes().length > 0) {
             Scanner scanner = new Scanner(System.in);
             String value;
 

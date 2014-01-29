@@ -25,6 +25,9 @@ public class ZipTest {
     private static File impressjsTemplateFile;
     private static File impressjsTemplateFolder;
 
+    private static File bespokejsTemplateFile;
+    private static File bespokejsTemplateFolder;
+
     private static File presentationExampleFolder;
     private static File presentationExampleFile;
 
@@ -38,6 +41,9 @@ public class ZipTest {
 
         impressjsTemplateFolder = new File("./src/test/resources/impress.js-template");
         impressjsTemplateFile = new File("./src/test/resources/impress.js-template.sfxt");
+
+        bespokejsTemplateFolder = new File("./src/test/resources/bespoke.js-template");
+        bespokejsTemplateFile = new File("./src/test/resources/bespoke.js-template.sfxt");
 
         presentationExampleFolder = new File("./src/test/resources/iCode");
         presentationExampleFile = new File("./src/test/resources/iCode.sfx");
@@ -81,6 +87,21 @@ public class ZipTest {
     @Test
     public void zipImpressjsTemplateFolder() throws IOException {
         ZipUtils.zip(impressjsTemplateFolder, impressjsTemplateFile);
+    }
+
+    @Test
+    public void unzipBespokejsTemplate() throws IOException {
+        try {
+            builder.loadTemplate(bespokejsTemplateFile);
+        } catch (InvalidTemplateException | InvalidTemplateConfigurationException | PresentationException e) {
+            LOGGER.log(Level.SEVERE, "Error while unzipping template", e);
+            Assert.assertTrue(false);
+        }
+    }
+
+    @Test
+    public void zipBespokejsTemplateFolder() throws IOException {
+        ZipUtils.zip(bespokejsTemplateFolder, bespokejsTemplateFile);
     }
 
     @Test

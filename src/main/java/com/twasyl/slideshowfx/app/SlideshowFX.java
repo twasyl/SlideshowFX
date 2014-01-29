@@ -3,45 +3,16 @@ package com.twasyl.slideshowfx.app;
 import com.leapmotion.leap.Controller;
 import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
-import com.twasyl.slideshowfx.leap.SlideController;
-import com.twasyl.slideshowfx.utils.NetworkUtils;
+import com.twasyl.slideshowfx.leap.SlideshowFXLeapListener;
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.VertxFactory;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.ServerWebSocket;
-import org.vertx.java.core.http.impl.WebSocketMatcher;
-import org.vertx.java.core.streams.Pump;
-import org.w3c.dom.ls.LSOutput;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.ServerSocket;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.logging.Logger;
 
 public class SlideshowFX extends Application {
@@ -54,12 +25,12 @@ public class SlideshowFX extends Application {
     private static final BooleanProperty leapMotionAllowed = new SimpleBooleanProperty();
 
     private static Controller leapController;
-    private static SlideController slideController;
+    private static SlideshowFXLeapListener slideshowFXLeapListener;
 
     @Override
     public void init() throws Exception {
         // Init LeapMotion
-        slideController = new SlideController();
+        slideshowFXLeapListener = new SlideshowFXLeapListener();
         leapController = new Controller();
 
         // The listener is added and removed each time the slideShowActive property changes
@@ -67,9 +38,9 @@ public class SlideshowFX extends Application {
             @Override
             public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean aBoolean2) {
                 if (aBoolean2) {
-                    leapController.addListener(slideController);
+                    leapController.addListener(slideshowFXLeapListener);
                 } else {
-                    leapController.removeListener(slideController);
+                    leapController.removeListener(slideshowFXLeapListener);
 
                     getStage().setScene(presentationBuilderScene.get());
                     getStage().setFullScreen(false);
@@ -81,7 +52,7 @@ public class SlideshowFX extends Application {
         leapMotionAllowedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean aBoolean2) {
-                slideController.setTracking(aBoolean2);
+                slideshowFXLeapListener.setTracking(aBoolean2);
                 LOGGER.finest(String.format("LeapMotion tracking has changed to %1$s", aBoolean2));
             }
         });
@@ -120,7 +91,7 @@ public class SlideshowFX extends Application {
         super.stop();
 
         LOGGER.info("Stopping the LeapMotion controller correctly");
-        leapController.removeListener(slideController);
+        leapController.removeListener(slideshowFXLeapListener);
 
         Chat.close();
     }

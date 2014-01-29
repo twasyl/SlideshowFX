@@ -174,15 +174,19 @@ public class Template {
 
                     dynamicAttributesJson = slideJson.getJsonArray("dynamic-attributes");
                     if(dynamicAttributesJson != null && !dynamicAttributesJson.isEmpty()) {
+                        slideTemplate.setDynamicAttributes(new DynamicAttribute[dynamicAttributesJson.size()]);
                         DynamicAttribute dynamicAttribute;
+                        JsonObject dynamicAttributeJson;
 
-                        for(JsonObject dynamicAttributeJson : dynamicAttributesJson.getValuesAs(JsonObject.class)) {
+                        for(int index = 0; index < dynamicAttributesJson.size(); index++) {
                             dynamicAttribute = new DynamicAttribute();
+                            dynamicAttributeJson = dynamicAttributesJson.getJsonObject(index);
+
                             dynamicAttribute.setAttribute(dynamicAttributeJson.getString("attribute"));
                             dynamicAttribute.setPromptMessage(dynamicAttributeJson.getString("prompt-message"));
                             dynamicAttribute.setTemplateExpression(dynamicAttributeJson.getString("template-expression"));
 
-                            slideTemplate.getDynamicAttributes().add(dynamicAttribute);
+                            slideTemplate.getDynamicAttributes()[index] = dynamicAttribute;
                         }
                     }
 

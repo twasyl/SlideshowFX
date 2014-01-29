@@ -6,8 +6,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents a slide defined by the template
@@ -17,7 +15,7 @@ public class SlideTemplate {
     private String name;
     private File file;
     private String[] dynamicIds;
-    private List<DynamicAttribute> dynamicAttributes = new ArrayList<>();
+    private DynamicAttribute[] dynamicAttributes;
 
     public SlideTemplate() {
     }
@@ -40,8 +38,8 @@ public class SlideTemplate {
     public String[] getDynamicIds() { return dynamicIds; }
     public void setDynamicIds(String[] dynamicIds) { this.dynamicIds = dynamicIds; }
 
-    public List<DynamicAttribute> getDynamicAttributes() { return dynamicAttributes; }
-    public void setDynamicAttributes(List<DynamicAttribute> dynamicAttributes) { this.dynamicAttributes = dynamicAttributes; }
+    public DynamicAttribute[] getDynamicAttributes() { return dynamicAttributes; }
+    public void setDynamicAttributes(DynamicAttribute[] dynamicAttributes) { this.dynamicAttributes = dynamicAttributes; }
 
     public static void buildContent(StringBuffer buffer, Slide slide) throws IOException, SAXException, ParserConfigurationException {
         buffer.append(slide.getText());

@@ -1,5 +1,11 @@
 package com.twasyl.slideshowfx.chat;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageConfig;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -411,4 +417,33 @@ public class Chat {
     public static String getIp() { return ip; }
 
     public static int getPort() { return port; }
+
+    public byte[] generateQRCode(int size) {
+        byte[] qrCode = null;
+
+        final String qrCodeData = String.format("http://%1$s:%2$s%3$s",
+            getIp(), getPort(), WS_CLIENT_CHAT);
+
+        final QRCodeWriter qrWriter = new QRCodeWriter();
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            final BitMatrix matrix = qrWriter.encode(qrCodeData, BarcodeFormat.QR_CODE, size, size);
+
+            MatrixToImageWriter.writeToStream(matrix, "png", out);
+
+            out.flush();
+            qrCode = out.toByteArray();
+        } catch (WriterException | IOException e) {
+            LOGGER.log(Level.WARNING, "Can not generate QR Code", e);
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Can not close output stream that contains the QR Code", e);
+            }
+        }
+
+        return qrCode;
+    }
 }

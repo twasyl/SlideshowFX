@@ -92,8 +92,6 @@ public class SlideShowScene extends Scene {
         if(Chat.isOpened()) {
             root.getChildren().add(this.chatBrowser.get());
         }
-
-        setCursor(Cursor.NONE);
     }
 
     public ObjectProperty<WebView> browserProperty() { return browser; }

@@ -51,10 +51,7 @@ import org.vertx.java.core.streams.Pump;
 
 import java.io.*;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -331,6 +328,13 @@ public class Chat {
                     } catch (URISyntaxException e) {
                         LOGGER.log(Level.WARNING, "Can not send check images", e);
                     }
+                } else if("/images/chatQRCode.png".equals(httpServerRequest.path())) {
+                    httpServerRequest.response().setChunked(true);
+                    httpServerRequest.response().headers().set("Content-Type", "image/png");
+
+                    Buffer buffer = new Buffer(Chat.generateQRCode(350))    ;
+                    httpServerRequest.response().write(buffer);
+                    httpServerRequest.response().end();
                 }
             }
         }).websocketHandler(new Handler<ServerWebSocket>() {
@@ -434,11 +438,11 @@ public class Chat {
 
     public static int getPort() { return port; }
 
-    public byte[] generateQRCode(int size) {
+    public static byte[] generateQRCode(int size) {
         byte[] qrCode = null;
 
         final String qrCodeData = String.format("http://%1$s:%2$s%3$s",
-            getIp(), getPort(), WS_CLIENT_CHAT);
+            getIp(), getPort(), HTTP_CLIENT_CHAT_PATH);
 
         final QRCodeWriter qrWriter = new QRCodeWriter();
         final ByteArrayOutputStream out = new ByteArrayOutputStream();

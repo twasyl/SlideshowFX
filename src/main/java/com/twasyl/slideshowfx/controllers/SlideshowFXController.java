@@ -380,7 +380,7 @@ public class SlideshowFXController implements Initializable {
 
                 final String imgMarkup = String.format("<img src=\"%1$s/%2$s\" />", relativePath.toString(), targetFile.getName());
 
-                this.fieldValueText.setText(this.fieldValueText.getText() + imgMarkup);
+                this.insertText(this.fieldValueText, imgMarkup, null);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -389,10 +389,44 @@ public class SlideshowFXController implements Initializable {
 
     @FXML private void insertQuote(ActionEvent event) {
         String quoteMarkup = "<blockquote></blockquote>";
-        this.fieldValueText.setText(this.fieldValueText.getText() + quoteMarkup);
+
+        this.insertText(this.fieldValueText, quoteMarkup, 12);
 
         this.fieldValueText.requestFocus();
-        this.fieldValueText.positionCaret(this.fieldValueText.getText().length() - 13);
+    }
+
+    @FXML private void insertChatQRCode(ActionEvent event) {
+        final String qrCode = String.format("<img src=\"http://%1$s:%2$s/images/chatQRCode.png\" />",
+                Chat.getIp(), Chat.getPort());
+
+
+        this.insertText(this.fieldValueText, qrCode, null);
+
+        this.fieldValueText.requestFocus();
+    }
+
+    private void insertText(TextInputControl input, String textToInsert, Integer moveCaretPosition) {
+        if(!input.getText().isEmpty()) {
+            final int currentCarret = input.getCaretPosition();
+            final String firstPart = input.getText().substring(0, currentCarret);
+            final String secondPart = input.getText().substring(currentCarret);
+
+            input.setText(String.format("%1$s%2$s%3$s", firstPart, textToInsert, secondPart));
+
+            if(moveCaretPosition != null) {
+                input.positionCaret(currentCarret + moveCaretPosition);
+            } else {
+                input.positionCaret(currentCarret + textToInsert.length());
+            }
+        } else {
+            input.setText(textToInsert);
+
+            if(moveCaretPosition != null) {
+                input.positionCaret(input.getCaretPosition() + moveCaretPosition);
+            } else {
+                input.positionCaret(input.getCaretPosition() + textToInsert.length());
+            }
+        }
     }
 
     private void updateSlideTemplatesSplitMenu() {

@@ -27,6 +27,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.util.logging.Logger;
@@ -98,7 +99,7 @@ public class SlideshowFX extends Application {
 
         stage.setTitle("SlideshowFX");
         stage.setScene(scene);
-
+        stage.getIcons().add(new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/SlideshowFX.png")));
         stage.show();
     }
 

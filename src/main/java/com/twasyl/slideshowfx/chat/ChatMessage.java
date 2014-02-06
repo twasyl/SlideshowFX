@@ -18,9 +18,14 @@ package com.twasyl.slideshowfx.chat;
 
 import org.vertx.java.core.json.JsonObject;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ChatMessage {
+    private static final Logger LOGGER = Logger.getLogger(ChatMessage.class.getName());
     private static final String JSON_MESSAGE_OBJECT = "message";
     private static final String JSON_MESSAGE_ID_ATTR = "id";
     private static final String JSON_MESSAGE_AUTHOR_ATTR = "author";
@@ -65,12 +70,40 @@ public class ChatMessage {
     public InetSocketAddress getIp() { return ip; }
     public void setIp(InetSocketAddress ip) { this.ip = ip; }
 
-    private String getFormattedContent() {
-        return getContent().replaceAll("\\n", "&#10;")
+    /**
+     * Encode the content in Base64.
+     * @return the content of the message encoded in Base64.
+     */
+    private String encodeContent() {
+        /*return getContent().replaceAll("\\n", "&#10;")
                 .replaceAll("\\\\", "&#92;")
                 .replaceAll("\'", "&#39;")
                 .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;");
+                .replaceAll(">", "&gt;"); */
+        if(getContent() != null) {
+            try {
+                return Base64.getEncoder().encodeToString(getContent().getBytes("UTF8"));
+            } catch (UnsupportedEncodingException e) {
+               LOGGER.log(Level.WARNING, "Can not encode chat message content", e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Decode the given base64 content.
+     * @param contentToDecode
+     * @return the decoded content
+     */
+    private String decodeContent(String contentToDecode) {
+        if(contentToDecode != null) {
+            try {
+                return new String(Base64.getDecoder().decode(contentToDecode), "UTF8");
+            } catch (UnsupportedEncodingException e) {
+                LOGGER.log(Level.WARNING, "Can not decode chat message content", e);
+            }
+        }
+        return null;
     }
 
     /**
@@ -93,7 +126,7 @@ public class ChatMessage {
         message.setSource(ChatMessageSource.fromString(jsonObject.getString(JSON_MESSAGE_SOURCE_ATTR)));
         message.setAction(ChatMessageAction.fromString(jsonObject.getString(JSON_MESSAGE_ACTION_ATTR)));
         message.setStatus(ChatMessageStatus.fromString(jsonObject.getString(JSON_MESSAGE_STATUS_ATTR)));
-        message.setContent(jsonObject.getString(JSON_MESSAGE_CONTENT_ATTR));
+        message.setContent(message.decodeContent(jsonObject.getString(JSON_MESSAGE_CONTENT_ATTR)));
 
         return message;
     }
@@ -117,7 +150,7 @@ public class ChatMessage {
 
         if(getAuthor() != null) jsonMessage.putString(JSON_MESSAGE_AUTHOR_ATTR, getAuthor());
 
-        if(getContent() != null) jsonMessage.putString(JSON_MESSAGE_CONTENT_ATTR, getFormattedContent());
+        if(getContent() != null) jsonMessage.putString(JSON_MESSAGE_CONTENT_ATTR, encodeContent());
 
         if(getSource() != null) jsonMessage.putString(JSON_MESSAGE_SOURCE_ATTR, getSource().getAsString());
 

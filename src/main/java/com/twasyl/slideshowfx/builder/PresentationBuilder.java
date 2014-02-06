@@ -53,14 +53,14 @@ public class PresentationBuilder {
 
     private static final String VELOCITY_SFX_CONTENT_DEFINER_SCRIPT = "function setField(slide, what, value) {\n" +
             "\telement = document.getElementById(slide + \"-\" + what);\n" +
-            "\telement.innerHTML = value;\n" +
+            "\telement.innerHTML = decodeURIComponent(escape(window.atob(value)));\n" +
             "}";
     private static final String VELOCITY_SFX_CALLBACK_SCRIPT = "function sendInformationToSlideshowFX(source) {\n" +
             "\tdashIndex = source.id.indexOf(\"-\");\n" +
             "\tslideNumber = source.id.substring(0, dashIndex);\n" +
             "\tfieldName = source.id.substring(dashIndex+1);\n" +
             "\n" +
-            "\tsfx.prefillContentDefinition(slideNumber, fieldName, source.innerHTML);\n" +
+            "\tsfx.prefillContentDefinition(slideNumber, fieldName, window.btoa(unescape(encodeURIComponent(source.innerHTML))));\n" +
             "}";
 
     private static final String VELOCITY_SFX_CALLBACK_CALL = "sendInformationToSlideshowFX(this);";

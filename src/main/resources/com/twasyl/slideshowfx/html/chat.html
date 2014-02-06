@@ -81,7 +81,7 @@
                         }
 
                         htmlMessage = htmlMessage + " :" + "</span><br />"
-                                    + "<span class=\"message-content\">" + json.message.content + "</span></div>";
+                                    + "<span class=\"message-content\">" + decodeURIComponent(escape(window.atob(json.message.content))) + "</span></div>";
 
                         messagesDiv.innerHTML = messagesDiv.innerHTML + htmlMessage;
 
@@ -117,7 +117,7 @@
                 if(attendeeName === "") {
                     attendeeName = "somebody";
                 }
-                var jsonMessage = "{ \"message\" : { \"author\": \"" + attendeeName + "\", \"content\": \"" + attendeeMessage + "\"} }";
+                var jsonMessage = "{ \"message\" : { \"author\": \"" + attendeeName + "\", \"content\": \"" + window.btoa(unescape(encodeURIComponent(attendeeMessage))) + "\"} }";
 
                 socket.send(jsonMessage);
 

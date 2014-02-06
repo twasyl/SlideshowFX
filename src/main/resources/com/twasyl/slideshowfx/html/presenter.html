@@ -36,7 +36,7 @@
 
                 var htmlMessage = "<div class=\"chat-message\" id=\"" + json.message.id + "\">"
                                 + "<span class=\"author\">" + json.message.author + " said :</span><br />"
-                                + "<span class=\"message-content\">" + json.message.content + "</span></div>";
+                                + "<span class=\"message-content\">" + decodeURIComponent(escape(window.atob(json.message.content))) + "</span></div>";
 
                 messagesDiv.innerHTML = messagesDiv.innerHTML + htmlMessage;
 
@@ -45,6 +45,7 @@
                 msgDiv.ondblclick = function(event) {
                     var json = "{ \"message\" : { \"id\" : \"" + event.target.id + "\", \"action\" : \"mark-read\" } }";
                     socket.send(json);
+                    msgDiv.className += " question-answered";
                 };
 
             };
@@ -93,6 +94,9 @@
         }
         .message-content {
             font-style: italic;
+        }
+        .question-answered {
+            background-color: #D0F5A9;
         }
     </style>
 </head>

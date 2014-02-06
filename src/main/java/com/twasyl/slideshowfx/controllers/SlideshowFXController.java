@@ -53,12 +53,17 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SlideshowFXController implements Initializable {
+    private static final Logger LOGGER = Logger.getLogger(SlideshowFXController.class.getName());
 
     private final PresentationBuilder builder = new PresentationBuilder();
 
@@ -197,10 +202,11 @@ public class SlideshowFXController implements Initializable {
 
     private void updateSlide(String content) throws TransformerException, IOException, ParserConfigurationException, SAXException {
 
-        String clearedContent = content.replaceAll("\\n", "&#10;")
+        /* String clearedContent = content.replaceAll("\\n", "&#10;")
                 .replaceAll("\\\\", "&#92;")
-                .replaceAll("\'", "&#39;");
+                .replaceAll("\'", "&#39;"); */
 
+        String clearedContent = Base64.getEncoder().encodeToString(content.getBytes("UTF8"));
         String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",
                 this.builder.getTemplate().getContentDefinerMethod(),
                 this.slideNumber.getText(),
@@ -457,7 +463,11 @@ public class SlideshowFXController implements Initializable {
     public void prefillContentDefinition(String slideNumber, String field, String value) {
         this.slideNumber.setText(slideNumber);
         this.fieldName.setText(field);
-        this.fieldValueText.setText(value);
+        try {
+            this.fieldValueText.setText(new String(Base64.getDecoder().decode(value), "UTF8"));
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.log(Level.WARNING, "Can not prefill content definition with the given value", e);
+        }
 
         this.fieldValueText.requestFocus();
         this.fieldValueText.selectAll();

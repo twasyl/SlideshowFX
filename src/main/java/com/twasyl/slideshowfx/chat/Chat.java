@@ -400,11 +400,14 @@ public class Chat {
                             }
 
                             chatMessage = Chat.chatHistory.get(chatMessage.getId());
-                            chatMessage.setStatus(msgStatus);
-                            chatMessage.setAction(null);
 
-                            for (ServerWebSocket client : clients) {
-                                client.writeTextFrame(chatMessage.toJSON(client.remoteAddress()));
+                            if (chatMessage != null) {
+                                chatMessage.setStatus(msgStatus);
+                                chatMessage.setAction(null);
+
+                                for (ServerWebSocket client : clients) {
+                                    client.writeTextFrame(chatMessage.toJSON(client.remoteAddress()));
+                                }
                             }
                         }
                     });

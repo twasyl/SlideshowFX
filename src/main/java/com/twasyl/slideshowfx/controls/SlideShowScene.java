@@ -18,8 +18,8 @@ package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.chat.Chat;
+import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.animation.TranslateTransition;
-import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -27,13 +27,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -43,19 +39,24 @@ import netscape.javascript.JSObject;
 
 import java.util.logging.Logger;
 
+/**
+ * Represents the scene that will host the slideshow, as well as the chat. This scene will also provides methods for
+ * showing and hiding a pointer on the slideshow.
+ *
+ * @author Thierry Wasylczenko
+ */
 public class SlideShowScene extends Scene {
 
     private static final Logger LOGGER = Logger.getLogger(SlideShowScene.class.getName());
 
     private final ObjectProperty<WebView> browser = new SimpleObjectProperty<>();
     private final ObjectProperty<WebView> chatBrowser = new SimpleObjectProperty<>();
-    private final ObjectProperty<AnchorPane> canvas = new SimpleObjectProperty<>();
     private final ObjectProperty<Circle> pointer = new SimpleObjectProperty<>();
 
     public SlideShowScene(WebView browser) {
         super(new StackPane());
         this.browser.set(browser);
-        this.canvas.set(new AnchorPane());
+        // this.canvas.set(new AnchorPane());
 
         if(Chat.isOpened()) {
             chatBrowser.set(new WebView());
@@ -80,17 +81,20 @@ public class SlideShowScene extends Scene {
                 if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
                     keyEvent.consume();
 
-                    SlideshowFX.setSlideShowActive(false);
+                    SlideShowScene.this.exitSlideshow();
                 }
             }
         });
 
-        final StackPane root = (StackPane) getRoot();
-        root.setAlignment(Pos.BOTTOM_LEFT);
-        root.getChildren().addAll(this.browser.get(), this.canvas.get());
+        final StackPane root = getSceneRoot();
+        root.setAlignment(Pos.TOP_LEFT);
+        root.getChildren().add(this.browser.get());
 
         if(Chat.isOpened()) {
             root.getChildren().add(this.chatBrowser.get());
+            /* This binding is only useful when the scene is displayed. The property is unbind when the chat is
+            opened/closed */
+            this.chatBrowser.get().translateYProperty().bind(root.heightProperty().subtract(this.chatBrowser.get().heightProperty()));
         }
     }
 
@@ -98,51 +102,80 @@ public class SlideShowScene extends Scene {
     public WebView getBrowser() { return this.browserProperty().get(); }
     public void setBrowser(WebView browser) { this.browser.set(browser); }
 
+    public StackPane getSceneRoot() {
+        return (StackPane) this.getRoot();
+    }
+
+    /**
+     * Exit the slide show mode. This method calls SlideshowFX#setSlideShowActive and set the value to <code>false</code>.
+     */
+    public void exitSlideshow() {
+        PlatformHelper.run(() -> {
+            SlideshowFX.setSlideShowActive(false);
+        });
+    }
+
+    /**
+     * Send a key to the HTML5 presentation. Currently only the LEFT and RIGHT keycodes are implemented.
+     * @param keyCode the key code to send to the HTML5 presentation.
+     */
     public void sendKey(final KeyCode keyCode) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                if(keyCode.equals(KeyCode.LEFT)) browser.get().getEngine().executeScript(String.format("slideshowFXLeap('%1$s')", "LEFT"));
-                else if(keyCode.equals(KeyCode.RIGHT)) browser.get().getEngine().executeScript(String.format("slideshowFXLeap('%1$s')", "RIGHT"));
-            }
+        PlatformHelper.run(() -> {
+            if (keyCode.equals(KeyCode.LEFT))
+                browser.get().getEngine().executeScript(String.format("slideshowFXLeap('%1$s')", "LEFT"));
+            else if (keyCode.equals(KeyCode.RIGHT))
+                browser.get().getEngine().executeScript(String.format("slideshowFXLeap('%1$s')", "RIGHT"));
         });
     }
 
-    public void displayChat(boolean open) {
-        TranslateTransition translation = new TranslateTransition(Duration.millis(500), chatBrowser.get());
+    /**
+     * Display or hide the presenter chat on the presentation. The translateY property of the chat is unboud if needed.
+     * @param open if true, displays the chat, hide it otherwise.
+     */
+    public void displayChat(final boolean open) {
+        PlatformHelper.run(() -> {
+            if(SlideShowScene.this.chatBrowser.get().translateYProperty().isBound()) {
+                SlideShowScene.this.chatBrowser.get().translateYProperty().unbind();
+            }
 
-        if(open) translation.setByY(-300);
-        else translation.setByY(300);
+            TranslateTransition translation = new TranslateTransition(Duration.millis(500), chatBrowser.get());
 
-        translation.play();
+            if (open) translation.setByY(-300);
+            else translation.setByY(300);
+
+            translation.play();
+        });
     }
 
+    /**
+     * Show a circular red pointer on the presentation.
+     * @param x The X position of the pointer.
+     * @param y The Y position of the pointer.
+     */
     public void showPointer(double x, double y) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                if(SlideShowScene.this.pointer.get() == null) {
-                    SlideShowScene.this.pointer.set(new Circle(10d, new Color(1, 0, 0, 0.5)));
-                }
-
-                if(!SlideShowScene.this.canvas.get().getChildren().contains(SlideShowScene.this.pointer.get())) {
-                    SlideShowScene.this.canvas.get().getChildren().add(SlideShowScene.this.pointer.get());
-                }
-
-                SlideShowScene.this.pointer.get().setLayoutX(x);
-                SlideShowScene.this.pointer.get().setLayoutY(y);
+        PlatformHelper.run(() -> {
+            if (SlideShowScene.this.pointer.get() == null) {
+                SlideShowScene.this.pointer.set(new Circle(10d, new Color(1, 0, 0, 0.5)));
             }
-        });
 
+            if (!SlideShowScene.this.getSceneRoot().getChildren().contains(SlideShowScene.this.pointer.get())) {
+                SlideShowScene.this.pointer.get().setLayoutX(0);
+                SlideShowScene.this.pointer.get().setLayoutY(0);
+                SlideShowScene.this.getSceneRoot().getChildren().add(SlideShowScene.this.pointer.get());
+            }
+
+            SlideShowScene.this.pointer.get().setTranslateX(x);
+            SlideShowScene.this.pointer.get().setTranslateY(y);
+        });
     }
 
+    /**
+     * Hides the pointer which is displayed on the HTML5 presentation.
+     */
     public void hidePointer() {
         if(this.pointer.get() != null) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    SlideShowScene.this.canvas.get().getChildren().removeAll(SlideShowScene.this.pointer.get());
-                }
+            PlatformHelper.run(() -> {
+                ((StackPane) SlideShowScene.this.getRoot()).getChildren().remove(SlideShowScene.this.pointer.get());
             });
         }
     }

@@ -1,0 +1,13 @@
+h1. What is SlideshowFX ?
+
+p. SlideshowFX is a tool allowing you to create slideshow using HTML5 frameworks. Maybe have you heard about reveal.js or impress.js that allow you  to create beautiful slideshows, entirely customizable by using HTML5 and CSS3 technologies.
+
+p. The main advantage is you don't need anything else than e text editor and a browser, both tools that can be find for free. Moreover, even if tools like PowerPoint and Keynote are mostly used and really interesting tools, if you are a geek, you'll fall in love with creating HTML5 slideshows. It brings you a lot of freedom like adding a YouTube video right inside your presentation, playing music, automatically syntax highlighting code example and more.
+
+h6. But why SlideshowFX ?
+
+p. Even if you like web technologies, it could be long to completely create your presentation by writing HTML code. The goal of SlideshowFX is to facilitate that task by allowing you to use a template and then simply set titles, content, images, copying slides, moving them and more. All with a nice and simple interface. But SlideshowFX also brings features that aren't provided by existing tools. Indeed you can use a LeapMotion controller to switch slides, point something on the screen. You can also start a chat with which your attendees can ask you questions that are resend to all others attendees connected to the chat. But questions could also be asked through Twitter with a hashtag you define. In brief, bring the presentation to the next level of interactivity.
+
+h6. What is beneath all of this?
+
+p. SlideshowFX is developed using many technologies. The application is done in JavaFX for the UI. The chat feature is done by using "Vert.X":http://vertx.io. "Velocity":http://velocity.apache.org and HTML5 is used for templates creations. It is also possible to create slides using markdown.

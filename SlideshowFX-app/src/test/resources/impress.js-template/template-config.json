@@ -1,0 +1,115 @@
+{
+	"template": {
+		"name": "Test template",
+		"file": "template.html",
+		"js-object": "sfx",
+		"resources-directory": "resources",
+		
+		"methods": [
+			{
+				"type": "CONTENT_DEFINER",
+				"name": "setField",
+				"arguments": [
+					{
+						"type": "int"
+					},
+					{
+						"type": "string"
+					},
+					{
+						"type": "string"
+					}
+				]
+			},
+			{
+				"type": "GET_CURRENT_SLIDE",
+				"name": "slideShowFXGetCurrentSlide"
+			}
+		],
+		
+		"slides": {
+			"configuration": {
+				"slide-id-prefix": "slide-",
+				"template-directory": "slides/template",
+				"presentation-directory": "slides/presentation",
+				"thumbnail-directory": "slides/presentation/thumbnails"
+			},
+			"slides-definition": [
+				{
+					"id": 1,
+					"name": "Slide card",
+					"file": "slide_card.html",
+					"dynamic-ids": [
+						"${slideIdPrefix}${slideNumber}",
+						"${slideNumber}-title",
+						"${slideNumber}-content"
+					],
+					"dynamic-attributes" : [
+						{
+							"attribute": "data-x",
+							"template-expression": "slideDataX",
+							"prompt-message": "Enter X position of the slide:"
+						},
+						{
+							"attribute": "data-y",
+							"template-expression": "slideDataY",
+							"prompt-message": "Enter Y position of the slide:"
+						},
+						{
+							"attribute": "data-z",
+							"template-expression": "slideDataZ",
+							"prompt-message": "Enter Z position of the slide:"
+						},
+						{
+							"attribute": "data-rotate",
+							"template-expression": "slideDataRotate",
+							"prompt-message": "Enter the rotation angle of the slide:"
+						},
+						{
+							"attribute": "data-scale",
+							"template-expression": "slideDataScale",
+							"prompt-message": "Enter scale of the slide:"
+						}
+					]
+				},
+				{
+					"id": 2,
+					"name": "Free style",
+					"file": "free_style.html",
+					"dynamic-ids": [
+						"${slideIdPrefix}${slideNumber}",
+						"${slideNumber}-title",
+						"${slideNumber}-content"
+					],
+					"dynamic-attributes" : [
+						{
+							"attribute": "data-x",
+							"template-expression": "slideDataX",
+							"prompt-message": "Enter X position of the slide:"
+						},
+						{
+							"attribute": "data-y",
+							"template-expression": "slideDataY",
+							"prompt-message": "Enter Y position of the slide:"
+						},
+						{
+							"attribute": "data-z",
+							"template-expression": "slideDataZ",
+							"prompt-message": "Enter Z position of the slide:"
+						},
+						{
+							"attribute": "data-rotate",
+							"template-expression": "slideDataRotate",
+							"prompt-message": "Enter the rotation angle of the slide:"
+						},
+						{
+							"attribute": "data-scale",
+							"template-expression": "slideDataScale",
+							"prompt-message": "Enter scale of the slide:"
+						}
+					]
+				}
+			]
+		}
+	}
+}

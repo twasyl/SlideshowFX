@@ -2,3 +2,5 @@
 *.iml
 out
 src/test/resources/iCode
+felix-cache
+plugins/*

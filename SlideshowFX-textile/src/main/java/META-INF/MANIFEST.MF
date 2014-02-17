@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-Name: SlideshowFX Textile support
+Bundle-Description: Support Textile for defining slide's content
+Bundle-Version: 1.0.0
+Bundle-Activator: com.twasyl.slideshowfx.markup.textile.activator.TextileActivator
+Bundle-ClassPath: org.eclipse.mylyn.wikitext.core_2.0.0.20140108-1934.jar,org.eclipse.mylyn.wikitext.textile.core_2.0.0.20131212-0025.jar,.
+Export-Package: com.twasyl.slideshowfx.markup
+Import-Package: org.osgi.framework
+Bundle-Vendor: Thierry Wasylczenko

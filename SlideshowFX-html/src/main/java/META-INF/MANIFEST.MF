@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-Name: SlideshowFX HTML support
+Bundle-Description: Support HTML for defining slide's content
+Bundle-Version: 1.0.0
+Bundle-Activator: com.twasyl.slideshowfx.markup.html.activator.HtmlActivator
+Bundle-Vendor: Thierry Wasylczenko
+Export-Package: com.twasyl.slideshowfx.markup
+Import-Package: org.osgi.framework

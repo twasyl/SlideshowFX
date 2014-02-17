@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width" />
+		<link rel="stylesheet" type="text/css" href="bespoke.js-0.4.0/css/style.css" />
+		<link rel="stylesheet" type="text/css" href="bespoke.js-0.4.0/css/themes.css" />
+	</head>
+	<body class="coverflow">
+		<script type="text/javascript">
+			${sfxContentDefiner}
+				
+			${sfxCallback}
+			
+			function slideshowFXLeap(keyCode) {
+				deck = bespoke.from('article');
+				
+				if("LEFT" == keyCode) {
+					deck.next();
+				} else if("RIGHT" == keyCode) {
+					deck.prev();;
+				}
+			}
+			
+			function slideShowFXGetCurrentSlide() {
+				var slide = document.querySelector(".bespoke-active");
+				
+				if(slide != null) {
+					return slide.id;
+				}
+			}
+		</script>
+		
+		<div id="main">
+			<article>
+				${slides}
+			</article>
+		</div>
+
+
+		<script src="bespoke.js-0.4.0/js/bespoke.js"></script>
+		<script type="text/javascript">
+			deck = bespoke.from('article');
+			
+			document.addEventListener('keydown', function(e) {
+			var key = e.which;
+
+			key === 37 && deck.prev();
+			(key === 32 || key === 39) && deck.next();
+		});
+		</script>
+		<!-- script src="demo.js"></script -->
+	</body>
+</html>

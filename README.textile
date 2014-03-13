@@ -142,6 +142,7 @@ h3. Template file
 
 p. The template file is the file that will host all slides, include all JavaScript libraries, CSS files and so on. In order to work, you have to:
 * insert the Velocity token *${sfxCallback}* inside a *script* code block
+* insert the Velocity token *${sfxContentDefiner}* inside a *script* block
 * insert the Velocity token *${slides}* where the HTML slides should be inserted
 * insert the following javaScript function with the right implementation for changing slides using "LeapMotion":https://www.leapmotion.com
 
@@ -157,7 +158,7 @@ p. The template of a slide will define what HTML element a slide is. In some fra
 * The slide markup must have its ID attribute set to *${slideIdPrefix}${slideNumber}*
 * Each element that is editable by the user must have an ID attribute composed of the slide number and a discriminator. An example of the title of the slide:
 
-bc(html). <h1 id="$[slideNumber}-title"></h1>
+@<h1 id="${slideNumber}-title"></h1>@
 
 * Each element that is editable by the user must have the *ondblclick* attribute set to *${sfxCallback}*
 * If "dynamic attributes":#dynattr are needed, they can be defined like the following. Note that for this example, "template-expression":#dynattrtempexpr are *slideDataX* and *slideDataY*

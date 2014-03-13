@@ -103,6 +103,7 @@ public class PresentationBuilder {
         if(!dataArchive.exists()) throw new IllegalArgumentException("Can not prepare the resources: dataArchive does not exist");
 
         this.template = new Template();
+        this.template.setContentDefinerMethod("setField");
         this.template.setFolder(new File(System.getProperty("java.io.tmpdir") + File.separator + "sfx-" + System.currentTimeMillis()));
 
         LOGGER.fine("The temporaryTemplateFolder is " + this.template.getFolder().getAbsolutePath());

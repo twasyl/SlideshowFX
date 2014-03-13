@@ -31,6 +31,17 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
+import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SlideshowFX extends Application {
@@ -111,6 +122,45 @@ public class SlideshowFX extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
+
+        LOGGER.info("Cleaning temporary files");
+        File tempDirectory = new File(System.getProperty("java.io.tmpdir"));
+
+        Arrays.stream(tempDirectory.listFiles())
+              .filter(file -> { return file.getName().startsWith("sfx-"); })
+              .forEach(file -> {
+                  try {
+                      Files.walkFileTree(file.toPath(), new SimpleFileVisitor<Path>()
+                      {
+                          @Override
+                          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                              Files.delete(file);
+                              return FileVisitResult.CONTINUE;
+                          }
+
+                          @Override
+                          public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                              Files.delete(file);
+                              return FileVisitResult.CONTINUE;
+                          }
+
+                          @Override
+                          public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                              if (exc == null) {
+                                  Files.delete(dir);
+                                  return FileVisitResult.CONTINUE;
+                              } else {
+                                  // directory iteration failed; propagate exception
+                                  throw exc;
+                              }
+                          }
+                      });
+                  } catch (IOException e) {
+                      LOGGER.log(Level.SEVERE,
+                              String.format("Can not delete temporary file %1$s", file.getAbsolutePath()),
+                              e);
+                  }
+              });
 
         LOGGER.info("Stopping the LeapMotion controller correctly");
         leapController.removeListener(slideshowFXLeapListener);

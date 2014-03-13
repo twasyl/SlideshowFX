@@ -163,7 +163,7 @@ p. The template of a slide will define what HTML element a slide is. In some fra
 * Each element that is editable by the user must have the *ondblclick* attribute set to *${sfxCallback}*
 * If "dynamic attributes":#dynattr are needed, they can be defined like the following. Note that for this example, "template-expression":#dynattrtempexpr are *slideDataX* and *slideDataY*
 
-bc. <section ${slideDataX} ${slideDataY}></section>
+@<section ${slideDataX} ${slideDataY}></section>@
 
 h3. Valid Velocity tokens
 

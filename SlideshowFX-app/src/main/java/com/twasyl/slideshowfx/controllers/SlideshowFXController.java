@@ -44,7 +44,10 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.layout.HBox;
+import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import netscape.javascript.JSObject;
@@ -54,6 +57,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -61,6 +65,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -157,15 +162,10 @@ public class SlideshowFXController implements Initializable {
 
         if(templateFile != null) {
             try {
-                this.builder.loadTemplate(templateFile);
-                this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
-
-                this.updateSlideTemplatesSplitMenu();
-            } catch (InvalidTemplateException e) {
+                this.openTemplateOrPresentation(templateFile);
+            } catch (IllegalAccessException e) {
                 e.printStackTrace();
-            } catch (InvalidTemplateConfigurationException e) {
-                e.printStackTrace();
-            } catch (PresentationException e) {
+            } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         }
@@ -178,7 +178,31 @@ public class SlideshowFXController implements Initializable {
 
         if(file != null) {
             try {
-                this.builder.openPresentation(file);
+                this.openTemplateOrPresentation(file);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Open the dataFile. If the name ends with <code>.sfx</code> the file is considered as a presentation,
+     * if it ends with <code>.sfxt</code> it is considered as a template.
+     * @param dataFile
+     * @throws java.lang.IllegalArgumentException If the file is null.
+     * @throws java.io.FileNotFoundException If dataFile does not exist.
+     * @throws java.lang.IllegalAccessException If the file can not be accessed.
+     */
+    private void openTemplateOrPresentation(final File dataFile) throws IllegalArgumentException, IllegalAccessException, FileNotFoundException {
+        if(dataFile == null) throw new IllegalArgumentException("The dataFile can not be null");
+        if(!dataFile.exists()) throw new FileNotFoundException("The dataFile does not exist");
+        if(!dataFile.canRead()) throw new IllegalAccessException("The dataFile can not be accessed");
+
+        if(dataFile.getName().endsWith(".sfx")) {
+            try {
+                this.builder.openPresentation(dataFile);
                 this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
 
                 this.updateSlideTemplatesSplitMenu();
@@ -190,6 +214,19 @@ public class SlideshowFXController implements Initializable {
             } catch (PresentationException e) {
                 e.printStackTrace();
             } catch (InvalidPresentationConfigurationException e) {
+                e.printStackTrace();
+            }
+        } else if(dataFile.getName().endsWith(".sfxt")) {
+            try {
+                this.builder.loadTemplate(dataFile);
+                this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
+
+                this.updateSlideTemplatesSplitMenu();
+            } catch (InvalidTemplateException e) {
+                e.printStackTrace();
+            } catch (InvalidTemplateConfigurationException e) {
+                e.printStackTrace();
+            } catch (PresentationException e) {
                 e.printStackTrace();
             }
         }
@@ -483,6 +520,35 @@ public class SlideshowFXController implements Initializable {
 
         this.browser.getEngine().setJavaScriptEnabled(true);
 
+        this.browser.setOnDragDropped(new EventHandler<DragEvent>() {
+            @Override
+            public void handle(DragEvent dragEvent) {
+                Dragboard board = dragEvent.getDragboard();
+                boolean dragSuccess = false;
+
+                if(board.hasFiles()) {
+                    Optional<File> slideshowFXFile = board.getFiles().stream()
+                            .filter(file -> file.getName().endsWith(".sfx") || file.getName().endsWith(".sfxt"))
+                            .findFirst();
+
+                    if(slideshowFXFile != null && slideshowFXFile.isPresent()) {
+                        try {
+                            SlideshowFXController.this.openTemplateOrPresentation(slideshowFXFile.get());
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+
+                        dragSuccess = true;
+                    }
+                }
+
+                dragEvent.setDropCompleted(dragSuccess);
+                dragEvent.consume();
+            }
+        });
+
         this.saveButton.setGraphic(
                 new ImageView(
                         new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/save.png"), 20d, 20d, true, true)
@@ -507,13 +573,13 @@ public class SlideshowFXController implements Initializable {
         // Creating RadioButtons for each markup bundle installed
         MarkupManager.getInstalledMarkupSyntax()
                 .stream().sorted((markup1, markup2) -> {
-                            return markup1.getName().compareTo(markup2.getName());
-                        })
+            return markup1.getName().compareTo(markup2.getName());
+        })
                 .forEach(markup -> {
-                            RadioButton button = new RadioButton(markup.getName());
-                            button.setUserData(markup.getCode());
-                            markupContentType.getToggles().add(button);
-                            markupContentTypeBox.getChildren().add(button);
+                    RadioButton button = new RadioButton(markup.getName());
+                    button.setUserData(markup.getCode());
+                    markupContentType.getToggles().add(button);
+                    markupContentTypeBox.getChildren().add(button);
                 });
     }
 }

@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.builder;
 
 import javafx.scene.image.Image;
+import org.jsoup.nodes.Document;
 
 import java.io.File;
 import java.util.List;
@@ -30,6 +31,7 @@ public class Presentation {
     protected static final String PRESENTATION_CONFIGURATION_NAME = "presentation-config.json";
     protected static final String PRESENTATION_FILE_NAME = "presentation.html";
 
+    private Document document;
     private File presentationFile;
     private List<Slide> slides;
 
@@ -38,6 +40,9 @@ public class Presentation {
 
     public List<Slide> getSlides() { return slides; }
     public void setSlides(List<Slide> slides) { this.slides = slides; }
+
+    public Document getDocument() { return document; }
+    public void setDocument(Document document) { this.document = document; }
 
     public void updateSlideText(String slideNumber, String content) {
         if(slideNumber == null) throw new IllegalArgumentException("The slide number can not be null");

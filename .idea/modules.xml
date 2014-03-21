@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/SlideshowFX-app/src/main/SlideshowFX-app.iml" filepath="$PROJECT_DIR$/SlideshowFX-app/src/main/SlideshowFX-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SlideshowFX-html/src/main/SlideshowFX-html.iml" filepath="$PROJECT_DIR$/SlideshowFX-html/src/main/SlideshowFX-html.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SlideshowFX-markdown/src/main/SlideshowFX-markdown.iml" filepath="$PROJECT_DIR$/SlideshowFX-markdown/src/main/SlideshowFX-markdown.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SlideshowFX-markup/src/main/SlideshowFX-markup.iml" filepath="$PROJECT_DIR$/SlideshowFX-markup/src/main/SlideshowFX-markup.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SlideshowFX-textile/src/main/SlideshowFX-textile.iml" filepath="$PROJECT_DIR$/SlideshowFX-textile/src/main/SlideshowFX-textile.iml" />
+    </modules>
+  </component>
+</project>
+

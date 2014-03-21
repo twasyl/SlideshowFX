@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Vert.x">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/Vert.x/jackson-databind-2.2.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/Vert.x/jackson-annotations-2.2.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/Vert.x/jackson-core-2.2.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/Vert.x/vertx-core-2.1M2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/Vert.x/netty-all-4.0.13.Final.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SlideshowFX-html:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SlideshowFX_html_jar</output-path>
+    <root id="archive" name="SlideshowFX-html.jar">
+      <element id="module-output" name="SlideshowFX-html" />
+    </root>
+  </artifact>
+</component>

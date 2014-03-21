@@ -234,11 +234,18 @@ public class SlideshowFXController implements Initializable {
 
     @FXML private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
         RadioButton selectedMarkup = (RadioButton) this.markupContentType.getSelectedToggle();
-        this.updateSlide(MarkupManager.convertToHtml((String) selectedMarkup.getUserData(), this.fieldValueText.getText()));
+        this.updateSlide((String) selectedMarkup.getUserData(), this.fieldValueText.getText());
     }
 
-    private void updateSlide(String content) throws TransformerException, IOException, ParserConfigurationException, SAXException {
-        String clearedContent = Base64.getEncoder().encodeToString(content.getBytes("UTF8"));
+    private void updateSlide(final String contentCode, final String originalContent) throws TransformerException, IOException, ParserConfigurationException, SAXException {
+        final String htmlContent = MarkupManager.convertToHtml(contentCode,originalContent);
+
+        // Update the SlideElement
+        this.builder.getPresentation().getSlide(this.slideNumber.getText()).updateElement(
+                this.slideNumber.getText() + "-" + this.fieldName.getText(), contentCode, originalContent, htmlContent
+        );
+
+        String clearedContent = Base64.getEncoder().encodeToString(htmlContent.getBytes("UTF8"));
         String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",
                 this.builder.getTemplate().getContentDefinerMethod(),
                 this.slideNumber.getText(),
@@ -246,9 +253,7 @@ public class SlideshowFXController implements Initializable {
                clearedContent);
 
         this.browser.getEngine().executeScript(jsCommand);
-        Element slideElement = this.browser.getEngine().getDocument().getElementById(this.builder.getTemplate().getSlideIdPrefix() + this.slideNumber.getText());
 
-        this.builder.getPresentation().updateSlideText(this.slideNumber.getText(), DOMUtils.convertNodeToText(slideElement));
         this.builder.saveTemporaryPresentation();
 
         // Take a thumbnail of the slide

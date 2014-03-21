@@ -22,6 +22,10 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Represents a slide of the presentation
@@ -31,6 +35,7 @@ public class Slide {
     private String slideNumber;
     private String text;
     private Image thumbnail;
+    private final Map<String, SlideElement> elements = new HashMap<>();
 
     public Slide() {
     }
@@ -56,7 +61,31 @@ public class Slide {
     public Image getThumbnail() { return thumbnail; }
     public void setThumbnail(Image thumbnail) { this.thumbnail = thumbnail; }
 
-    public static void buildContent(StringBuffer buffer, Slide slide) throws IOException, SAXException, ParserConfigurationException {
-        buffer.append(slide.getText());
+    /**
+     * The elements contained in the slide. The key represents the ID of each element in the slide.
+     * The given content should not be given in Base64.
+     * @return
+     */
+    public Map<String, SlideElement> getElements() { return elements; }
+
+    public void updateElement(String elementId, String code, String originalContent, String htmlContent) {
+        Optional<SlideElement> slideElement = getElements().entrySet()
+                .stream().filter(entry -> entry.getKey().equals(elementId))
+                .map(entry -> entry.getValue())
+                .findFirst();
+
+        if(slideElement.isPresent()) {
+            slideElement.get().setOriginalContentCode(code);
+            slideElement.get().setOriginalContent(originalContent);
+            slideElement.get().setHtmlContent(htmlContent);
+        } else {
+            SlideElement se = new SlideElement();
+            se.setId(elementId);
+            se.setOriginalContentCode(code);
+            se.setOriginalContent(originalContent);
+            se.setHtmlContent(htmlContent);
+
+            getElements().put(elementId, se);
+        }
     }
 }

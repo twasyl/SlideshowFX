@@ -17,7 +17,10 @@
 package com.twasyl.slideshowfx.utils;
 
 
+import org.jsoup.Jsoup;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -27,9 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class DOMUtils {
 
@@ -39,11 +40,10 @@ public class DOMUtils {
         String result = null;
 
         final DOMSource source = new DOMSource(node);
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         Transformer transformer = null;
 
-        try {
+        try(final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -62,12 +62,6 @@ public class DOMUtils {
             e.printStackTrace();
         } catch (TransformerException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
         return result;
@@ -82,5 +76,29 @@ public class DOMUtils {
         ).getDocumentElement();
 
         return node;
+    }
+
+    public static org.jsoup.nodes.Document createDocument(String documentAsString) {
+        org.jsoup.nodes.Document document = null;
+
+        document = Jsoup.parse(documentAsString);
+
+        return document;
+    }
+
+    public static void saveDocument(org.jsoup.nodes.Document document, File file) {
+        String result = null;
+
+        document.outputSettings().prettyPrint(true);
+
+        try(FileOutputStream output = new FileOutputStream(file)) {
+            output.write(document.outerHtml().getBytes());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        };
+
+
     }
 }

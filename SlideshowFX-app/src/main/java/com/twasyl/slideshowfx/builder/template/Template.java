@@ -46,6 +46,7 @@ public class Template {
     private File slidesThumbnailDirectory;
     private File resourcesDirectory;
     private String slideIdPrefix;
+    private String slidesContainer;
 
     public Template() {
     }
@@ -89,6 +90,9 @@ public class Template {
     public String getSlideIdPrefix() { return slideIdPrefix; }
     public void setSlideIdPrefix(String slideIdPrefix) { this.slideIdPrefix = slideIdPrefix; }
 
+    public String getSlidesContainer() { return slidesContainer; }
+    public void setSlidesContainer(String slidesContainer) { this.slidesContainer = slidesContainer; }
+
     public SlideTemplate getSlideTemplate(int slideId) {
         SlideTemplate searchedTemplate = null;
 
@@ -121,6 +125,9 @@ public class Template {
 
         this.setJsObject(templateJson.getString("js-object"));
         LOGGER.fine("[Template configuration] jsObject = " + this.getJsObject());
+
+        this.setSlidesContainer(templateJson.getString("slides-container"));
+        LOGGER.fine("[Template configuration] slidesContainer = " + this.getSlidesContainer());
 
         this.setResourcesDirectory(new File(this.getFolder(), templateJson.getString("resources-directory")));
         LOGGER.fine("[Template configuration] resources-directory = " + this.getResourcesDirectory().getAbsolutePath());

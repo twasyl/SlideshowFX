@@ -18,6 +18,7 @@ package com.twasyl.slideshowfx.builder;
 
 import javafx.scene.image.Image;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.io.File;
 import java.util.List;

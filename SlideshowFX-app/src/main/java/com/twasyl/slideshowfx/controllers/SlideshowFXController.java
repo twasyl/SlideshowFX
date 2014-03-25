@@ -126,15 +126,7 @@ public class SlideshowFXController implements Initializable {
 
             SlideshowFXController.this.builder.getPresentation().getSlides().add(index, slideToMove);
 
-            try {
-                SlideshowFXController.this.builder.saveTemporaryPresentation();
-            } catch (ParserConfigurationException e) {
-                e.printStackTrace();
-            } catch (SAXException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            SlideshowFXController.this.builder.saveTemporaryPresentation();
 
             SlideshowFXController.this.browser.getEngine().reload();
             SlideshowFXController.this.updateSlideSplitMenu();
@@ -279,18 +271,10 @@ public class SlideshowFXController implements Initializable {
             }
         }
 
-        try {
-            this.builder.saveTemporaryPresentation();
-            this.updateSlideSplitMenu();
+        this.builder.saveTemporaryPresentation();
+        this.updateSlideSplitMenu();
 
-            this.browser.getEngine().reload();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.browser.getEngine().reload();
     }
 
     @FXML private void deleteSlide(ActionEvent event) {

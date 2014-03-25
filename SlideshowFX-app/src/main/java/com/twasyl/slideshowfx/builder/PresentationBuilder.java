@@ -29,6 +29,7 @@ import javafx.embed.swing.SwingFXUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -46,7 +47,6 @@ public class PresentationBuilder {
 
     private static final Logger LOGGER = Logger.getLogger(PresentationBuilder.class.getName());
     private static final String VELOCITY_SLIDE_NUMBER_TOKEN = "slideNumber";
-    private static final String VELOCITY_SLIDES_TOKEN = "slides";
     private static final String VELOCITY_SFX_CALLBACK_TOKEN = "sfxCallback";
     private static final String VELOCITY_SFX_CONTENT_DEFINER_TOKEN = "sfxContentDefiner";
     private static final String VELOCITY_SLIDE_ID_PREFIX_TOKEN = "slideIdPrefix";
@@ -150,7 +150,6 @@ public class PresentationBuilder {
             VelocityContext context = new VelocityContext();
             context.put(VELOCITY_SFX_CONTENT_DEFINER_TOKEN, VELOCITY_SFX_CONTENT_DEFINER_SCRIPT);
             context.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_SCRIPT);
-            context.put(VELOCITY_SLIDES_TOKEN, "");
 
             Velocity.evaluate(context, writer, "", reader);
 
@@ -158,6 +157,9 @@ public class PresentationBuilder {
             outputStream.flush();
 
             this.presentation.setDocument(Jsoup.parse(outputStream.toString("UTF8")));
+
+            this.saveTemporaryPresentation();
+
         } catch (FileNotFoundException e) {
             throw new InvalidTemplateException("The template file is not found");
         } catch (IOException e) {
@@ -279,7 +281,6 @@ public class PresentationBuilder {
         context = new VelocityContext();
         context.put(VELOCITY_SFX_CONTENT_DEFINER_TOKEN, VELOCITY_SFX_CONTENT_DEFINER_SCRIPT);
         context.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_SCRIPT);
-        context.put(VELOCITY_SLIDES_TOKEN, slidesBuffer.toString());
 
         Velocity.evaluate(context, outputWriter, "", templateReader);
 
@@ -335,6 +336,7 @@ public class PresentationBuilder {
         } else {
             ListIterator<Slide> slidesIterator = this.getPresentation().getSlides().listIterator();
 
+            this.presentation.getSlide(afterSlideNumber);
             int index = -1;
             while(slidesIterator.hasNext()) {
                 if(slidesIterator.next().getSlideNumber().equals(afterSlideNumber)) {
@@ -380,9 +382,20 @@ public class PresentationBuilder {
         slideContentWriter.flush();
         slideContentWriter.close();
 
+        Element htmlSlide = DOMUtils.convertToNode(slideContentByte.toString("UTF8"));
+        slide.setId(htmlSlide.id());
 
-        slide.setText(new String(slideContentByte.toByteArray()));
+        if(afterSlideNumber == null || afterSlideNumber.isEmpty()) {
+            this.presentation.getDocument()
+                    .getElementById(this.template.getSlidesContainer())
+                    .append(htmlSlide.outerHtml());
+        } else {
+            this.presentation.getDocument()
+                    .getElementById(this.presentation.getSlide(afterSlideNumber).getId())
+                    .after(htmlSlide.outerHtml());
+        }
 
+        System.out.println(this.presentation.getDocument().html());
         this.saveTemporaryPresentation();
 
         return slide;
@@ -395,13 +408,11 @@ public class PresentationBuilder {
     public void deleteSlide(String slideNumber) throws IOException, SAXException, ParserConfigurationException {
         if(slideNumber == null) throw new IllegalArgumentException("Slide number can not be null");
 
-        ListIterator<Slide> slidesIterator = this.presentation.getSlides().listIterator();
-
-        while(slidesIterator.hasNext()) {
-            if(slidesIterator.next().getSlideNumber().equals(slideNumber)) {
-                slidesIterator.remove();
-                break;
-            }
+        Slide slideToRemove = this.presentation.getSlide(slideNumber);
+        if(slideToRemove != null) {
+            this.presentation.getSlides().remove(slideToRemove);
+            this.presentation.getDocument()
+                    .getElementById(slideToRemove.getId()).remove();
         }
 
         this.saveTemporaryPresentation();
@@ -492,30 +503,12 @@ public class PresentationBuilder {
         return copy;
     }
 
-    public void saveTemporaryPresentation() throws ParserConfigurationException, SAXException, IOException {
-        /* Velocity.init();
-
-        // Saving the presentation file
-        // Step 1: build the slides
-        final StringBuffer slidesBuffer = new StringBuffer();
-        for(Slide s : this.presentation.getSlides()) {
-            Slide.buildContent(slidesBuffer, s);
+    public void saveTemporaryPresentation() {
+        try(final Writer writer = new FileWriter(this.presentation.getPresentationFile())) {
+            writer.write(this.presentation.getDocument().html());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        // Step 2: rewrite from the template
-        final Reader templateReader = new FileReader(this.template.getFile());
-        final Writer presentationWriter = new FileWriter(this.presentation.getPresentationFile());
-
-        VelocityContext context = new VelocityContext();
-        context.put(VELOCITY_SFX_CONTENT_DEFINER_TOKEN, VELOCITY_SFX_CONTENT_DEFINER_SCRIPT);
-        context.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_SCRIPT);
-        context.put(VELOCITY_SLIDES_TOKEN, slidesBuffer.toString());
-
-        Velocity.evaluate(context, presentationWriter, "", templateReader);
-
-        templateReader.close();
-        presentationWriter.flush();
-        presentationWriter.close(); */
     }
 
     /**

@@ -32,6 +32,7 @@ import java.util.Set;
  */
 public class Slide {
     private SlideTemplate template;
+    private String id;
     private String slideNumber;
     private String text;
     private Image thumbnail;
@@ -48,6 +49,9 @@ public class Slide {
         this.template = template;
         this.slideNumber = slideNumber;
     }
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public SlideTemplate getTemplate() { return template; }
     public void setTemplate(SlideTemplate template) { this.template = template; }

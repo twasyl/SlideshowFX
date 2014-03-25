@@ -129,4 +129,27 @@ public class MarkupManager {
 
         return markups;
     }
+
+    /**
+     * Test if the given <code>contentCode</code> is supported.
+     * @param contentCode
+     * @return
+     */
+    public static boolean isContentSupported(final String contentCode) {
+        boolean supported = false;
+
+        Object[] services = serviceTracker.getServices();
+
+        if(services != null) {
+            Optional<IMarkup> iMarkup =  Arrays.stream(services)
+                                                  .filter(service -> service instanceof IMarkup)
+                                                  .map(service -> (IMarkup) service)
+                                                  .filter(service -> contentCode.equals(service.getCode()))
+                                                  .findFirst();
+
+            supported = iMarkup.isPresent();
+        }
+
+        return supported;
+    }
 }

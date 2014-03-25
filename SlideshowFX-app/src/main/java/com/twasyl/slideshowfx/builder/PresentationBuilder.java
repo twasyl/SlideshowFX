@@ -29,8 +29,8 @@ import javafx.embed.swing.SwingFXUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
@@ -38,7 +38,6 @@ import javax.json.*;
 import javax.json.stream.JsonGenerator;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -187,7 +186,7 @@ public class PresentationBuilder {
         // Copy the template to the presentation file
         LOGGER.fine("Creating presentation file");
         this.presentation = new Presentation();
-        this.presentation.setSlides(new ArrayList<Slide>());
+        this.presentation.setSlides(new ArrayList<>());
         this.presentation.setPresentationFile(new File(this.template.getFolder(), Presentation.PRESENTATION_FILE_NAME));
 
         // Reading the slides' configuration
@@ -211,6 +210,7 @@ public class PresentationBuilder {
             slide = new Slide();
 
             slideJson = slidesJson.getJsonObject(index);
+            slide.setId(slideJson.getString("id"));
             slide.setSlideNumber(slideJson.getString("number"));
             slide.setTemplate(this.template.getSlideTemplate(slideJson.getInt("template-id")));
 
@@ -300,7 +300,10 @@ public class PresentationBuilder {
             LOGGER.log(Level.WARNING, "Error while closing template stream", e);
         }
 
-        final org.jsoup.nodes.Document document = DOMUtils.createDocument(arrayOutputStream.toString());
+        final Document document = DOMUtils.createDocument(arrayOutputStream.toString());
+        document.getElementById(this.template.getSlidesContainer())
+                .empty()
+                .html(slidesBuffer.toString());
 
         for(Slide sl : this.getPresentation().getSlides()) {
             for(SlideElement element : sl.getElements().values()) {
@@ -336,7 +339,7 @@ public class PresentationBuilder {
         } else {
             ListIterator<Slide> slidesIterator = this.getPresentation().getSlides().listIterator();
 
-            this.presentation.getSlide(afterSlideNumber);
+            this.presentation.getSlideByNumber(afterSlideNumber);
             int index = -1;
             while(slidesIterator.hasNext()) {
                 if(slidesIterator.next().getSlideNumber().equals(afterSlideNumber)) {
@@ -391,11 +394,10 @@ public class PresentationBuilder {
                     .append(htmlSlide.outerHtml());
         } else {
             this.presentation.getDocument()
-                    .getElementById(this.presentation.getSlide(afterSlideNumber).getId())
+                    .getElementById(this.presentation.getSlideByNumber(afterSlideNumber).getId())
                     .after(htmlSlide.outerHtml());
         }
 
-        System.out.println(this.presentation.getDocument().html());
         this.saveTemporaryPresentation();
 
         return slide;
@@ -408,7 +410,7 @@ public class PresentationBuilder {
     public void deleteSlide(String slideNumber) throws IOException, SAXException, ParserConfigurationException {
         if(slideNumber == null) throw new IllegalArgumentException("Slide number can not be null");
 
-        Slide slideToRemove = this.presentation.getSlide(slideNumber);
+        Slide slideToRemove = this.presentation.getSlideByNumber(slideNumber);
         if(slideToRemove != null) {
             this.presentation.getSlides().remove(slideToRemove);
             this.presentation.getDocument()
@@ -425,7 +427,6 @@ public class PresentationBuilder {
         if(slide == null) throw new IllegalArgumentException("The slide to duplicate can not be null");
 
         final Slide copy = new Slide(slide.getTemplate(), System.currentTimeMillis() + "");
-        copy.setText(slide.getText());
         copy.setThumbnail(slide.getThumbnail());
 
         // Copy the elements. Keep original IDs for now
@@ -538,6 +539,7 @@ public class PresentationBuilder {
             slidesJsonArray.add(
                     Json.createObjectBuilder()
                             .add("template-id", slide.getTemplate().getId())
+                            .add("id", slide.getId())
                             .add("number", slide.getSlideNumber())
                             .add("elements", slideElementsJsonArray.build())
                             .build()
@@ -554,6 +556,7 @@ public class PresentationBuilder {
         writerConfiguration.put(JsonGenerator.PRETTY_PRINTING, true);
         JsonWriter writer = Json.createWriterFactory(writerConfiguration).createWriter(new FileOutputStream(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME)));
         writer.writeObject(configuration);
+        writer.close();
 
         LOGGER.fine("Presentation configuration file created");
 

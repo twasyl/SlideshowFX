@@ -16,13 +16,13 @@
 
 package com.twasyl.slideshowfx.io;
 
+import com.twasyl.slideshowfx.builder.PresentationBuilder;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
 import com.twasyl.slideshowfx.exceptions.PresentationException;
-import com.twasyl.slideshowfx.builder.PresentationBuilder;
 import com.twasyl.slideshowfx.utils.ZipUtils;
-import junit.framework.Assert;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

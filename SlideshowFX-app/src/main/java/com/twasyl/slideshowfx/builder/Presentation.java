@@ -22,6 +22,7 @@ import org.jsoup.nodes.Element;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 /**
@@ -45,19 +46,6 @@ public class Presentation {
     public Document getDocument() { return document; }
     public void setDocument(Document document) { this.document = document; }
 
-    public void updateSlideText(String slideNumber, String content) {
-        if(slideNumber == null) throw new IllegalArgumentException("The slide number can not be null");
-
-        Slide slideToUpdate = null;
-        for (Slide s : getSlides()) {
-            if (slideNumber.equals(s.getSlideNumber())) {
-                s.setText(content);
-                LOGGER.finest("Slide's text updated");
-                break;
-            }
-        }
-    }
-
     public void updateSlideThumbnail(String slideNumber, Image image) {
         if(slideNumber == null) throw new IllegalArgumentException("The slide number can not be null");
 
@@ -71,15 +59,36 @@ public class Presentation {
         }
     }
 
-    public Slide getSlide(String slideNumber) {
+    /**
+     * Get a slide by it's slide number.
+     * @param slideNumber
+     * @return The slide or null if not found
+     */
+    public Slide getSlideByNumber(String slideNumber) {
         Slide slide = null;
 
-        for(Slide s : slides) {
-            if(s.getSlideNumber().equals(slideNumber)) {
-                slide = s;
-                break;
-            }
-        }
+        Optional<Slide> slideOpt = slides.stream()
+                .filter(s -> slideNumber.equals(s.getSlideNumber()))
+                .findFirst();
+
+        if(slideOpt.isPresent()) slide = slideOpt.get();
+
+        return slide;
+    }
+
+    /**
+     * Get a slide by it's ID.
+     * @param id
+     * @return The slide or null if not found
+     */
+    public Slide getSlideById(String id) {
+        Slide slide = null;
+
+        Optional<Slide> slideOpt = slides.stream()
+                .filter(s -> id.equals(s.getId()))
+                .findFirst();
+
+        if(slideOpt.isPresent()) slide = slideOpt.get();
 
         return slide;
     }

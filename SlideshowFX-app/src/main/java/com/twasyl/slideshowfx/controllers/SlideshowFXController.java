@@ -19,6 +19,7 @@ package com.twasyl.slideshowfx.controllers;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.builder.PresentationBuilder;
 import com.twasyl.slideshowfx.builder.Slide;
+import com.twasyl.slideshowfx.builder.SlideElement;
 import com.twasyl.slideshowfx.builder.template.SlideTemplate;
 import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
@@ -28,9 +29,7 @@ import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
 import com.twasyl.slideshowfx.exceptions.PresentationException;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
-import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
-import com.twasyl.slideshowfx.utils.DOMUtils;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -47,11 +46,9 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.layout.HBox;
-import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import netscape.javascript.JSObject;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -64,7 +61,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
-import java.util.Comparator;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -112,7 +108,7 @@ public class SlideshowFXController implements Initializable {
             final String slideId = (String) SlideshowFXController.this.browser.getEngine().executeScript(SlideshowFXController.this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
             final String slideNumber = slideId.substring(SlideshowFXController.this.builder.getTemplate().getSlideIdPrefix().length());
 
-            Slide slideToMove = SlideshowFXController.this.builder.getPresentation().getSlide(slideNumber);
+            Slide slideToMove = SlideshowFXController.this.builder.getPresentation().getSlideByNumber(slideNumber);
 
             SlideshowFXController.this.builder.getPresentation().getSlides().remove(slideToMove);
 
@@ -233,7 +229,7 @@ public class SlideshowFXController implements Initializable {
         final String htmlContent = MarkupManager.convertToHtml(contentCode,originalContent);
 
         // Update the SlideElement
-        this.builder.getPresentation().getSlide(this.slideNumber.getText()).updateElement(
+        this.builder.getPresentation().getSlideByNumber(this.slideNumber.getText()).updateElement(
                 this.slideNumber.getText() + "-" + this.fieldName.getText(), contentCode, originalContent, htmlContent
         );
 
@@ -259,7 +255,7 @@ public class SlideshowFXController implements Initializable {
         final String slideId = (String) this.browser.getEngine().executeScript(this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
         final String slideNumber = slideId.substring(this.builder.getTemplate().getSlideIdPrefix().length());
 
-        Slide slideToCopy = this.builder.getPresentation().getSlide(slideNumber);
+        Slide slideToCopy = this.builder.getPresentation().getSlideByNumber(slideNumber);
         Slide copy = this.builder.duplicateSlide(slideToCopy);
 
         int index = this.builder.getPresentation().getSlides().indexOf(slideToCopy);
@@ -481,17 +477,52 @@ public class SlideshowFXController implements Initializable {
         }
     }
 
-    public void prefillContentDefinition(String slideNumber, String field, String value) {
+    /**
+     * Prefill the information coming from the HTML page in the JavaFX UI.
+     * @param slideNumber
+     * @param field
+     * @param currentElementContent
+     */
+    public void prefillContentDefinition(String slideNumber, String field, String currentElementContent) {
         this.slideNumber.setText(slideNumber);
         this.fieldName.setText(field);
-        try {
-            this.fieldValueText.setText(new String(Base64.getDecoder().decode(value), "UTF8"));
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.log(Level.WARNING, "Can not prefill content definition with the given value", e);
-        }
 
-        this.fieldValueText.requestFocus();
-        this.fieldValueText.selectAll();
+        final Slide slide = this.builder.getPresentation().getSlideByNumber(slideNumber);
+
+        if(slide != null) {
+            final SlideElement element = slide.getElements().get(slideNumber + "-" + field);
+
+            /**
+             * Prefill the content either with the element's content if it is not null, either with the given
+             * <code>currentElementContent</code>.
+             */
+            if(element != null) {
+                /**
+                 * Prefill the content with either the original content is it is still supported either
+                 * the HTML content.
+                 */
+                if(MarkupManager.isContentSupported(element.getOriginalContentCode())) {
+                    this.fieldValueText.setText(element.getOriginalContent());
+                } else {
+                    this.fieldValueText.setText(element.getHtmlContent());
+                }
+
+                this.selectMarkupRadioButton(element.getOriginalContentCode());
+            } else {
+                try {
+                    this.fieldValueText.setText(new String(Base64.getDecoder().decode(currentElementContent), "UTF8"));
+                } catch (UnsupportedEncodingException e) {
+                    LOGGER.log(Level.WARNING, "Can not decode String in UTF8", e);
+                } finally {
+                    this.selectMarkupRadioButton(null);
+                    this.fieldValueText.selectAll();
+                }
+            }
+
+            this.fieldValueText.requestFocus();
+        } else {
+            LOGGER.info(String.format("Prefill information for the field %1$s of slide #%2$s is impossible: the slide is not found", field, slideNumber));
+        }
     }
 
     @Override
@@ -570,5 +601,29 @@ public class SlideshowFXController implements Initializable {
                     markupContentType.getToggles().add(button);
                     markupContentTypeBox.getChildren().add(button);
                 });
+    }
+
+    /**
+     * Select the RadioButton correcponding to the given <code>contentCode</code>. If the <code>contentCode</code> is null,
+     * every RadioBUtton is unselected.
+     * @param contentCode
+     */
+    private void selectMarkupRadioButton(final String contentCode) {
+        if(contentCode == null || !MarkupManager.isContentSupported(contentCode)) {
+            this.markupContentTypeBox.getChildren()
+                    .stream()
+                    .filter(child -> child instanceof RadioButton)
+                    .map(child -> (RadioButton) child)
+                    .forEach(button -> button.setSelected(false));
+        } else {
+            Optional<RadioButton> radioButton = this.markupContentTypeBox.getChildren()
+                    .stream()
+                    .filter(child -> child instanceof RadioButton)
+                    .map(child -> (RadioButton) child)
+                    .filter(button -> contentCode.equals(button.getUserData()))
+                    .findFirst();
+
+            if (radioButton.isPresent()) radioButton.get().setSelected(true);
+        }
     }
 }

@@ -34,7 +34,6 @@ public class Slide {
     private SlideTemplate template;
     private String id;
     private String slideNumber;
-    private String text;
     private Image thumbnail;
     private final Map<String, SlideElement> elements = new HashMap<>();
 
@@ -55,9 +54,6 @@ public class Slide {
 
     public SlideTemplate getTemplate() { return template; }
     public void setTemplate(SlideTemplate template) { this.template = template; }
-
-    public String getText() { return text; }
-    public void setText(String text) { this.text = text; }
 
     public String getSlideNumber() { return slideNumber; }
     public void setSlideNumber(String slideNumber) { this.slideNumber = slideNumber; }

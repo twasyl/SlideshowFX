@@ -56,8 +56,4 @@ public class SlideTemplate {
 
     public DynamicAttribute[] getDynamicAttributes() { return dynamicAttributes; }
     public void setDynamicAttributes(DynamicAttribute[] dynamicAttributes) { this.dynamicAttributes = dynamicAttributes; }
-
-    public static void buildContent(StringBuffer buffer, Slide slide) throws IOException, SAXException, ParserConfigurationException {
-        buffer.append(slide.getText());
-    }
 }

@@ -130,13 +130,13 @@ public class PresentationBuilder {
      * Load the current template defined by the templateArchiveFile attribute.
      * This creates a temporary file.
      */
-    public void loadTemplate() throws InvalidTemplateException, InvalidTemplateConfigurationException, PresentationException {
+    private void loadTemplate() throws InvalidTemplateException, InvalidTemplateConfigurationException, PresentationException {
         this.prepareResources(this.templateArchiveFile);
 
         // Copy the template to the presentation file
         LOGGER.fine("Creating presentation file");
         this.presentation = new Presentation();
-        this.presentation.setSlides(new ArrayList<Slide>());
+        this.presentation.setSlides(new ArrayList<>());
         this.presentation.setPresentationFile(new File(this.template.getFolder(), Presentation.PRESENTATION_FILE_NAME));
 
         // Replacing the velocity tokens
@@ -179,16 +179,7 @@ public class PresentationBuilder {
     /**
      * Open a saved presentation
      */
-    public void openPresentation() throws InvalidTemplateException, InvalidTemplateConfigurationException, InvalidPresentationConfigurationException, PresentationException {
-        this.prepareResources(this.templateArchiveFile);
-        this.presentationArchiveFile = this.templateArchiveFile;
-
-        // Copy the template to the presentation file
-        LOGGER.fine("Creating presentation file");
-        this.presentation = new Presentation();
-        this.presentation.setSlides(new ArrayList<>());
-        this.presentation.setPresentationFile(new File(this.template.getFolder(), Presentation.PRESENTATION_FILE_NAME));
-
+    private void openPresentation() throws InvalidTemplateException, InvalidTemplateConfigurationException, InvalidPresentationConfigurationException, PresentationException {
         // Reading the slides' configuration
         LOGGER.fine("Parsing presentation configuration");
 
@@ -239,87 +230,56 @@ public class PresentationBuilder {
 
         reader.close();
 
-        // Creates the presentation file
-        // Build the slides without the user content
+        // Append the slides' content to the presentation
         LOGGER.fine("Building presentation file");
         Velocity.init();
         VelocityContext context = new VelocityContext();
         context.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_CALL);
         context.put(VELOCITY_SLIDE_ID_PREFIX_TOKEN, this.template.getSlideIdPrefix());
 
-        final StringBuffer slidesBuffer = new StringBuffer();
-        final ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
-        final Writer outputWriter = new BufferedWriter(new OutputStreamWriter(arrayOutputStream));
-        FileReader slideReader;
-
         for(Slide s : this.presentation.getSlides()) {
-            try {
-                slideReader = new FileReader(s.getTemplate().getFile());
+            try (final ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+                 final Writer outputWriter = new BufferedWriter(new OutputStreamWriter(arrayOutputStream));
+                 final FileReader slideReader = new FileReader(s.getTemplate().getFile());) {
+
                 context.put(VELOCITY_SLIDE_NUMBER_TOKEN, s.getSlideNumber());
                 Velocity.evaluate(context, outputWriter, "", slideReader);
 
                 outputWriter.flush();
                 arrayOutputStream.flush();
 
-                slidesBuffer.append(arrayOutputStream.toString("UTF8"));
+                this.presentation.getDocument()
+                        .getElementById(this.template.getSlidesContainer())
+                        .append(arrayOutputStream.toString("UTF8"));
+
+                s.getElements().values()
+                        .stream()
+                        .forEach(element -> presentation.getDocument()
+                                                        .getElementById(element.getId())
+                                                        .html(element.getHtmlContent()));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                arrayOutputStream.reset();
             }
         }
 
-        Reader templateReader = null;
-        try {
-            templateReader = new FileReader(this.template.getFile());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        context = new VelocityContext();
-        context.put(VELOCITY_SFX_CONTENT_DEFINER_TOKEN, VELOCITY_SFX_CONTENT_DEFINER_SCRIPT);
-        context.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_SCRIPT);
-
-        Velocity.evaluate(context, outputWriter, "", templateReader);
-
-        try {
-            arrayOutputStream.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            outputWriter.flush();
-        } catch (IOException e) {
-            throw new PresentationException("Can not create presentation temporary file", e);
-        }
-        try {
-            templateReader.close();
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Error while closing template stream", e);
-        }
-
-        final Document document = DOMUtils.createDocument(arrayOutputStream.toString());
-        document.getElementById(this.template.getSlidesContainer())
-                .empty()
-                .html(slidesBuffer.toString());
-
-        for(Slide sl : this.getPresentation().getSlides()) {
-            for(SlideElement element : sl.getElements().values()) {
-                document.getElementById(element.getId())
-                        .empty().html(element.getHtmlContent());
-            }
-        }
-
-        DOMUtils.saveDocument(document, this.getPresentation().getPresentationFile());
-
+        this.saveTemporaryPresentation();
 
         LOGGER.fine("Presentation file created at " + this.presentation.getPresentationFile().getAbsolutePath());
     }
 
+    /**
+     * Open the given presentation. This methods first load the template and then the content of the presentation
+     * @param presentation
+     * @throws InvalidTemplateConfigurationException
+     * @throws InvalidTemplateException
+     * @throws PresentationException
+     * @throws InvalidPresentationConfigurationException
+     */
     public void openPresentation(File presentation) throws InvalidTemplateConfigurationException, InvalidTemplateException, PresentationException, InvalidPresentationConfigurationException {
         setTemplateArchiveFile(presentation);
+        loadTemplate();
         openPresentation();
     }
 
@@ -421,22 +381,23 @@ public class PresentationBuilder {
     }
 
     /**
-     * Duplicates the given slide
+     * Duplicates the given slide and add it to the presentation. The presentation is temporary saved.
      */
     public Slide duplicateSlide(Slide slide) {
         if(slide == null) throw new IllegalArgumentException("The slide to duplicate can not be null");
 
         final Slide copy = new Slide(slide.getTemplate(), System.currentTimeMillis() + "");
         copy.setThumbnail(slide.getThumbnail());
+        copy.setId(new String(slide.getId()));
 
         // Copy the elements. Keep original IDs for now
         SlideElement copySlideElement;
         for(SlideElement slideElement : slide.getElements().values()) {
             copySlideElement = new SlideElement();
-            copySlideElement.setId(slideElement.getId());
-            copySlideElement.setOriginalContentCode(slideElement.getOriginalContentCode());
-            copySlideElement.setOriginalContent(slideElement.getOriginalContent());
-            copySlideElement.setHtmlContent(slideElement.getHtmlContent());
+            copySlideElement.setId(new String(slideElement.getId()));
+            copySlideElement.setOriginalContentCode(new String(slideElement.getOriginalContentCode()));
+            copySlideElement.setOriginalContent(new String(slideElement.getOriginalContent()));
+            copySlideElement.setHtmlContent(new String(slideElement.getHtmlContent()));
 
             copy.getElements().put(copySlideElement.getId(), copySlideElement);
         }
@@ -450,11 +411,8 @@ public class PresentationBuilder {
         copyContext.put(VELOCITY_SLIDE_ID_PREFIX_TOKEN, this.template.getSlideIdPrefix());
         copyContext.put(VELOCITY_SLIDE_NUMBER_TOKEN, copy.getSlideNumber());
 
-        ByteArrayOutputStream byteOutput = null;
-        Writer writer = null;
-        try {
-            byteOutput = new ByteArrayOutputStream();
-            writer = new OutputStreamWriter(byteOutput);
+        try (ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+             Writer writer = new OutputStreamWriter(byteOutput);) {
 
             String oldId, newId;
 
@@ -474,6 +432,9 @@ public class PresentationBuilder {
                 oldId = new String(byteOutput.toByteArray());
                 byteOutput.reset();
 
+                /**
+                 * Manage slide elements IDs
+                 */
                 if(copy.getElements().containsKey(oldId)) {
                     Velocity.evaluate(copyContext, writer, "", dynamicId);
                     writer.flush();
@@ -487,6 +448,19 @@ public class PresentationBuilder {
 
                     copySlideElements.add(copySlideElement);
                 }
+
+                /**
+                 * Manage slide ID
+                 */
+                if(copy.getId().equals(oldId)) {
+                    Velocity.evaluate(copyContext, writer, "", dynamicId);
+                    writer.flush();
+
+                    newId = new String(byteOutput.toByteArray());
+                    byteOutput.reset();
+
+                    copy.setId(newId);
+                }
             }
 
             copy.getElements().clear();
@@ -497,9 +471,51 @@ public class PresentationBuilder {
             copySlideElements = null;
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-
         }
+
+        /**
+         * Add the slide to the document
+         */
+        try(final ByteArrayOutputStream output = new ByteArrayOutputStream();
+            final Writer writer = new OutputStreamWriter(output);
+            final FileReader input = new FileReader(copy.getTemplate().getFile())) {
+
+            copyContext.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_CALL);
+
+            Velocity.evaluate(copyContext, writer, "", input);
+
+            writer.flush();
+            output.flush();
+
+            this.presentation.getDocument()
+                    .getElementById(slide.getId())
+                    .after(output.toString("UTF8"));
+
+            /**
+             * Insert the content
+             */
+            copy.getElements().values()
+                    .stream()
+                    .forEach(element -> this.presentation.getDocument()
+                                                            .getElementById(element.getId())
+                                                            .html(element.getHtmlContent()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /**
+         * Add the slide to the presentation's slides
+         */
+        int index = this.presentation.getSlides().indexOf(slide);
+        if(index != -1) {
+            if(index == this.presentation.getSlides().size() - 1) {
+                this.presentation.getSlides().add(copy);
+            } else {
+                this.presentation.getSlides().add(index + 1, copy);
+            }
+        }
+
+        this.saveTemporaryPresentation();
 
         return copy;
     }

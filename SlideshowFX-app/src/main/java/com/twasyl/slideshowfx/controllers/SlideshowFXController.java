@@ -253,21 +253,10 @@ public class SlideshowFXController implements Initializable {
 
     @FXML private void copySlide(ActionEvent event) {
         final String slideId = (String) this.browser.getEngine().executeScript(this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
-        final String slideNumber = slideId.substring(this.builder.getTemplate().getSlideIdPrefix().length());
 
-        Slide slideToCopy = this.builder.getPresentation().getSlideByNumber(slideNumber);
-        Slide copy = this.builder.duplicateSlide(slideToCopy);
+        Slide slideToCopy = this.builder.getPresentation().getSlideById(slideId);
+        this.builder.duplicateSlide(slideToCopy);
 
-        int index = this.builder.getPresentation().getSlides().indexOf(slideToCopy);
-        if(index != -1) {
-            if(index == this.builder.getPresentation().getSlides().size() - 1) {
-                this.builder.getPresentation().getSlides().add(copy);
-            } else {
-                this.builder.getPresentation().getSlides().add(index + 1, copy);
-            }
-        }
-
-        this.builder.saveTemporaryPresentation();
         this.updateSlideSplitMenu();
 
         this.browser.getEngine().reload();

@@ -20,7 +20,7 @@ public enum ChatMessageAction {
 
     MARK_READ("mark-read");
 
-    private String asString;
+    private final String asString;
 
     private ChatMessageAction(String action) { this.asString = action; }
 

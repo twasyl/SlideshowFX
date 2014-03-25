@@ -18,14 +18,10 @@ package com.twasyl.slideshowfx.builder;
 
 import com.twasyl.slideshowfx.builder.template.SlideTemplate;
 import javafx.scene.image.Image;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Represents a slide of the presentation

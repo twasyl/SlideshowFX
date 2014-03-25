@@ -20,7 +20,7 @@ public enum ChatMessageStatus {
     ANSWERED("answered"),
     NEW("new");
 
-    private String asString;
+    private final String asString;
 
     private ChatMessageStatus(String asString) { this.asString = asString; }
 

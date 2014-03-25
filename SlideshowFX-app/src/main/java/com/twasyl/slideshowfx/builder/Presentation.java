@@ -18,7 +18,6 @@ package com.twasyl.slideshowfx.builder;
 
 import javafx.scene.image.Image;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 import java.io.File;
 import java.util.List;
@@ -91,5 +90,18 @@ public class Presentation {
         if(slideOpt.isPresent()) slide = slideOpt.get();
 
         return slide;
+    }
+
+    /**
+     * In the HTML document update the given slide.
+     * @param slide
+     */
+    public void updateSlideInDocument(Slide slide) {
+        if(slide == null) throw new IllegalArgumentException("The slide can not be null");
+
+        slide.getElements().values()
+                .stream()
+                .forEach(element -> this.document.getElementById(element.getId())
+                                                 .html(element.getHtmlContent()));
     }
 }

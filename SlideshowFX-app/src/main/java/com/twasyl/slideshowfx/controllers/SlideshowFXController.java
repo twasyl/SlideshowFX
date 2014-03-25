@@ -85,16 +85,12 @@ public class SlideshowFXController implements Initializable {
                         slideNumber = slideId.substring(SlideshowFXController.this.builder.getTemplate().getSlideIdPrefix().length());
                     }
 
-                    Slide addedSlide = SlideshowFXController.this.builder.addSlide((SlideTemplate) userData, slideNumber);
+                    SlideshowFXController.this.builder.addSlide((SlideTemplate) userData, slideNumber);
                     SlideshowFXController.this.browser.getEngine().reload();
 
                     SlideshowFXController.this.updateSlideSplitMenu();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ParserConfigurationException e) {
-                e.printStackTrace();
-            } catch (SAXException e) {
                 e.printStackTrace();
             }
         }
@@ -226,12 +222,17 @@ public class SlideshowFXController implements Initializable {
     }
 
     private void updateSlide(final String contentCode, final String originalContent) throws TransformerException, IOException, ParserConfigurationException, SAXException {
-        final String htmlContent = MarkupManager.convertToHtml(contentCode,originalContent);
+        final String htmlContent = MarkupManager.convertToHtml(contentCode, originalContent);
 
         // Update the SlideElement
-        this.builder.getPresentation().getSlideByNumber(this.slideNumber.getText()).updateElement(
-                this.slideNumber.getText() + "-" + this.fieldName.getText(), contentCode, originalContent, htmlContent
+        final Slide slideToUpdate = this.builder.getPresentation().getSlideByNumber(this.slideNumber.getText());
+        slideToUpdate.updateElement(
+                    this.slideNumber.getText() + "-" + this.fieldName.getText(), contentCode, originalContent, htmlContent
         );
+
+        this.builder.getPresentation().updateSlideInDocument(slideToUpdate);
+        
+        this.builder.saveTemporaryPresentation();
 
         String clearedContent = Base64.getEncoder().encodeToString(htmlContent.getBytes("UTF8"));
         String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",
@@ -241,8 +242,6 @@ public class SlideshowFXController implements Initializable {
                clearedContent);
 
         this.browser.getEngine().executeScript(jsCommand);
-
-        this.builder.saveTemporaryPresentation();
 
         // Take a thumbnail of the slide
         WritableImage thumbnail = this.browser.snapshot(null, null);
@@ -307,11 +306,13 @@ public class SlideshowFXController implements Initializable {
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
         presentationArchive = chooser.showSaveDialog(null);
 
-        try {
-            this.builder.setPresentationArchiveFile(presentationArchive);
-            this.builder.savePresentation(presentationArchive);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(presentationArchive != null) {
+            try {
+                this.builder.setPresentationArchiveFile(presentationArchive);
+                this.builder.savePresentation(presentationArchive);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

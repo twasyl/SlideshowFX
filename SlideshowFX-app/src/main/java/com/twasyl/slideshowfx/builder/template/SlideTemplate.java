@@ -16,12 +16,7 @@
 
 package com.twasyl.slideshowfx.builder.template;
 
-import com.twasyl.slideshowfx.builder.Slide;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Represents a slide defined by the template

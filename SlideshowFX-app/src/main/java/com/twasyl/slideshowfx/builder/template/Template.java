@@ -17,8 +17,6 @@
 package com.twasyl.slideshowfx.builder.template;
 
 import javax.json.*;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

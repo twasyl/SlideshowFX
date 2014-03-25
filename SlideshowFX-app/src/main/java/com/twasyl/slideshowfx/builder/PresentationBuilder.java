@@ -29,7 +29,6 @@ import javafx.embed.swing.SwingFXUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.xml.sax.SAXException;
 
@@ -39,7 +38,6 @@ import javax.json.stream.JsonGenerator;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PresentationBuilder {
@@ -130,7 +128,7 @@ public class PresentationBuilder {
      * Load the current template defined by the templateArchiveFile attribute.
      * This creates a temporary file.
      */
-    private void loadTemplate() throws InvalidTemplateException, InvalidTemplateConfigurationException, PresentationException {
+    private void loadTemplate() throws InvalidTemplateException, InvalidTemplateConfigurationException {
         this.prepareResources(this.templateArchiveFile);
 
         // Copy the template to the presentation file
@@ -179,7 +177,7 @@ public class PresentationBuilder {
     /**
      * Open a saved presentation
      */
-    private void openPresentation() throws InvalidTemplateException, InvalidTemplateConfigurationException, InvalidPresentationConfigurationException, PresentationException {
+    private void openPresentation() throws InvalidPresentationConfigurationException {
         // Reading the slides' configuration
         LOGGER.fine("Parsing presentation configuration");
 
@@ -240,7 +238,7 @@ public class PresentationBuilder {
         for(Slide s : this.presentation.getSlides()) {
             try (final ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
                  final Writer outputWriter = new BufferedWriter(new OutputStreamWriter(arrayOutputStream));
-                 final FileReader slideReader = new FileReader(s.getTemplate().getFile());) {
+                 final FileReader slideReader = new FileReader(s.getTemplate().getFile())) {
 
                 context.put(VELOCITY_SLIDE_NUMBER_TOKEN, s.getSlideNumber());
                 Velocity.evaluate(context, outputWriter, "", slideReader);
@@ -279,6 +277,7 @@ public class PresentationBuilder {
      */
     public void openPresentation(File presentation) throws InvalidTemplateConfigurationException, InvalidTemplateException, PresentationException, InvalidPresentationConfigurationException {
         setTemplateArchiveFile(presentation);
+        setPresentationArchiveFile(presentation);
         loadTemplate();
         openPresentation();
     }
@@ -288,7 +287,7 @@ public class PresentationBuilder {
      * @param template
      * @throws IOException
      */
-    public Slide addSlide(SlideTemplate template, String afterSlideNumber) throws IOException, ParserConfigurationException, SAXException {
+    public Slide addSlide(SlideTemplate template, String afterSlideNumber) throws IOException {
         if(template == null) throw new IllegalArgumentException("The template for creating a slide can not be null");
         Velocity.init();
 
@@ -367,7 +366,7 @@ public class PresentationBuilder {
      * Delete the slide with the slideNumber and save the presentation
      * @param slideNumber
      */
-    public void deleteSlide(String slideNumber) throws IOException, SAXException, ParserConfigurationException {
+    public void deleteSlide(String slideNumber) throws ParserConfigurationException {
         if(slideNumber == null) throw new IllegalArgumentException("Slide number can not be null");
 
         Slide slideToRemove = this.presentation.getSlideByNumber(slideNumber);
@@ -388,16 +387,16 @@ public class PresentationBuilder {
 
         final Slide copy = new Slide(slide.getTemplate(), System.currentTimeMillis() + "");
         copy.setThumbnail(slide.getThumbnail());
-        copy.setId(new String(slide.getId()));
+        copy.setId(slide.getId());
 
         // Copy the elements. Keep original IDs for now
         SlideElement copySlideElement;
         for(SlideElement slideElement : slide.getElements().values()) {
             copySlideElement = new SlideElement();
-            copySlideElement.setId(new String(slideElement.getId()));
-            copySlideElement.setOriginalContentCode(new String(slideElement.getOriginalContentCode()));
-            copySlideElement.setOriginalContent(new String(slideElement.getOriginalContent()));
-            copySlideElement.setHtmlContent(new String(slideElement.getHtmlContent()));
+            copySlideElement.setId(slideElement.getId());
+            copySlideElement.setOriginalContentCode(slideElement.getOriginalContentCode());
+            copySlideElement.setOriginalContent(slideElement.getOriginalContent());
+            copySlideElement.setHtmlContent(slideElement.getHtmlContent());
 
             copy.getElements().put(copySlideElement.getId(), copySlideElement);
         }
@@ -412,7 +411,7 @@ public class PresentationBuilder {
         copyContext.put(VELOCITY_SLIDE_NUMBER_TOKEN, copy.getSlideNumber());
 
         try (ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-             Writer writer = new OutputStreamWriter(byteOutput);) {
+             Writer writer = new OutputStreamWriter(byteOutput)) {
 
             String oldId, newId;
 
@@ -523,6 +522,7 @@ public class PresentationBuilder {
     public void saveTemporaryPresentation() {
         try(final Writer writer = new FileWriter(this.presentation.getPresentationFile())) {
             writer.write(this.presentation.getDocument().html());
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -31,9 +31,7 @@ public class DOMUtils {
     public static String convertElementToText(Element element) {
         if(element == null) throw new IllegalArgumentException("Element can not be null");
 
-        String result = element.outerHtml();
-
-        return result;
+        return element.outerHtml();
     }
 
     public static Element convertToNode(String text) {
@@ -66,8 +64,6 @@ public class DOMUtils {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        };
-
-
+        }
     }
 }

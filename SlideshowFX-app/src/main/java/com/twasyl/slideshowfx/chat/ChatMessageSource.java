@@ -21,7 +21,7 @@ public enum ChatMessageSource {
     CHAT("chat"),
     TWITTER("twitter");
 
-    private String asString;
+    private final String asString;
 
     private ChatMessageSource(String source) { this.asString = source; }
 

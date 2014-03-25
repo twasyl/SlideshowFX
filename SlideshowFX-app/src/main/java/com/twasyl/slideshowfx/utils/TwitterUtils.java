@@ -26,8 +26,8 @@ import java.io.Serializable;
 public class TwitterUtils implements Serializable {
 
     public static class AuthenticationInfo {
-        private OAuthService service;
-        private Token accessToken;
+        private final OAuthService service;
+        private final Token accessToken;
 
         private AuthenticationInfo(OAuthService service, Token accessToken) {
             this.service = service;

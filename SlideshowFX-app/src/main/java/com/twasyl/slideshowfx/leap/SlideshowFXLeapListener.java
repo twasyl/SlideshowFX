@@ -35,11 +35,11 @@ public class SlideshowFXLeapListener extends Listener {
     /**
      * When performing a gesture, indicates the maximum angle from the X axis the gesture's direction could have.
      */
-    public static double X_AXIS_DIRECTION_MAX_ANGLE = 25;
+    public static final double X_AXIS_DIRECTION_MAX_ANGLE = 25;
     /**
      * When performing a gesture, indicates the maximum angle from the Z axis the gesture's direction could have.
      */
-    public static double Z_AXIS_DIRECTION_MAX_ANGLE = 15;
+    public static final double Z_AXIS_DIRECTION_MAX_ANGLE = 15;
 
     private boolean tracking = false;
     private SwipeGesture lastSwipeGesture;

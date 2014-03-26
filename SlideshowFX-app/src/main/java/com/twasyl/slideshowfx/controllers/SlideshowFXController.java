@@ -101,24 +101,13 @@ public class SlideshowFXController implements Initializable {
         public void handle(ActionEvent actionEvent) {
             final SlideMenuItem menunItem = (SlideMenuItem) actionEvent.getSource();
 
-            final String slideId = (String) SlideshowFXController.this.browser.getEngine().executeScript(SlideshowFXController.this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
-            final String slideNumber = slideId.substring(SlideshowFXController.this.builder.getTemplate().getSlideIdPrefix().length());
+            final String slideId = (String) SlideshowFXController.this.browser.getEngine()
+                    .executeScript(SlideshowFXController.this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
 
-            Slide slideToMove = SlideshowFXController.this.builder.getPresentation().getSlideByNumber(slideNumber);
+            Slide slideToMove = SlideshowFXController.this.builder.getPresentation().getSlideById(slideId);
+            Slide beforeSlide = menunItem.getSlide();
 
-            SlideshowFXController.this.builder.getPresentation().getSlides().remove(slideToMove);
-
-            int index = -1;
-            for(int i = 0; i < SlideshowFXController.this.builder.getPresentation().getSlides().size(); i++) {
-                if(SlideshowFXController.this.builder.getPresentation().getSlides().get(i).getSlideNumber().equals(menunItem.getSlide().getSlideNumber())) {
-                    index = i;
-                    break;
-                }
-            }
-
-            SlideshowFXController.this.builder.getPresentation().getSlides().add(index, slideToMove);
-
-            SlideshowFXController.this.builder.saveTemporaryPresentation();
+            SlideshowFXController.this.builder.moveSlide(slideToMove, beforeSlide);
 
             SlideshowFXController.this.browser.getEngine().reload();
             SlideshowFXController.this.updateSlideSplitMenu();

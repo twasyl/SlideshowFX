@@ -519,6 +519,46 @@ public class PresentationBuilder {
         return copy;
     }
 
+    /**
+     * Move a slide and update the presentation's document. If <code>beforeSlide</code> is null,
+     * the slide is moved at the end of the presentation. If <code>slideToMove</code> is equal to <code>beforeSlide</code>
+     * nothing is done.
+     * If an operation has been performed, the presentation is temporary saved.
+     * @param slideToMove The slide to move
+     * @param beforeSlide The slide before <code>slideToMove</code> is moved
+     * @throws java.lang.IllegalArgumentException if the slideToMove is null
+     */
+    public void moveSlide(Slide slideToMove, Slide beforeSlide) {
+        if(slideToMove == null) throw new IllegalArgumentException("The slideToMove to move can not be null");
+
+        if(!slideToMove.equals(beforeSlide)) {
+            this.presentation.getSlides().remove(slideToMove);
+
+            final String slideHtml = this.presentation.getDocument()
+                    .getElementById(slideToMove.getId()).outerHtml();
+
+            this.presentation.getDocument()
+                    .getElementById(slideToMove.getId())
+                    .remove();
+
+            if(beforeSlide == null) {
+                this.presentation.getSlides().add(slideToMove);
+                this.presentation.getDocument()
+                        .getElementById(this.template.getSlidesContainer())
+                        .append(slideHtml);
+            } else {
+                int index = this.presentation.getSlides().indexOf(beforeSlide);
+                this.presentation.getSlides().add(index, slideToMove);
+
+                this.presentation.getDocument()
+                        .getElementById(beforeSlide.getId())
+                        .before(slideHtml);
+            }
+
+            this.saveTemporaryPresentation();
+        }
+    }
+
     public void saveTemporaryPresentation() {
         try(final Writer writer = new FileWriter(this.presentation.getPresentationFile())) {
             writer.write(this.presentation.getDocument().html());

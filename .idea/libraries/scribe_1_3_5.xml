@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="lib">
+  <library name="scribe-1.3.5">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/junit-4.11.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/Scribe/scribe-1.3.5.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

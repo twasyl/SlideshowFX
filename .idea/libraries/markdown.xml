@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="lib">
+  <library name="markdown">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/junit-4.11.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/markdown/txtmark-0.11.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

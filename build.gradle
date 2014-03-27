@@ -1,0 +1,94 @@
+allprojects {
+	apply plugin: 'java'
+	sourceCompatibility = 1.8
+	targetCompatibility= 1.8
+}
+
+project(':SlideshowFX-markup') {
+	
+}
+
+project(':SlideshowFX-html') {
+	apply plugin: 'osgi'
+
+	dependencies {
+		compile project(':SlideshowFX-markup')
+		compile fileTree(dir: '../lib/Felix', include: '*.jar')
+	}
+
+	jar {
+		manifest {
+			instruction 'Manifest-Version', '1.0'
+			instruction 'Bundle-Name', 'SlideshowFX HTML support'
+			instruction 'Bundle-Description','Support HTML for defining slide\'s content'
+			instruction 'Bundle-Version', '1.0.0'
+			instruction 'Bundle-Activator', 'com.twasyl.slideshowfx.markup.html.activator.HtmlActivator'
+			instruction 'Bundle-Vendor', 'Thierry Wasylczenko'
+			instruction 'Export-Package', 'com.twasyl.slideshowfx.markup'
+			instruction 'Import-Package', 'org.osgi.framework'
+		}
+	}
+}
+
+project(':SlideshowFX-markdown') {
+	apply plugin: 'osgi'
+	
+	dependencies {
+		runtime project(':SlideshowFX-markup')
+		runtime fileTree(dir: 'lib/Felix', include: '*.jar')
+	}
+
+	jar {
+		manifest {
+			instruction 'Manifest-Version', '1.0'
+			instruction 'Bundle-Name', 'SlideshowFX markdown support'
+			instruction 'Bundle-Description','Support markdown for defining slide\'s content'
+			instruction 'Bundle-Version', '1.0.0'
+			instruction 'Bundle-Activator', 'com.twasyl.slideshowfx.markup.markdown.activator.MarkdownActivator'
+			instruction 'Bundle-ClassPath', 'txtmark-0.11.jar,.'
+			instruction 'Bundle-Vendor', 'Thierry Wasylczenko'
+			instruction 'Export-Package', 'com.twasyl.slideshowfx.markup'
+			instruction 'Import-Package', 'org.osgi.framework'
+		}
+	}	
+}
+
+project(':SlideshowFX-textile') {
+	apply plugin: 'osgi'
+	
+	dependencies {
+		compile project(':SlideshowFX-markup')
+		compile fileTree(dir: '../lib/Felix', include: '*.jar')
+		compile fileTree(dir: '../lib/WikiText', include: '*.jar')
+	}	
+
+	jar {
+		manifest {
+			instruction 'Manifest-Version', '1.0'
+			instruction 'Bundle-Name', 'SlideshowFX Textile support'
+			instruction 'Bundle-Description','Support Textile for defining slide\'s content'
+			instruction 'Bundle-Version', '1.0.0'
+			instruction 'Bundle-Activator', 'com.twasyl.slideshowfx.markup.textile.activator.TextileActivator'
+			instruction 'Bundle-ClassPath', 'org.eclipse.mylyn.wikitext.core_2.0.0.20140108-1934.jar,org.eclipse.mylyn.wikitext.textile.core_2.0.0.20131212-0025.jar,.'
+			instruction 'Bundle-Vendor', 'Thierry Wasylczenko'
+			instruction 'Export-Package', 'com.twasyl.slideshowfx.markup'
+			instruction 'Import-Package', 'org.osgi.framework'
+		}
+	}
+}
+
+project(':SlideshowFX-app') {
+	// apply from: 'javafx.plugin'
+
+	dependencies {
+		runtime project(':SlideshowFX-markup')
+		runtime files('jsoup-1.7.3.jar')
+		runtime fileTree(dir: 'lib/Vert.x', include: '*.jar')
+		runtime fileTree(dir: 'lib/Felix', include: '*.jar')
+		runtime fileTree(dir: 'lib/ZXing', include: '*.jar')
+		runtime fileTree(dir: 'lib/Leap', include: '*')
+		runtime fileTree(dir: 'lib/Velocity', include: '*.jar')
+		runtime fileTree(dir: 'lib/json', include: '*.jar')
+		runtime fileTree(dir: 'lib/Scribe', include: '*.jar')
+	}
+}

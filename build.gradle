@@ -85,6 +85,23 @@ project(':SlideshowFX-textile') {
 project(':SlideshowFX-app') {
 	apply from: '../javafx.plugin'
 
+	task(buildVersionNumber) {
+	    def gitCommitIdCmd = "git rev-parse --short HEAD"
+	    def gitCommitId = gitCommitIdCmd.execute().text.trim()
+
+	    def isRepoDirtyCmd = "git status 2"
+	    def isRepoDirty = !isRepoDirtyCmd.execute().text.trim().contains("nothing to commit, working directory clean");
+
+	    def appVersion = gitCommitId + (isRepoDirty ? "-unofficial" : "");
+
+	    def metaInfFolder = new File(project.buildDir, 'classes/main/META-INF')
+
+		if(!metaInfFolder.exists()) metaInfFolder.mkdirs();
+
+	    def versionFile = new File(metaInfFolder, 'build.info')
+		versionFile.text = 'revision=' + appVersion
+	}
+
 	dependencies {
 		compile project(':SlideshowFX-markup')
 		compile files('../lib/jsoup-1.7.3.jar')
@@ -98,13 +115,38 @@ project(':SlideshowFX-app') {
 		testCompile files('../lib/junit-4.11.jar')
 	}
 
+	jar {
+		into('lib') {
+			from fileTree('../lib')
+			from project(':SlideshowFX-markup').libsDir
+
+			include project(':SlideshowFX-markup').archivesBaseName.toString() + '.jar'
+			include 'jsoup-1.7.3.jar'
+			include 'Vert.x/*.jar'
+			include 'Felix/*.jar'
+			include 'ZXing/*.jar'
+			include 'Leap/*'
+			include 'Velocity/*.jar'
+			include 'json/*.jar'
+			include 'Scribe/*.jar'
+		}
+	}
+
 	javafx {
 		appID 'SlideshowFX'
 		appName 'SlideshowFX'
+
 		mainClass 'com.twasyl.slideshowfx.app.SlideshowFX'
+
+		jvmArgs = ['-Djava.library.path=SlideshowFX-app.jar/META-INF/Leap/']
+
 		width 1024
 		height 800
+
+		signingMode 'release'
 	}
+
+	tasks['compileJava'].dependsOn 'buildVersionNumber'
 }
 
 task installMarkupPlugins << {

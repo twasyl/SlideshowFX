@@ -3,6 +3,8 @@ allprojects {
 	sourceCompatibility = 1.8
 	targetCompatibility= 1.8
 
+	def allLibs = new File(rootDir, '/lib')
+
 	configurations {
 		felix
 		json
@@ -18,17 +20,17 @@ allprojects {
 	}
 
 	dependencies {
-		felix fileTree(dir: '../lib/Felix', include: '*.jar')
-		json fileTree(dir: '../lib/json', include: '*.jar')
-		jsoup files('../lib/jsoup-1.7.3.jar')
-		junit files('../lib/junit-4.11.jar')
-		leapmotion fileTree(dir: '../lib/Leap', include: '*')
-		markdown fileTree(dir: '../lib/markdown', include: '*.jar')
-		scribe fileTree(dir: '../lib/Scribe', include: '*.jar')
-		textile fileTree(dir: '../lib/WikiText', include: '*.jar')
-		velocity fileTree(dir: '../lib/Velocity', include: '*.jar')
-		vertx fileTree(dir: '../lib/Vert.x', include: '*.jar')		
-		zxing fileTree(dir: '../lib/ZXing', include: '*.jar')
+		felix fileTree(dir: allLibs, include: 'Felix/*.jar')
+		json fileTree(dir: allLibs, include: 'json/*.jar')
+		jsoup fileTree(dir: allLibs, include: 'jsoup-1.7.3.jar')
+		junit fileTree(dir: allLibs, include: 'junit-4.11.jar')
+		leapmotion fileTree(dir: allLibs, include: 'Leap/*')
+		markdown fileTree(dir: allLibs, include: 'markdown/*.jar')
+		scribe fileTree(dir: allLibs, include: 'Scribe/*.jar')
+		textile fileTree(dir: allLibs, include: 'WikiText/*.jar')
+		velocity fileTree(dir: allLibs, include: 'Velocity/*.jar')
+		vertx fileTree(dir: allLibs, include: 'Vert.x/*.jar')		
+		zxing fileTree(dir: allLibs, include: 'ZXing/*.jar')
 	}
 }
 
@@ -152,7 +154,7 @@ project(':SlideshowFX-app') {
 	}
 
 	javafx {
-
+		javaRuntime = 'C:/Program Files/Java/jdk1.8.0'
 		appID 'SlideshowFX'
 		appName 'SlideshowFX'
 

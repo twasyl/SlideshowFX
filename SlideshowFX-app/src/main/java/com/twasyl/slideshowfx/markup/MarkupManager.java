@@ -68,6 +68,8 @@ public class MarkupManager {
         serviceTracker.open();
 
         // Deploy initially present plugins
+        if(!pluginsDirectory.exists()) pluginsDirectory.mkdirs();
+        
         Arrays.stream(pluginsDirectory.listFiles((dir, name) -> name.endsWith(".jar")))
               .forEach(file -> {
                   Bundle bundle = null;

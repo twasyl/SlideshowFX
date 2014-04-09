@@ -2,9 +2,7 @@ out
 src/test/resources/iCode
 felix-cache
 plugins
+.idea/
+**/*.iml
 .gradle/
-SlideshowFX-markup/build/
-SlideshowFX-html/build/
-SlideshowFX-markdown/build/
-SlideshowFX-textile/build/
-SlideshowFX-app/build/
+**/build/

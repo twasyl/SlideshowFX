@@ -1,4 +1,4 @@
-allprojects {
+subprojects {
 	apply plugin: 'java'
 	sourceCompatibility = 1.8
 	targetCompatibility= 1.8
@@ -113,9 +113,9 @@ project(':SlideshowFX-textile') {
 }
 
 project(':SlideshowFX-app') {
-	apply from: '../javafx.plugin'
+	// apply from: '../javafx.plugin'
 
-	task(buildVersionNumber) {
+	task buildVersionNumber << {
 	    ext.gitCommitIdCmd = "git rev-parse --short HEAD"
 	    ext.gitCommitId = ext.gitCommitIdCmd.execute().text.trim()
 
@@ -132,6 +132,28 @@ project(':SlideshowFX-app') {
 		ext.versionFile.text = 'revision=' + ext.appVersion
 	}
 
+    task createJavaFXJar {
+
+    }
+
+    task buildJavaFXBundle(dependsOn: ':SlideshowFX-app:jar') {
+        ext.distDir = new File(buildDir, "dist")
+        ext.libsDir = new File(buildDir, "libs")
+
+        ext.jdk = System.env.'JAVA_HOME'
+
+        if (ext.jdk != null && !ext.jdk.isEmpty()) {
+            println "Using JDK '${ext.jdk}'"
+            println "Output dir: '${ext.distDir.absolutePath}'"
+            println "Source dir: '${ext.libsDir.absolutePath}'"
+
+            ext.javafxpackagerCmd = "${ext.jdk}/bin/javafxpackager -deploy -v -native -name SlideshowFX -outdir \"${ext.distDir.absolutePath}\" -outfile SlideshowFX -srcdir \"${ext.libsDir.absolutePath}\" -appclass com.twasyl.slideshowfx.app.SlideshowFX".execute()
+            ext.javafxpackagerCmd.in.eachLine {line -> println line}
+            ext.javafxpackagerCmd.err.eachLine {line -> println line}
+            ext.javafxpackagerCmd.waitFor()
+        }
+    }
+
 	dependencies {
 		compile project(':SlideshowFX-markup')
 		compile configurations.felix.dependencies
@@ -142,6 +164,7 @@ project(':SlideshowFX-app') {
 		compile configurations.velocity.dependencies
 		compile configurations.vertx.dependencies
 		compile configurations.zxing.dependencies
+
 		testCompile configurations.junit
 	}
 
@@ -153,8 +176,7 @@ project(':SlideshowFX-app') {
 		}
 	}
 
-	javafx {
-		javaRuntime = 'C:/Program Files/Java/jdk1.8.0'
+	/*javafx {
 		appID 'SlideshowFX'
 		appName 'SlideshowFX'
 
@@ -164,7 +186,7 @@ project(':SlideshowFX-app') {
 		height 800
 
 		signingMode 'release'
-	}
+	}     */
 
 	tasks['compileJava'].dependsOn 'buildVersionNumber'
 }

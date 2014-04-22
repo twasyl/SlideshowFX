@@ -132,11 +132,23 @@ project(':SlideshowFX-app') {
 		ext.versionFile.text = 'revision=' + ext.appVersion
 	}
 
-    task createJavaFXJar {
+    task jar(overwrite: true, dependsOn: 'classes') << {
+        ext.libsDir = new File(buildDir, "libs")
+        ext.jdk = System.env.'JAVA_HOME'
 
+        if (ext.jdk != null && !ext.jdk.isEmpty()) {
+
+        	if(!ext.libsDir.exists()) ext.libsDir.mkdirs()
+
+        	println "${ext.jdk}/bin/javafxpackager -createjar -appclass com.twasyl.slideshowfx.app.SlideshowFX  -outdir \"${ext.libsDir.absolutePath}\" -outfile ${project.archivesBaseName} -srcfiles \"${project.buildDir.absolutePath}/classes/main/com\";\"${project.buildDir.absolutePath}/classes/main/META-INF\";\"${project.buildDir.absolutePath}/resources/main/com\""
+            ext.javafxpackagerCmd = "${ext.jdk}/bin/javafxpackager -createjar -appclass com.twasyl.slideshowfx.app.SlideshowFX  -outdir \"${ext.libsDir.absolutePath}\" -outfile ${project.archivesBaseName} -srcfiles \"${project.buildDir.absolutePath}/classes/main/com\";\"${project.buildDir.absolutePath}/classes/main/META-INF\";\"${project.buildDir.absolutePath}/resources/main/com\"".execute()
+            ext.javafxpackagerCmd.in.eachLine {line -> println line}
+            ext.javafxpackagerCmd.err.eachLine {line -> println line}
+            ext.javafxpackagerCmd.waitFor()
+        }
     }
 
-    task buildJavaFXBundle(dependsOn: ':SlideshowFX-app:jar') {
+    task buildJavaFXBundle(dependsOn: ':SlideshowFX-app:jar') << {
         ext.distDir = new File(buildDir, "dist")
         ext.libsDir = new File(buildDir, "libs")
 

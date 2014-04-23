@@ -128,7 +128,8 @@ project(':SlideshowFX-app') {
 
         	ext.classpath += "."
 
-            ext.javafxpackagerCmd = "${ext.jdk}/bin/javafxpackager -createjar -appclass com.twasyl.slideshowfx.app.SlideshowFX -classpath ${ext.classpath} -outdir \"${ext.libsDir.absolutePath}\" -outfile ${project.archivesBaseName} -srcfiles \"${project.buildDir.absolutePath}/classes/main/com\";\"${project.buildDir.absolutePath}/classes/main/META-INF\";\"${project.buildDir.absolutePath}/resources/main/com\"".execute()
+        	println "${ext.jdk}/bin/javafxpackager -createjar -v -appclass com.twasyl.slideshowfx.app.SlideshowFX -classpath ${ext.classpath} -outdir \"${ext.libsDir.absolutePath}\" -outfile ${project.archivesBaseName} -srcdir \"${project.buildDir.absolutePath}/classes/main\" -srcdir \"${project.buildDir.absolutePath}/resources/main\""
+            ext.javafxpackagerCmd = "${ext.jdk}/bin/javafxpackager -createjar -v -appclass com.twasyl.slideshowfx.app.SlideshowFX -classpath ${ext.classpath} -outdir \"${ext.libsDir.absolutePath}\" -outfile ${project.archivesBaseName} -srcdir \"${project.buildDir.absolutePath}/classes/main\" -srcdir \"${project.buildDir.absolutePath}/resources/main\"".execute()
             ext.javafxpackagerCmd.in.eachLine {line -> println line}
             ext.javafxpackagerCmd.err.eachLine {line -> println line}
             ext.javafxpackagerCmd.waitFor()

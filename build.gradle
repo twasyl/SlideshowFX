@@ -1,47 +1,26 @@
+def allLibs = new File(rootDir, '/lib')
+def felix = fileTree(dir: allLibs, include: 'Felix/*.jar')
+def json = fileTree(dir: allLibs, include: 'json/*.jar')
+def jsoup = fileTree(dir: allLibs, include: 'jsoup-1.7.3.jar')
+def junit = fileTree(dir: allLibs, include: 'junit-4.11.jar')
+def leapmotion = fileTree(dir: allLibs, include: 'Leap/*')
+def markdown = fileTree(dir: allLibs, include: 'markdown/*.jar')
+def scribe = fileTree(dir: allLibs, include: 'Scribe/*.jar')
+def textile = fileTree(dir: allLibs, include: 'WikiText/*.jar')
+def velocity = fileTree(dir: allLibs, include: 'Velocity/*.jar')
+def vertx = fileTree(dir: allLibs, include: 'Vert.x/*.jar')		
+def zxing = fileTree(dir: allLibs, include: 'ZXing/*.jar')
+
 subprojects {
 	apply plugin: 'java'
 	sourceCompatibility = 1.8
 	targetCompatibility= 1.8
-
-	def allLibs = new File(rootDir, '/lib')
-
-	configurations {
-		felix
-		json
-		jsoup
-		junit
-		leapmotion
-		markdown
-		scribe
-		textile
-		velocity
-		vertx
-		zxing
-	}
-
-	dependencies {
-		felix fileTree(dir: allLibs, include: 'Felix/*.jar')
-		json fileTree(dir: allLibs, include: 'json/*.jar')
-		jsoup fileTree(dir: allLibs, include: 'jsoup-1.7.3.jar')
-		junit fileTree(dir: allLibs, include: 'junit-4.11.jar')
-		leapmotion fileTree(dir: allLibs, include: 'Leap/*')
-		markdown fileTree(dir: allLibs, include: 'markdown/*.jar')
-		scribe fileTree(dir: allLibs, include: 'Scribe/*.jar')
-		textile fileTree(dir: allLibs, include: 'WikiText/*.jar')
-		velocity fileTree(dir: allLibs, include: 'Velocity/*.jar')
-		vertx fileTree(dir: allLibs, include: 'Vert.x/*.jar')		
-		zxing fileTree(dir: allLibs, include: 'ZXing/*.jar')
-	}
-}
-
-project(':SlideshowFX-markup') {
-	
 }
 
 project(':SlideshowFX-html') {
 	dependencies {
 		compile project(':SlideshowFX-markup')
-		compile configurations.felix.dependencies
+		compile felix
 	}
 
 	jar {
@@ -62,12 +41,12 @@ project(':SlideshowFX-markdown') {
 	
 	dependencies {
 		compile project(':SlideshowFX-markup')
-		compile configurations.felix.dependencies
-		compile configurations.markdown.dependencies
+		compile felix
+		compile markdown
 	}
 
 	jar {
-		from( configurations.markdown.files ) {
+		from( markdown.files ) {
       		include '*'
    		}
 
@@ -89,12 +68,12 @@ project(':SlideshowFX-textile') {
 	
 	dependencies {
 		compile project(':SlideshowFX-markup')
-		compile configurations.felix.dependencies
-		compile configurations.textile.dependencies
+		compile felix
+		compile textile
 	}	
 
 	jar {
-		from( configurations.textile.files ) {
+		from( textile.files ) {
       		include '*'
    		}
 
@@ -113,7 +92,6 @@ project(':SlideshowFX-textile') {
 }
 
 project(':SlideshowFX-app') {
-	// apply from: '../javafx.plugin'
 
 	task buildVersionNumber << {
 	    ext.gitCommitIdCmd = "git rev-parse --short HEAD"
@@ -132,7 +110,8 @@ project(':SlideshowFX-app') {
 		ext.versionFile.text = 'revision=' + ext.appVersion
 	}
 
-    task jar(overwrite: true, dependsOn: 'classes') << {
+    task jar(overwrite: true) << {
+
         ext.libsDir = new File(buildDir, "libs")
         ext.jdk = System.env.'JAVA_HOME'
 
@@ -140,15 +119,40 @@ project(':SlideshowFX-app') {
 
         	if(!ext.libsDir.exists()) ext.libsDir.mkdirs()
 
-        	println "${ext.jdk}/bin/javafxpackager -createjar -appclass com.twasyl.slideshowfx.app.SlideshowFX  -outdir \"${ext.libsDir.absolutePath}\" -outfile ${project.archivesBaseName} -srcfiles \"${project.buildDir.absolutePath}/classes/main/com\";\"${project.buildDir.absolutePath}/classes/main/META-INF\";\"${project.buildDir.absolutePath}/resources/main/com\""
-            ext.javafxpackagerCmd = "${ext.jdk}/bin/javafxpackager -createjar -appclass com.twasyl.slideshowfx.app.SlideshowFX  -outdir \"${ext.libsDir.absolutePath}\" -outfile ${project.archivesBaseName} -srcfiles \"${project.buildDir.absolutePath}/classes/main/com\";\"${project.buildDir.absolutePath}/classes/main/META-INF\";\"${project.buildDir.absolutePath}/resources/main/com\"".execute()
+        	ext.classpath = ""
+        	
+        	fileTree(dir: ext.libsDir, include: '*.jar', exclude: archivesBaseName + ".jar").each {
+        		f ->
+        		ext.classpath += f.name + ","
+        	}
+
+        	ext.classpath += "."
+
+            ext.javafxpackagerCmd = "${ext.jdk}/bin/javafxpackager -createjar -appclass com.twasyl.slideshowfx.app.SlideshowFX -classpath ${ext.classpath} -outdir \"${ext.libsDir.absolutePath}\" -outfile ${project.archivesBaseName} -srcfiles \"${project.buildDir.absolutePath}/classes/main/com\";\"${project.buildDir.absolutePath}/classes/main/META-INF\";\"${project.buildDir.absolutePath}/resources/main/com\"".execute()
             ext.javafxpackagerCmd.in.eachLine {line -> println line}
             ext.javafxpackagerCmd.err.eachLine {line -> println line}
             ext.javafxpackagerCmd.waitFor()
+
+            // Copying libs
+            copy {
+            	from(new File(project(':SlideshowFX-markup').libsDir, project(':SlideshowFX-markup').archivesBaseName + ".jar"))
+				from(felix.files)
+				from(json.files)
+				from(jsoup.files)
+				from(leapmotion.files)
+				from(scribe.files)
+				from(velocity.files)
+				from(vertx.files)
+				from(zxing.files)
+
+            	into(ext.libsDir)
+            }
         }
     }
+    tasks['jar'].dependsOn 'classes'
+	tasks['jar'].dependsOn ':SlideshowFX-markup:jar'
 
-    task buildJavaFXBundle(dependsOn: ':SlideshowFX-app:jar') << {
+   task buildJavaFXBundle(dependsOn: ':SlideshowFX-app:jar') << {
         ext.distDir = new File(buildDir, "dist")
         ext.libsDir = new File(buildDir, "libs")
 
@@ -168,39 +172,20 @@ project(':SlideshowFX-app') {
 
 	dependencies {
 		compile project(':SlideshowFX-markup')
-		compile configurations.felix.dependencies
-		compile configurations.json.dependencies
-		compile configurations.jsoup.dependencies
-		compile configurations.leapmotion.dependencies
-		compile configurations.scribe.dependencies
-		compile configurations.velocity.dependencies
-		compile configurations.vertx.dependencies
-		compile configurations.zxing.dependencies
+		compile felix
+		compile json
+		compile jsoup
+		compile leapmotion
+		compile scribe
+		compile velocity
+		compile vertx
+		compile zxing
 
-		testCompile configurations.junit
+		testCompile  junit
 	}
-
-	jar {
-		manifest {
-			attributes(
-				"Main-Class": "com.twasyl.slideshowfx.app.SlideshowFX"
-			)
-		}
-	}
-
-	/*javafx {
-		appID 'SlideshowFX'
-		appName 'SlideshowFX'
-
-		mainClass 'com.twasyl.slideshowfx.app.SlideshowFX'
-
-		width 1024
-		height 800
-
-		signingMode 'release'
-	}     */
 
 	tasks['compileJava'].dependsOn 'buildVersionNumber'
+	
 }
 
 task installMarkupPlugins << {

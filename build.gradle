@@ -1,15 +1,19 @@
-def allLibs = new File(rootDir, '/lib')
-def felix = fileTree(dir: allLibs, include: 'Felix/*.jar')
-def json = fileTree(dir: allLibs, include: 'json/*.jar')
-def jsoup = fileTree(dir: allLibs, include: 'jsoup-1.7.3.jar')
-def junit = fileTree(dir: allLibs, include: 'junit-4.11.jar')
-def leapmotion = fileTree(dir: allLibs, include: 'Leap/*')
-def markdown = fileTree(dir: allLibs, include: 'markdown/*.jar')
-def scribe = fileTree(dir: allLibs, include: 'Scribe/*.jar')
-def textile = fileTree(dir: allLibs, include: 'WikiText/*.jar')
-def velocity = fileTree(dir: allLibs, include: 'Velocity/*.jar')
-def vertx = fileTree(dir: allLibs, include: 'Vert.x/*.jar')		
-def zxing = fileTree(dir: allLibs, include: 'ZXing/*.jar')
+ext {
+	allLibs = new File(rootDir, '/lib')
+	felix = fileTree(dir: allLibs, include: 'Felix/*.jar')
+	json = fileTree(dir: allLibs, include: 'json/*.jar')
+	jsoup = fileTree(dir: allLibs, include: 'jsoup-1.7.3.jar')
+	junit = fileTree(dir: allLibs, include: 'junit-4.11.jar')
+	leapmotion = fileTree(dir: allLibs, include: 'Leap/*')
+	markdown = fileTree(dir: allLibs, include: 'markdown/*.jar')
+	scribe = fileTree(dir: allLibs, include: 'Scribe/*.jar')
+	textile = fileTree(dir: allLibs, include: 'WikiText/*.jar')
+	velocity = fileTree(dir: allLibs, include: 'Velocity/*.jar')
+	vertx = fileTree(dir: allLibs, include: 'Vert.x/*.jar')		
+	zxing = fileTree(dir: allLibs, include: 'ZXing/*.jar')
+
+	jdk = System.env.'JAVA_HOME'
+}
 
 def getBuildNumber() {
 	ext.gitCommitIdCmd = "git --work-tree=\"${rootDir.absolutePath}\" --git-dir=\"${rootDir.absolutePath}${File.separator}.git\" rev-parse --short HEAD"
@@ -105,14 +109,11 @@ project(':SlideshowFX-textile') {
 
 project(':SlideshowFX-app') {
 
-    task jar(overwrite: true) << {
+	task jar(overwrite: true) << {
 
-        ext.libsDir = new File(buildDir, "libs")
-        ext.jdk = System.env.'JAVA_HOME'
+        if (jdk != null && !jdk.isEmpty()) {
 
-        if (ext.jdk != null && !ext.jdk.isEmpty()) {
-
-        	if(!ext.libsDir.exists()) ext.libsDir.mkdirs()
+        	if(!libsDir.exists()) libsDir.mkdirs()
 
         	// Copying libs
             copy {
@@ -126,48 +127,45 @@ project(':SlideshowFX-app') {
 				from(vertx.files)
 				from(zxing.files)
 
-            	into(ext.libsDir)
+            	into(libsDir)
             }
 
-        	ext.classpath = ""
+        	def classpath = ""
         	
-        	fileTree(dir: ext.libsDir, include: '*.jar', exclude: archivesBaseName + ".jar").each {
+        	fileTree(dir: libsDir, include: '*.jar', exclude: archivesBaseName + ".jar").each {
         		f ->
-        		ext.classpath += f.name + ","
+        		classpath += f.name + ","
         	}
 
-        	ext.classpath += "."
+        	classpath += "."
 
-			ext.manifestAttrs = "Implementation-Version=${getBuildNumber()}"
+			def manifestAttrs = "Implementation-Version=${getBuildNumber()}"
 
-        	ext.sourceDir = new File(project.buildDir, 'classes/main')
-        	ext.sourcesArguments = "-srcdir \"${ext.sourceDir.absolutePath}\" -srcfiles com META-INF"
+        	def sourceDir = new File(project.buildDir, 'classes/main')
+        	def sourcesArguments = "-srcdir \"${sourceDir.absolutePath}\" -srcfiles com"
 
-        	ext.sourceDir = new File(project.buildDir, 'resources/main')
-			ext.sourcesArguments += " -srcdir \"${ext.sourceDir.absolutePath}\" -srcfiles com"
+        	sourceDir = new File(project.buildDir, 'resources/main')
+			sourcesArguments += " -srcdir \"${sourceDir.absolutePath}\" -srcfiles com"
 
-            ext.javafxpackagerCmd = "\"${ext.jdk}/bin/javafxpackager\" -createjar -v -appclass com.twasyl.slideshowfx.app.SlideshowFX -classpath ${ext.classpath} -manifestAttrs \"${ext.manifestAttrs}\" -outdir \"${ext.libsDir.absolutePath}\" -outfile ${project.archivesBaseName} ${ext.sourcesArguments}".execute()
-            ext.javafxpackagerCmd.in.eachLine {line -> println line}
-            ext.javafxpackagerCmd.err.eachLine {line -> println line}
-            ext.javafxpackagerCmd.waitFor()
+            def javafxpackagerCmd = "\"${jdk}/bin/javafxpackager\" -createjar -appclass com.twasyl.slideshowfx.app.SlideshowFX -classpath ${classpath} -manifestAttrs \"${manifestAttrs}\" -outdir \"${libsDir.absolutePath}\" -outfile ${project.archivesBaseName} ${sourcesArguments}".execute()
+            javafxpackagerCmd.in.eachLine {line -> println line}
+            javafxpackagerCmd.err.eachLine {line -> println line}
+            javafxpackagerCmd.waitFor()
         }
     }
 
     task buildJavaFXBundle << {
-        ext.distDir = new File(buildDir, "dist")
-        ext.libsDir = new File(buildDir, "libs")
+        def distDir = new File(buildDir, "dist")
 
-        ext.jdk = System.env.'JAVA_HOME'
+        if (jdk != null && !jdk.isEmpty()) {
+            println "Using JDK '${jdk}'"
+            println "Output dir: '${distDir.absolutePath}'"
+            println "Source dir: '${libsDir.absolutePath}'"
 
-        if (ext.jdk != null && !ext.jdk.isEmpty()) {
-            println "Using JDK '${ext.jdk}'"
-            println "Output dir: '${ext.distDir.absolutePath}'"
-            println "Source dir: '${ext.libsDir.absolutePath}'"
-
-            ext.javafxpackagerCmd = "${ext.jdk}/bin/javafxpackager -deploy -v -native -name SlideshowFX -outdir \"${ext.distDir.absolutePath}\" -outfile SlideshowFX -srcdir \"${ext.libsDir.absolutePath}\" -appclass com.twasyl.slideshowfx.app.SlideshowFX".execute()
-            ext.javafxpackagerCmd.in.eachLine {line -> println line}
-            ext.javafxpackagerCmd.err.eachLine {line -> println line}
-            ext.javafxpackagerCmd.waitFor()
+            def javafxpackagerCmd = "${jdk}/bin/javafxpackager -deploy -native -name SlideshowFX -outdir \"${distDir.absolutePath}\" -outfile SlideshowFX -srcdir \"${libsDir.absolutePath}\" -appclass com.twasyl.slideshowfx.app.SlideshowFX".execute()
+            javafxpackagerCmd.in.eachLine {line -> println line}
+            javafxpackagerCmd.err.eachLine {line -> println line}
+            javafxpackagerCmd.waitFor()
         }
     }
 

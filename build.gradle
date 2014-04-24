@@ -11,6 +11,18 @@ def velocity = fileTree(dir: allLibs, include: 'Velocity/*.jar')
 def vertx = fileTree(dir: allLibs, include: 'Vert.x/*.jar')		
 def zxing = fileTree(dir: allLibs, include: 'ZXing/*.jar')
 
+def getBuildNumber() {
+	ext.gitCommitIdCmd = "git --work-tree=\"${rootDir.absolutePath}\" --git-dir=\"${rootDir.absolutePath}${File.separator}.git\" rev-parse --short HEAD"
+    ext.gitCommitId = ext.gitCommitIdCmd.execute().text.trim()
+
+    ext.isRepoDirtyCmd = "git --work-tree=\"${rootDir.absolutePath}\" --git-dir=\"${rootDir.absolutePath}${File.separator}.git\" status 2"
+    ext.isRepoDirty = !ext.isRepoDirtyCmd.execute().text.trim().contains("nothing to commit, working directory clean");
+
+    ext.appVersion = "${ext.gitCommitId}${ext.isRepoDirty ? '-unofficial' : ''}";
+
+    return ext.appVersion
+}
+
 subprojects {
 	apply plugin: 'java'
 	sourceCompatibility = 1.8
@@ -93,23 +105,6 @@ project(':SlideshowFX-textile') {
 
 project(':SlideshowFX-app') {
 
-	task buildVersionNumber << {
-	    ext.gitCommitIdCmd = "git rev-parse --short HEAD"
-	    ext.gitCommitId = ext.gitCommitIdCmd.execute().text.trim()
-
-	    ext.isRepoDirtyCmd = "git status 2"
-	    ext.isRepoDirty = !ext.isRepoDirtyCmd.execute().text.trim().contains("nothing to commit, working directory clean");
-
-	    ext.appVersion = ext.gitCommitId + (ext.isRepoDirty ? "-unofficial" : "");
-
-	    ext.metaInfFolder = new File(project.buildDir, 'classes/main/META-INF')
-
-		if(!ext.metaInfFolder.exists()) ext.metaInfFolder.mkdirs();
-
-	    ext.versionFile = new File(ext.metaInfFolder, 'build.info')
-		ext.versionFile.text = 'revision=' + ext.appVersion
-	}
-
     task jar(overwrite: true) << {
 
         ext.libsDir = new File(buildDir, "libs")
@@ -119,22 +114,7 @@ project(':SlideshowFX-app') {
 
         	if(!ext.libsDir.exists()) ext.libsDir.mkdirs()
 
-        	ext.classpath = ""
-        	
-        	fileTree(dir: ext.libsDir, include: '*.jar', exclude: archivesBaseName + ".jar").each {
-        		f ->
-        		ext.classpath += f.name + ","
-        	}
-
-        	ext.classpath += "."
-
-        	println "${ext.jdk}/bin/javafxpackager -createjar -v -appclass com.twasyl.slideshowfx.app.SlideshowFX -classpath ${ext.classpath} -outdir \"${ext.libsDir.absolutePath}\" -outfile ${project.archivesBaseName} -srcdir \"${project.buildDir.absolutePath}/classes/main\" -srcdir \"${project.buildDir.absolutePath}/resources/main\""
-            ext.javafxpackagerCmd = "${ext.jdk}/bin/javafxpackager -createjar -v -appclass com.twasyl.slideshowfx.app.SlideshowFX -classpath ${ext.classpath} -outdir \"${ext.libsDir.absolutePath}\" -outfile ${project.archivesBaseName} -srcdir \"${project.buildDir.absolutePath}/classes/main\" -srcdir \"${project.buildDir.absolutePath}/resources/main\"".execute()
-            ext.javafxpackagerCmd.in.eachLine {line -> println line}
-            ext.javafxpackagerCmd.err.eachLine {line -> println line}
-            ext.javafxpackagerCmd.waitFor()
-
-            // Copying libs
+        	// Copying libs
             copy {
             	from(new File(project(':SlideshowFX-markup').libsDir, project(':SlideshowFX-markup').archivesBaseName + ".jar"))
 				from(felix.files)
@@ -148,12 +128,32 @@ project(':SlideshowFX-app') {
 
             	into(ext.libsDir)
             }
+
+        	ext.classpath = ""
+        	
+        	fileTree(dir: ext.libsDir, include: '*.jar', exclude: archivesBaseName + ".jar").each {
+        		f ->
+        		ext.classpath += f.name + ","
+        	}
+
+        	ext.classpath += "."
+
+			ext.manifestAttrs = "Implementation-Version=${getBuildNumber()}"
+
+        	ext.sourceDir = new File(project.buildDir, 'classes/main')
+        	ext.sourcesArguments = "-srcdir \"${ext.sourceDir.absolutePath}\" -srcfiles com META-INF"
+
+        	ext.sourceDir = new File(project.buildDir, 'resources/main')
+			ext.sourcesArguments += " -srcdir \"${ext.sourceDir.absolutePath}\" -srcfiles com"
+
+            ext.javafxpackagerCmd = "\"${ext.jdk}/bin/javafxpackager\" -createjar -v -appclass com.twasyl.slideshowfx.app.SlideshowFX -classpath ${ext.classpath} -manifestAttrs \"${ext.manifestAttrs}\" -outdir \"${ext.libsDir.absolutePath}\" -outfile ${project.archivesBaseName} ${ext.sourcesArguments}".execute()
+            ext.javafxpackagerCmd.in.eachLine {line -> println line}
+            ext.javafxpackagerCmd.err.eachLine {line -> println line}
+            ext.javafxpackagerCmd.waitFor()
         }
     }
-    tasks['jar'].dependsOn 'classes'
-	tasks['jar'].dependsOn ':SlideshowFX-markup:jar'
 
-   task buildJavaFXBundle(dependsOn: ':SlideshowFX-app:jar') << {
+    task buildJavaFXBundle << {
         ext.distDir = new File(buildDir, "dist")
         ext.libsDir = new File(buildDir, "libs")
 
@@ -183,10 +183,12 @@ project(':SlideshowFX-app') {
 		compile zxing
 
 		testCompile  junit
-	}
+	}	
 
-	tasks['compileJava'].dependsOn 'buildVersionNumber'
-	
+	tasks['jar'].dependsOn 'classes'
+	tasks['jar'].dependsOn ':SlideshowFX-markup:jar'
+	tasks['buildJavaFXBundle'].dependsOn 'jar'
+	tasks['assemble'].dependsOn 'buildJavaFXBundle'
 }
 
 task installMarkupPlugins << {

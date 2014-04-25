@@ -184,4 +184,6 @@ public class SlideshowFX extends Application {
     public static final ObjectProperty<SlideShowScene> slideShowSceneProperty() { return slideShowScene; }
     public static final SlideShowScene getSlideShowScene() { return slideShowSceneProperty().get(); }
     public static final void setSlideShowScene(SlideShowScene scene) { slideShowSceneProperty().set(scene); }
+
+    public static void main(String[] args) { SlideshowFX.launch(args); }
 }

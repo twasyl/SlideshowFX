@@ -141,31 +141,38 @@ project(':SlideshowFX-app') {
 
 			def manifestAttrs = "Implementation-Version=${getBuildNumber()}"
 
-        	def sourceDir = new File(project.buildDir, 'classes/main')
-        	def sourcesArguments = "-srcdir \"${sourceDir.absolutePath}\" -srcfiles com"
+			def javafxpackager = exec {
+				workingDir "${project.projectDir.absolutePath}"
 
-        	sourceDir = new File(project.buildDir, 'resources/main')
-			sourcesArguments += " -srcdir \"${sourceDir.absolutePath}\" -srcfiles com"
-
-            def javafxpackagerCmd = "\"${jdk}/bin/javafxpackager\" -createjar -appclass com.twasyl.slideshowfx.app.SlideshowFX -classpath ${classpath} -manifestAttrs \"${manifestAttrs}\" -outdir \"${libsDir.absolutePath}\" -outfile ${project.archivesBaseName} ${sourcesArguments}".execute()
-            javafxpackagerCmd.in.eachLine {line -> println line}
-            javafxpackagerCmd.err.eachLine {line -> println line}
-            javafxpackagerCmd.waitFor()
+				commandLine "${jdk}/bin/javafxpackager",
+							"-createjar", "-v",
+							"-appclass", "com.twasyl.slideshowfx.app.SlideshowFX",
+							"-classpath", "${classpath}",
+							"-manifestAttrs", "${manifestAttrs}",
+							"-outdir", "${buildDir}${File.separator}${libsDir.name}",
+							"-outfile", "${project.archivesBaseName}",
+							"-srcdir", "${buildDir.name}/classes/main", "-srcfiles", "com",
+							"-srcdir", "${buildDir.name}/resources/main", "-srcfiles", "com"
+			}
         }
     }
 
     task buildJavaFXBundle << {
-        def distDir = new File(buildDir, "dist")
 
         if (jdk != null && !jdk.isEmpty()) {
-            println "Using JDK '${jdk}'"
-            println "Output dir: '${distDir.absolutePath}'"
-            println "Source dir: '${libsDir.absolutePath}'"
 
-            def javafxpackagerCmd = "${jdk}/bin/javafxpackager -deploy -native -name SlideshowFX -outdir \"${distDir.absolutePath}\" -outfile SlideshowFX -srcdir \"${libsDir.absolutePath}\" -appclass com.twasyl.slideshowfx.app.SlideshowFX".execute()
-            javafxpackagerCmd.in.eachLine {line -> println line}
-            javafxpackagerCmd.err.eachLine {line -> println line}
-            javafxpackagerCmd.waitFor()
+            def javafxpackager = exec {
+				workingDir "${project.projectDir.absolutePath}"
+
+				commandLine "${jdk}/bin/javafxpackager",
+							"-deploy", 
+							"-native",
+							"-name", "SlideshowFX",
+							"-outdir", "${buildDir.name}${File.separator}dist",
+							"-outfile", "SlideshowFX",
+							"-srcdir", "${buildDir.name}${File.separator}${libsDir.name}",
+							"-appclass", "com.twasyl.slideshowfx.app.SlideshowFX"
+			}
         }
     }
 
@@ -191,15 +198,15 @@ project(':SlideshowFX-app') {
 
 task installMarkupPlugins << {
 	
-	ext.pluginsFoder = new File(projectDir, 'plugins')
-	if(!ext.pluginsFoder.exists()) ext.pluginsFoder.mkdir()
+	def pluginsFoder = new File(projectDir, 'plugins')
+	if(!pluginsFoder.exists()) pluginsFoder.mkdir()
 
 	copy {
 		from(new File(project(':SlideshowFX-html').libsDir, project(':SlideshowFX-html').archivesBaseName + ".jar"))
 		from(new File(project(':SlideshowFX-markdown').libsDir, project(':SlideshowFX-markdown').archivesBaseName + ".jar"))
 		from(new File(project(':SlideshowFX-textile').libsDir, project(':SlideshowFX-textile').archivesBaseName + ".jar"))
 
-		into(ext.pluginsFoder)
+		into (pluginsFoder)
 	}
 }
 

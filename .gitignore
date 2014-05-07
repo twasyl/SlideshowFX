@@ -3,6 +3,8 @@ src/test/resources/iCode
 felix-cache
 plugins
 .idea/
+*.iml
 **/*.iml
 .gradle/
+build
 **/build/

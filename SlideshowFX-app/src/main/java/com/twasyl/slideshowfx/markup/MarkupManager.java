@@ -44,7 +44,8 @@ public class MarkupManager {
         Map configurationMap = new HashMap<>();
         configurationMap.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, IMarkup.class.getPackage().getName() + "; 1.0.0");
         configurationMap.put(Constants.FRAMEWORK_STORAGE_CLEAN, "true");
-        configurationMap.put("org.osgi.osgiFramework.storage.clean", "onFirstInit");
+        configurationMap.put("org.osgi.framework.storage.clean", "onFirstInit");
+        configurationMap.put("org.osgi.framework.storage", System.getProperty("user.home") + "/.SlideshowFX/felix-cache");
         configurationMap.put("felix.auto.deploy.action", "install,start");
 
         // Starting OSGi

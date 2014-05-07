@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 public class MarkupManager {
     private static final Logger LOGGER = Logger.getLogger(MarkupManager.class.getName());
 
-    private static final File pluginsDirectory = new File("./plugins");
+    private static final File pluginsDirectory = new File(System.getProperty("user.home") + "/.SlideshowFX/plugins");
     private static Framework osgiFramework;
     private static ServiceTracker serviceTracker;
 
@@ -74,7 +74,7 @@ public class MarkupManager {
               .forEach(file -> {
                   Bundle bundle = null;
                   try {
-                      bundle = osgiFramework.getBundleContext().installBundle(String.format("file:%1$s/%2$s", pluginsDirectory.getName(), file.getName()));
+                      bundle = osgiFramework.getBundleContext().installBundle(String.format("file:%1$s/%2$s", pluginsDirectory.getAbsolutePath(), file.getName()));
                   } catch (BundleException e) {
                       LOGGER.log(Level.WARNING, "Can not install bundle", e);
                   }

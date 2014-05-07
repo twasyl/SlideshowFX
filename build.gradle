@@ -1,41 +1,20 @@
-buildscript {
-    dependencies {
-        classpath files('gradle-javafx.jar')
-    }
-}
+/*
+ * Copyright 2014 Thierry Wasylczenko
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 apply plugin: 'idea'
-
-/*idea {
-	project {
-		languageLevel '1.8'
-
-		iws {
-			withXml {
-				provider ->
-					 def node = provider.node.component.find { it.@name == 'RunManager' }
-
-					 def runConfiguration = node.appendNode("configuration", ["default:true", "name:SlideshowFX", "type:Application", "factoryName:Application", "nameIsGenerated:true"])
-					 runConfiguration {
-					 	appendNode("option", ["name:MAIN_CLASS_NAME", "value:com.twasyl.slideshowfx.app.SlideshowFX"])
-					 	appendNode("option", ["name:VM_PARAMETERS", "value:-Djava.library.path=lib/Leap"])
-					 	appendNode("option", ["name:PROGRAM_PARAMETERS", "value:"])
-					 	appendNode("option", ["name:WORKING_DIRECTORY", "value:file://\$PROJECT_DIR\$"])
-					 	appendNode("option", ["name:ALTERNATIVE_JRE_PATH_ENABLED", "value:false"])
-					 	appendNode("option", ["name:ALTERNATIVE_JRE_PATH", "value:"])
-					 	appendNode("option", ["name:ENABLE_SWING_INSPECTOR", "value:false"])
-					 	appendNode("option", ["name:ENV_VARIABLES"])
-					 	appendNode("option", ["name:PASS_PARENT_ENVS", "value:true"])
-					 	appendNode("module", ["name:SlideshowFX-app"])
-					 	appendNode("envs")
-					 	appendNode("RunnerSettings", ["RunnerId:Run"])
-					 	appendNode("ConfigurationWrapper", ["RunnerId:Run"])
-					 	appendNode("method")
-					 }
-			}	
-		}
-	}
-}*/
 
 ext {
 	allLibs = new File(rootDir, '/lib')
@@ -147,37 +126,8 @@ project(':SlideshowFX-textile') {
 }
 
 project(':SlideshowFX-app') {
-	apply plugin: "javafx"
 
-	createjar {
-		// Copying libs
-        copy {
-        	from(new File(project(':SlideshowFX-markup').libsDir, project(':SlideshowFX-markup').archivesBaseName + ".jar"))
-			from(felix.files)
-			from(json.files)
-			from(jsoup.files)
-			from(leapmotion.files)
-			from(scribe.files)
-			from(velocity.files)
-			from(vertx.files)
-			from(zxing.files)
-
-        	into(libsDir)
-        }
-
-        fileTree(dir: libsDir, include: '*.jar', exclude: archivesBaseName + ".jar").each {
-    		f ->
-    		classpath(f.name)
-    	}
-
-        classpath(".")
-
-        manifestAttribute("Implementation-Version", "${getBuildNumber()}")
-
-        appclass "com.twasyl.slideshowfx.app.SlideshowFX"
-	}
-
-	/*task jar(overwrite: true) << {
+	task jar(overwrite: true) << {
 
         if (jdk != null && !jdk.isEmpty()) {
 
@@ -224,7 +174,7 @@ project(':SlideshowFX-app') {
 			}
         }
     }
-*/
+
     task buildJavaFXBundle << {
 
         if (jdk != null && !jdk.isEmpty()) {
@@ -258,15 +208,15 @@ project(':SlideshowFX-app') {
 		testCompile  junit
 	}	
 
-	//tasks['jar'].dependsOn 'classes'
-	//tasks['jar'].dependsOn ':SlideshowFX-markup:jar'
+	tasks['jar'].dependsOn 'classes'
+	tasks['jar'].dependsOn ':SlideshowFX-markup:jar'
 	tasks['buildJavaFXBundle'].dependsOn 'jar'
 	tasks['assemble'].dependsOn 'buildJavaFXBundle'
 }
 
 task installMarkupPlugins << {
-	
-	def pluginsFoder = new File(projectDir, 'plugins')
+
+	def pluginsFoder = new File(System.getProperty("user.home"), './SlideshowFX/plugins')
 	if(!pluginsFoder.exists()) pluginsFoder.mkdir()
 
 	copy {
@@ -274,14 +224,10 @@ task installMarkupPlugins << {
 		from(new File(project(':SlideshowFX-markdown').libsDir, project(':SlideshowFX-markdown').archivesBaseName + ".jar"))
 		from(new File(project(':SlideshowFX-textile').libsDir, project(':SlideshowFX-textile').archivesBaseName + ".jar"))
 
-		into (pluginsFoder)
+		into(pluginsFoder)
 	}
 }
 
 installMarkupPlugins.dependsOn 'SlideshowFX-html:jar'
 installMarkupPlugins.dependsOn 'SlideshowFX-markdown:jar'
 installMarkupPlugins.dependsOn 'SlideshowFX-textile:jar'
-
-task testMe << {
-	idea.project.ipr.withXml
-}

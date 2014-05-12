@@ -228,6 +228,10 @@ task installMarkupPlugins << {
 	}
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.12'
+}
+
 installMarkupPlugins.dependsOn 'SlideshowFX-html:jar'
 installMarkupPlugins.dependsOn 'SlideshowFX-markdown:jar'
 installMarkupPlugins.dependsOn 'SlideshowFX-textile:jar'

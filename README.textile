@@ -1,4 +1,5 @@
-!https://drone.io/bitbucket.org/twasyl/slideshowfx/status.png!
+Build on drone.io : !https://drone.io/bitbucket.org/twasyl/slideshowfx/status.png!
+Build on Shippable : !https://api.shippable.com/projects/53761b57d5084086002f3244/badge/master!:https://www.shippable.com/projects/53761b57d5084086002f3244
 
 h1. What is SlideshowFX ?
 

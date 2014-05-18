@@ -21,16 +21,14 @@ import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
 import com.twasyl.slideshowfx.exceptions.PresentationException;
 import com.twasyl.slideshowfx.utils.ZipUtils;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Ignore
 public class ZipTest {
 
     private static final Logger LOGGER = Logger.getLogger(ZipTest.class.getName());

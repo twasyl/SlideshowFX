@@ -2,11 +2,13 @@ package com.twasyl.slideshowfx.Jsoup;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author Thierry Wasylczenko
  */
+@Ignore
 public class JsoupTest {
 
     @Test

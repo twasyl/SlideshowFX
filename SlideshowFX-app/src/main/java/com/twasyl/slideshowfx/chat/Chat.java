@@ -273,11 +273,11 @@ public class Chat {
             public void handle(HttpServerRequest httpServerRequest) {
                 if(HTTP_CLIENT_CHAT_PATH.equals(httpServerRequest.path())) {
                     // Read the chat HTML page, parse it and send it to the client
-                    try {
-                        final File extractedChatFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "sfx-chatFile.html");
-                        LOGGER.fine("Chat HTML file generated: " + extractedChatFile.getAbsolutePath());
-                        final FileReader chatPageReader = new FileReader( new File(getClass().getResource("/com/twasyl/slideshowfx/html/chat.html").toURI()));
-                        final FileWriter writer = new FileWriter(extractedChatFile);
+                    final File extractedChatFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "sfx-chatFile.html");
+                    LOGGER.fine("Chat HTML file generated: " + extractedChatFile.getAbsolutePath());
+
+                    try (final InputStreamReader chatPageReader = new InputStreamReader(getClass().getResourceAsStream("/com/twasyl/slideshowfx/html/chat.html"));
+                         final FileWriter writer = new FileWriter(extractedChatFile)) {
 
                         extractedChatFile.deleteOnExit();
 
@@ -289,9 +289,6 @@ public class Chat {
                         Velocity.evaluate(context, writer, "", chatPageReader);
 
                         writer.flush();
-                        writer.close();
-
-                        chatPageReader.close();
 
                         httpServerRequest.response().sendFile(extractedChatFile.getAbsolutePath());
                     } catch (Exception e) {
@@ -299,11 +296,11 @@ public class Chat {
                     }
                 } else if(HTTP_PRESENTER_CHAT.equals(httpServerRequest.path())) {
                     // Read the chat presenter HTML page, parse it and send it to the client
-                    try {
-                        final File extractedChatFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "sfx-chatPresenterFile.html");
-                        LOGGER.fine("Chat HTML file generated: " + extractedChatFile.getAbsolutePath());
-                        final FileReader chatPageReader = new FileReader( new File(getClass().getResource("/com/twasyl/slideshowfx/html/presenter.html").toURI()));
-                        final FileWriter writer = new FileWriter(extractedChatFile);
+                    final File extractedChatFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "sfx-chatPresenterFile.html");
+                    LOGGER.fine("Chat HTML file generated: " + extractedChatFile.getAbsolutePath());
+
+                    try(final InputStreamReader chatPageReader = new InputStreamReader(new InputStream(getClass().getResourceAsStream("/com/twasyl/slideshowfx/html/presenter.html")));
+                        final FileWriter writer = new FileWriter(extractedChatFile)) {
 
                         extractedChatFile.deleteOnExit();
 
@@ -315,9 +312,6 @@ public class Chat {
                         Velocity.evaluate(context, writer, "", chatPageReader);
 
                         writer.flush();
-                        writer.close();
-
-                        chatPageReader.close();
 
                         httpServerRequest.response().sendFile(extractedChatFile.getAbsolutePath());
                     } catch (Exception e) {

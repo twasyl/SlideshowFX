@@ -299,7 +299,7 @@ public class Chat {
                     final File extractedChatFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "sfx-chatPresenterFile.html");
                     LOGGER.fine("Chat HTML file generated: " + extractedChatFile.getAbsolutePath());
 
-                    try(final InputStreamReader chatPageReader = new InputStreamReader(new InputStream(getClass().getResourceAsStream("/com/twasyl/slideshowfx/html/presenter.html")));
+                    try(final InputStreamReader chatPageReader = new InputStreamReader(getClass().getResourceAsStream("/com/twasyl/slideshowfx/html/presenter.html"));
                         final FileWriter writer = new FileWriter(extractedChatFile)) {
 
                         extractedChatFile.deleteOnExit();

@@ -16,7 +16,7 @@
 
 package com.twasyl.slideshowfx.markup.textile;
 
-import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.markup.AbstractMarkup;
 import org.eclipse.mylyn.internal.wikitext.textile.core.TextileContentState;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.IdGenerator;
@@ -31,9 +31,14 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 /**
+ * This class implements the Textile syntax.
+ * This markup language is identified byt the code <code>TEXTILE</code> which is returned by {@link com.twasyl.slideshowfx.markup.IMarkup#getCode()}.
+ *
  * @author Thierry Wasylczenko
+ * @since 1.0
+ * @version 1.0
  */
-public class TextileMarkup implements IMarkup {
+public class TextileMarkup extends AbstractMarkup {
     // The generation strategy generates IDs using the current timestamp
     final IdGenerationStrategy idGenerationStrategy = new IdGenerationStrategy() {
         @Override
@@ -59,16 +64,16 @@ public class TextileMarkup implements IMarkup {
         }
     };
 
-    @Override
-    public String getCode() {
-        return "TEXTILE";
-    }
+    public TextileMarkup() { super("TEXTILE", "Textile"); }
 
-    @Override
-    public String getName() {
-        return "Textile";
-    }
-
+    /**
+     * This methods convert the given <code>markupString</code> to HTML.
+     * This method assumes the given String is in the correct textile format.
+     *
+     * @param markupString The string written in the markup syntax to convert as HTML.
+     * @return the HTML representation of the textile string.
+     * @throws IllegalArgumentException If <code>markupString</code> is null, this exception is thrown.
+     */
     @Override
     public String convertAsHtml(String markupString) throws IllegalArgumentException {
         if(markupString == null) throw new IllegalArgumentException("Can not convert " + getName() + " to HTML : the String is null");

@@ -18,17 +18,23 @@ package com.twasyl.slideshowfx.markup;
 
 /**
  * Defines the contract to be considered as a supported markup language for SlideshowFX.
+ * A supported markup language allows the user to define the content of each slides instead of writing HTML code directly.
+ * As supported language, a mechanism has to be provided in order to convert the markup language to HTML.
+ *
  * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since 1.0
  */
 public interface IMarkup {
     /**
-     * Get the code for the markup.
+     * Get the code for the markup. The code uniquely identifies the markup language in the SlideshowFX application. It
+     * is used for example used to retrieve the correct bundle to call when the user decides to define the slide content.
      * @return The code of the markup.
      */
     String getCode();
 
     /**
-     * Get the name of the markup.
+     * Get the name of the markup. The name of the markup is only informative and is not used in the application for deterministic choices.
      * @return The name of the markup.
      */
     String getName();

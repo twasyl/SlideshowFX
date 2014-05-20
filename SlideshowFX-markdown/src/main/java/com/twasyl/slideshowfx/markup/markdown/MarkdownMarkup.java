@@ -17,23 +17,28 @@
 package com.twasyl.slideshowfx.markup.markdown;
 
 import com.github.rjeschke.txtmark.Processor;
-import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.markup.AbstractMarkup;
 
 /**
+ * This class implements the Markdown syntax.
+ * This markup language is identified byt the code <code>MARKDOWN</code> which is returned by {@link com.twasyl.slideshowfx.markup.IMarkup#getCode()}.
+ *
  * @author Thierry Wasylczenko
+ * @since 1.0
+ * @version 1.0
  */
-public class MarkdownMarkup implements IMarkup {
+public class MarkdownMarkup extends AbstractMarkup {
 
-    @Override
-    public String getCode() {
-        return "MARKDOWN";
-    }
+    public MarkdownMarkup() { super("MARKDOWN", "Markdown"); }
 
-    @Override
-    public String getName() {
-        return "Markdown";
-    }
-
+    /**
+     * This methods convert the given <code>markupString</code> to HTML.
+     * This method assumes the given String is in the correct mardodwn format.
+     *
+     * @param markupString The string written in the markup syntax to convert as HTML.
+     * @return the HTML representation of the markdown string.
+     * @throws IllegalArgumentException If <code>markupString</code> is null, this exception is thrown.
+     */
     @Override
     public String convertAsHtml(String markupString) throws IllegalArgumentException {
         if(markupString == null) throw new IllegalArgumentException("Can not convert " + getName() + " to HTML : the String is null");

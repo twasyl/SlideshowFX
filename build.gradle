@@ -214,15 +214,32 @@ project(':SlideshowFX-app') {
 
 task installMarkupPlugins << {
 
-	def pluginsFoder = new File(System.getProperty("user.home"), './SlideshowFX/plugins')
-	if(!pluginsFoder.exists()) pluginsFoder.mkdir()
+    def markupProject = project(':SlideshowFX-html')
+    def htmlMarkupFile = new File(markupProject.libsDir, markupProject.archivesBaseName + ".jar")
+    if(!htmlMarkupFile.exists()) throw new GradleException("The HTML markup JAR does not exist")
+
+    markupProject = project(':SlideshowFX-markdown')
+    def markdownMarkupFile = new File(markupProject.libsDir, markupProject.archivesBaseName + ".jar")
+    if(!markdownMarkupFile.exists()) throw new GradleException("The markdown markup JAR does not exist")
+
+    markupProject = project(':SlideshowFX-textile')
+    def textileMarkupFile = new File(markupProject.libsDir, markupProject.archivesBaseName + ".jar")
+    if(!textileMarkupFile.exists()) throw new GradleException("The textile  markup JAR does not exist")
+
+	def pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
+	if(!pluginsFolder.exists()) pluginsFolder.mkdirs()
+
+    println "The following files will be copied to ${pluginsFolder.absolutePath}"
+    println "- ${htmlMarkupFile.absolutePath}"
+    println "- ${markdownMarkupFile.absolutePath}"
+    println "- ${textileMarkupFile.absolutePath}"
 
 	copy {
-		from(new File(project(':SlideshowFX-html').libsDir, project(':SlideshowFX-html').archivesBaseName + ".jar"))
-		from(new File(project(':SlideshowFX-markdown').libsDir, project(':SlideshowFX-markdown').archivesBaseName + ".jar"))
-		from(new File(project(':SlideshowFX-textile').libsDir, project(':SlideshowFX-textile').archivesBaseName + ".jar"))
+		from htmlMarkupFile
+		from markdownMarkupFile
+		from textileMarkupFile
 
-		into(pluginsFoder)
+		into pluginsFolder
 	}
 }
 
@@ -230,6 +247,6 @@ task wrapper(type: Wrapper) {
     gradleVersion = '1.12'
 }
 
-installMarkupPlugins.dependsOn 'SlideshowFX-html:jar'
-installMarkupPlugins.dependsOn 'SlideshowFX-markdown:jar'
-installMarkupPlugins.dependsOn 'SlideshowFX-textile:jar'
+installMarkupPlugins.dependsOn ':SlideshowFX-html:assemble'
+installMarkupPlugins.dependsOn ':SlideshowFX-markdown:assemble'
+installMarkupPlugins.dependsOn ':SlideshowFX-textile:assemble'

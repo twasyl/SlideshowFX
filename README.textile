@@ -1,7 +1,4 @@
-Build on drone.io : !https://drone.io/bitbucket.org/twasyl/slideshowfx/status.png!
-Build on Shippable : !https://api.shippable.com/projects/53761b57d5084086002f3244/badge/master!:https://www.shippable.com/projects/53761b57d5084086002f3244
-
-h1. What is SlideshowFX ?
+h1. What is SlideshowFX ? !https://api.shippable.com/projects/53761b57d5084086002f3244/badge/master!:https://www.shippable.com/projects/53761b57d5084086002f3244
 
 p. SlideshowFX is a tool allowing you to create slideshow using HTML5 frameworks. Maybe have you heard about "reveal.js":http://lab.hakim.se/reveal-js/ or "impress.js":https://github.com/bartaz/impress.js/ that allow you  to create beautiful slideshows, entirely customizable by using HTML5 and CSS3 technologies.
 

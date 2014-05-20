@@ -3,12 +3,10 @@ build_environment: Ubuntu 13.10
 language: java
 
 script:
- - gradle assemble -x test
+    - gradle assemble -x test
 
 jdk:
- - oraclejdk8
+    - oraclejdk8
 
  notifications:
-    email:
-        on_success: never
-        on_failure: always
+    email: false

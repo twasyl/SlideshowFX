@@ -66,6 +66,14 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *  This class is the controller of the <code>Slideshow.fxml</code> file. It defines all actions possible inside the view
+ *  represented by the FXML.
+ *  
+ *  @author Thierry Wasyczenko
+ *  @version 1.0
+ *  @since 1.0
+ */
 public class SlideshowFXController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXController.class.getName());
 
@@ -127,7 +135,14 @@ public class SlideshowFXController implements Initializable {
     @FXML private TextField chatPort;
     @FXML private TextField twitterHashtag;
     @FXML private CheckBox leapMotionEnabled;
+    @FXML private Button defineContent;
 
+    /**
+     * Loads a SlideshowFX template. This method displays an open dialog which only allows to open template files (with
+     * .sfxt extension) and then call the {@link #openTemplateOrPresentation(java.io.File)} method.
+     *
+     * @param event the event that triggered the call.
+     */
     @FXML private void loadTemplate(ActionEvent event) {
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.TEMPLATE_FILTER);
@@ -144,6 +159,12 @@ public class SlideshowFXController implements Initializable {
         }
     }
 
+    /**
+     * Open a SlideshowFX presentation. This method displays an open dialog which only allows to open presentation files
+     * (with the .sfx extension) and then call {@link #openTemplateOrPresentation(java.io.File)} method.
+     *
+     * @param event the event that triggered the call.
+     */
     @FXML private void openPresentation(ActionEvent event) {
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
@@ -163,7 +184,7 @@ public class SlideshowFXController implements Initializable {
     /**
      * Open the dataFile. If the name ends with <code>.sfx</code> the file is considered as a presentation,
      * if it ends with <code>.sfxt</code> it is considered as a template.
-     * @param dataFile
+     * @param dataFile the file corresponding to either a template or a presentation.
      * @throws java.lang.IllegalArgumentException If the file is null.
      * @throws java.io.FileNotFoundException If dataFile does not exist.
      * @throws java.lang.IllegalAccessException If the file can not be accessed.
@@ -205,11 +226,35 @@ public class SlideshowFXController implements Initializable {
         }
     }
 
+    /**
+     * This method is called by the <code>Define</code> button of the FXML. The selected syntax is retrieved as well as the content.
+     * The treatment is then delegated to the {@link #updateSlide(String, String)} method.
+     *
+     * @param event
+     * @throws TransformerException
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     */
     @FXML private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
         RadioButton selectedMarkup = (RadioButton) this.markupContentType.getSelectedToggle();
         this.updateSlide((String) selectedMarkup.getUserData(), this.fieldValueText.getText());
     }
 
+    /**
+     * This method updates a slide of the presentation. It takes the <code>contentCode</code> to identifies which syntax
+     * is used for the <code>originalContent</code>.
+     * The original content is converted in HTML and the slide element is updated. The presentation is then saved temporary.
+     * The content is send to the page by calling the {@link com.twasyl.slideshowfx.builder.template.Template#getContentDefinerMethod()}
+     * with the HTLM content converted in Base64.
+     * A screenshot of the slide is taken to update the menu of available slides.
+     * @param contentCode
+     * @param originalContent
+     * @throws TransformerException
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     */
     private void updateSlide(final String contentCode, final String originalContent) throws TransformerException, IOException, ParserConfigurationException, SAXException {
         final String htmlContent = MarkupManager.convertToHtml(contentCode, originalContent);
 
@@ -239,6 +284,12 @@ public class SlideshowFXController implements Initializable {
         updateSlideSplitMenu();
     }
 
+    /**
+     * Copy the slide, update the menu of available slides and reload the presentation.
+     * The copy is delegated to {@link com.twasyl.slideshowfx.builder.PresentationBuilder#duplicateSlide(com.twasyl.slideshowfx.builder.Slide)}.
+     *
+     * @param event
+     */
     @FXML private void copySlide(ActionEvent event) {
         final String slideId = (String) this.browser.getEngine().executeScript(this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
 
@@ -250,6 +301,11 @@ public class SlideshowFXController implements Initializable {
         this.browser.getEngine().reload();
     }
 
+    /**
+     * Delete a slide from the presentation. The deletion is delegated to {@link com.twasyl.slideshowfx.builder.PresentationBuilder#deleteSlide(String)}.
+     *
+     * @param event
+     */
     @FXML private void deleteSlide(ActionEvent event) {
         String slideId = this.browser.getEngine().executeScript(this.builder.getTemplate().getGetCurrentSlideMethod() + "();").toString();
 
@@ -265,13 +321,22 @@ public class SlideshowFXController implements Initializable {
         }
     }
 
-    @FXML
-    private void reload(ActionEvent event) {
+    /**
+     * Simply releod the presentation by calling {@link javafx.scene.web.WebEngine#reload()}.
+     *
+     * @param event
+     */
+    @FXML private void reload(ActionEvent event) {
         this.browser.getEngine().reload();
     }
 
-    @FXML
-    private void save(ActionEvent event) {
+    /**
+     * Save the current presentation. If the presentation has never been saved a save dialog is displayed.
+     * Then the presentation is saved where the user has chosen or opened the presentation.
+     * The saving is delegated to {@link com.twasyl.slideshowfx.builder.PresentationBuilder#savePresentation(java.io.File)}
+     * @param event
+     */
+    @FXML private void save(ActionEvent event) {
         File presentationArchive = null;
         if(this.builder.getPresentationArchiveFile() == null) {
             FileChooser chooser = new FileChooser();
@@ -288,8 +353,13 @@ public class SlideshowFXController implements Initializable {
         }
     }
 
-    @FXML
-    private void saveAs(ActionEvent event) {
+    /**
+     * Saves a copy of the existing presentation. A save dialog is displayed to the user.
+     * The saving is delegated to {@link com.twasyl.slideshowfx.builder.PresentationBuilder#savePresentation(java.io.File)}.
+     *
+     * @param event
+     */
+    @FXML private void saveAs(ActionEvent event) {
         File presentationArchive = null;
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
@@ -305,8 +375,11 @@ public class SlideshowFXController implements Initializable {
         }
     }
 
-    @FXML
-    private void print(ActionEvent event) {
+    /**
+     * Print the presentation displayed.
+     * @param event
+     */
+    @FXML private void print(ActionEvent event) {
         PrinterJob job = PrinterJob.createPrinterJob();
 
         if (job != null) {
@@ -580,6 +653,11 @@ public class SlideshowFXController implements Initializable {
                     markupContentType.getToggles().add(button);
                     markupContentTypeBox.getChildren().add(button);
                 });
+        
+
+        this.defineContent.disableProperty().bind(this.slideNumber.textProperty().isEmpty()
+                .or(this.fieldName.textProperty().isEmpty())
+                .or(this.markupContentType.selectedToggleProperty().isNull()));
     }
 
     /**

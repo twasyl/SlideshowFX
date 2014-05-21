@@ -223,7 +223,7 @@
                 </HBox>
                 <VBox spacing="10">
                     <TextArea fx:id="fieldValueText" prefColumnCount="50" prefRowCount="25" wrapText="true" />
-                    <Button text="Define" onAction="#updateSlideWithText" />
+                    <Button fx:id="defineContent" text="Define" onAction="#updateSlideWithText" />
                 </VBox>
             </VBox>
         </VBox>

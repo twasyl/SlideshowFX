@@ -32,6 +32,15 @@
     <top>
         <VBox>
             <MenuBar>
+                <Menu text="File">
+                    <MenuItem text="New" onAction="#loadTemplate" />
+                    <MenuItem text="Open" onAction="#openPresentation" />
+                    <SeparatorMenuItem />
+                    <MenuItem text="Save" onAction="#save" />
+                    <MenuItem text="Save as ..." onAction="#saveAs" />
+                    <SeparatorMenuItem />
+                    <MenuItem text="Quit" onAction="#exitApplication" />
+                </Menu>
                 <Menu text="Options">
                     <MenuItem text="Install plugin" onAction="#installPlugin" />
                 </Menu>

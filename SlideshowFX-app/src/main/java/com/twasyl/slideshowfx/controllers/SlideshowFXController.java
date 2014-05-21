@@ -33,6 +33,8 @@ import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.OSGiManager;
+import com.twasyl.slideshowfx.utils.PlatformHelper;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
@@ -729,8 +731,21 @@ public class SlideshowFXController implements Initializable {
         if (radioButton.isPresent()) radioButton.get().setSelected(true);
     }
 
+    // The following section is for methods used inside the MenuBar
+
     /**
-     * This methods shows an open dialog that allows to install plugin.
+     * This method exits the application.
+     *
+     * @param event
+     */
+    @FXML private void exitApplication(ActionEvent event) {
+        PlatformHelper.run(() -> Platform.exit());
+    }
+
+    /**
+     * This method shows an open dialog that allows to install plugin.
+     *
+     * @param event
      */
     @FXML
     private void installPlugin(ActionEvent event) {

@@ -21,6 +21,7 @@ import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.leap.SlideshowFXLeapListener;
 import com.twasyl.slideshowfx.markup.MarkupManager;
+import com.twasyl.slideshowfx.utils.OSGiManager;
 import javafx.application.Application;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -99,7 +100,7 @@ public class SlideshowFX extends Application {
 
         // Start the MarkupManager
         LOGGER.info("Starting Felix");
-        MarkupManager.start();
+        OSGiManager.startAndDeploy();
     }
 
     @Override
@@ -167,7 +168,7 @@ public class SlideshowFX extends Application {
         Chat.close();
 
         LOGGER.info("Stopping the MarkupManager");
-        MarkupManager.stop();
+        OSGiManager.stop();
     }
 
     public static ReadOnlyObjectProperty<Stage> stageProperty() { return stage; }

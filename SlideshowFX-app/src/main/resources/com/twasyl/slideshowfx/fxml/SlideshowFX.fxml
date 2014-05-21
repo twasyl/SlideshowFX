@@ -30,143 +30,150 @@
     </fx:define>
 
     <top>
-        <ToolBar>
-            <Button onAction="#loadTemplate">
-                <tooltip>
-                    <Tooltip text="New presentation" />
-                </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/new.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
+        <VBox>
+            <MenuBar>
+                <Menu text="Options">
+                    <MenuItem text="Install plugin" onAction="#installPlugin" />
+                </Menu>
+            </MenuBar>
+            <ToolBar>
+                <Button onAction="#loadTemplate">
+                    <tooltip>
+                        <Tooltip text="New presentation" />
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                            <Image url="@/com/twasyl/slideshowfx/images/new.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-            <Button onAction="#openPresentation">
-                <tooltip>
-                    <Tooltip text="Open presentation" />
-                </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/open.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
+                <Button onAction="#openPresentation">
+                    <tooltip>
+                        <Tooltip text="Open presentation" />
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                            <Image url="@/com/twasyl/slideshowfx/images/open.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-            <SplitMenuButton fx:id="saveButton" onAction="#save">
-                <tooltip>
-                    <Tooltip text="Save" />
-                </tooltip>
-                <items>
-                    <MenuItem text="Save as ..." onAction="#saveAs" />
-                </items>
-            </SplitMenuButton>
+                <SplitMenuButton fx:id="saveButton" onAction="#save">
+                    <tooltip>
+                        <Tooltip text="Save" />
+                    </tooltip>
+                    <items>
+                        <MenuItem text="Save as ..." onAction="#saveAs" />
+                    </items>
+                </SplitMenuButton>
 
-            <Button onAction="#print">
-                <tooltip>
-                    <Tooltip text="Print" />
-                </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/print.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
+                <Button onAction="#print">
+                    <tooltip>
+                        <Tooltip text="Print" />
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                            <Image url="@/com/twasyl/slideshowfx/images/print.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-            <Separator />
+                <Separator />
 
-            <SplitMenuButton fx:id="addSlideButton">
-                <tooltip>
-                    <Tooltip text="Add slide" />
-                </tooltip>
-            </SplitMenuButton>
+                <SplitMenuButton fx:id="addSlideButton">
+                    <tooltip>
+                        <Tooltip text="Add slide" />
+                    </tooltip>
+                </SplitMenuButton>
 
-            <Button onAction="#copySlide">
-                <tooltip>
-                    <Tooltip text="Copy slide" />
-                </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/copy.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
+                <Button onAction="#copySlide">
+                    <tooltip>
+                        <Tooltip text="Copy slide" />
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                            <Image url="@/com/twasyl/slideshowfx/images/copy.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-            <SplitMenuButton fx:id="moveSlideButton">
-                <tooltip>
-                    <Tooltip  text="Move slide" />
-                </tooltip>
-            </SplitMenuButton>
+                <SplitMenuButton fx:id="moveSlideButton">
+                    <tooltip>
+                        <Tooltip  text="Move slide" />
+                    </tooltip>
+                </SplitMenuButton>
 
-            <Button onAction="#deleteSlide">
-                <tooltip>
-                    <Tooltip text="Delete slide" />
-                </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/delete.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
+                <Button onAction="#deleteSlide">
+                    <tooltip>
+                        <Tooltip text="Delete slide" />
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                            <Image url="@/com/twasyl/slideshowfx/images/delete.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-            <Separator />
+                <Separator />
 
-            <Button onAction="#reload">
-                <tooltip>
-                    <Tooltip text="Reload" />
-                </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/reload.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
+                <Button onAction="#reload">
+                    <tooltip>
+                        <Tooltip text="Reload" />
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                            <Image url="@/com/twasyl/slideshowfx/images/reload.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-            <Button  onAction="#slideShow">
-                <tooltip>
-                    <Tooltip text="Slideshow" />
-                </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/slideshow.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
+                <Button  onAction="#slideShow">
+                    <tooltip>
+                        <Tooltip text="Slideshow" />
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                            <Image url="@/com/twasyl/slideshowfx/images/slideshow.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-            <CheckBox fx:id="leapMotionEnabled">
-                <tooltip>
-                    <Tooltip text="LeapMotion controller" />
-                </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/leap.png" />
-                    </ImageView>
-                </graphic>
-            </CheckBox>
+                <CheckBox fx:id="leapMotionEnabled">
+                    <tooltip>
+                        <Tooltip text="LeapMotion controller" />
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                            <Image url="@/com/twasyl/slideshowfx/images/leap.png" />
+                        </ImageView>
+                    </graphic>
+                </CheckBox>
 
-            <Separator />
+                <Separator />
 
-            <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                <Image url="@/com/twasyl/slideshowfx/images/chat.png"  smooth="true" />
-            </ImageView>
+                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                    <Image url="@/com/twasyl/slideshowfx/images/chat.png"  smooth="true" />
+                </ImageView>
 
-            <TextField prefColumnCount="8" promptText="IP address" fx:id="chatIpAddress" />
-            <TextField prefColumnCount="3" promptText="Port" fx:id="chatPort" />
+                <TextField prefColumnCount="8" promptText="IP address" fx:id="chatIpAddress" />
+                <TextField prefColumnCount="3" promptText="Port" fx:id="chatPort" />
 
-            <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                <Image url="@/com/twasyl/slideshowfx/images/twitter.png"  smooth="true" />
-            </ImageView>
+                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                    <Image url="@/com/twasyl/slideshowfx/images/twitter.png"  smooth="true" />
+                </ImageView>
 
-            <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" />
+                <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" />
 
-            <Button onAction="#startChat">
-                <graphic>
-                    <ImageView fitWidth="$TOOLBAR_ICON_WIDTH" fitHeight="$TOOLBAR_ICON_HEIGHT">
-                        <Image url="@/com/twasyl/slideshowfx/images/start.png" preserveRatio="true" smooth="true" />
-                    </ImageView>
-                </graphic>
-            </Button>
-        </ToolBar>
+                <Button onAction="#startChat">
+                    <graphic>
+                        <ImageView fitWidth="$TOOLBAR_ICON_WIDTH" fitHeight="$TOOLBAR_ICON_HEIGHT">
+                            <Image url="@/com/twasyl/slideshowfx/images/start.png" preserveRatio="true" smooth="true" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </ToolBar>
+        </VBox>
     </top>
     <center>
         <WebView fx:id="browser" />

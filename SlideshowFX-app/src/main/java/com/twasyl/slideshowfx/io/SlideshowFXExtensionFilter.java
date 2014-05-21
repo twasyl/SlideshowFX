@@ -23,4 +23,6 @@ public interface SlideshowFXExtensionFilter {
     public static FileChooser.ExtensionFilter TEMPLATE_FILTER = new FileChooser.ExtensionFilter("Template files", "*.sfxt");
 
     public static FileChooser.ExtensionFilter PRESENTATION_FILES = new FileChooser.ExtensionFilter("Presentation files", "*.sfx");
+
+    public static FileChooser.ExtensionFilter PLUGIN_FILES = new FileChooser.ExtensionFilter("Plugin files", "*.jar");
 }

@@ -709,7 +709,7 @@ public class SlideshowFXController implements Initializable {
 
     /**
      * Select the RadioButton corresponding to the given <code>contentCode</code>. If the <code>contentCode</code> is null,
-     * every RadioBUtton is unselected.
+     * every RadioButton is unselected.
      *
      * @param contentCode
      */
@@ -725,13 +725,11 @@ public class SlideshowFXController implements Initializable {
                 .stream()
                 .filter(child -> child instanceof RadioButton)
                 .map(child -> (RadioButton) child)
-                .filter(button -> contentCode.equals(((IMarkup) button.getUserData()).getCode()))
+                .filter(button -> ((IMarkup) button.getUserData()).getCode().equals(contentCode))
                 .findFirst();
 
         if (radioButton.isPresent()) radioButton.get().setSelected(true);
     }
-
-    // The following section is for methods used inside the MenuBar
 
     /**
      * This method exits the application.

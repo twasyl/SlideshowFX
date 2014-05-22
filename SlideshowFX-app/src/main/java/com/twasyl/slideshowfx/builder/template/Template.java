@@ -124,9 +124,6 @@ public class Template {
         this.setJsObject(templateJson.getString("js-object"));
         LOGGER.fine("[Template configuration] jsObject = " + this.getJsObject());
 
-        this.setSlidesContainer(templateJson.getString("slides-container"));
-        LOGGER.fine("[Template configuration] slidesContainer = " + this.getSlidesContainer());
-
         this.setResourcesDirectory(new File(this.getFolder(), templateJson.getString("resources-directory")));
         LOGGER.fine("[Template configuration] resources-directory = " + this.getResourcesDirectory().getAbsolutePath());
 
@@ -165,6 +162,9 @@ public class Template {
 
             this.setSlideIdPrefix(slidesConfigurationJson.getString("slide-id-prefix"));
             LOGGER.fine("[Template configuration] slideIdPrefix = " + this.getSlideIdPrefix());
+
+            this.setSlidesContainer(slidesConfigurationJson.getString("slides-container"));
+            LOGGER.fine("[Template configuration] slidesContainer = " + this.getSlidesContainer());
 
             JsonArray slidesDefinition = slidesJson.getJsonArray("slides-definition");
 

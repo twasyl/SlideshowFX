@@ -48,7 +48,6 @@ bc(json).. {
     "name": "My first template",
     "file" : "template.html",
     "js-object" : "sfx",
-    "slides-container" : "slideshowfx-slides-div",
     "resources-directory" : "resources",
 
     "methods" : [
@@ -60,6 +59,7 @@ bc(json).. {
 
     "slides" : {
       "configuration" : {
+        "slides-container" : "slideshowfx-slides-div",
         "slide-id-prefix" : "slide-",
         "template-directory" : "slides/template",
         "presentation-directory" : "slides/presentation",
@@ -118,7 +118,6 @@ p. The complete configuration is wrapped into a *template* JSON object. This obj
 * %(#tempname)*name*% : the name of the template
 * *file* : the HTML file that is the template, which will host the slides
 * *js-object* : is the name JavaScript object that will be used to callback to SlideshowFX
-* *slides-container* : is the ID of the HTML markup that will contain the slides
 * *resources-directory* : the folder that will contain the resources of the presentation, typically images file, sounds, etc
 * *methods* : indicates the name of methods that are required and called by SlideshowFX. Method with the type *GET_CURRENT_SLIDE* is mandatory. 
 ** *type* : the code that identifies the method for SlideshowFX. Currently one type is defined:
@@ -126,6 +125,7 @@ p. The complete configuration is wrapped into a *template* JSON object. This obj
 ** *name* : the name of the method that will be called.
 * *slides* : define the configuration of slides inside the presentation, as well as their template
 ** *configuration* : JSON object that will contain the configuration of the slides
+*** *slides-container* : is the ID of the HTML markup that will contain the slides
 *** *slide-id-prefix* : is a prefix that will be placed in the ID attribute of an HTML slide element, prefixing the slide number
 *** *template-directory* : the directory that will contain the slide's templates
 *** *presentation-directory* : the directory that will contain the slides of the presentation, created by the user
@@ -146,7 +146,7 @@ p. The template file is the file that will host all slides, include all JavaScri
 * insert the Velocity token *${sfxCallback}* inside a *script* code block
 * insert the Velocity token *${sfxContentDefiner}* inside a *script* block
 * define an ID for the HTML element that will host all slides
-* insert the following javaScript function with the right implementation for changing slides using "LeapMotion":https://www.leapmotion.com
+* insert the following JavaScript function with the right implementation for changing slides using "LeapMotion":https://www.leapmotion.com
 
 bc(javascript). function slideshowFXLeap(keyCode) {
   // Manage the LEFT and RIGHT key codes for changing slides

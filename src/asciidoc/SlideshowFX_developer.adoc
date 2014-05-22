@@ -1,0 +1,262 @@
+= SlideshowFX developer documentation
+:linkcss:
+:numbered:
+
+== Introduction
+
+SlideshowFX is an application allowing you to create HTML5 based presentation in a very common manner. Nowadays we all use PowerPoint, Keynnote and their friends but with evolution of web technologies, new perspectives are now possible. Indeed there is a lot of HTML5/javaScript based framework, like http://lab.hakim.se/reveal-js/[reveal.js] or https://github.com/bartaz/impress.js/[impress.js], that allow you to create beautiful presentations to keep your audience active. It brings you a lot of freedom like adding a YouTube video right inside your presentation, playing music, automatically syntax highlighting code example and more. But to do such presentations you have to know HTML, CSS and JavaScript programming languages.
+
+SlideshowFX lets programming languages to developers and presenetations' creation to end users. This means that you will be able to create your presentations without knowing HTML, even if it is recommended to have the basics.
+
+But SlideshowFX isn't just another simple presentation engine. It brings much more for you:
+
+- A chat is provided so your audience can send you questions and you will answer them whenever you want
+- Present using your hands by changing slides with two fingers, have a "laser" pointer by using one finger. It's cool isn't it? All of this brought to you by LeapMotion
+
+== Developer guide
+
+=== Tools & APIs
+
+[options=header, width="65"]
+|===
+| API, Tool | Version | Comments
+
+| Java / JavaFX | 8 |
+
+| Apache Felix | 4.4.0 |
+
+| commons-collections | 3.2.1 |
+
+| commons-lang | 2.4 |
+
+| hamcrest-core | 1.3 |
+
+| jackson-annotations | 2.2.2 |
+
+| jackson-core | 2.2.2 |
+
+| jackson-databind | 2.2.2 |
+
+| javax.json | 1.0.4 |
+
+| javax.json-api | 1.0 |
+
+| jsoup | 1.7.3 |
+
+| netty-all | 4.0.18.Final |
+
+| org.eclipse.mylyn.wikitext.core | 2.0.0.20140108-1934 | Library used for textile support
+
+| org.eclipse.mylyn.wikitext.textile.core | 2.0.0.20131212-0025 | Library used for textile support
+
+| Scribe | 1.3.5 | Library used for the Twitter support
+
+| txtmark | 0.11 | Library used for the markdown support
+
+| Velocity | 1.7 |
+
+| vertx-core | 2.1RC3 |
+
+| zxing-core | 2.3.0 |
+
+| zxing-jse | 2.3.0 |
+
+|===
+
+=== Gradle
+
+SlideshowFX uses http://www.gradle.org/[gradle] as build system. The version used is {gradle-version}. +
+The following plugins are currently used in the Gradle script:
+
+- java
+- asciidoctor
+
+==== Tasks
+
+In order to build the JavaFX native bundle, the `jar` task of the `SlideshowFX-app` project has been overriden. +
+Moreover a task named `buildJavaFXBundle` which depends on the JAR task has been created in the `SlideshowFX-app` project. This task creates the JavaFX bundle. +
+A task named `installMarkupPlugins` has been created in the root project in order to copy the markup supported to the directory of plugins.
+
+=== Set up your environment
+
+==== Environment variable
+
+In order to build SlideshowFX, you will need to set *JAVA_HOME* to point to your JDK {jdk-version} installation and *GRADLE_HOME* to your gradle installation. Ensure both variables are present in the *PATH* environment variable.
+
+==== Running SlideshowFX in your IDE
+
+If you are contributing to SlideshowFX and developing some features, you probably use an IDE (http://www.jetbrains.com/idea/[IntelliJ IDEA], https://netbeans.org/[NetBeans], http://www.eclipse.org/[eclipse], ...). +
+Because SlideshowFX uses LeapMotion, you have to set up a JVM argument which is 
+[source]
+-Djava.library.path=./lib/Leap
+
+=== Templates
+
+Each presentation done with SlideshowFX is based on a _template_.  +
+A template is composed by three main parts:
+
+- A _template configuration_ file which contains the configuration of the template. This file *must be* named *template-config.json* and is written using JSON ;
+- A _template file_ which is the HTML page that will host all slides of the presentation ;
+- _Slide's template files_ which are the template for each kind of slide the user can add in his presentation.
+
+All of this content is archived in a file with the extension *.sfxt* (which stands for SlideshowFX template)
+
+A typical template archive structure is the following:
+[source]
+----
+/
+|- [F] template-config.json
+|- [F] template.html
+|- [D] resources
+|- [D] slides
+|------|- [D] template
+----
+
+Where:
+
+- *[F]* = file
+- *[D]* = directory
+
+==== Template configuration file
+
+The template configuration must be at the root of the archive and will contain all the configuration the template will need to load. An example is show below:
+[source]
+----
+{
+  "template" : {
+    "name": "My first template",
+    "file" : "template.html",
+    "js-object" : "sfx",
+    "resources-directory" : "resources",
+
+    "methods" : [
+      {
+        "type" : "GET_CURRENT_SLIDE",
+        "name" : "slideShowFXGetCurrentSlide"
+      }
+    ],
+
+    "slides" : {
+      "configuration" : {
+        "slides-container" : "slideshowfx-slides-div",
+        "slide-id-prefix" : "slide-",
+        "template-directory" : "slides/template",
+        "presentation-directory" : "slides/presentation",
+        "thumbnail-directory" : "slides/presentation/thumbnails"
+      },
+      "slides-definition" : [
+        {
+          "id" : 1,
+          "name" : "Title",
+          "file" : "title.html",
+          "dynamic-ids" : [
+            "${slideIdPrefix}${slideNumber}",
+            "${slideNumber}-title",
+            "${slideNumber}-subtitle",
+            "${slideNumber}-author",
+            "${slideNumber}-twitter",
+          ]
+        },
+        {
+          "id" : 2,
+          "name" : "Title and content",
+          "file" : "title_content.html",
+          "dynamic-ids" : [
+            "${slideIdPrefix}${slideNumber}",
+            "${slideNumber}-title",
+            "${slideNumber}-text"
+          ]
+        },
+        {
+          "id" : 3,
+          "name" : "Empty",
+          "file" : "empty.html",
+          "dynamic-ids" : [
+            "${slideIdPrefix}${slideNumber}",
+            "${dslideNumber}-content"
+          ],
+          "dynamic-attributes" : [
+            {
+              "attribute" : "data-x",
+              "template-expression" : "slideDataX",
+              "prompt-message" : "Enter X position of the slide:"
+            },
+            {
+              "attribute" : "data-y",
+              "template-expression" : "slideDataY",
+              "prompt-message" : "Enter Y position of the slide:"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+----
+
+The complete configuration is wrapped into a *template* JSON object. This object is described as below:
+
+* *name* : the name of the template
+* *file* : the HTML file that is the template, which will host the slides
+* *js-object* : is the name JavaScript object that will be used to callback to SlideshowFX
+* *slides-container* : is the ID of the HTML markup that will contain the slides
+* *resources-directory* : the folder that will contain the resources of the presentation, typically images file, sounds, etc
+* *methods* : indicates the name of methods that are required and called by SlideshowFX. Method with the type *GET_CURRENT_SLIDE* is mandatory.
+** *type* : the code that identifies the method for SlideshowFX. Currently one type is defined:
+*** *GET_CURRENT_SLIDE* : this type represents the methods that will return the ID of the current displayed slide. The implementation is specific for each HTLM presentation framework.
+** *name* : the name of the method that will be called.
+* *slides* : define the configuration of slides inside the presentation, as well as their template
+** *configuration* : JSON object that will contain the configuration of the slides
+*** *slide-id-prefix* : is a prefix that will be placed in the ID attribute of an HTML slide element, prefixing the slide number
+*** *template-directory* : the directory that will contain the slide’s templates
+*** *presentation-directory* : the directory that will contain the slides of the presentation, created by the user
+*** *thumbnail-directory* : the directory that will contain the thumbnail of each slide created by the user
+** *slides-definition* : a JSON array that will contain the definition of each slide template as a JSON object with the following structure:
+*** *id* : the ID of the slide
+*** *name* : the name of the slide that will be displayed in SlideshowFX in the lst of available slide’s type
+*** *file* : the template file of the slide
+*** *dynamic-ids* : a JSON array composed of JSON string that lists all the HTML IDs that can be generated when a slide is created in the presentation. It is mainly used for copying a slide inside the application
+*** *dynamic-attributes* : a JSON array composed of JSON object describing the attributes that can be dynamically created when creating a slide by prompting its value to the user. Each object is structured as follow:
+**** *attribute* : the name of the attribute
+**** *template-expression* : the name of the template token. It is the Velocity token without the dollar sign.
+**** *prompt-message* : the message displayed to the user asking the value of the attribute.
+
+==== Template file
+
+The template file is the file that will host all slides, include all JavaScript libraries, CSS files and so on. In order to work, you have to:
+
+- insert the Velocity token *$\{sfxCallback\}* inside a *script* code block
+- insert the Velocity token *$\{sfxContentDefiner\}* inside a *script* block
+- define an ID for the HTML element that will host all slides
+- insert the following javaScript function with the right implementation for changing slides using https://www.leapmotion.com/[LeapMotion]
+
+[source,javascript]
+----
+function slideshowFXLeap(keyCode) {
+  // Manage the LEFT and RIGHT key codes for changing slides
+}
+----
+
+- insert the JavaScript function that will return the current slide
+
+==== Slide’s template file
+
+The template of a slide will define what HTML element a slide is. In some frameworks it will be a *section* markup, in others a *div* and so on. In order to create a template, you will have to respect some pre-requisites:
+
+- The slide markup must have its ID attribute set to *$\{slideIdPrefix\}$\{slideNumber}*
+- Each element that is editable by the user must have an ID attribute composed of the slide number and a discriminator. An example of the title of the slide:
+[source,html]
+<h1 id="${slideNumber}-title"></h1>
+- Each element that is editable by the user must have the *ondblclick* attribute set to *$\{sfxCallback\}*
+- If dynamic attributes are needed, they can be defined like the following. Note that for this example, template-expression are *slideDataX* and *slideDataY*
+[source,html]
+<section ${slideDataX} ${slideDataY}></section>
+
+==== Valid Velocity tokens
+
+The following Velocity tokens are available for SlideshowFX:
+
+* *$\{slideIdPrefix\}* indicates the prefix that will be placed before the slide number for each slide
+* *$\{slideNumber\}* indicates the slide number generated by SlideshowFX
+* *$\{sfxCallback\}* indicates the function that will call SlideshowFX from JavaScript
+* *$\{sfxContentDefiner\}* indicates the JavaScript function that SlideshowFX will call in order to define the content of an element inside a slide

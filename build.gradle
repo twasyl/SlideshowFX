@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 
+buildscript {
+    repositories {
+        mavenCentral name: 'Bintray Asciidoctor repo', url: 'http://dl.bintray.com/content/aalmiray/asciidoctor'
+        mavenCentral name: 'Bintray JCenter', url: 'http://jcenter.bintray.com'
+    }
+
+    dependencies {
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:0.4.1'
+    }
+}
+
+apply plugin: 'asciidoctor'
+
 ext {
 	allLibs = new File(rootDir, '/lib')
 	felix = fileTree(dir: allLibs, include: 'Felix/*.jar')
@@ -29,6 +42,19 @@ ext {
 	zxing = fileTree(dir: allLibs, include: 'ZXing/*.jar')
 
 	jdk = System.env.'JAVA_HOME'
+}
+
+asciidoctor {
+    outputDir = new File("$buildDir/docs/asciidoctor")
+    options = [
+            attributes: [
+                    'source-highlighter': 'coderay',
+                    toc: '',
+                    'javafx-version': 8,
+                    'jdk-version': 8,
+                    'gradle-version': 1.12
+            ]
+    ]
 }
 
 def getBuildNumber() {

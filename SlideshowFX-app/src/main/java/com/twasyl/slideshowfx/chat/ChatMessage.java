@@ -75,11 +75,6 @@ public class ChatMessage {
      * @return the content of the message encoded in Base64.
      */
     private String encodeContent() {
-        /*return getContent().replaceAll("\\n", "&#10;")
-                .replaceAll("\\\\", "&#92;")
-                .replaceAll("\'", "&#39;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;"); */
         if(getContent() != null) {
             try {
                 return Base64.getEncoder().encodeToString(getContent().getBytes("UTF8"));

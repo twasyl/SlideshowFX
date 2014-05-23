@@ -58,7 +58,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Created by 100043901 on 19/12/13.
+ * This class manages the chat that is provided by SlideshowFX. It has method for creating and stopping the chat and
+ * it also handles all possible URL requests.
+ * A WebSocket server is started in order messages to be exchanged.
+ * 
+ * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since 1.0
  */
 public class Chat {
 
@@ -99,9 +105,8 @@ public class Chat {
 
                 final String authUrl = this.service.getAuthorizationUrl(requestToken);
 
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
+                Platform.runLater(() -> {
+
                         final WebView twitterBrowser = new WebView();
                         final Scene scene = new Scene(twitterBrowser);
                         final Stage stage = new Stage();
@@ -128,7 +133,6 @@ public class Chat {
 
                         stage.setScene(scene);
                         stage.show();
-                    }
                 });
             }
         }
@@ -216,11 +220,14 @@ public class Chat {
     private static int port;
     private static Twitter twitter;
 
-    public Chat(String ipAddress, int port) {
-
-        init();
-    }
-
+    /**
+     * Creates a chat with the given IP address, port and Twitter hashtag to look for. Once this method is called the 
+     * chat is initialized and can be used by attendees as well as the presenter.
+     * 
+     * @param ip The IP address of the chat.
+     * @param port The port of the chat.
+     * @param twitterHashtag The Twitter hashtag to look for.
+     */
     public static void create(String ip, int port, String twitterHashtag) {
         Chat.ip = ip;
         Chat.port = port;
@@ -229,6 +236,17 @@ public class Chat {
         init();
     }
 
+    /**
+     * Close all resources linked to the chat. The following steps are performed:
+     * <ul>
+     *     <li>Close all clients' connections</li>
+     *     <li>Close the presenter connection</li>
+     *     <li>Stop the WebServer</li>
+     *     <li>Close Vert.x</li>
+     *     <li>Close the Twitter stream</li>
+     * </ul>
+     * 
+     */
     public static void close() {
         for(ServerWebSocket client : clients) {
             client.close();
@@ -257,11 +275,29 @@ public class Chat {
         }
     }
 
-    public static boolean isOpened() {
-        return server != null;
-    }
     /**
-     * Initialize the embedded web server
+     * Indicates if the server is considered as opened.
+     * @return <code>true</code> is the WebServer is not null, <code>false</code> otherwise.
+     */
+    public static boolean isOpened() { return server != null; }
+    
+    /**
+     * Initialize the embedded web server. A WebServer is created and tries to listen on <code>Chat#ip</code> and <code>Chat#port</code>.
+     * The web server handles the following requests :
+     * <ul>
+     *     <li><b>Chat.HTTP_CLIENT_CHAT_PATH</b> : the URL for the Chat HTML page dedicated to the audience</li>
+     *     <li><b>Chat.HTTP_PRESENTER_CHAT</b> : the URL for the Chat HTML page dedicated to the presenter</li>
+     *     <li><b>/images/check.png</b> : the icon indicating messages are acknowledged by the presenter</li>
+     *     <li><b>/images/chatQRCode.png</b> : the QR code for accessing the chat</li>
+     * </ul>
+     *
+     * The websocket server handles the following requests :
+     * <ul>
+     *     <li><b>Chat.WS_CLIENT_CHAT</b> : which is the URL of the WebSocket for each client</li>
+     *     <li><b>Chat.WS_PRESENTER_CHAT</b> : which is the URL of the WebSocket for the presenter</li>
+     * </ul>
+     *
+     * The Twitter stream is also initialized in this method.
      */
     private static void init() {
 
@@ -433,10 +469,26 @@ public class Chat {
         }
     }
 
+    /**
+     * Get the IP address the WebServer is listening to.
+     * @return The IP address of the WebServer
+     */
     public static String getIp() { return ip; }
 
+    /**
+     * Get the port the WebServer is listening to.
+     * @return The port ofof the WebServer
+     */
     public static int getPort() { return port; }
 
+    /**
+     * Generates the QR code that will be used to access the chat. Data of the QR code are simply the URL of the
+     * Chat taking into consideration the <code>Chat.ip</code> and the <code>Chat.port</code>. The URL is of this form:
+     * <code>http://ip:port/HTTP_CLIENT_CHAT_PATH</code>. For example: <code>http://127.0.0.1:8080/</code>
+     *
+     * @param size the size in pixel of the QR code to generate.
+     * @return The bytes corresponding to the image of the QR code.
+     */
     public static byte[] generateQRCode(int size) {
         byte[] qrCode = null;
 

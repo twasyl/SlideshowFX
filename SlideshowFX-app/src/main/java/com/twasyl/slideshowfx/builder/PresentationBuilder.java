@@ -16,6 +16,9 @@
 
 package com.twasyl.slideshowfx.builder;
 
+import com.oracle.javafx.jmx.json.JSONDocument;
+import com.oracle.javafx.jmx.json.JSONFactory;
+import com.oracle.javafx.jmx.json.JSONWriter;
 import com.twasyl.slideshowfx.builder.template.DynamicAttribute;
 import com.twasyl.slideshowfx.builder.template.SlideTemplate;
 import com.twasyl.slideshowfx.builder.template.Template;
@@ -24,22 +27,29 @@ import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
 import com.twasyl.slideshowfx.exceptions.PresentationException;
 import com.twasyl.slideshowfx.utils.DOMUtils;
+import com.twasyl.slideshowfx.utils.JSONHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import javafx.embed.swing.SwingFXUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
-import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
-import javax.json.*;
-import javax.json.stream.JsonGenerator;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This class manages all operations for templates and presentations. It is used to open them as well as add, update an
+ * delete slides.
+ *
+ * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since 1.0
+ */
 public class PresentationBuilder {
 
     private static final Logger LOGGER = Logger.getLogger(PresentationBuilder.class.getName());
@@ -119,7 +129,7 @@ public class PresentationBuilder {
         // Read the configuration
         try {
             this.template.readFromFolder();
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new InvalidTemplateConfigurationException("Can not read template's configuration");
         }
     }
@@ -181,52 +191,47 @@ public class PresentationBuilder {
         // Reading the slides' configuration
         LOGGER.fine("Parsing presentation configuration");
 
-        JsonReader reader = null;
+        JSONDocument presentationJson;
         try {
-            reader = Json.createReader(new FileInputStream(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME)));
-        } catch (FileNotFoundException e) {
+            presentationJson = JSONHelper.readFromFile(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME));
+            presentationJson = presentationJson.get("presentation");
+        } catch (IOException e) {
             throw new InvalidPresentationConfigurationException("Can not read presentation configuration file", e);
         }
-        JsonObject presentationJson = reader.readObject().getJsonObject("presentation");
-        JsonArray slidesJson = presentationJson.getJsonArray("slides");
-        JsonObject slideJson;
-        JsonArray slideElementsJson;
-        Slide slide;
-        SlideElement slideElement;
+
 
         LOGGER.fine("Reading slides configuration");
-        for(int index = 0; index < slidesJson.size(); index++)  {
-            slide = new Slide();
+        presentationJson.getList("slides")
+                .stream()
+                .map(slideJson -> (JSONDocument) slideJson)
+                .forEach( slideJson -> {
+                    final Slide slide = new Slide();
 
-            slideJson = slidesJson.getJsonObject(index);
-            slide.setId(slideJson.getString("id"));
-            slide.setSlideNumber(slideJson.getString("number"));
-            slide.setTemplate(this.template.getSlideTemplate(slideJson.getInt("template-id")));
+                    slide.setId(slideJson.getString("id"));
+                    slide.setSlideNumber(slideJson.getString("number"));
+                    slide.setTemplate(this.template.getSlideTemplate(slideJson.getNumber("template-id").intValue()));
 
-            try {
-                slide.setThumbnail(SwingFXUtils.toFXImage(ImageIO.read(new File(this.template.getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png"))), null));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                    try {
+                        slide.setThumbnail(SwingFXUtils.toFXImage(ImageIO.read(new File(this.template.getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png"))), null));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
-            slideElementsJson = slideJson.getJsonArray("elements");
+                    slideJson.getList("elements")
+                            .stream()
+                            .map(slideElementJson -> (JSONDocument) slideElementJson)
+                            .forEach(slideElementJson -> {
+                                final SlideElement slideElement = new SlideElement();
+                                slideElement.setId(slideElementJson.getString("element-id"));
+                                slideElement.setOriginalContentCode(slideElementJson.getString("original-content-code"));
+                                slideElement.setOriginalContentAsBase64(slideElementJson.getString("original-content"));
+                                slideElement.setHtmlContentAsBase64(slideElementJson.getString("html-content"));
 
-            if(slideElementsJson != null && !slideElementsJson.isEmpty()) {
-                for(JsonObject slideElementJson : slideElementsJson.getValuesAs(JsonObject.class)) {
-                    slideElement = new SlideElement();
-                    slideElement.setId(slideElementJson.getString("element-id"));
-                    slideElement.setOriginalContentCode(slideElementJson.getString("original-content-code"));
-                    slideElement.setOriginalContentAsBase64(slideElementJson.getString("original-content"));
-                    slideElement.setHtmlContentAsBase64(slideElementJson.getString("html-content"));
+                                slide.getElements().put(slideElement.getId(), slideElement);
+                            });
 
-                    slide.getElements().put(slideElement.getId(), slideElement);
-                }
-            }
-
-            this.presentation.getSlides().add(slide);
-        }
-
-        reader.close();
+                    this.presentation.getSlides().add(slide);
+        });
 
         // Append the slides' content to the presentation
         LOGGER.fine("Building presentation file");
@@ -575,63 +580,73 @@ public class PresentationBuilder {
         if(presentationArchive == null) throw new IllegalArgumentException("The presentation archive can not be null");
 
         LOGGER.fine("Creating the presentation configuration file");
-        JsonArrayBuilder slidesJsonArray = Json.createArrayBuilder();
-        JsonArrayBuilder slideElementsJsonArray;
+        JSONWriter writer = JSONFactory.instance().makeWriter(new PrintWriter(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME)));
 
-        for(Slide slide : this.presentation.getSlides()) {
-            slideElementsJsonArray = Json.createArrayBuilder();
+        writer.startObject()
+              .startObject("presentation")
+              .startArray("slides");
 
-            for(SlideElement slideElement : slide.getElements().values()) {
-                slideElementsJsonArray.add(
-                        Json.createObjectBuilder()
-                                .add("element-id", slideElement.getId())
-                                .add("original-content-code", slideElement.getOriginalContentCode())
-                                .add("original-content", slideElement.getOriginalContentAsBase64())
-                                .add("html-content", slideElement.getHtmlContentAsBase64())
-                                .build()
-                );
-            }
+        this.presentation.getSlides()
+                .stream()
+                .forEach(slide -> {
+                    try {
+                        writer.startObject()
+                              .objectValue("template-id", slide.getTemplate().getId())
+                              .objectValue("id", slide.getId())
+                              .objectValue("number", slide.getSlideNumber())
+                              .startArray("elements");
 
-            slidesJsonArray.add(
-                    Json.createObjectBuilder()
-                            .add("template-id", slide.getTemplate().getId())
-                            .add("id", slide.getId())
-                            .add("number", slide.getSlideNumber())
-                            .add("elements", slideElementsJsonArray.build())
-                            .build()
-            );
-        }
+                        slide.getElements().values()
+                                .stream()
+                                .forEach(slideElement -> {
+                                    try {
+                                        writer.startObject()
+                                                .objectValue("element-id", slideElement.getId())
+                                                .objectValue("original-content-code", slideElement.getOriginalContentCode())
+                                                .objectValue("original-content", slideElement.getOriginalContentAsBase64())
+                                                .objectValue("html-content", slideElement.getHtmlContentAsBase64())
+                                                .endObject();
+                                    } catch(IOException e) {
+                                        LOGGER.log(Level.WARNING, "Can not create slide element", e);
+                                    }
+                                });
+                        writer.endArray()
+                              .endObject();
+                    } catch (IOException e) {
+                        LOGGER.log(Level.WARNING, "Can not add slide object to the configuration file", e);
+                    }
+                });
 
-        JsonObject configuration = Json.createObjectBuilder()
-                .add("presentation",
-                        Json.createObjectBuilder()
-                                .add("slides", slidesJsonArray.build()))
-                .build();
 
-        HashMap<String, Object> writerConfiguration = new HashMap<>();
-        writerConfiguration.put(JsonGenerator.PRETTY_PRINTING, true);
-        JsonWriter writer = Json.createWriterFactory(writerConfiguration).createWriter(new FileOutputStream(new File(this.template.getFolder(), Presentation.PRESENTATION_CONFIGURATION_NAME)));
-        writer.writeObject(configuration);
-        writer.close();
+        writer.endArray() // Ends the slides array
+              .endObject() // End the presentation document
+              .endObject() // End the document
+              .flush()
+              .close();
 
         LOGGER.fine("Presentation configuration file created");
 
         LOGGER.fine("Create slides thumbnails");
         if(!this.template.getSlidesThumbnailDirectory().exists()) this.template.getSlidesThumbnailDirectory().mkdirs();
         else {
-            for(File slideFile : this.template.getSlidesThumbnailDirectory().listFiles()) {
-                if(slideFile.isFile()) {
-                    slideFile.delete();
-                }
-            }
+            Arrays.stream(this.template.getSlidesThumbnailDirectory()
+                    .listFiles(file -> file.isFile()))
+                    .forEach(slideFile -> slideFile.delete());
         }
 
-        for(Slide slide : this.presentation.getSlides()) {
-            LOGGER.fine("Creating thumbnail file: " + this.template.getSlidesThumbnailDirectory().getAbsolutePath() + File.separator + slide.getSlideNumber() + ".png");
-
-            if(slide.getThumbnail() != null)
-                ImageIO.write(SwingFXUtils.fromFXImage(slide.getThumbnail(), null), "png", new File(this.getTemplate().getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png")));
-        }
+        this.presentation.getSlides()
+                .stream()
+                .filter(slide -> slide != null)
+                .forEach(slide -> {
+                    LOGGER.fine("Creating thumbnail file: " + this.template.getSlidesThumbnailDirectory().getAbsolutePath() + File.separator + slide.getSlideNumber() + ".png");
+                    try {
+                        ImageIO.write(SwingFXUtils.fromFXImage(slide.getThumbnail(), null), "png", new File(this.getTemplate().getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png")));
+                    } catch (IOException e) {
+                        LOGGER.log(Level.WARNING,
+                                String.format("Can not create thumbnail for slide number %1$s", slide.getSlideNumber()),
+                                e);
+                    }
+                });
 
         LOGGER.fine("Compressing temporary file");
         ZipUtils.zip(this.template.getFolder(), presentationArchive);

@@ -30,7 +30,6 @@ apply plugin: 'asciidoctor'
 ext {
 	allLibs = new File(rootDir, '/lib')
 	felix = fileTree(dir: allLibs, include: 'Felix/*.jar')
-	json = fileTree(dir: allLibs, include: 'json/*.jar')
 	jsoup = fileTree(dir: allLibs, include: 'jsoup-1.7.3.jar')
 	junit = fileTree(dir: allLibs, include: 'junit-4.11.jar')
 	leapmotion = fileTree(dir: allLibs, include: 'Leap/*')
@@ -161,7 +160,6 @@ project(':SlideshowFX-app') {
             copy {
             	from(new File(project(':SlideshowFX-markup').libsDir, project(':SlideshowFX-markup').archivesBaseName + ".jar"))
 				from(felix.files)
-				from(json.files)
 				from(jsoup.files)
 				from(leapmotion.files)
 				from(scribe.files)
@@ -221,7 +219,6 @@ project(':SlideshowFX-app') {
 	dependencies {
 		compile project(':SlideshowFX-markup')
 		compile felix
-		compile json
 		compile jsoup
 		compile leapmotion
 		compile scribe

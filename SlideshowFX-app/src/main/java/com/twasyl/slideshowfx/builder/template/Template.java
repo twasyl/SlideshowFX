@@ -16,16 +16,21 @@
 
 package com.twasyl.slideshowfx.builder.template;
 
-import javax.json.*;
+import com.oracle.javafx.jmx.json.JSONDocument;
+import com.twasyl.slideshowfx.utils.JSONHelper;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 /**
  * Represents the template found in the template configuration file
+ *
+ * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since 1.0
  */
 public class Template {
     private static final Logger LOGGER = Logger.getLogger(Template.class.getName());
@@ -106,14 +111,16 @@ public class Template {
     /**
      * Read the configuration of this template located in the <b>folder</b> attribute.
      */
-    public void readFromFolder() throws FileNotFoundException {
+    public void readFromFolder() throws IOException {
 
         // Set the template information
         LOGGER.fine("Starting reading template configuration");
         this.setConfigurationFile(new File(this.getFolder(), Template.TEMPLATE_CONFIGURATION_NAME));
 
-        JsonReader configurationReader = Json.createReader(new FileInputStream(this.getConfigurationFile()));
-        JsonObject templateJson = configurationReader.readObject().getJsonObject("template");
+
+        JSONDocument configuration = JSONHelper.readFromFile(this.getConfigurationFile());
+
+        JSONDocument templateJson = configuration.get("template");
 
         this.setName(templateJson.getString("name"));
         LOGGER.fine("[Template configuration] name = " + this.getName());
@@ -127,29 +134,26 @@ public class Template {
         this.setResourcesDirectory(new File(this.getFolder(), templateJson.getString("resources-directory")));
         LOGGER.fine("[Template configuration] resources-directory = " + this.getResourcesDirectory().getAbsolutePath());
 
-        JsonArray methodsJson = templateJson.getJsonArray("methods");
-
-        if(methodsJson != null && methodsJson.size() > 0) {
-            for(JsonValue method : methodsJson) {
-                if(method.getValueType().equals(JsonValue.ValueType.OBJECT)) {
-                    if("CONTENT_DEFINER".equals(((JsonObject) method).getString("type"))) {
-                        this.setContentDefinerMethod(((JsonObject) method).getString("name"));
-                        LOGGER.fine("[Template configuration] content definer method = " + this.getContentDefinerMethod());
-                    } else if("GET_CURRENT_SLIDE".equals(((JsonObject) method).getString("type"))) {
-                        this.setGetCurrentSlideMethod(((JsonObject) method).getString("name"));
-                        LOGGER.fine("[Template configuration] get current slide method = " + this.getGetCurrentSlideMethod());
-                    }
-                }
-            }
-        }
+        templateJson.getList("methods")
+                    .stream()
+                    .map(method -> (JSONDocument) method)
+                    .forEach(method -> {
+                        if("CONTENT_DEFINER".equals(method.getString("type"))) {
+                            this.setContentDefinerMethod(method.getString("name"));
+                            LOGGER.fine("[Template configuration] content definer method = " + this.getContentDefinerMethod());
+                        } else if("GET_CURRENT_SLIDE".equals(method.getString("type"))) {
+                            this.setGetCurrentSlideMethod(method.getString("name"));
+                            LOGGER.fine("[Template configuration] get current slide method = " + this.getGetCurrentSlideMethod());
+                        }
+                    });
 
         // Setting the slides
         this.setSlideTemplates(new ArrayList<SlideTemplate>());
-        JsonObject slidesJson = templateJson.getJsonObject("slides");
+        JSONDocument slidesJson = templateJson.get("slides");
 
         if (slidesJson != null) {
             LOGGER.fine("Reading slide's configuration");
-            JsonObject slidesConfigurationJson = slidesJson.getJsonObject("configuration");
+            JSONDocument slidesConfigurationJson = slidesJson.get("configuration");
 
             this.setSlidesTemplateDirectory(new File(this.getFolder(), slidesConfigurationJson.getString("template-directory")));
             LOGGER.fine("[Slide's configuration] template directory = " + this.getSlidesTemplateDirectory().getAbsolutePath());
@@ -166,56 +170,51 @@ public class Template {
             this.setSlidesContainer(slidesConfigurationJson.getString("slides-container"));
             LOGGER.fine("[Template configuration] slidesContainer = " + this.getSlidesContainer());
 
-            JsonArray slidesDefinition = slidesJson.getJsonArray("slides-definition");
+            slidesJson.getList("slides-definition")
+                    .stream()
+                    .map(slideJson -> (JSONDocument) slideJson)
+                    .forEach(slideJson -> {
+                        Number number;
 
-            if(slidesDefinition != null && !slidesDefinition.isEmpty()) {
-                SlideTemplate slideTemplate;
-                JsonArray dynamicIdsJson;
-                JsonArray dynamicAttributesJson;
+                        final SlideTemplate slideTemplate = new SlideTemplate();
+                        slideTemplate.setId((number = slideJson.getNumber("id")) != null ? number.intValue() : -1);
+                        LOGGER.fine("[Slide definition] id = " + slideTemplate.getId());
 
-                for (JsonObject slideJson : slidesDefinition.getValuesAs(JsonObject.class)) {
-                    slideTemplate = new SlideTemplate();
-                    slideTemplate.setId(slideJson.getInt("id"));
-                    LOGGER.fine("[Slide definition] id = " + slideTemplate.getId());
+                        slideTemplate.setName(slideJson.getString("name"));
+                        LOGGER.fine("[Slide definition] name = " + slideTemplate.getName());
 
-                    slideTemplate.setName(slideJson.getString("name"));
-                    LOGGER.fine("[Slide definition] name = " + slideTemplate.getName());
+                        slideTemplate.setFile(new File(this.getSlidesTemplateDirectory(), slideJson.getString("file")));
+                        LOGGER.fine("[Slide definition] file = " + slideTemplate.getFile().getAbsolutePath());
 
-                    slideTemplate.setFile(new File(this.getSlidesTemplateDirectory(), slideJson.getString("file")));
-                    LOGGER.fine("[Slide definition] file = " + slideTemplate.getFile().getAbsolutePath());
+                        final List<Object> dynamicIdsJson = slideJson.getList("dynamic-ids");
+                        if(dynamicIdsJson != null && dynamicIdsJson.size() > 0) {
+                            slideTemplate.setDynamicIds(new String[dynamicIdsJson.size()]);
 
-                    dynamicIdsJson = slideJson.getJsonArray("dynamic-ids");
-                    if(dynamicIdsJson != null && !dynamicIdsJson.isEmpty()) {
-                        slideTemplate.setDynamicIds(new String[dynamicIdsJson.size()]);
-
-                        for(int index = 0; index < dynamicIdsJson.size(); index++) {
-                            slideTemplate.getDynamicIds()[index] = dynamicIdsJson.getString(index);
+                            for(int index = 0; index < dynamicIdsJson.size(); index++) {
+                                slideTemplate.getDynamicIds()[index] = (String) dynamicIdsJson.get(index);
+                            }
                         }
-                    }
 
-                    dynamicAttributesJson = slideJson.getJsonArray("dynamic-attributes");
-                    if(dynamicAttributesJson != null && !dynamicAttributesJson.isEmpty()) {
-                        slideTemplate.setDynamicAttributes(new DynamicAttribute[dynamicAttributesJson.size()]);
-                        DynamicAttribute dynamicAttribute;
-                        JsonObject dynamicAttributeJson;
+                        final List<Object> dynamicAttributesJson = slideJson.getList("dynamic-attributes");
+                        if(dynamicAttributesJson != null && dynamicAttributesJson.size() > 0) {
+                            slideTemplate.setDynamicAttributes(new DynamicAttribute[dynamicAttributesJson.size()]);
+                            DynamicAttribute dynamicAttribute;
+                            JSONDocument dynamicAttributeJson;
 
-                        for(int index = 0; index < dynamicAttributesJson.size(); index++) {
-                            dynamicAttribute = new DynamicAttribute();
-                            dynamicAttributeJson = dynamicAttributesJson.getJsonObject(index);
+                            for(int index = 0; index < dynamicAttributesJson.size(); index++) {
+                                dynamicAttribute = new DynamicAttribute();
+                                dynamicAttributeJson = (JSONDocument) dynamicAttributesJson.get(index);
 
-                            dynamicAttribute.setAttribute(dynamicAttributeJson.getString("attribute"));
-                            dynamicAttribute.setPromptMessage(dynamicAttributeJson.getString("prompt-message"));
-                            dynamicAttribute.setTemplateExpression(dynamicAttributeJson.getString("template-expression"));
+                                dynamicAttribute.setAttribute(dynamicAttributeJson.getString("attribute"));
+                                dynamicAttribute.setPromptMessage(dynamicAttributeJson.getString("prompt-message"));
+                                dynamicAttribute.setTemplateExpression(dynamicAttributeJson.getString("template-expression"));
 
-                            slideTemplate.getDynamicAttributes()[index] = dynamicAttribute;
+                                slideTemplate.getDynamicAttributes()[index] = dynamicAttribute;
+                            }
                         }
-                    }
 
-                    this.getSlideTemplates().add(slideTemplate);
-                }
-            } else {
-                LOGGER.fine("No slide's definition found");
-            }
+                        this.getSlideTemplates().add(slideTemplate);
+                    });
         } else {
             LOGGER.fine("No slide's configuration found");
         }

@@ -17,18 +17,9 @@
 package com.twasyl.slideshowfx.markup;
 
 import com.twasyl.slideshowfx.utils.OSGiManager;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.launch.Framework;
-import org.osgi.framework.launch.FrameworkFactory;
-import org.osgi.util.tracker.ServiceTracker;
 
-import java.io.File;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * This class allows operations on supported markup syntax. It also has helper methods accessing {@link com.twasyl.slideshowfx.utils.OSGiManager}.

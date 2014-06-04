@@ -20,7 +20,6 @@ import com.leapmotion.leap.Controller;
 import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.leap.SlideshowFXLeapListener;
-import com.twasyl.slideshowfx.markup.MarkupManager;
 import com.twasyl.slideshowfx.utils.OSGiManager;
 import javafx.application.Application;
 import javafx.beans.property.*;

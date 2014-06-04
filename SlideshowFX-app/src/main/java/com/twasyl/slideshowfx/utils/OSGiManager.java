@@ -12,14 +12,12 @@ import org.osgi.util.tracker.ServiceTracker;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * This class manages all OSGi bundles: from installation to uninstallation. It also starts the OSGi container as well

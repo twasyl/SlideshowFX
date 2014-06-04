@@ -53,7 +53,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import netscape.javascript.JSObject;
-import org.osgi.framework.Bundle;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -65,7 +64,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.ResourceBundle;

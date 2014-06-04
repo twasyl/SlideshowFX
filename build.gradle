@@ -127,6 +127,8 @@ project(':SlideshowFX-textile') {
 		compile project(':SlideshowFX-markup')
 		compile felix
 		compile textile
+
+        testCompile junit
 	}	
 
 	jar {

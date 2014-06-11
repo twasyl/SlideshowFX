@@ -49,6 +49,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
@@ -150,6 +152,7 @@ public class SlideshowFXController implements Initializable {
     private TextField chatPort;
     @FXML
     private TextField twitterHashtag;
+    @FXML private Button startChatButton;
     @FXML
     private CheckBox leapMotionEnabled;
     @FXML
@@ -436,34 +439,22 @@ public class SlideshowFXController implements Initializable {
         }
     }
 
-    @FXML
-    private void startChat(ActionEvent event) {
-        Image icon;
+    /**
+     * This methods starts the chat when the ENTER key is pressed in the IP address, port number or Twitter's hashtag textfields.
+     *
+     * @param event
+     */
+    @FXML private void startChatByKeyPressed(KeyEvent event) {
+        if(event.getCode().equals(KeyCode.ENTER)) this.startChat();
+    }
 
-        if (Chat.isOpened()) {
-            Chat.close();
-
-            icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/start.png"));
-        } else {
-            String ip = this.chatIpAddress.getText();
-            if (ip == null || ip.isEmpty()) {
-                ip = NetworkUtils.getIP();
-            }
-
-            int port = 80;
-            if (this.chatPort.getText() != null && !this.chatPort.getText().isEmpty()) {
-                port = Integer.parseInt(this.chatPort.getText());
-            }
-
-            this.chatIpAddress.setText(ip);
-            this.chatPort.setText(port + "");
-
-            Chat.create(ip, port, this.twitterHashtag.getText());
-
-            icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/shutdown.png"));
-        }
-
-        ((ImageView) ((Button) event.getSource()).getGraphic()).setImage(icon);
+    /**
+     * This methods starts the chat when the button for starting the chat is clicked.
+     *
+     * @param event
+     */
+    @FXML private void startChatByButton(ActionEvent event) {
+        this.startChat();
     }
 
     @FXML
@@ -611,6 +602,43 @@ public class SlideshowFXController implements Initializable {
         } else {
             LOGGER.info(String.format("Prefill information for the field %1$s of slide #%2$s is impossible: the slide is not found", field, slideNumber));
         }
+    }
+
+    /**
+     * Start the chat. This method takes the text entered in the IP, port and Twitter's hashtag fields to start the chat.
+     * If no text is entered for the IP address and the port number, the IP address of the computer is used and the port 80 is chosen.
+     */
+    private void startChat() {
+        Image icon;
+
+        if (Chat.isOpened()) {
+            Chat.close();
+
+            icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/start.png"));
+        } else {
+            String ip = this.chatIpAddress.getText();
+            if (ip == null || ip.isEmpty()) {
+                ip = NetworkUtils.getIP();
+            }
+
+            int port = 80;
+            if (this.chatPort.getText() != null && !this.chatPort.getText().isEmpty()) {
+                try {
+                    port = Integer.parseInt(this.chatPort.getText());
+                } catch(NumberFormatException ex) {
+                    LOGGER.log(Level.WARNING, "Can not parse given chat port, use the default one instead", ex);
+                }
+            }
+
+            this.chatIpAddress.setText(ip);
+            this.chatPort.setText(port + "");
+
+            Chat.create(ip, port, this.twitterHashtag.getText());
+
+            icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/shutdown.png"));
+        }
+
+        ((ImageView) this.startChatButton.getGraphic()).setImage(icon);
     }
 
     @Override

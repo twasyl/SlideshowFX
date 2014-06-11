@@ -163,16 +163,16 @@
                     <Image url="@/com/twasyl/slideshowfx/images/chat.png"  smooth="true" />
                 </ImageView>
 
-                <TextField prefColumnCount="8" promptText="IP address" fx:id="chatIpAddress" />
-                <TextField prefColumnCount="3" promptText="Port" fx:id="chatPort" />
+                <TextField prefColumnCount="8" promptText="IP address" fx:id="chatIpAddress" onKeyPressed="#startChatByKeyPressed" />
+                <TextField prefColumnCount="3" promptText="Port" fx:id="chatPort" onKeyPressed="#startChatByKeyPressed" />
 
                 <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
                     <Image url="@/com/twasyl/slideshowfx/images/twitter.png"  smooth="true" />
                 </ImageView>
 
-                <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" />
+                <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" onKeyPressed="#startChatByKeyPressed" />
 
-                <Button onAction="#startChat">
+                <Button onAction="#startChatByButton" fx:id="startChatButton">
                     <graphic>
                         <ImageView fitWidth="$TOOLBAR_ICON_WIDTH" fitHeight="$TOOLBAR_ICON_HEIGHT">
                             <Image url="@/com/twasyl/slideshowfx/images/start.png" preserveRatio="true" smooth="true" />

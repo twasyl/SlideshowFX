@@ -1,0 +1,13 @@
+.noDragActive {
+    -fx-border-style: dashed;
+    -fx-border-width: 3px;
+    -fx-border-color: transparent;
+}
+
+.validDragOver {
+    -fx-border-color: lightgreen;
+}
+
+.invalidDragOver {
+    -fx-border-color: #FF9900;
+}

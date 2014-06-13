@@ -24,6 +24,7 @@ import com.twasyl.slideshowfx.builder.template.SlideTemplate;
 import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
+import com.twasyl.slideshowfx.controls.TaskProgressIndicator;
 import com.twasyl.slideshowfx.exceptions.InvalidPresentationConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
 import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
@@ -35,8 +36,6 @@ import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.OSGiManager;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -47,11 +46,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import netscape.javascript.JSObject;
@@ -128,6 +125,7 @@ public class SlideshowFXController implements Initializable {
         }
     };
 
+    @FXML private StackPane browserStackPane;
     @FXML
     private WebView browser;
     @FXML
@@ -157,6 +155,7 @@ public class SlideshowFXController implements Initializable {
     private CheckBox leapMotionEnabled;
     @FXML
     private Button defineContent;
+    @FXML private TaskProgressIndicator taskInProgress;
 
     /**
      * Loads a SlideshowFX template. This method displays an open dialog which only allows to open template files (with
@@ -220,32 +219,46 @@ public class SlideshowFXController implements Initializable {
 
         if (dataFile.getName().endsWith(".sfx")) {
             try {
+                this.taskInProgress.update(-1, "Opening presentation ...");
+
                 this.builder.openPresentation(dataFile);
                 this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
 
                 this.updateSlideTemplatesSplitMenu();
                 this.updateSlideSplitMenu();
+
+                this.taskInProgress.update(0, "Presentation loaded");
             } catch (InvalidTemplateConfigurationException e) {
-                e.printStackTrace();
+                this.taskInProgress.update(0, "Configuration of the presentation's template is invalid");
+                LOGGER.log(Level.SEVERE, "Error when opening the presentation", e);
             } catch (InvalidTemplateException e) {
-                e.printStackTrace();
+                this.taskInProgress.update(0, "Presentation's template is invalid");
+                LOGGER.log(Level.SEVERE, "Error when opening the presentation", e);
             } catch (PresentationException e) {
-                e.printStackTrace();
+                this.taskInProgress.update(0, "Error when opening the presentation");
+                LOGGER.log(Level.SEVERE, "Error when opening the presentation", e);
             } catch (InvalidPresentationConfigurationException e) {
-                e.printStackTrace();
+                this.taskInProgress.update(0, "Configuration of the presentation is invalid");
+                LOGGER.log(Level.SEVERE, "Error when opening the presentation", e);
             }
         } else if (dataFile.getName().endsWith(".sfxt")) {
             try {
+                this.taskInProgress.update(-1, "Opening template ...");
+
                 this.builder.loadTemplate(dataFile);
                 this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
 
                 this.updateSlideTemplatesSplitMenu();
+
+                this.taskInProgress.update(0, "Template loaded");
             } catch (InvalidTemplateException e) {
-                e.printStackTrace();
+                this.taskInProgress.update(0, "Presentation's template is invalid");
+                LOGGER.log(Level.SEVERE, "Error when opening the template", e);
             } catch (InvalidTemplateConfigurationException e) {
-                e.printStackTrace();
+                this.taskInProgress.update(0, "Configuration of the presentation's template is invalid");
+                LOGGER.log(Level.SEVERE, "Error when opening the template", e);
             } catch (PresentationException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Error when opening the template", e);
             }
         }
     }
@@ -270,7 +283,7 @@ public class SlideshowFXController implements Initializable {
      * This method updates a slide of the presentation. It takes the <code>markup</code> to converte the <code>originalContent</code>
      * in HTML and then the slide element is updated. The presentation is then saved temporary.
      * The content is send to the page by calling the {@link com.twasyl.slideshowfx.builder.template.Template#getContentDefinerMethod()}
-     * with the HTLM content converted in Base64.
+     * with the HTML content converted in Base64.
      * A screenshot of the slide is taken to update the menu of available slides.
      *
      * @param markup
@@ -377,9 +390,14 @@ public class SlideshowFXController implements Initializable {
         }
 
         try {
+            this.taskInProgress.update(-1, "Saving presentation");
+
             this.builder.savePresentation(presentationArchive);
+
+            this.taskInProgress.update(0, "Presentation saved");
         } catch (IOException e) {
-            e.printStackTrace();
+            this.taskInProgress.update(0, "Error while saving the presentation");
+            LOGGER.log(Level.SEVERE, "Error while saving the presentation", e);
         }
     }
 
@@ -398,10 +416,15 @@ public class SlideshowFXController implements Initializable {
 
         if (presentationArchive != null) {
             try {
+                this.taskInProgress.update(-1, "Saving presentation");
+
                 this.builder.setPresentationArchiveFile(presentationArchive);
                 this.builder.savePresentation(presentationArchive);
+
+                this.taskInProgress.update(0, "Presentation saved");
             } catch (IOException e) {
-                e.printStackTrace();
+                this.taskInProgress.update(0, "Error while saving the presentation");
+                LOGGER.log(Level.SEVERE, "Error while saving the presentation", e);
             }
         }
     }
@@ -504,6 +527,94 @@ public class SlideshowFXController implements Initializable {
         this.insertText(this.fieldValueText, qrCode, null);
 
         this.fieldValueText.requestFocus();
+    }
+
+    /**
+     * This method is called when a file is dropped on the presentation's browser.
+     * It allows to open presentation or template to be opened by drag'n'drop.
+     *
+     * @param dragEvent The drag event associated to the drag.
+     */
+    @FXML private void dragDroppedOnBrowser(DragEvent dragEvent) {
+        Dragboard board = dragEvent.getDragboard();
+        boolean dragSuccess = false;
+
+        if (board.hasFiles()) {
+            Optional<File> slideshowFXFile = board.getFiles().stream()
+                    .filter(file -> file.getName().endsWith(".sfx") || file.getName().endsWith(".sfxt"))
+                    .findFirst();
+
+            if (slideshowFXFile != null && slideshowFXFile.isPresent()) {
+                try {
+                    SlideshowFXController.this.openTemplateOrPresentation(slideshowFXFile.get());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                dragSuccess = true;
+            }
+        }
+
+        dragEvent.setDropCompleted(dragSuccess);
+        dragEvent.consume();
+        PlatformHelper.run(() -> {
+            this.browserStackPane.getStyleClass().remove("validDragOver");
+            this.browserStackPane.getStyleClass().remove("invalidDragOver");
+        });
+    }
+
+    /**
+     * This method is called when a file is dragged over the presentation's browser.
+     * It allows to open presentation or template to be opened by drag'n'drop.
+     *
+     * @param dragEvent The drag event associated to the drag.
+     */
+    @FXML private void dragOverBrowser(DragEvent dragEvent) {
+        if(dragEvent.getGestureSource() != browser && dragEvent.getDragboard().hasFiles()) {
+            /**
+             * Check if either a template or a presentation is drag over the browser.
+             */
+            Optional<File> slideshowFXFile = dragEvent.getDragboard().getFiles().stream()
+                    .filter(file -> file.getName().endsWith(".sfx") || file.getName().endsWith(".sfxt"))
+                    .findFirst();
+
+            if (slideshowFXFile != null && slideshowFXFile.isPresent()) {
+                dragEvent.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+
+                PlatformHelper.run(() ->  {
+                    this.browserStackPane.getStyleClass().remove("invalidDragOver");
+
+                    if(!this.browserStackPane.getStyleClass().contains("validDragOver")) {
+                        this.browserStackPane.getStyleClass().add("validDragOver");
+                    }
+                });
+
+            } else {
+                PlatformHelper.run(() -> {
+                    this.browserStackPane.getStyleClass().remove("validDragOver");
+
+                    if (!this.browserStackPane.getStyleClass().contains("invalidDragOver")) {
+                        this.browserStackPane.getStyleClass().add("invalidDragOver");
+                    }
+                });
+            }
+
+            dragEvent.consume();
+        }
+    }
+
+    /**
+     * This method is called the drag exits the presentation's browser
+     *
+     * @param dragEvent The drag event associated to the drag.
+     */
+    @FXML private void onDragExitedBrowser(DragEvent dragEvent) {
+        PlatformHelper.run(() -> {
+            this.browserStackPane.getStyleClass().remove("validDragOver");
+            this.browserStackPane.getStyleClass().remove("invalidDragOver");
+        });
     }
 
     private void insertText(TextInputControl input, String textToInsert, Integer moveCaretPosition) {
@@ -644,46 +755,22 @@ public class SlideshowFXController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Make this controller available to JavaScript
-        this.browser.getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
-            @Override
-            public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State state2) {
-                if (state2 == Worker.State.SUCCEEDED) {
-                    JSObject window = (JSObject) browser.getEngine().executeScript("window");
-                    window.setMember(SlideshowFXController.this.builder.getTemplate().getJsObject(), SlideshowFXController.this);
-                }
+        this.browser.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                JSObject window = (JSObject) browser.getEngine().executeScript("window");
+                window.setMember(SlideshowFXController.this.builder.getTemplate().getJsObject(), SlideshowFXController.this);
+
+                taskInProgress.update(0, "Presentation loaded");
+            } else if(newState == Worker.State.RUNNING) {
+                taskInProgress.update(-1, "Loading presentation ...");
+            } else if(newState == Worker.State.CANCELLED) {
+                taskInProgress.update(0, "Presentation load aborted");
+            } else if(newState == Worker.State.CANCELLED || newState == Worker.State.FAILED) {
+                taskInProgress.update(0, "Error while loading presentation");
             }
         });
 
         this.browser.getEngine().setJavaScriptEnabled(true);
-
-        this.browser.setOnDragDropped(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent dragEvent) {
-                Dragboard board = dragEvent.getDragboard();
-                boolean dragSuccess = false;
-
-                if (board.hasFiles()) {
-                    Optional<File> slideshowFXFile = board.getFiles().stream()
-                            .filter(file -> file.getName().endsWith(".sfx") || file.getName().endsWith(".sfxt"))
-                            .findFirst();
-
-                    if (slideshowFXFile != null && slideshowFXFile.isPresent()) {
-                        try {
-                            SlideshowFXController.this.openTemplateOrPresentation(slideshowFXFile.get());
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-
-                        dragSuccess = true;
-                    }
-                }
-
-                dragEvent.setDropCompleted(dragSuccess);
-                dragEvent.consume();
-            }
-        });
 
         this.saveButton.setGraphic(
                 new ImageView(

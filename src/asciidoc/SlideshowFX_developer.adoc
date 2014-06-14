@@ -39,7 +39,7 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 | jsoup | 1.7.3 |
 
-| netty-all | 4.0.18.Final |
+| netty-all | 4.0.19.Final |
 
 | org.eclipse.mylyn.wikitext.core | 2.0.0.20140108-1934 | Library used for textile support
 
@@ -51,7 +51,7 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 | Velocity | 1.7 |
 
-| vertx-core | 2.1RC3 |
+| vertx-core | 2.1 |
 
 | zxing-core | 2.3.0 |
 

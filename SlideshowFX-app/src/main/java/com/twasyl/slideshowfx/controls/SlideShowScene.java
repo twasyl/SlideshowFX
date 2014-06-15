@@ -25,18 +25,20 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebView;
 import javafx.util.Duration;
 import netscape.javascript.JSObject;
 
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -56,7 +58,6 @@ public class SlideShowScene extends Scene {
     public SlideShowScene(WebView browser) {
         super(new StackPane());
         this.browser.set(browser);
-        // this.canvas.set(new AnchorPane());
 
         if(Chat.isOpened()) {
             chatBrowser.set(new WebView());
@@ -75,15 +76,19 @@ public class SlideShowScene extends Scene {
                 }
             });
         }
-        this.setOnKeyReleased(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent keyEvent) {
-                if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
-                    keyEvent.consume();
+        this.setOnKeyReleased(keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
+                keyEvent.consume();
 
-                    SlideShowScene.this.exitSlideshow();
-                }
+                SlideShowScene.this.exitSlideshow();
+            } else if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+                click();
             }
+        });
+
+        this.browser.get().getEngine().setOnError((WebErrorEvent event) -> {
+            LOGGER.warning("An error occurred in the slideshow's browser:");
+            LOGGER.warning(event.getMessage());
         });
 
         final StackPane root = getSceneRoot();
@@ -96,6 +101,8 @@ public class SlideShowScene extends Scene {
             opened/closed */
             this.chatBrowser.get().translateYProperty().bind(root.heightProperty().subtract(this.chatBrowser.get().heightProperty()));
         }
+
+        this.setCursor(null);
     }
 
     public ObjectProperty<WebView> browserProperty() { return browser; }
@@ -149,8 +156,8 @@ public class SlideShowScene extends Scene {
 
     /**
      * Show a circular red pointer on the presentation.
-     * @param x The X position of the pointer.
-     * @param y The Y position of the pointer.
+     * @param x The X position of the pointer. The coordinate is considered as the center of the pointer.
+     * @param y The Y position of the pointer. The coordinate is considered as the center of the pointer.
      */
     public void showPointer(double x, double y) {
         PlatformHelper.run(() -> {
@@ -164,8 +171,8 @@ public class SlideShowScene extends Scene {
                 SlideShowScene.this.getSceneRoot().getChildren().add(SlideShowScene.this.pointer.get());
             }
 
-            SlideShowScene.this.pointer.get().setTranslateX(x);
-            SlideShowScene.this.pointer.get().setTranslateY(y);
+            SlideShowScene.this.pointer.get().setTranslateX(x - SlideShowScene.this.pointer.get().getRadius());
+            SlideShowScene.this.pointer.get().setTranslateY(y - SlideShowScene.this.pointer.get().getRadius());
         });
     }
 
@@ -177,6 +184,52 @@ public class SlideShowScene extends Scene {
             PlatformHelper.run(() -> {
                 ((StackPane) SlideShowScene.this.getRoot()).getChildren().remove(SlideShowScene.this.pointer.get());
             });
+        }
+    }
+
+    /**
+     * Performs a click on the scene where the pointer is located. This method uses the {@link java.awt.Robot} class to
+     * move the mouse at the location of the pointer and perform a click. The coordinates used for the click are the center
+     * of the pointer and takes into account a multiple screen environment.
+     */
+    public void click() {
+        if(this.pointer.get() != null && this.getSceneRoot().getChildren().contains(this.pointer.get())) {
+
+            /**
+             * In a multi screen environment, we need to apply a delta on the coordinates. Indeed
+             * the location of the window (X and Y) takes in consideration this environment. For instance
+             * if you have 3 screens positioned horizontally and the main screen is the middle one:
+             * <ul>
+             *     <li>If the app is displayed on left screen, the X coordinate of the window will be negative
+             *     (according the width of the screen)</li>
+             *     <li>If the app is displayed on the right screen, the X coordinate of the window will be positive
+             *     (according the width of the screen)</li>
+             *     <li>If the app is displayed on the middle screen, the X coordinate will be 0</li>
+             * </ul>
+             */
+
+            double clickX = this.pointer.get().getTranslateX() + this.pointer.get().getRadius();
+            clickX += super.getWindow().getX();
+
+            double clickY = this.pointer.get().getTranslateY() + this.pointer.get().getRadius();
+            clickY += super.getWindow().getY();
+
+            /**
+             * The pointer has to be removed because if not, the click is performed on it, and not on elements
+             * of the scene. It will be added when click is performed.
+             */
+            SlideShowScene.this.getSceneRoot().getChildren().remove(SlideShowScene.this.pointer.get());
+
+            try {
+                Robot robot = new Robot(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
+                robot.mouseMove((int) clickX, (int) clickY);
+                robot.mousePress(InputEvent.BUTTON1_MASK);
+                robot.mouseRelease(InputEvent.BUTTON1_MASK);
+            } catch (AWTException e) {
+                LOGGER.log(Level.WARNING, "Can not simulate click", e);
+            } finally {
+                SlideShowScene.this.getSceneRoot().getChildren().add(SlideShowScene.this.pointer.get());
+            }
         }
     }
 }

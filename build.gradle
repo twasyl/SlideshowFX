@@ -16,17 +16,15 @@
 
 buildscript {
     repositories {
-        mavenCentral name: 'Bintray Asciidoctor repo', url: 'http://dl.bintray.com/content/aalmiray/asciidoctor'
-        mavenCentral name: 'Bintray JCenter', url: 'http://jcenter.bintray.com'
+        jcenter()
     }
 
     dependencies {
-        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:0.7.0'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.3'
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:0.7.2'
     }
 }
 
-apply plugin: 'asciidoctor'
+apply plugin: 'org.asciidoctor.gradle.asciidoctor'
 
 ext {
 	allLibs = new File(rootDir, '/lib')

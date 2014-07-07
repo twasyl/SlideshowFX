@@ -17,18 +17,14 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
-import com.twasyl.slideshowfx.builder.PresentationBuilder;
-import com.twasyl.slideshowfx.builder.Slide;
-import com.twasyl.slideshowfx.builder.SlideElement;
-import com.twasyl.slideshowfx.builder.template.SlideTemplate;
+import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
+import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
+import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
 import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.controls.TaskProgressIndicator;
-import com.twasyl.slideshowfx.exceptions.InvalidPresentationConfigurationException;
-import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
-import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
-import com.twasyl.slideshowfx.exceptions.PresentationException;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
@@ -40,8 +36,11 @@ import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.print.PrinterJob;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -51,6 +50,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import netscape.javascript.JSObject;
 import org.xml.sax.SAXException;
 
@@ -62,7 +62,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -80,7 +79,7 @@ import java.util.logging.Logger;
 public class SlideshowFXController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXController.class.getName());
 
-    private final PresentationBuilder builder = new PresentationBuilder();
+    private final PresentationEngine presentationEngine = new PresentationEngine();
 
     private final EventHandler<ActionEvent> addSlideActionEvent = new EventHandler<ActionEvent>() {
         @Override
@@ -88,15 +87,15 @@ public class SlideshowFXController implements Initializable {
             try {
 
                 Object userData = ((MenuItem) actionEvent.getSource()).getUserData();
-                if (userData instanceof SlideTemplate) {
-                    final String slideId = (String) SlideshowFXController.this.browser.getEngine().executeScript(SlideshowFXController.this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
+                if (userData instanceof SlideTemplateConfiguration) {
+                    final String slideId = (String) SlideshowFXController.this.browser.getEngine().executeScript(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getGetCurrentSlideMethod() + "();");
                     String slideNumber = null;
 
                     if (slideId != null && !slideId.isEmpty()) {
-                        slideNumber = slideId.substring(SlideshowFXController.this.builder.getTemplate().getSlideIdPrefix().length());
+                        slideNumber = slideId.substring(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getSlideIdPrefix().length());
                     }
 
-                    SlideshowFXController.this.builder.addSlide((SlideTemplate) userData, slideNumber);
+                    SlideshowFXController.this.presentationEngine.addSlide((SlideTemplateConfiguration) userData, slideNumber);
                     SlideshowFXController.this.browser.getEngine().reload();
 
                     SlideshowFXController.this.updateSlideSplitMenu();
@@ -113,12 +112,12 @@ public class SlideshowFXController implements Initializable {
             final SlideMenuItem menunItem = (SlideMenuItem) actionEvent.getSource();
 
             final String slideId = (String) SlideshowFXController.this.browser.getEngine()
-                    .executeScript(SlideshowFXController.this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
+                    .executeScript(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getGetCurrentSlideMethod() + "();");
 
-            Slide slideToMove = SlideshowFXController.this.builder.getPresentation().getSlideById(slideId);
-            Slide beforeSlide = menunItem.getSlide();
+            SlidePresentationConfiguration slideToMove = SlideshowFXController.this.presentationEngine.getConfiguration().getSlideById(slideId);
+            SlidePresentationConfiguration beforeSlide = menunItem.getSlide();
 
-            SlideshowFXController.this.builder.moveSlide(slideToMove, beforeSlide);
+            SlideshowFXController.this.presentationEngine.moveSlide(slideToMove, beforeSlide);
 
             SlideshowFXController.this.browser.getEngine().reload();
             SlideshowFXController.this.updateSlideSplitMenu();
@@ -159,7 +158,7 @@ public class SlideshowFXController implements Initializable {
 
     /**
      * Loads a SlideshowFX template. This method displays an open dialog which only allows to open template files (with
-     * .sfxt extension) and then call the {@link #openTemplateOrPresentation(java.io.File)} method.
+     * .sfxt archiveExtension) and then call the {@link #openTemplateOrPresentation(java.io.File)} method.
      *
      * @param event the event that triggered the call.
      */
@@ -182,7 +181,7 @@ public class SlideshowFXController implements Initializable {
 
     /**
      * Open a SlideshowFX presentation. This method displays an open dialog which only allows to open presentation files
-     * (with the .sfx extension) and then call {@link #openTemplateOrPresentation(java.io.File)} method.
+     * (with the .sfx archiveExtension) and then call {@link #openTemplateOrPresentation(java.io.File)} method.
      *
      * @param event the event that triggered the call.
      */
@@ -221,43 +220,29 @@ public class SlideshowFXController implements Initializable {
             try {
                 this.taskInProgress.update(-1, "Opening presentation ...");
 
-                this.builder.openPresentation(dataFile);
-                this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
+                this.presentationEngine.loadArchive(dataFile);
+                this.browser.getEngine().load(this.presentationEngine.getConfiguration().getPresentationFile().toURI().toASCIIString());
 
                 this.updateSlideTemplatesSplitMenu();
                 this.updateSlideSplitMenu();
 
                 this.taskInProgress.update(0, "Presentation loaded");
-            } catch (InvalidTemplateConfigurationException e) {
-                this.taskInProgress.update(0, "Configuration of the presentation's template is invalid");
-                LOGGER.log(Level.SEVERE, "Error when opening the presentation", e);
-            } catch (InvalidTemplateException e) {
-                this.taskInProgress.update(0, "Presentation's template is invalid");
-                LOGGER.log(Level.SEVERE, "Error when opening the presentation", e);
-            } catch (PresentationException e) {
+            } catch (IOException e) {
                 this.taskInProgress.update(0, "Error when opening the presentation");
-                LOGGER.log(Level.SEVERE, "Error when opening the presentation", e);
-            } catch (InvalidPresentationConfigurationException e) {
-                this.taskInProgress.update(0, "Configuration of the presentation is invalid");
                 LOGGER.log(Level.SEVERE, "Error when opening the presentation", e);
             }
         } else if (dataFile.getName().endsWith(".sfxt")) {
             try {
                 this.taskInProgress.update(-1, "Opening template ...");
 
-                this.builder.loadTemplate(dataFile);
-                this.browser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
+                this.presentationEngine.createFromTemplate(dataFile);
+                this.browser.getEngine().load(this.presentationEngine.getConfiguration().getPresentationFile().toURI().toASCIIString());
 
                 this.updateSlideTemplatesSplitMenu();
 
                 this.taskInProgress.update(0, "Template loaded");
-            } catch (InvalidTemplateException e) {
-                this.taskInProgress.update(0, "Presentation's template is invalid");
-                LOGGER.log(Level.SEVERE, "Error when opening the template", e);
-            } catch (InvalidTemplateConfigurationException e) {
-                this.taskInProgress.update(0, "Configuration of the presentation's template is invalid");
-                LOGGER.log(Level.SEVERE, "Error when opening the template", e);
-            } catch (PresentationException e) {
+            } catch (IOException e) {
+                this.taskInProgress.update(0, "Error when opening the template");
                 LOGGER.log(Level.SEVERE, "Error when opening the template", e);
             }
         }
@@ -282,7 +267,7 @@ public class SlideshowFXController implements Initializable {
     /**
      * This method updates a slide of the presentation. It takes the <code>markup</code> to converte the <code>originalContent</code>
      * in HTML and then the slide element is updated. The presentation is then saved temporary.
-     * The content is send to the page by calling the {@link com.twasyl.slideshowfx.builder.template.Template#getContentDefinerMethod()}
+     * The content is send to the page by calling the {@link com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration#getContentDefinerMethod()}
      * with the HTML content converted in Base64.
      * A screenshot of the slide is taken to update the menu of available slides.
      *
@@ -297,18 +282,18 @@ public class SlideshowFXController implements Initializable {
         final String htmlContent = markup.convertAsHtml(originalContent);
 
         // Update the SlideElement
-        final Slide slideToUpdate = this.builder.getPresentation().getSlideByNumber(this.slideNumber.getText());
+        final SlidePresentationConfiguration slideToUpdate = this.presentationEngine.getConfiguration().getSlideByNumber(this.slideNumber.getText());
         slideToUpdate.updateElement(
                 this.slideNumber.getText() + "-" + this.fieldName.getText(), markup.getCode(), originalContent, htmlContent
         );
 
-        this.builder.getPresentation().updateSlideInDocument(slideToUpdate);
+        this.presentationEngine.getConfiguration().updateSlideInDocument(slideToUpdate);
 
-        this.builder.saveTemporaryPresentation();
+        this.presentationEngine.savePresentationFile();
 
         String clearedContent = Base64.getEncoder().encodeToString(htmlContent.getBytes("UTF8"));
         String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",
-                this.builder.getTemplate().getContentDefinerMethod(),
+                this.presentationEngine.getTemplateConfiguration().getContentDefinerMethod(),
                 this.slideNumber.getText(),
                 this.fieldName.getText(),
                 clearedContent);
@@ -317,23 +302,23 @@ public class SlideshowFXController implements Initializable {
 
         // Take a thumbnail of the slide
         WritableImage thumbnail = this.browser.snapshot(null, null);
-        this.builder.getPresentation().updateSlideThumbnail(this.slideNumber.getText(), thumbnail);
+        this.presentationEngine.getConfiguration().updateSlideThumbnail(this.slideNumber.getText(), thumbnail);
 
         updateSlideSplitMenu();
     }
 
     /**
      * Copy the slide, update the menu of available slides and reload the presentation.
-     * The copy is delegated to {@link com.twasyl.slideshowfx.builder.PresentationBuilder#duplicateSlide(com.twasyl.slideshowfx.builder.Slide)}.
+     * The copy is delegated to {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#duplicateSlide(com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration)}.
      *
      * @param event
      */
     @FXML
     private void copySlide(ActionEvent event) {
-        final String slideId = (String) this.browser.getEngine().executeScript(this.builder.getTemplate().getGetCurrentSlideMethod() + "();");
+        final String slideId = (String) this.browser.getEngine().executeScript(this.presentationEngine.getTemplateConfiguration().getGetCurrentSlideMethod() + "();");
 
-        Slide slideToCopy = this.builder.getPresentation().getSlideById(slideId);
-        this.builder.duplicateSlide(slideToCopy);
+        SlidePresentationConfiguration slideToCopy = this.presentationEngine.getConfiguration().getSlideById(slideId);
+        this.presentationEngine.duplicateSlide(slideToCopy);
 
         this.updateSlideSplitMenu();
 
@@ -341,19 +326,19 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
-     * Delete a slide from the presentation. The deletion is delegated to {@link com.twasyl.slideshowfx.builder.PresentationBuilder#deleteSlide(String)}.
+     * Delete a slide from the presentation. The deletion is delegated to {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#deleteSlide(String)}.
      *
      * @param event
      */
     @FXML
     private void deleteSlide(ActionEvent event) {
-        String slideId = this.browser.getEngine().executeScript(this.builder.getTemplate().getGetCurrentSlideMethod() + "();").toString();
+        String slideId = this.browser.getEngine().executeScript(this.presentationEngine.getTemplateConfiguration().getGetCurrentSlideMethod() + "();").toString();
 
         if (slideId != null && !slideId.isEmpty()) {
-            String slideNumber = slideId.substring(this.builder.getTemplate().getSlideIdPrefix().length());
+            String slideNumber = slideId.substring(this.presentationEngine.getTemplateConfiguration().getSlideIdPrefix().length());
 
             try {
-                this.builder.deleteSlide(slideNumber);
+                this.presentationEngine.deleteSlide(slideNumber);
                 SlideshowFXController.this.browser.getEngine().reload();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -374,25 +359,25 @@ public class SlideshowFXController implements Initializable {
     /**
      * Save the current presentation. If the presentation has never been saved a save dialog is displayed.
      * Then the presentation is saved where the user has chosen or opened the presentation.
-     * The saving is delegated to {@link com.twasyl.slideshowfx.builder.PresentationBuilder#savePresentation(java.io.File)}
+     * The saving is delegated to {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#saveArchive(java.io.File)}
      *
      * @param event
      */
     @FXML
     private void save(ActionEvent event) {
         File presentationArchive = null;
-        if (this.builder.getPresentationArchiveFile() == null) {
+        if (this.presentationEngine.getArchive() == null) {
             FileChooser chooser = new FileChooser();
             chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
             presentationArchive = chooser.showSaveDialog(null);
         } else {
-            presentationArchive = this.builder.getPresentationArchiveFile();
+            presentationArchive = this.presentationEngine.getArchive();
         }
 
         try {
             this.taskInProgress.update(-1, "Saving presentation");
 
-            this.builder.savePresentation(presentationArchive);
+            this.presentationEngine.saveArchive(presentationArchive);
 
             this.taskInProgress.update(0, "Presentation saved");
         } catch (IOException e) {
@@ -403,7 +388,7 @@ public class SlideshowFXController implements Initializable {
 
     /**
      * Saves a copy of the existing presentation. A save dialog is displayed to the user.
-     * The saving is delegated to {@link com.twasyl.slideshowfx.builder.PresentationBuilder#savePresentation(java.io.File)}.
+     * The saving is delegated to {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#saveArchive(java.io.File)}.
      *
      * @param event
      */
@@ -418,8 +403,8 @@ public class SlideshowFXController implements Initializable {
             try {
                 this.taskInProgress.update(-1, "Saving presentation");
 
-                this.builder.setPresentationArchiveFile(presentationArchive);
-                this.builder.savePresentation(presentationArchive);
+                this.presentationEngine.setArchive(presentationArchive);
+                this.presentationEngine.saveArchive();
 
                 this.taskInProgress.update(0, "Presentation saved");
             } catch (IOException e) {
@@ -450,11 +435,11 @@ public class SlideshowFXController implements Initializable {
 
     @FXML
     private void slideShow(ActionEvent event) {
-        if (this.builder.getPresentation() != null
-                && this.builder.getPresentation().getPresentationFile() != null
-                && this.builder.getPresentation().getPresentationFile().exists()) {
+        if (this.presentationEngine.getConfiguration() != null
+                && this.presentationEngine.getConfiguration().getPresentationFile() != null
+                && this.presentationEngine.getConfiguration().getPresentationFile().exists()) {
             final WebView slideShowBrowser = new WebView();
-            slideShowBrowser.getEngine().load(this.builder.getPresentation().getPresentationFile().toURI().toASCIIString());
+            slideShowBrowser.getEngine().load(this.presentationEngine.getConfiguration().getPresentationFile().toURI().toASCIIString());
 
             final SlideShowScene subScene = new SlideShowScene(slideShowBrowser);
 
@@ -489,18 +474,18 @@ public class SlideshowFXController implements Initializable {
             File targetFile;
             if (imageFile.exists()) {
                 // If the file exists, add a timestamp to the source
-                targetFile = new File(this.builder.getTemplate().getResourcesDirectory(), System.currentTimeMillis() + imageFile.getName());
+                targetFile = new File(this.presentationEngine.getTemplateConfiguration().getResourcesDirectory(), System.currentTimeMillis() + imageFile.getName());
             } else {
-                targetFile = new File(this.builder.getTemplate().getResourcesDirectory(), imageFile.getName());
+                targetFile = new File(this.presentationEngine.getTemplateConfiguration().getResourcesDirectory(), imageFile.getName());
             }
 
             try {
                 Files.copy(imageFile.toPath(), targetFile.toPath());
 
                 // Get the relative path of the resources folder from the template directory
-                final Path relativePath = this.builder.getTemplate().getFolder().toPath().relativize(this.builder.getTemplate().getResourcesDirectory().toPath());
+                final String relativePath = this.presentationEngine.relativizeFromWorkingDirectory(this.presentationEngine.getTemplateConfiguration().getResourcesDirectory());
 
-                final String imgMarkup = String.format("<img src=\"%1$s/%2$s\" />", relativePath.toString(), targetFile.getName());
+                final String imgMarkup = String.format("<img src=\"%1$s/%2$s\" />", relativePath, targetFile.getName());
 
                 this.insertText(this.fieldValueText, imgMarkup, null);
             } catch (IOException e) {
@@ -643,13 +628,13 @@ public class SlideshowFXController implements Initializable {
 
     private void updateSlideTemplatesSplitMenu() {
         this.addSlideButton.getItems().clear();
-        if (this.builder.getTemplate() != null) {
+        if (this.presentationEngine.getTemplateConfiguration() != null) {
             MenuItem item;
 
-            for (SlideTemplate slideTemplate : this.builder.getTemplate().getSlideTemplates()) {
+            for (SlideTemplateConfiguration slideTemplateConfiguration : this.presentationEngine.getTemplateConfiguration().getSlideTemplateConfigurations()) {
                 item = new MenuItem();
-                item.setText(slideTemplate.getName());
-                item.setUserData(slideTemplate);
+                item.setText(slideTemplateConfiguration.getName());
+                item.setUserData(slideTemplateConfiguration);
                 item.setOnAction(addSlideActionEvent);
                 this.addSlideButton.getItems().add(item);
             }
@@ -659,7 +644,7 @@ public class SlideshowFXController implements Initializable {
     private void updateSlideSplitMenu() {
         SlideshowFXController.this.moveSlideButton.getItems().clear();
         SlideMenuItem menuItem;
-        for (Slide slide : SlideshowFXController.this.builder.getPresentation().getSlides()) {
+        for (SlidePresentationConfiguration slide : SlideshowFXController.this.presentationEngine.getConfiguration().getSlides()) {
             menuItem = new SlideMenuItem(slide);
             menuItem.setOnAction(SlideshowFXController.this.moveSlideActionEvent);
             SlideshowFXController.this.moveSlideButton.getItems().add(menuItem);
@@ -677,10 +662,10 @@ public class SlideshowFXController implements Initializable {
         this.slideNumber.setText(slideNumber);
         this.fieldName.setText(field);
 
-        final Slide slide = this.builder.getPresentation().getSlideByNumber(slideNumber);
+        final SlidePresentationConfiguration slide = this.presentationEngine.getConfiguration().getSlideByNumber(slideNumber);
 
         if (slide != null) {
-            final SlideElement element = slide.getElements().get(slideNumber + "-" + field);
+            final SlideElementConfiguration element = slide.getElements().get(slideNumber + "-" + field);
 
             /**
              * Prefill the content either with the element's content if it is not null, either with the given
@@ -758,7 +743,7 @@ public class SlideshowFXController implements Initializable {
         this.browser.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 JSObject window = (JSObject) browser.getEngine().executeScript("window");
-                window.setMember(SlideshowFXController.this.builder.getTemplate().getJsObject(), SlideshowFXController.this);
+                window.setMember(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getJsObject(), SlideshowFXController.this);
 
                 taskInProgress.update(0, "Presentation loaded");
             } else if(newState == Worker.State.RUNNING) {

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.builder;
+package com.twasyl.slideshowfx.engine.presentation.configuration;
 
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
-public class SlideElement {
+public class SlideElementConfiguration {
     private String id;
     private String htmlContent;
     private String originalContent;

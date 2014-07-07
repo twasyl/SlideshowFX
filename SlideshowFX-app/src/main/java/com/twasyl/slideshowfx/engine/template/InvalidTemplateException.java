@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.exceptions;
+package com.twasyl.slideshowfx.engine.template;
 
-public class InvalidTemplateConfigurationException extends Exception {
+public class InvalidTemplateException extends Exception {
 
-    public InvalidTemplateConfigurationException() {
-        super();
+    public InvalidTemplateException() {
     }
 
-    public InvalidTemplateConfigurationException(String message) {
+    public InvalidTemplateException(String message) {
         super(message);
     }
 
-    public InvalidTemplateConfigurationException(String message, Throwable cause) {
+    public InvalidTemplateException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public InvalidTemplateConfigurationException(Throwable cause) {
+    public InvalidTemplateException(Throwable cause) {
         super(cause);
     }
 
-    protected InvalidTemplateConfigurationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public InvalidTemplateException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

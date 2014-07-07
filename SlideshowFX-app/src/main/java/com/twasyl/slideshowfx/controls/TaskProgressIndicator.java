@@ -20,6 +20,7 @@ import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
+import javafx.animation.TranslateTransition;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
@@ -47,18 +48,10 @@ public class TaskProgressIndicator extends HBox {
     }
 
     public String getText() { return this.label.getText(); }
-
-    public void setText(String text) {
-        PlatformHelper.run(() -> {
-            this.label.setText(text);
-            this.labelTransition.playFromStart();
-        });
-    }
+    public void setText(String text) { this.label.setText(text); }
 
     public double getProgress() { return this.bar.getProgress(); }
-    public void setProgress(double progress) {
-        PlatformHelper.run(() -> this.bar.setProgress(progress));
-    }
+    public void setProgress(double progress) { this.bar.setProgress(progress); }
 
     /**
      * Updates the TaskProgressIndicator with the given progress and text.
@@ -68,5 +61,7 @@ public class TaskProgressIndicator extends HBox {
     public void update(double progress, String text) {
         this.setProgress(progress);
         this.setText(text);
+
+        PlatformHelper.run(() -> this.labelTransition.playFromStart());
     }
 }

@@ -31,6 +31,7 @@ apply plugin: 'asciidoctor'
 ext {
 	allLibs = new File(rootDir, '/lib')
 	felix = fileTree(dir: allLibs, include: 'Felix/*.jar')
+    hamcrest = fileTree(dir: allLibs, include: 'hamcrest-core-1.3.jar')
 	jsoup = fileTree(dir: allLibs, include: 'jsoup-1.7.3.jar')
 	junit = fileTree(dir: allLibs, include: 'junit-4.11.jar')
 	leapmotion = fileTree(dir: allLibs, include: 'Leap/*')
@@ -52,7 +53,7 @@ asciidoctor {
                     toc: '',
                     'javafx-version': 8,
                     'jdk-version': 8,
-                    'gradle-version': 1.12
+                    'gradle-version': 2.0
             ]
     ]
 }
@@ -229,6 +230,7 @@ project(':SlideshowFX-app') {
 		compile vertx
 		compile zxing
 
+        testCompile hamcrest
 		testCompile  junit
 	}	
 
@@ -269,8 +271,8 @@ task installMarkupPlugins << {
 	}
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.12'
+task buildGradleWrapper(type: Wrapper) {
+    gradleVersion = '2.0'
 }
 
 installMarkupPlugins.dependsOn ':SlideshowFX-html:assemble'

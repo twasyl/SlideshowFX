@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.builder;
+package com.twasyl.slideshowfx.engine.presentation.configuration;
 
+import com.twasyl.slideshowfx.engine.IConfiguration;
 import javafx.scene.image.Image;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -27,20 +29,19 @@ import java.util.logging.Logger;
 /**
  * Represents a presentation
  */
-public class Presentation {
-    private static final Logger LOGGER = Logger.getLogger(Presentation.class.getName());
-    protected static final String PRESENTATION_CONFIGURATION_NAME = "presentation-config.json";
-    protected static final String PRESENTATION_FILE_NAME = "presentation.html";
+public class PresentationConfiguration implements IConfiguration {
+    private static final Logger LOGGER = Logger.getLogger(PresentationConfiguration.class.getName());
+    public static final String DEFAULT_PRESENTATION_FILENAME = "presentation.html";
 
     private Document document;
     private File presentationFile;
-    private List<Slide> slides;
+    private List<SlidePresentationConfiguration> slides = new ArrayList<>();
 
     public File getPresentationFile() { return presentationFile; }
     public void setPresentationFile(File presentationFile) { this.presentationFile = presentationFile; }
 
-    public List<Slide> getSlides() { return slides; }
-    public void setSlides(List<Slide> slides) { this.slides = slides; }
+    public List<SlidePresentationConfiguration> getSlides() { return slides; }
+    public void setSlides(List<SlidePresentationConfiguration> slides) { this.slides = slides; }
 
     public Document getDocument() { return document; }
     public void setDocument(Document document) { this.document = document; }
@@ -48,8 +49,8 @@ public class Presentation {
     public void updateSlideThumbnail(String slideNumber, Image image) {
         if(slideNumber == null) throw new IllegalArgumentException("The slide number can not be null");
 
-        Slide slideToUpdate = null;
-        for (Slide s : getSlides()) {
+        SlidePresentationConfiguration slideToUpdate = null;
+        for (SlidePresentationConfiguration s : getSlides()) {
             if (slideNumber.equals(s.getSlideNumber())) {
                 s.setThumbnail(image);
                 LOGGER.finest("Slide's thumbnail updated");
@@ -63,10 +64,10 @@ public class Presentation {
      * @param slideNumber
      * @return The slide or null if not found
      */
-    public Slide getSlideByNumber(String slideNumber) {
-        Slide slide = null;
+    public SlidePresentationConfiguration getSlideByNumber(String slideNumber) {
+        SlidePresentationConfiguration slide = null;
 
-        Optional<Slide> slideOpt = slides.stream()
+        Optional<SlidePresentationConfiguration> slideOpt = slides.stream()
                 .filter(s -> slideNumber.equals(s.getSlideNumber()))
                 .findFirst();
 
@@ -80,10 +81,10 @@ public class Presentation {
      * @param id
      * @return The slide or null if not found
      */
-    public Slide getSlideById(String id) {
-        Slide slide = null;
+    public SlidePresentationConfiguration getSlideById(String id) {
+        SlidePresentationConfiguration slide = null;
 
-        Optional<Slide> slideOpt = slides.stream()
+        Optional<SlidePresentationConfiguration> slideOpt = slides.stream()
                 .filter(s -> id.equals(s.getId()))
                 .findFirst();
 
@@ -96,7 +97,7 @@ public class Presentation {
      * In the HTML document update the given slide.
      * @param slide
      */
-    public void updateSlideInDocument(Slide slide) {
+    public void updateSlideInDocument(SlidePresentationConfiguration slide) {
         if(slide == null) throw new IllegalArgumentException("The slide can not be null");
 
         slide.getElements().values()

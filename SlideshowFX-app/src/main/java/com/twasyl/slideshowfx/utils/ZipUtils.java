@@ -16,10 +16,7 @@
 
 package com.twasyl.slideshowfx.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -27,14 +24,26 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * This class provides utility methods for working with Zip files.
+ *
+ * @author Thierry Wasylczenko
+ */
 public class ZipUtils {
 
     private static final Logger LOGGER = Logger.getLogger(ZipUtils.class.getName());
 
-    public static void unzip(File archive, File destination) throws IOException {
-        if(archive == null) throw new IllegalArgumentException("The ZIP file can not be null");
-        if(!archive.exists()) throw new IllegalArgumentException("The ZIP file does not exist");
-        if(destination == null) throw new IllegalArgumentException("The destination can not be null");
+    /**
+     * Unzpi the given archive into the provided destination. If the destination does not exist it is created.
+     * @param archive The archive file to unzip.
+     * @param destination The destination directory where the archive will be unzipped.
+     * @throws IOException If the archive file does not exist.
+     * @throws java.lang.NullPointerException If the archive file or the destination is null.
+     */
+    public static void unzip(File archive, File destination) throws IOException, IllegalArgumentException {
+        if(archive == null) throw new NullPointerException("The ZIP file can not be null");
+        if(!archive.exists()) throw new FileNotFoundException("The ZIP file does not exist");
+        if(destination == null) throw new NullPointerException("The destination can not be null");
 
         if(!destination.exists()) destination.mkdirs();
 
@@ -76,10 +85,17 @@ public class ZipUtils {
         zipReader.close();
     }
 
+    /**
+     * Compress the given fileToZip into the given destination. This method manages if the fileToZip is a folder or a simple file.
+     * @param fileToZip The content to compress.
+     * @param destination The destination into the content will be compressed.
+     * @throws java.lang.NullPointerException If the fileToZip or the destination is null.
+     * @throws java.io.FileNotFoundException If the fileToZip does not exist.
+     */
     public static void zip(File fileToZip, File destination) throws IOException {
-        if(fileToZip == null) throw new IllegalArgumentException("The file to zip can not be null");
-        if(!fileToZip.exists()) throw new IllegalArgumentException("The file to zip does not exist");
-        if(destination == null) throw new IllegalArgumentException("The destination can not be null");
+        if(fileToZip == null) throw new NullPointerException("The file to zip can not be null");
+        if(!fileToZip.exists()) throw new FileNotFoundException("The file to zip does not exist");
+        if(destination == null) throw new NullPointerException("The destination can not be null");
 
         List<File> filesToZip = new ArrayList<>();
         makeFileList(filesToZip, fileToZip);

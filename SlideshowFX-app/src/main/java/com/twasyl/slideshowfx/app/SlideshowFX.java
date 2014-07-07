@@ -19,6 +19,7 @@ package com.twasyl.slideshowfx.app;
 import com.leapmotion.leap.Controller;
 import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
+import com.twasyl.slideshowfx.io.DeleteFileVisitor;
 import com.twasyl.slideshowfx.leap.SlideshowFXLeapListener;
 import com.twasyl.slideshowfx.utils.OSGiManager;
 import javafx.application.Application;
@@ -128,31 +129,7 @@ public class SlideshowFX extends Application {
               .filter(file -> { return file.getName().startsWith("sfx-"); })
               .forEach(file -> {
                   try {
-                      Files.walkFileTree(file.toPath(), new SimpleFileVisitor<Path>()
-                      {
-                          @Override
-                          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                              Files.delete(file);
-                              return FileVisitResult.CONTINUE;
-                          }
-
-                          @Override
-                          public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                              Files.delete(file);
-                              return FileVisitResult.CONTINUE;
-                          }
-
-                          @Override
-                          public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                              if (exc == null) {
-                                  Files.delete(dir);
-                                  return FileVisitResult.CONTINUE;
-                              } else {
-                                  // directory iteration failed; propagate exception
-                                  throw exc;
-                              }
-                          }
-                      });
+                      Files.walkFileTree(file.toPath(), new DeleteFileVisitor());
                   } catch (IOException e) {
                       LOGGER.log(Level.SEVERE,
                               String.format("Can not delete temporary file %1$s", file.getAbsolutePath()),

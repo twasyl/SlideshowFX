@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.builder;
+package com.twasyl.slideshowfx.engine.presentation.configuration;
 
-import com.twasyl.slideshowfx.builder.template.SlideTemplate;
+import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
 import javafx.scene.image.Image;
 
 import java.util.HashMap;
@@ -26,21 +26,21 @@ import java.util.Optional;
 /**
  * Represents a slide of the presentation
  */
-public class Slide {
-    private SlideTemplate template;
+public class SlidePresentationConfiguration {
+    private SlideTemplateConfiguration template;
     private String id;
     private String slideNumber;
     private Image thumbnail;
-    private final Map<String, SlideElement> elements = new HashMap<>();
+    private final Map<String, SlideElementConfiguration> elements = new HashMap<>();
 
-    public Slide() {
+    public SlidePresentationConfiguration() {
     }
 
-    public Slide(String slideNumber) {
+    public SlidePresentationConfiguration(String slideNumber) {
         this.slideNumber = slideNumber;
     }
 
-    public Slide(SlideTemplate template, String slideNumber) {
+    public SlidePresentationConfiguration(SlideTemplateConfiguration template, String slideNumber) {
         this.template = template;
         this.slideNumber = slideNumber;
     }
@@ -48,8 +48,8 @@ public class Slide {
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
-    public SlideTemplate getTemplate() { return template; }
-    public void setTemplate(SlideTemplate template) { this.template = template; }
+    public SlideTemplateConfiguration getTemplate() { return template; }
+    public void setTemplate(SlideTemplateConfiguration template) { this.template = template; }
 
     public String getSlideNumber() { return slideNumber; }
     public void setSlideNumber(String slideNumber) { this.slideNumber = slideNumber; }
@@ -62,10 +62,10 @@ public class Slide {
      * The given content should not be given in Base64.
      * @return
      */
-    public Map<String, SlideElement> getElements() { return elements; }
+    public Map<String, SlideElementConfiguration> getElements() { return elements; }
 
     public void updateElement(String elementId, String code, String originalContent, String htmlContent) {
-        Optional<SlideElement> slideElement = getElements().entrySet()
+        Optional<SlideElementConfiguration> slideElement = getElements().entrySet()
                 .stream().filter(entry -> entry.getKey().equals(elementId))
                 .map(entry -> entry.getValue())
                 .findFirst();
@@ -75,7 +75,7 @@ public class Slide {
             slideElement.get().setOriginalContent(originalContent);
             slideElement.get().setHtmlContent(htmlContent);
         } else {
-            SlideElement se = new SlideElement();
+            SlideElementConfiguration se = new SlideElementConfiguration();
             se.setId(elementId);
             se.setOriginalContentCode(code);
             se.setOriginalContent(originalContent);

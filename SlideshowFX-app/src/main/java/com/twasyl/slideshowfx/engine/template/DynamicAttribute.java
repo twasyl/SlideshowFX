@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.builder.template;
+package com.twasyl.slideshowfx.engine.template;
 
 /**
  * This class represents attributes that should be defined before adding a slide to a presentation

@@ -14,24 +14,28 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.builder.template;
+package com.twasyl.slideshowfx.engine.template.configuration;
+
+import com.twasyl.slideshowfx.engine.template.DynamicAttribute;
 
 import java.io.File;
 
 /**
- * Represents a slide defined by the template
+ * Represents a slide defined by the template.
+ *
+ * @author Thierry Wasylczenko
  */
-public class SlideTemplate {
+public class SlideTemplateConfiguration {
     private int id;
     private String name;
     private File file;
     private String[] dynamicIds;
     private DynamicAttribute[] dynamicAttributes;
 
-    public SlideTemplate() {
+    public SlideTemplateConfiguration() {
     }
 
-    public SlideTemplate(int id, String name, File file) {
+    public SlideTemplateConfiguration(int id, String name, File file) {
         this.id = id;
         this.name = name;
         this.file = file;

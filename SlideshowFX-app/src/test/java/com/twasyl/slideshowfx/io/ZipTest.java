@@ -16,15 +16,17 @@
 
 package com.twasyl.slideshowfx.io;
 
-import com.twasyl.slideshowfx.builder.PresentationBuilder;
-import com.twasyl.slideshowfx.exceptions.InvalidTemplateConfigurationException;
-import com.twasyl.slideshowfx.exceptions.InvalidTemplateException;
-import com.twasyl.slideshowfx.exceptions.PresentationException;
+import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.engine.template.InvalidTemplateConfigurationException;
+import com.twasyl.slideshowfx.engine.template.InvalidTemplateException;
+import com.twasyl.slideshowfx.engine.presentation.PresentationException;
+import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import org.junit.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +47,7 @@ public class ZipTest {
     private static File presentationExampleFolder;
     private static File presentationExampleFile;
 
-    private static PresentationBuilder builder;
+    private static TemplateEngine templateEngine;
 
     @BeforeClass
     public static void beforeClass() {
@@ -62,10 +64,10 @@ public class ZipTest {
         presentationExampleFolder = new File("./src/test/resources/iCode");
         presentationExampleFile = new File("./src/test/resources/iCode.sfx");
 
-        LOGGER.fine("Template folder: " + reveljsTemplateFolder.getAbsolutePath());
-        LOGGER.fine("Template file: " + revealjsTemplateFile.getAbsolutePath());
+        LOGGER.fine("TemplateConfiguration folder: " + reveljsTemplateFolder.getAbsolutePath());
+        LOGGER.fine("TemplateConfiguration file: " + revealjsTemplateFile.getAbsolutePath());
 
-        builder = new PresentationBuilder();
+        templateEngine = new TemplateEngine();
     }
 
     @AfterClass
@@ -76,10 +78,10 @@ public class ZipTest {
     @Test
     public void unzipRevealjsTemplate() throws IOException {
         try {
-            builder.loadTemplate(revealjsTemplateFile);
-        } catch (InvalidTemplateException | InvalidTemplateConfigurationException | PresentationException e) {
-           LOGGER.log(Level.SEVERE, "Error while unzipping template", e);
-            Assert.assertTrue(false);
+            templateEngine.loadArchive(revealjsTemplateFile);
+        } catch (IllegalAccessException e) {
+            LOGGER.log(Level.SEVERE, "Error while unzipping template", e);
+            Assert.fail();
         }
     }
 
@@ -91,10 +93,10 @@ public class ZipTest {
     @Test
     public void unzipImpressjsTemplate() throws IOException {
         try {
-            builder.loadTemplate(impressjsTemplateFile);
-        } catch (InvalidTemplateException | InvalidTemplateConfigurationException | PresentationException e) {
+            templateEngine.loadArchive(impressjsTemplateFile);
+        } catch (IllegalAccessException e) {
             LOGGER.log(Level.SEVERE, "Error while unzipping template", e);
-            Assert.assertTrue(false);
+            Assert.fail();
         }
     }
 
@@ -106,10 +108,10 @@ public class ZipTest {
     @Test
     public void unzipBespokejsTemplate() throws IOException {
         try {
-            builder.loadTemplate(bespokejsTemplateFile);
-        } catch (InvalidTemplateException | InvalidTemplateConfigurationException | PresentationException e) {
+            templateEngine.loadArchive(bespokejsTemplateFile);
+        } catch (IllegalAccessException e) {
             LOGGER.log(Level.SEVERE, "Error while unzipping template", e);
-            Assert.assertTrue(false);
+            Assert.fail();
         }
     }
 

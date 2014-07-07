@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.exceptions;
+package com.twasyl.slideshowfx.engine.presentation;
 
 public class PresentationException extends Exception {
 

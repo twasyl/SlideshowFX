@@ -114,7 +114,13 @@ public class SlideshowFX extends Application {
 
         stage.setTitle("SlideshowFX");
         stage.setScene(scene);
-        stage.getIcons().add(new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/SlideshowFX.png")));
+        stage.getIcons().addAll(
+                new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/16.png")),
+                new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/32.png")),
+                new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/64.png")),
+                new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/128.png")),
+                new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/256.png")),
+                new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/512.png")));
         stage.show();
     }
 

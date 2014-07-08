@@ -191,6 +191,7 @@ project(':SlideshowFX-app') {
 							"-appclass", "com.twasyl.slideshowfx.app.SlideshowFX",
 							"-classpath", "${classpath}",
 							"-manifestAttrs", "${manifestAttrs}",
+                            "-nocss2bin",
 							"-outdir", "${buildDir}${File.separator}${libsDir.name}",
 							"-outfile", "${project.archivesBaseName}",
 							"-srcdir", "${buildDir.name}/classes/main", "-srcfiles", "com",

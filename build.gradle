@@ -151,6 +151,31 @@ project(':SlideshowFX-textile') {
 }
 
 project(':SlideshowFX-app') {
+    apply plugin: 'application'
+
+    ant.importBuild "${project.projectDir.absolutePath}/src/main/resources/javafx.xml"
+
+    ant.classpath = "${jdk}/lib/ant-javafx.jar"
+    ant.mainClassName = 'com.twasyl.slideshowfx.app.SlideshowFX'
+    ant.fallbackClassName = 'com.javafx.main.NoJavaFXFallback'
+
+    ant.distDir = "${project.buildDir.absolutePath}${File.separator}${libsDir.name}"
+    ant.distName = "${project.archivesBaseName}"
+    ant.resourceDir = libsDir
+
+    ant.resourceExcludePattern = archivesBaseName + ".jar"
+
+    ant.applicationTitle = "SlideshowFX"
+    ant.applicationVendor = "Thierry Wasylczenko"
+    ant.applicationVersion = "${getBuildNumber()}"
+
+    ant.applicationClasses = "${project.buildDir.absolutePath}/classes/main/"
+    ant.applicationClassesIncludes = "**/com/"
+    ant.applicationResources = "${project.buildDir.absolutePath}/resources/main/"
+    ant.applicationResourcesIncludes = "**/com/"
+
+    ant.deployOutDir = "${project.buildDir.absolutePath}${File.separator}packaging"
+    ant.deployResourcesDir = "${project.buildDir.absolutePath}${File.separator}${libsDir.name}"
 
 	task jar(overwrite: true) << {
 
@@ -181,41 +206,15 @@ project(':SlideshowFX-app') {
 
         	classpath += "."
 
-			def manifestAttrs = "Implementation-Version=${getBuildNumber()}"
-
-			def javafxpackager = exec {
-				workingDir "${project.projectDir.absolutePath}"
-
-				commandLine "${jdk}/bin/javafxpackager",
-							"-createjar", "-v",
-							"-appclass", "com.twasyl.slideshowfx.app.SlideshowFX",
-							"-classpath", "${classpath}",
-							"-manifestAttrs", "${manifestAttrs}",
-                            "-nocss2bin",
-							"-outdir", "${buildDir}${File.separator}${libsDir.name}",
-							"-outfile", "${project.archivesBaseName}",
-							"-srcdir", "${buildDir.name}/classes/main", "-srcfiles", "com",
-							"-srcdir", "${buildDir.name}/resources/main", "-srcfiles", "com"
-			}
+            ant.resourceIncludePattern = classpath
+            javafxjar.execute()
         }
     }
 
     task buildJavaFXBundle << {
 
         if (jdk != null && !jdk.isEmpty()) {
-
-            def javafxpackager = exec {
-				workingDir "${project.projectDir.absolutePath}"
-
-				commandLine "${jdk}/bin/javafxpackager",
-							"-deploy", 
-							"-native",
-							"-name", "SlideshowFX",
-							"-outdir", "${buildDir.name}${File.separator}dist",
-							"-outfile", "SlideshowFX",
-							"-srcdir", "${buildDir.name}${File.separator}${libsDir.name}",
-							"-appclass", "com.twasyl.slideshowfx.app.SlideshowFX"
-			}
+            javafxdeploy.execute()
         }
     }
 

@@ -1,1 +1,2 @@
-include 'SlideshowFX-app', 'SlideshowFX-markup', 'SlideshowFX-html', 'SlideshowFX-markdown', 'SlideshowFX-textile'
+include 'SlideshowFX-app', 'SlideshowFX-markup', 'SlideshowFX-html', 'SlideshowFX-markdown', 'SlideshowFX-textile',  'SlideshowFX-asciidoctor'
+

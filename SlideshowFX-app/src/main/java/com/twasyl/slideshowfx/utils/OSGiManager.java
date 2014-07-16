@@ -44,6 +44,8 @@ public class OSGiManager {
         configurationMap.put(Constants.FRAMEWORK_STORAGE_CLEAN, "true");
         configurationMap.put("org.osgi.framework.storage.clean", "onFirstInit");
         configurationMap.put("org.osgi.framework.storage", System.getProperty("user.home") + "/.SlideshowFX/felix-cache");
+        configurationMap.put("org.osgi.framework.bundle.parent", "app");
+        configurationMap.put("org.osgi.framework.bootdelegation", "com.twasyl.slideshowfx.markup,sun.misc,javax.*");
         configurationMap.put("felix.auto.deploy.action", "install,start");
 
         // Starting OSGi
@@ -133,11 +135,15 @@ public class OSGiManager {
             try {
                 bundle.start();
             } catch (BundleException e) {
-                LOGGER.log(Level.WARNING, "Can not install bundle", e);
+                LOGGER.log(Level.WARNING, String.format("Can not install bundle [%1$s]", bundleFile.getName()), e);
             }
         }
 
-        return serviceTracker.getService(bundle.getRegisteredServices()[0]);
+        if(bundle != null && bundle.getRegisteredServices() != null && bundle.getRegisteredServices().length > 0) {
+            return serviceTracker.getService(bundle.getRegisteredServices()[0]);
+        } else {
+            return null;
+        }
     }
 
     /**

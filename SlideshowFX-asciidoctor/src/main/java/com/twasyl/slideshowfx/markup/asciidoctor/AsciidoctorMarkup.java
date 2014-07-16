@@ -19,7 +19,10 @@ package com.twasyl.slideshowfx.markup.asciidoctor;
 import com.twasyl.slideshowfx.markup.AbstractMarkup;
 import org.asciidoctor.Asciidoctor;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,22 +37,20 @@ import java.util.logging.Logger;
 public class AsciidoctorMarkup extends AbstractMarkup {
 
     private static final Logger LOGGER = Logger.getLogger(AsciidoctorMarkup.class.getName());
+    private final Asciidoctor asciidoctor;
+
+    private final List<String> loadPaths = new ArrayList<>();
 
     public AsciidoctorMarkup() {
         super("ASCIIDOCTOR", "asciidoctor");
-        try {
-            ClassLoader.getSystemClassLoader().loadClass("sun.misc.Unsafe");
-        } catch (ClassNotFoundException e) {
-            LOGGER.log(Level.SEVERE, "Can not load classes required by the AsciidoctorMarkup", e);
-        }
+
+        this.asciidoctor = Asciidoctor.Factory.create();
     }
 
     @Override
     public String convertAsHtml(String markupString) throws IllegalArgumentException {
         if(markupString == null) throw new IllegalArgumentException("Can not convert " + getName() + " to HTML : the String is null");
 
-        final Asciidoctor asciidoctor = Asciidoctor.Factory.create(ClassLoader.getSystemClassLoader());
-
-        return asciidoctor.render(markupString,new HashMap<String, Object>());
+        return this.asciidoctor.render(markupString,new HashMap<String, Object>());
     }
 }

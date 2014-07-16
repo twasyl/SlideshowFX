@@ -76,6 +76,7 @@ subprojects {
 }
 
 project(':SlideshowFX-html') {
+
 	dependencies {
 		compile project(':SlideshowFX-markup')
 		compile felix
@@ -83,20 +84,23 @@ project(':SlideshowFX-html') {
 
 	jar {
 		manifest {
+
 			attributes('Manifest-Version': '1.0',
+                       'Bundle-ManifestVersion': '2',
 					   'Bundle-Name': 'SlideshowFX HTML support',
+                       'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.html',
 					   'Bundle-Description':'Support HTML for defining slide\'s content',
 					   'Bundle-Version': '1.0.0',
 					   'Bundle-Activator': 'com.twasyl.slideshowfx.markup.html.activator.HtmlActivator',
 					   'Bundle-Vendor': 'Thierry Wasylczenko',
-					   'Export-Package': 'com.twasyl.slideshowfx.markup',
+					   'Export-Package': 'com.twasyl.slideshowfx.markup.html,com.twasyl.slideshowfx.markup.html.activator',
 					   'Import-Package': 'org.osgi.framework')
 		}
 	}
 }
 
 project(':SlideshowFX-markdown') {
-	
+
 	dependencies {
 		compile project(':SlideshowFX-markup')
 		compile felix
@@ -110,13 +114,15 @@ project(':SlideshowFX-markdown') {
 
 		manifest {
 			attributes('Manifest-Version': '1.0',
+                       'Bundle-ManifestVersion': '2',
 					   'Bundle-Name': 'SlideshowFX markdown support',
+                       'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.markdown',
 					   'Bundle-Description': 'Support markdown for defining slide\'s content',
 					   'Bundle-Version': '1.0.0',
 					   'Bundle-Activator': 'com.twasyl.slideshowfx.markup.markdown.activator.MarkdownActivator',
 					   'Bundle-ClassPath': 'txtmark-0.11.jar,.',
 					   'Bundle-Vendor': 'Thierry Wasylczenko',
-					   'Export-Package': 'com.twasyl.slideshowfx.markup',
+					   'Export-Package': 'com.twasyl.slideshowfx.markup.markdown,com.twasyl.slideshowfx.markup.markdown.activator',
 					   'Import-Package': 'org.osgi.framework')
 		}
 	}	
@@ -139,13 +145,15 @@ project(':SlideshowFX-textile') {
 
 		manifest {
 			attributes('Manifest-Version': '1.0',
+                       'Bundle-ManifestVersion': '2',
 					   'Bundle-Name': 'SlideshowFX Textile support',
+                       'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.textile',
 					   'Bundle-Description': 'Support Textile for defining slide\'s content',
 					   'Bundle-Version': '1.0.0',
 					   'Bundle-Activator': 'com.twasyl.slideshowfx.markup.textile.activator.TextileActivator',
 					   'Bundle-ClassPath': 'org.eclipse.mylyn.wikitext.core_2.0.0.20140108-1934.jar,org.eclipse.mylyn.wikitext.textile.core_2.0.0.20131212-0025.jar,.',
 					   'Bundle-Vendor': 'Thierry Wasylczenko',
-					   'Export-Package': 'com.twasyl.slideshowfx.markup',
+					   'Export-Package': 'com.twasyl.slideshowfx.markup.textile,com.twasyl.slideshowfx.markup.textile.activator',
 					   'Import-Package': 'org.osgi.framework')
 		}
 	}
@@ -169,13 +177,15 @@ project(':SlideshowFX-asciidoctor') {
 
         manifest {
             attributes('Manifest-Version': '1.0',
+                    'Bundle-ManifestVersion': '2',
                     'Bundle-Name': 'SlideshowFX asciidoctor support',
+                    'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.asciidoctor',
                     'Bundle-Description': 'Support asscidoctor for defining slide\'s content',
                     'Bundle-Version': '1.0.0',
                     'Bundle-Activator': 'com.twasyl.slideshowfx.markup.asciidoctor.activator.AsciidoctorActivator',
-                    'Bundle-ClassPath': 'slf4j-api-1.7.7.jar,slf4j-simple-1.7.7.jar,jruby-complete-1.7.13.jar,asciidoctorj-1.5.0.preview.7.jar,.',
+                    'Bundle-ClassPath': 'slf4j-api-1.7.7.jar,slf4j-simple-1.7.7.jar,jruby-complete-1.7.9.jar,asciidoctorj-1.5.0.preview.7.jar,.',
                     'Bundle-Vendor': 'Thierry Wasylczenko',
-                    'Export-Package': 'com.twasyl.slideshowfx.markup',
+                    'Export-Package': 'com.twasyl.slideshowfx.markup.asciidoctor,com.twasyl.slideshowfx.markup.asciidoctor.activator',
                     'Import-Package': 'org.osgi.framework')
         }
     }
@@ -306,10 +316,18 @@ task installMarkupPlugins << {
 	}
 }
 
+task cleanMarkupPlugins << {
+    def pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
+    def felixCacheFolder = new File(System.getProperty("user.home"), '.SlideshowFX/felix-cache')
+
+    delete pluginsFolder, felixCacheFolder
+}
+
 task buildGradleWrapper(type: Wrapper) {
     gradleVersion = '2.0'
 }
 
+installMarkupPlugins.dependsOn ':SlideshowFX-markup:assemble'
 installMarkupPlugins.dependsOn ':SlideshowFX-html:assemble'
 installMarkupPlugins.dependsOn ':SlideshowFX-markdown:assemble'
 installMarkupPlugins.dependsOn ':SlideshowFX-textile:assemble'

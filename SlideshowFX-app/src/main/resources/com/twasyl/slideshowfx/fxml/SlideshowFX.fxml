@@ -23,8 +23,10 @@
 <?import javafx.scene.web.WebView?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
+
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController">
     <stylesheets>
+        <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
         <URL value="@/com/twasyl/slideshowfx/css/SlideshowFX.css" />
     </stylesheets>
 
@@ -238,18 +240,18 @@
                 </fx:define>
 
                 <Label text="Set text:" />
-                 <HBox spacing="10">
+                 <HBox spacing="10" alignment="BASELINE_LEFT">
                      <Label text="Slide #:" />
                      <TextField prefColumnCount="3" fx:id="slideNumber" />
                      <Label text="Field:" />
                      <TextField prefColumnCount="15" fx:id="fieldName" />
                  </HBox>
-                <HBox spacing="10" fx:id="markupContentTypeBox">
+                <HBox spacing="10" fx:id="markupContentTypeBox" alignment="BASELINE_LEFT">
                     <Label text="Content:" />
                 </HBox>
                 <VBox spacing="10">
                     <TextArea fx:id="fieldValueText" prefColumnCount="50" prefRowCount="25" wrapText="true" />
-                    <Button fx:id="defineContent" text="Define" onAction="#updateSlideWithText" />
+                    <Button fx:id="defineContent" text="Define" id="define-button" onAction="#updateSlideWithText" />
                 </VBox>
             </VBox>
         </VBox>

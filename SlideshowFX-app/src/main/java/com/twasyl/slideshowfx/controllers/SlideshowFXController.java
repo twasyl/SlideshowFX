@@ -742,20 +742,25 @@ public class SlideshowFXController implements Initializable {
         // Make this controller available to JavaScript
         this.browser.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
-                JSObject window = (JSObject) browser.getEngine().executeScript("window");
-                window.setMember(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getJsObject(), SlideshowFXController.this);
+                if(SlideshowFXController.this.presentationEngine != null
+                        && SlideshowFXController.this.presentationEngine.getTemplateConfiguration() != null
+                        && SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getJsObject() != null) {
+                    JSObject window = (JSObject) browser.getEngine().executeScript("window");
+                    window.setMember(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getJsObject(), SlideshowFXController.this);
+                }
 
                 taskInProgress.update(0, "Presentation loaded");
-            } else if(newState == Worker.State.RUNNING) {
+            } else if (newState == Worker.State.RUNNING) {
                 taskInProgress.update(-1, "Loading presentation ...");
-            } else if(newState == Worker.State.CANCELLED) {
+            } else if (newState == Worker.State.CANCELLED) {
                 taskInProgress.update(0, "Presentation load aborted");
-            } else if(newState == Worker.State.CANCELLED || newState == Worker.State.FAILED) {
+            } else if (newState == Worker.State.CANCELLED || newState == Worker.State.FAILED) {
                 taskInProgress.update(0, "Error while loading presentation");
             }
         });
 
         this.browser.getEngine().setJavaScriptEnabled(true);
+        this.browser.getEngine().load(getClass().getResource("/com/twasyl/slideshowfx/html/empty-webview.html").toExternalForm());
 
         this.saveButton.setGraphic(
                 new ImageView(

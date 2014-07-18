@@ -5,9 +5,13 @@
 }
 
 .validDragOver {
-    -fx-border-color: lightgreen;
+    -fx-border-color: app-color-text-fill;
 }
 
 .invalidDragOver {
-    -fx-border-color: #FF9900;
+    -fx-border-color: app-color-error;
+}
+
+#define-button {
+    -fx-border-color: app-color-input-background;
 }

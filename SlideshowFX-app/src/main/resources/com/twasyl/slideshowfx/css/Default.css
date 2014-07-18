@@ -1,0 +1,183 @@
+.root {
+    app-color-background: RGB(60, 63, 63);
+    app-color-text-fill: #A9B7C6;
+    app-color-prompt-text-fill: #414142;
+    app-color-border-top: RGB(85, 85, 85);
+    app-color-border-bottom: RGB(40,40,40);
+    app-color-light-gray: RGB(95, 95, 95);
+    app-color-input-background: #2B2B2B;
+    app-color-thumb: RGB(88, 88, 88);
+    app-color-mouse-over: #686B6D;
+    app-color-mouse-over-border: #8c9297;
+    app-color-checkable-background: linear-gradient(
+        from 0% 0%
+        to 100% 100%,
+        #7f7f7f 0%,
+        #747474 100%
+    );
+    app-color-checkable-selected-background: #b1b1b1;
+    app-color-checkable-border: #434344;
+    app-color-checkable-focused-border: linear-gradient(
+        from 0% 0%
+        to 100% 100%,
+        #6d96b6 0%,
+        #678fae 100%
+    );
+    app-color-error: #BC3F3C;
+
+    -fx-background-color: app-color-background;
+    -fx-text-fill: app-color-text-fill;
+}
+
+.text-area, .text-area .content, .text-field {
+    -fx-background-color: app-color-input-background;
+    -fx-text-fill: app-color-text-fill;
+    -fx-prompt-text-fill: app-color-prompt-text-fill;
+}
+
+.context-menu {
+    -fx-background-color: app-color-background;
+}
+
+.context-menu .separator .line {
+    -fx-border-color: app-color-light-gray transparent transparent transparent;
+    -fx-border-width: 2px;
+    -fx-border-style: dotted;
+}
+
+.menu-bar, .menu-button .menu {
+    -fx-background-color: app-color-background;
+    -fx-text-fill: app-color-text-fill;
+
+    -fx-border-color: app-color-border-top transparent app-color-border-bottom transparent;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+}
+
+.menu-bar, .menu-button .menu .menu-item {
+    -fx-background-color: app-color-background;
+}
+
+.menu {
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-border-color: transparent;
+}
+
+.menu:hover, .menu:showing {
+    -fx-background-color: app-color-mouse-over;
+}
+
+.menu-item {
+    -fx-background-color: app-color-background;
+    -fx-text-fill: app-color-text-fill;
+}
+
+.menu-item:hover {
+    -fx-background-color: #103750;
+}
+
+.tool-bar {
+    -fx-background-color: app-color-background;
+    -fx-text-fill: app-color-text-fill;
+
+    -fx-border-color: app-color-border-top transparent app-color-border-bottom transparent;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+}
+
+
+.button, .split-menu-button, .split-menu-button .label, .split-menu-button .arrow-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: app-color-text-fill;
+}
+
+.button {
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-border-color: transparent;
+}
+
+.button:hover {
+    -fx-background-color: app-color-mouse-over;
+    -fx-border-color: app-color-mouse-over-border;
+}
+
+.split-menu-button {
+    -fx-border-color: app-color-light-gray;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.split-menu-button:hover {
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-border-color: app-color-mouse-over-border;
+}
+
+.split-menu-button .arrow {
+    -fx-background-color: RGB(173,  173, 173);
+}
+
+.separator .line {
+    -fx-border-color: transparent app-color-light-gray transparent transparent;
+    -fx-border-width: 2px;
+    -fx-border-style: dotted;
+}
+
+
+
+.radio-button {
+    -fx-text-fill: app-color-text-fill;
+}
+
+.label {
+    -fx-text-fill: app-color-text-fill;
+}
+
+.progress-bar {
+    -fx-background-color: app-color-input-background;
+}
+
+.progress-bar > .track {
+    -fx-text-box-border: app-color-text-fill;
+    -fx-background-color: app-color-input-background;
+}
+
+.scroll-bar > .track-background {
+    -fx-background-color: app-color-background;
+}
+
+.scroll-bar > .thumb {
+    -fx-background-color: app-color-thumb;
+}
+
+.scroll-bar > .increment-button, .scroll-bar > .decrement-button {
+    -fx-background-color: app-color-background;
+}
+
+.check-box > .box, .radio-button > .radio {
+    -fx-background-color: app-color-checkable-background;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-color: app-color-checkable-border;
+}
+
+.check-box > .box {
+    -fx-border-radius: 3px;
+}
+
+.radio-button > .radio {
+    -fx-border-radius: 50px;
+}
+
+.check-box:selected > .box > .mark, .check-box:focused:selected > .box > .mark,
+.radio-button:selected > .radio > .dot, .radio-button:focused:selected > .radio > .dot {
+    -fx-background-color: app-color-checkable-selected-background;
+}
+
+.check-box:focused > .box, .radio-button:focused > .radio {
+    -fx-border-color: app-color-checkable-focused-border;
+}

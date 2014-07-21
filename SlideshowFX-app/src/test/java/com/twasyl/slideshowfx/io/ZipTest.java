@@ -16,10 +16,6 @@
 
 package com.twasyl.slideshowfx.io;
 
-import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
-import com.twasyl.slideshowfx.engine.template.InvalidTemplateConfigurationException;
-import com.twasyl.slideshowfx.engine.template.InvalidTemplateException;
-import com.twasyl.slideshowfx.engine.presentation.PresentationException;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import org.junit.*;

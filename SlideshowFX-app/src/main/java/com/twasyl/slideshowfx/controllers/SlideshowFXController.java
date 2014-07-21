@@ -17,20 +17,22 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
-import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
-import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
-import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
-import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
 import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.controls.TaskProgressIndicator;
+import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
+import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
+import com.twasyl.slideshowfx.engine.template.TemplateEngine;
+import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.OSGiManager;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
+import com.twasyl.slideshowfx.utils.ZipUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
@@ -50,6 +52,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import netscape.javascript.JSObject;
 import org.xml.sax.SAXException;
@@ -600,6 +603,97 @@ public class SlideshowFXController implements Initializable {
             this.browserStackPane.getStyleClass().remove("validDragOver");
             this.browserStackPane.getStyleClass().remove("invalidDragOver");
         });
+    }
+
+    /**
+     * This method is called in order to create a template from scratch.
+     * @param event The event associated to the click that should open the template builder.
+     */
+    @FXML private void createTemplate(ActionEvent event) {
+        final TemplateEngine engine = new TemplateEngine();
+        engine.setWorkingDirectory(engine.generateWorkingDirectory());
+        engine.getWorkingDirectory().mkdir();
+
+        final File templateConfigurationFile = new File(engine.getWorkingDirectory(), engine.getConfigurationFilename());
+
+        try {
+            Files.createFile(templateConfigurationFile.toPath());
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Can not create template configuration file", e);
+        }
+
+        this.showTemplateBuilder(engine);
+    }
+
+    /**
+     * This method is called in order to open an existing template from scratch.
+     * @param event The event associated to the click that should open the template builder.
+     */
+    @FXML private void openTemplate(ActionEvent event) {
+        final FileChooser chooser = new FileChooser();
+        chooser.setSelectedExtensionFilter(SlideshowFXExtensionFilter.TEMPLATE_FILTER);
+
+        final File file = chooser.showOpenDialog(null);
+        if(file != null) {
+            final TemplateEngine engine = new TemplateEngine();
+            engine.setWorkingDirectory(engine.generateWorkingDirectory());
+            engine.getWorkingDirectory().mkdir();
+
+
+            try {
+                ZipUtils.unzip(file, engine.getWorkingDirectory());
+
+                this.showTemplateBuilder(engine);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Can not unzip the template", e);
+            }
+        }
+    }
+
+    /**
+     * This method is called in order to edit the current template for the opened presentation.
+     * @param event The event associated to the click that should open the template builder.
+     */
+    @FXML private void editTemplate(ActionEvent event) {
+        final TemplateEngine engine = new TemplateEngine();
+        engine.setWorkingDirectory(this.presentationEngine.getWorkingDirectory());
+
+        this.showTemplateBuilder(engine);
+    }
+
+    /**
+     * Show the template builder window.
+     * @param engine the engine used for the template builder that will be created.
+     */
+    private void showTemplateBuilder(final TemplateEngine engine) {
+        try {
+            final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/twasyl/slideshowfx/fxml/TemplateBuilder.fxml"));
+            final Parent root = loader.load();
+
+            final TemplateBuilderController controller = loader.getController();
+            controller.setTemplateEngine(engine);
+
+            final Scene scene = new Scene(root);
+
+            final Stage stage = new Stage();
+            stage.initOwner(SlideshowFX.getStage());
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+            stage.setTitle("Template builder");
+            stage.getIcons().addAll(
+                    new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/16.png")),
+                    new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/32.png")),
+                    new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/64.png")),
+                    new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/128.png")),
+                    new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/256.png")),
+                    new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/512.png")));
+
+            stage.show();
+
+            controller.setStage(stage);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Can not load the template builder", e);
+        }
     }
 
     private void insertText(TextInputControl input, String textToInsert, Integer moveCaretPosition) {

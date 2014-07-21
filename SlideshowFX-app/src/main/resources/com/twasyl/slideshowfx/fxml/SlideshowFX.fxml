@@ -23,7 +23,6 @@
 <?import javafx.scene.web.WebView?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
-
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
@@ -49,6 +48,13 @@
                 </Menu>
                 <Menu text="Options">
                     <MenuItem text="Install plugin" onAction="#installPlugin" />
+                </Menu>
+                <Menu text="Tools">
+                    <Menu text="Template builder">
+                        <MenuItem text="Create template" onAction="#createTemplate" />
+                        <MenuItem text="Open template" onAction="#openTemplate" />
+                        <MenuItem text="Edit current template" onAction="#editTemplate" />
+                    </Menu>
                 </Menu>
             </MenuBar>
             <ToolBar>

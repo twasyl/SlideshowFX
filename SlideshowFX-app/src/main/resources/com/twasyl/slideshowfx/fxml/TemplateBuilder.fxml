@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright 2014 Thierry Wasylczenko
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<?import com.twasyl.slideshowfx.controls.builder.labels.*?>
+<?import com.twasyl.slideshowfx.controls.tree.TemplateTreeView?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.Double?>
+<?import java.lang.String?>
+<?import java.net.URL?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.TemplateBuilderController"
+        prefHeight="700" prefWidth="1024">
+    <stylesheets>
+        <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
+        <URL value="@/com/twasyl/slideshowfx/css/TemplateBuilder.css" />
+    </stylesheets>
+
+    <fx:define>
+        <Double fx:id="TOOLBAR_ICON_WIDTH" fx:value="20" />
+        <Double fx:id="TOOLBAR_ICON_HEIGHT" fx:value="20" />
+    </fx:define>
+
+    <top>
+        <ToolBar>
+            <SplitMenuButton fx:id="buildButton" onAction="#buildTemplateArchive">
+                <tooltip>
+                    <Tooltip text="Build template archive" />
+                </tooltip>
+                <items>
+                    <MenuItem text="Build as ..." onAction="#buildAsTemplateArchive" />
+                </items>
+            </SplitMenuButton>
+
+            <SplitMenuButton fx:id="saveButton" onAction="#saveCurrentFile">
+                <tooltip>
+                    <Tooltip text="Save" />
+                </tooltip>
+                <items>
+                    <MenuItem text="Save all" onAction="#saveAllFiles" />
+                </items>
+            </SplitMenuButton>
+
+            <Separator />
+
+            <Button onAction="#addFileToTreeView">
+                <tooltip>
+                    <Tooltip text="Add file" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/add.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <SplitMenuButton fx:id="addFolderButton" onAction="#addFolderToTreeView">
+                <tooltip>
+                    <Tooltip text="Add folder" />
+                </tooltip>
+                <items>
+                    <MenuItem text="Create directory" onAction="#createDirectory" />
+                </items>
+            </SplitMenuButton>
+
+            <Button onAction="#deleteFromTreeView">
+                <tooltip>
+                    <Tooltip text="Delete selection" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/delete.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+        </ToolBar>
+    </top>
+
+    <center>
+        <SplitPane>
+            <TemplateTreeView fx:id="templateContentTreeView" maxWidth="300" />
+            <TabPane fx:id="openedFiles" />
+            <Accordion maxWidth="300">
+                <expandedPane>
+                    <TitledPane text="Template elements" fx:id="templateElements">
+                        <VBox spacing="5">
+                            <ListDragableTemplateElement text="Template container" templateElementName="template" />
+                            <StringDragableTemplateElement text="Template's name" templateElementName="name" />
+                            <FileDragableTemplateElement text="Template's file" templateElementName="file" />
+                            <StringDragableTemplateElement text="JS Object" templateElementName="js-object" />
+                            <DirectoryDragableTemplateElement text="Resources directory" templateElementName="resources" />
+                            <ArrayDragableTemplateElement text="Methods" templateElementName="methods" />
+                            <ListDragableTemplateElement text="Slides" templateElementName="slides" />
+                        </VBox>
+                    </TitledPane>
+                </expandedPane>
+
+                <panes>
+                    <fx:reference source="templateElements" />
+                    <TitledPane text="Methods elements">
+                        <VBox spacing="5">
+                            <ListDragableTemplateElement text="Method container" />
+                            <ChoiceBoxDragableTemplateElement text="Method's type" templateElementName="type">
+                                <values>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="GET_CURRENT_SLIDE" />
+                                    </FXCollections>
+                                </values>
+                            </ChoiceBoxDragableTemplateElement>
+                            <StringDragableTemplateElement text="Method's name" templateElementName="name" />
+                        </VBox>
+                    </TitledPane>
+                    <TitledPane text="Slides' elements">
+                        <VBox spacing="5">
+                            <ListDragableTemplateElement text="Slides' configuration" templateElementName="configuration" />
+                            <ArrayDragableTemplateElement text="Slides definition" templateElementName="slides-definition" />
+                        </VBox>
+                    </TitledPane>
+                    <TitledPane text="Slide's elements">
+                        <VBox spacing="5">
+                            <ListDragableTemplateElement text="Slide container" />
+                            <StringDragableTemplateElement text="Slide's ID" templateElementName="id" />
+                            <StringDragableTemplateElement text="Slide's name" templateElementName="name" />
+                            <FileDragableTemplateElement text="Slide's file" templateElementName="file" />
+                            <ArrayDragableTemplateElement text="Dynamic IDs" templateElementName="dynamic-ids" />
+                            <ArrayDragableTemplateElement text="Dynamic attributes" templateElementName="dynamic-attributes" />
+                        </VBox>
+                    </TitledPane>
+                    <TitledPane text="Slides's configuration elements">
+                        <VBox spacing="5">
+                            <StringDragableTemplateElement text="Slides container" templateElementName="slides-container" />
+                            <StringDragableTemplateElement text="Slide ID prefix" templateElementName="slide-id-prefix" />
+                            <DirectoryDragableTemplateElement text="Template directory" templateElementName="template-directory" />
+                            <DirectoryDragableTemplateElement text="Presentation directory" templateElementName="presentation-directory" />
+                            <DirectoryDragableTemplateElement text="Thumbnail directory" templateElementName="thumbnail-directory" />
+                        </VBox>
+                    </TitledPane>
+                    <TitledPane text="Misc">
+                        <VBox spacing="5">
+                            <StringDragableTemplateElement text="String field" />
+                        </VBox>
+                    </TitledPane>
+                </panes>
+            </Accordion>
+        </SplitPane>
+    </center>
+
+    <right>
+    </right>
+</BorderPane>

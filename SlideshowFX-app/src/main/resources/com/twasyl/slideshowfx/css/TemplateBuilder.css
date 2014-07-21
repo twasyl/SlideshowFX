@@ -1,0 +1,26 @@
+.noDragActive {
+    -fx-border-style: dashed;
+    -fx-border-width: 3px;
+    -fx-border-color: transparent;
+}
+
+.noDragActive .text {
+    -fx-font-style: normal;
+}
+
+.validDragOver {
+    -fx-border-color: app-color-prompt-text-fill;
+}
+
+.validDragOver .text {
+    -fx-font-style: italic;
+}
+
+.invalidDragOver {
+    -fx-border-color: app-color-error;
+}
+
+.template-element-delete-button:hover {
+    -fx-background: null;
+    -fx-border-width: 0px;
+}

@@ -24,6 +24,13 @@
         #678fae 100%
     );
     app-color-error: #BC3F3C;
+    app-color-linear-gradient-background: linear-gradient(
+        from 0% 0%
+        to 100% 100%,
+        #4f4f50 0%,
+        #48494a 100%
+    );
+    app-color-menu-in-use: #103750;
 
     -fx-background-color: app-color-background;
     -fx-text-fill: app-color-text-fill;
@@ -33,6 +40,23 @@
     -fx-background-color: app-color-input-background;
     -fx-text-fill: app-color-text-fill;
     -fx-prompt-text-fill: app-color-prompt-text-fill;
+}
+
+.menu-bar > .container > .menu-button .menu {
+    -fx-background-color: app-color-background;
+    -fx-text-fill: app-color-text-fill;
+
+    -fx-border-color: app-color-border-top transparent app-color-border-bottom transparent;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+}
+
+.menu-bar > .container > .menu:showing {
+    -fx-background-color: app-color-menu-in-use;
+}
+
+.menu-bar, .menu-button .menu .menu-item {
+    -fx-background-color: app-color-background;
 }
 
 .context-menu {
@@ -45,26 +69,11 @@
     -fx-border-style: dotted;
 }
 
-.menu-bar, .menu-button .menu {
-    -fx-background-color: app-color-background;
-    -fx-text-fill: app-color-text-fill;
-
-    -fx-border-color: app-color-border-top transparent app-color-border-bottom transparent;
-    -fx-border-width: 1px;
-    -fx-border-style: solid;
+.context-menu .menu .menu-item:hover, .context-menu .menu:hover {
+    -fx-background-color: app-color-menu-in-use;
 }
 
-.menu-bar, .menu-button .menu .menu-item {
-    -fx-background-color: app-color-background;
-}
-
-.menu {
-    -fx-border-width: 1px;
-    -fx-border-style: solid;
-    -fx-border-color: transparent;
-}
-
-.menu:hover, .menu:showing {
+.menu:hover {
     -fx-background-color: app-color-mouse-over;
 }
 
@@ -73,8 +82,12 @@
     -fx-text-fill: app-color-text-fill;
 }
 
+.menu-item > .right-container > .arrow {
+    -fx-background-color: app-color-text-fill;
+}
+
 .menu-item:hover {
-    -fx-background-color: #103750;
+    -fx-background-color: app-color-menu-in-use;
 }
 
 .tool-bar {
@@ -85,7 +98,6 @@
     -fx-border-width: 1px;
     -fx-border-style: solid;
 }
-
 
 .button, .split-menu-button, .split-menu-button .label, .split-menu-button .arrow-button {
     -fx-background-color: transparent;
@@ -126,8 +138,6 @@
     -fx-border-width: 2px;
     -fx-border-style: dotted;
 }
-
-
 
 .radio-button {
     -fx-text-fill: app-color-text-fill;
@@ -180,4 +190,126 @@
 
 .check-box:focused > .box, .radio-button:focused > .radio {
     -fx-border-color: app-color-checkable-focused-border;
+}
+
+.tab-pane {
+    -fx-border-width: 0px;
+}
+
+.tab-pane .tab-header-background, .tab-pane .tab-header-area {
+    -fx-background-color: app-color-linear-gradient-background;
+}
+
+.tab-pane .tab {
+    -fx-background-color: app-color-background;
+    -fx-text-fill: app-color-text-fill;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-color: black;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: app-color-text-fill;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: linear-gradient(
+        from 50% 0%
+        to 50% 100%,
+        #666666 0%,
+        #4f4f4f 100%
+    );
+    -fx-border-color: black black transparent black;
+}
+
+.tab-pane .tab-content-area .viewport {
+    -fx-background-color: app-color-input-background;
+}
+
+.tab-pane .tab-content-area .viewport .text-field {
+    -fx-border-color: derive(app-color-text-fill, 10%);
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.tab-pane .tab-content-area .viewport .button {
+    -fx-border-color: transparent;
+    -fx-background-color: linear-gradient(
+                                  from 50% 0%
+                                  to 50% 100%,
+                                  #666666 0%,
+                                  #4f4f4f 100%
+                              );
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.tab-pane .tab-content-area .viewport .button:hover {
+    -fx-background-color: app-color-mouse-over;
+    -fx-border-color: app-color-text-fill;
+}
+
+.tree-cell:filled, .tree-cell:empty {
+    -fx-text-fill: app-color-text-fill;
+    -fx-background-color: app-color-background;
+}
+
+.tree-cell:filled:selected {
+    -fx-background-color: app-color-menu-in-use;
+}
+
+.tree-disclosure-node .arrow {
+    -fx-background-color: app-color-text-fill;
+}
+
+.split-pane {
+    -fx-background-color: app-color-background;
+}
+
+.split-pane-divider {
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent app-color-border-bottom;
+    -fx-background-color: app-color-background;
+}
+
+.titled-pane {
+    -fx-text-fill: app-color-input-background;
+}
+
+.titled-pane:expanded {
+    -fx-text-fill: app-color-text-fill;
+}
+
+.titled-pane > .title {
+    -fx-background-color: linear-gradient(
+            from 50% 0%
+            to 50% 100%,
+            #666666 0%,
+            #4f4f4f 100%
+        );
+}
+
+.titled-pane > .title > .arrow-button .arrow {
+    -fx-background-color: app-color-text-fill;
+}
+
+.titled-pane > .content {
+    -fx-background-color: app-color-background;
+}
+
+.titled-pane:expanded > .content {
+    -fx-border-width: 0;
+}
+
+.choice-box {
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-color: app-color-light-gray;
+    -fx-border-radius: 3px;
+    -fx-background-color: app-color-input-background;
 }

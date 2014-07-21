@@ -17,14 +17,8 @@
 package com.twasyl.slideshowfx.engine.template.configuration;
 
 import com.twasyl.slideshowfx.engine.IConfiguration;
-import com.twasyl.slideshowfx.engine.template.DynamicAttribute;
-import com.twasyl.slideshowfx.utils.JSONHelper;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 

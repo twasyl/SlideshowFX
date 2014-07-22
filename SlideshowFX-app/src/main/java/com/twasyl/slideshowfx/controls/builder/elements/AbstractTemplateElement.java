@@ -112,10 +112,12 @@ public abstract class AbstractTemplateElement<T extends Object> extends HBox imp
 
     @Override
     public void setWorkingPath(Path workingPath) {
-        try {
-            this.workingPath.set(workingPath.toRealPath());
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not determine real path", e);
+        if (workingPath != null) {
+            try {
+                this.workingPath.set(workingPath.toRealPath());
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Can not determine real path", e);
+            }
         }
     }
 

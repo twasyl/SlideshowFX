@@ -1,9 +1,6 @@
 package com.twasyl.slideshowfx.controls.builder.editor;
 
-import com.twasyl.slideshowfx.controls.builder.elements.ArrayTemplateElement;
-import com.twasyl.slideshowfx.controls.builder.elements.ITemplateElement;
-import com.twasyl.slideshowfx.controls.builder.elements.ListTemplateElement;
-import com.twasyl.slideshowfx.controls.builder.elements.StringTemplateElement;
+import com.twasyl.slideshowfx.controls.builder.elements.*;
 import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import org.vertx.java.core.json.JsonArray;
@@ -12,6 +9,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +26,11 @@ import java.util.logging.Logger;
 public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElement> {
 
     private static final Logger LOGGER = Logger.getLogger(ConfigurationFileEditor.class.getName());
+
+    private static final String[] FILES_ATTRIBUTES = {"file"};
+
+    private static final String[] DIRECTORIES_ATTRIBUTES = {"presentation-directory", "resources-directory",
+            "template-directory", "thumbnail-directory"};
 
     public ConfigurationFileEditor() {
         super();
@@ -93,13 +96,26 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
 
                 if(value instanceof JsonElement) {
                     element = buildTemplateElementStructure((JsonElement) value);
-
+                } else if(Arrays.binarySearch(FILES_ATTRIBUTES, fieldName) >= 0) {
+                    element = new FileTemplateElement(null);
+                    element.setWorkingPath(this.getWorkingPath());
+                    element.setValue(new File(value.toString()));
+                } else if(Arrays.binarySearch(DIRECTORIES_ATTRIBUTES, fieldName) >= 0) {
+                    element = new DirectoryTemplateElement(null);
+                    element.setWorkingPath(this.getWorkingPath());
+                    element.setValue(new File(value.toString()));
+                } else if(value instanceof Number) {
+                    element = new IntegerTemplateElement(null);
+                    element.setWorkingPath(this.getWorkingPath());
+                    element.setValue(((Number) value).intValue());
                 } else {
                     element = new StringTemplateElement(null);
+                    element.setWorkingPath(this.getWorkingPath());
                     element.setValue(value.toString());
                 }
 
                 element.setName(fieldName);
+
                 ((ListTemplateElement) templateElement).getValue().add(element);
             }
 
@@ -115,8 +131,14 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
 
                 if(value instanceof JsonElement) {
                     element = buildTemplateElementStructure((JsonElement) value);
+                    element.setWorkingPath(this.getWorkingPath());
+                } else if(value instanceof Number) {
+                    element = new IntegerTemplateElement(null);
+                    element.setWorkingPath(this.getWorkingPath());
+                    element.setValue(((Number) value).intValue());
                 } else {
                     element = new StringTemplateElement(null);
+                    element.setWorkingPath(this.getWorkingPath());
                     element.setValue(value.toString());
                 }
 

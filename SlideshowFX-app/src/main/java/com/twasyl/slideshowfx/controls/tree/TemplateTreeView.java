@@ -87,8 +87,11 @@ public class TemplateTreeView extends TreeView<File> {
                         final TreeItem<File> item = dragEvent.getSource() == this ? this.getRoot() : ((TreeCell<File>) dragEvent.getSource()).getTreeItem();
                         this.appendContentToTreeView(file, item);
                     });
+
+            dragSuccess = true;
         }
 
+        this.cleanCssClassForDragEvent((Node) dragEvent.getSource());
         dragEvent.setDropCompleted(dragSuccess);
         dragEvent.consume();
     };
@@ -101,7 +104,6 @@ public class TemplateTreeView extends TreeView<File> {
      */
     private EventHandler<DragEvent> onDragDoneItem = dragEvent -> {
         this.cleanCssClassForDragEvent((Node) dragEvent.getSource());
-        ((Node) dragEvent.getSource()).getStyleClass().add("noDragActive");
     };
 
 

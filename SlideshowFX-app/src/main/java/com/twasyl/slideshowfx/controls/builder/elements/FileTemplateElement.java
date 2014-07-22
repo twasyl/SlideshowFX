@@ -3,8 +3,10 @@ package com.twasyl.slideshowfx.controls.builder.elements;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
+import javafx.util.StringConverter;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -25,9 +27,22 @@ public class FileTemplateElement extends AbstractTemplateElement<File> {
 
         this.name.set(name);
 
-        this.field.textProperty().addListener((value, oldPath, newPath) -> {
-            if(newPath != null && !newPath.trim().isEmpty()) {
-                this.value.set(new File(newPath.trim()));
+        this.field.textProperty().bindBidirectional(this.value, new StringConverter<File>() {
+            @Override
+            public String toString(File object) {
+                if(object == null) return "";
+                else if(getWorkingPath() == null) return object.getAbsolutePath().replace("\\", "//");
+                else {
+                    Path reconstructedFile = getWorkingPath().resolve(object.toPath());
+                    return  getWorkingPath().relativize(reconstructedFile).toString().replace("\\", "/");
+                }
+            }
+
+            @Override
+            public File fromString(String string) {
+                if(string == null || string.isEmpty()) return null;
+                else if(getWorkingPath() == null) return new File(string.replace("\\", "/"));
+                else return getWorkingPath().resolve(new File(string).toPath()).toFile();
             }
         });
 

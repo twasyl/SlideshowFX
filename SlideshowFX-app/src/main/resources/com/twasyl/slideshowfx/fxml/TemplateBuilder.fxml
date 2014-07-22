@@ -105,7 +105,7 @@
                             <StringDragableTemplateElement text="Template's name" templateElementName="name" />
                             <FileDragableTemplateElement text="Template's file" templateElementName="file" />
                             <StringDragableTemplateElement text="JS Object" templateElementName="js-object" />
-                            <DirectoryDragableTemplateElement text="Resources directory" templateElementName="resources" />
+                            <DirectoryDragableTemplateElement text="Resources directory" templateElementName="resources-directory" />
                             <ArrayDragableTemplateElement text="Methods" templateElementName="methods" />
                             <ListDragableTemplateElement text="Slides" templateElementName="slides" />
                         </VBox>
@@ -136,7 +136,7 @@
                     <TitledPane text="Slide's elements">
                         <VBox spacing="5">
                             <ListDragableTemplateElement text="Slide container" />
-                            <StringDragableTemplateElement text="Slide's ID" templateElementName="id" />
+                            <IntegerDragableTemplateElement text="Slide's ID" templateElementName="id" />
                             <StringDragableTemplateElement text="Slide's name" templateElementName="name" />
                             <FileDragableTemplateElement text="Slide's file" templateElementName="file" />
                             <ArrayDragableTemplateElement text="Dynamic IDs" templateElementName="dynamic-ids" />

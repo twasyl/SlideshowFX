@@ -20,7 +20,7 @@
     -fx-border-color: app-color-error;
 }
 
-.template-element-delete-button:hover {
-    -fx-background: null;
+.template-element-delete-button, .template-element-delete-button:hover {
+    -fx-background: transparent;
     -fx-border-width: 0px;
 }

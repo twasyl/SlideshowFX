@@ -50,7 +50,7 @@ public class SimpleFileEditor extends AbstractFileEditor<TextArea> {
         try(final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(getFile())))) {
             final StringBuilder builder = new StringBuilder();
 
-            reader.lines().forEach(line -> builder.append(line));
+            reader.lines().forEach(line -> builder.append(line).append("\n"));
 
             getFileContent().setText(builder.toString());
         } catch (IOException e) {

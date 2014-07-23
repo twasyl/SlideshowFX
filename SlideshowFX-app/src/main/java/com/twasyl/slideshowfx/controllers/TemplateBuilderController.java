@@ -19,6 +19,7 @@ package com.twasyl.slideshowfx.controllers;
 import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.controls.builder.editor.ConfigurationFileEditor;
 import com.twasyl.slideshowfx.controls.builder.editor.IFileEditor;
+import com.twasyl.slideshowfx.controls.builder.editor.ImageFileEditor;
 import com.twasyl.slideshowfx.controls.builder.editor.SimpleFileEditor;
 import com.twasyl.slideshowfx.controls.tree.FileTreeCell;
 import com.twasyl.slideshowfx.controls.tree.TemplateTreeView;
@@ -39,6 +40,8 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -349,7 +352,19 @@ public class TemplateBuilderController implements Initializable {
                             if(file.equals(new File(this.templateEngine.getWorkingDirectory(), this.templateEngine.getConfigurationFilename()))) {
                                 fileEditor = new ConfigurationFileEditor(this.templateEngine.getWorkingDirectory().toPath(), file);
                             } else {
-                                fileEditor = new SimpleFileEditor(file);
+                                /**
+                                 * Try to determine the best file editor to use
+                                 * by checking the MIME type
+                                 */
+                                try {
+                                    String mimeType = Files.probeContentType(file.toPath());
+
+                                    if(mimeType != null && mimeType.contains("image")) fileEditor = new ImageFileEditor();
+                                    else fileEditor = new SimpleFileEditor();
+                                } catch (IOException e) {
+                                    LOGGER.log(Level.WARNING, "An error occurred while truing to determine the MIME type of the file to open", e);
+                                    fileEditor = new SimpleFileEditor();
+                                }
                             }
 
                             fileEditor.setWorkingPath(this.templateEngine.getWorkingDirectory().toPath());

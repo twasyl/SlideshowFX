@@ -116,6 +116,10 @@
     -fx-border-color: app-color-mouse-over-border;
 }
 
+.button:pressed {
+    -fx-background-color: app-color-input-background;
+}
+
 .split-menu-button {
     -fx-border-color: app-color-light-gray;
     -fx-border-style: solid;
@@ -127,6 +131,10 @@
     -fx-border-width: 1px;
     -fx-border-style: solid;
     -fx-border-color: app-color-mouse-over-border;
+}
+
+.split-menu-button:pressed, .split-menu-button:showing {
+    -fx-background-color: app-color-input-background;
 }
 
 .split-menu-button .arrow {
@@ -268,6 +276,11 @@
 
 .split-pane {
     -fx-background-color: app-color-background;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent transparent app-color-border-bottom transparent;
+    -fx-background-color: app-color-background;
+
 }
 
 .split-pane-divider {
@@ -275,6 +288,12 @@
     -fx-border-width: 1px;
     -fx-border-color: transparent app-color-border-bottom;
     -fx-background-color: app-color-background;
+}
+
+.split-pane *.horizontal-grabber {
+    -fx-padding: 5 1;
+    -fx-background-color: app-color-input-background;
+    -fx-shape: "M0 0 L0 0 L2 0 L2 2 L0 2 Z M0 4 L0 4 L2 4 L2 6 L0 6 Z M0 8 L0 8 L2 8 L2 10 L0 10 Z";
 }
 
 .titled-pane {

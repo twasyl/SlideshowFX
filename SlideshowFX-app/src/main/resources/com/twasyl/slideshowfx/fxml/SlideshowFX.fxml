@@ -196,72 +196,73 @@
             </ToolBar>
         </VBox>
     </top>
+
     <center>
-        <StackPane fx:id="browserStackPane"
-                styleClass="noDragActive">
-            <WebView fx:id="browser"
-                     onDragOver="#dragOverBrowser"
-                     onDragDropped="#dragDroppedOnBrowser"
-                     onDragExited="#onDragExitedBrowser" />
-        </StackPane>
-    </center>
+        <SplitPane>
+            <StackPane fx:id="browserStackPane" minWidth="500"
+                    styleClass="noDragActive">
+                <WebView fx:id="browser"
+                         onDragOver="#dragOverBrowser"
+                         onDragDropped="#dragDroppedOnBrowser"
+                         onDragExited="#onDragExitedBrowser" />
+            </StackPane>
 
-    <right>
-        <VBox spacing="10">
-            <ToolBar>
-                <Button onAction="#insertImage">
-                    <tooltip>
-                        <Tooltip text="Insert image" />
-                    </tooltip>
-                    <graphic>
-                         <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                             <Image url="@/com/twasyl/slideshowfx/images/image.png" />
-                         </ImageView>
-                    </graphic>
-                </Button>
-                <Button onAction="#insertQuote">
-                    <tooltip>
-                        <Tooltip text="Insert quote" />
-                    </tooltip>
-                    <graphic>
-                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                            <Image url="@/com/twasyl/slideshowfx/images/quote.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
-                <Button onAction="#insertChatQRCode">
-                    <tooltip>
-                        <Tooltip text="Insert chat QR code" />
-                    </tooltip>
-                    <graphic>
-                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                            <Image url="@/com/twasyl/slideshowfx/images/qrcode.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
-            </ToolBar>
-            <VBox spacing="10">
-                <fx:define>
-                    <ToggleGroup fx:id="markupContentType"/>
-                </fx:define>
-
-                <Label text="Set text:" />
-                 <HBox spacing="10" alignment="BASELINE_LEFT">
-                     <Label text="Slide #:" />
-                     <TextField prefColumnCount="3" fx:id="slideNumber" />
-                     <Label text="Field:" />
-                     <TextField prefColumnCount="15" fx:id="fieldName" />
-                 </HBox>
-                <HBox spacing="10" fx:id="markupContentTypeBox" alignment="BASELINE_LEFT">
-                    <Label text="Content:" />
-                </HBox>
+            <VBox spacing="10" minWidth="400">
+                <ToolBar>
+                    <Button onAction="#insertImage">
+                        <tooltip>
+                            <Tooltip text="Insert image" />
+                        </tooltip>
+                        <graphic>
+                            <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                                <Image url="@/com/twasyl/slideshowfx/images/image.png" />
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button onAction="#insertQuote">
+                        <tooltip>
+                            <Tooltip text="Insert quote" />
+                        </tooltip>
+                        <graphic>
+                            <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                                <Image url="@/com/twasyl/slideshowfx/images/quote.png" />
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button onAction="#insertChatQRCode">
+                        <tooltip>
+                            <Tooltip text="Insert chat QR code" />
+                        </tooltip>
+                        <graphic>
+                            <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                                <Image url="@/com/twasyl/slideshowfx/images/qrcode.png" />
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </ToolBar>
                 <VBox spacing="10">
-                    <TextArea fx:id="fieldValueText" prefColumnCount="50" prefRowCount="25" wrapText="true" />
-                    <Button fx:id="defineContent" text="Define" id="define-button" onAction="#updateSlideWithText" />
+                    <fx:define>
+                        <ToggleGroup fx:id="markupContentType"/>
+                    </fx:define>
+
+                    <Label text="Set text:" />
+                    <HBox spacing="10" alignment="BASELINE_LEFT">
+                        <Label text="Slide #:" />
+                        <TextField prefColumnCount="3" fx:id="slideNumber" />
+                        <Label text="Field:" />
+                        <TextField prefColumnCount="15" fx:id="fieldName" />
+                    </HBox>
+                    <HBox spacing="10" fx:id="markupContentTypeBox" alignment="BASELINE_LEFT">
+                        <Label text="Content:" />
+                    </HBox>
+                    <VBox spacing="10">
+                        <TextArea fx:id="fieldValueText" prefColumnCount="50" prefRowCount="25" wrapText="true" />
+                        <Button fx:id="defineContent" text="Define" id="define-button" onAction="#updateSlideWithText" />
+                    </VBox>
                 </VBox>
             </VBox>
-        </VBox>
-    </right>
+        </SplitPane>
+    </center>
 
     <bottom>
         <TaskProgressIndicator fx:id="taskInProgress" />

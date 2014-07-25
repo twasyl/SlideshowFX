@@ -41,9 +41,9 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 | netty-all | 4.0.20.Final |
 
-| org.eclipse.mylyn.wikitext.core | 2.0.0.20140108-1934 | Library used for textile support
+| org.eclipse.mylyn.wikitext.core | 2.2.0.N20140702-2138 | Library used for textile support
 
-| org.eclipse.mylyn.wikitext.textile.core | 2.0.0.20131212-0025 | Library used for textile support
+| org.eclipse.mylyn.wikitext.textile.core | 2.2.0.N20140702-2138 | Library used for textile support
 
 | Scribe | 1.3.5 | Library used for the Twitter support
 

@@ -60,16 +60,14 @@
 
             <Separator />
 
-            <Button onAction="#addFileToTreeView">
+            <SplitMenuButton fx:id="addFileButton" onAction="#addFileToTreeView">
                 <tooltip>
                     <Tooltip text="Add file" />
                 </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/add.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
+                <items>
+                    <MenuItem text="Create empty file" onAction="#createFile" />
+                </items>
+            </SplitMenuButton>
 
             <SplitMenuButton fx:id="addFolderButton" onAction="#addFolderToTreeView">
                 <tooltip>

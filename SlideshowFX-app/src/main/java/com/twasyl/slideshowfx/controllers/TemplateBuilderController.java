@@ -41,7 +41,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -60,6 +59,7 @@ public class TemplateBuilderController implements Initializable {
     @FXML private SplitMenuButton saveButton;
     @FXML private SplitMenuButton buildButton;
     @FXML private SplitMenuButton addFolderButton;
+    @FXML private SplitMenuButton addFileButton;
     @FXML private TemplateTreeView templateContentTreeView;
     @FXML private TabPane openedFiles;
 
@@ -253,6 +253,44 @@ public class TemplateBuilderController implements Initializable {
     }
 
     /**
+     * Allow the user to create am empty file in the template. This method asks the user for the given file name
+     * and creates the desired file in the selection of the TreeView. If there is no selection, the file will be created
+     * at the root of this template.
+     *
+     * @param event The event associated to button clicked to call this method.
+     */
+    @FXML private void createFile(ActionEvent event) {
+        final TextField field = new TextField();
+        field.setPromptText("File name");
+
+        Dialog.Response response = Dialog.showCancellableDialog(this.getStage(), "Create a file", field);
+
+        if(response == Dialog.Response.OK) {
+            if(!field.getText().trim().isEmpty()) {
+                TreeItem<File> parent = this.templateContentTreeView.getSelectionModel().getSelectedItem();
+
+                if(parent == null) parent = this.templateContentTreeView.getRoot();
+                else {
+                    // Ensure the selected item contain a directory. If it contains a file, the parent is taken.
+                    if(parent.getValue().isFile()) {
+                        parent = parent.getParent();
+                    }
+                }
+
+                final File newFile = new File(parent.getValue(), field.getText().trim());
+                try {
+                    Files.createFile(newFile.toPath());
+                    final TreeItem<File> newFileItem = new TreeItem<>(newFile);
+
+                    parent.getChildren().add(newFileItem);
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Can not create the empty file", e);
+                }
+            }
+        }
+    }
+
+    /**
      * This method adds the given content to the TreeView. It detects if a TreeItem containing a directory
      * is selected in the TreeView to add the content to the selection. If not, the content is added to the root
      * of the TreeView.
@@ -319,6 +357,12 @@ public class TemplateBuilderController implements Initializable {
         this.addFolderButton.setGraphic(
                 new ImageView(
                         new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/add_folder.png"), 20d, 20d, true, true)
+                )
+        );
+
+        this.addFileButton.setGraphic(
+                new ImageView(
+                        new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/add.png"), 20d, 20d, true, true)
                 )
         );
 

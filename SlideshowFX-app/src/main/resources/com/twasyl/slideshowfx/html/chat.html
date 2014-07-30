@@ -49,7 +49,7 @@
                 document.getElementById("chat").style.display = "block";
             }
 
-            socket = new WebSocket("ws://${slideshowfx_server_ip}:${slideshowfx_server_port}/slideshowfx/chat");
+            socket = new WebSocket("ws://${slideshowfx_server_ip}:${slideshowfx_server_port}/slideshowfx/chat/attendee");
 
             socket.onopen = function(event) {
             };
@@ -73,7 +73,7 @@
                     // New message
                     if(undefined == htmlMessage) {
                         htmlMessage = "<div class=\"chat-message\" id=\"" + json.message.id + "\">"
-                                    + "<div id=\"" + json.message.id + "-check\" style=\"display: none; margin-right: 5px;\"><img src=\"http://${slideshowfx_server_ip}:${slideshowfx_server_port}/images/check.png\" width=\"10px\" /></div>"
+                                    + "<div id=\"" + json.message.id + "-check\" style=\"display: none; margin-right: 5px;\"><img src=\"http://${slideshowfx_server_ip}:${slideshowfx_server_port}/slideshowfx/chat/images/check.png\" width=\"10px\" /></div>"
                                     + "<span class=\"author\">" + json.message.author + " ";
 
                         if( json.message.author == "I") {

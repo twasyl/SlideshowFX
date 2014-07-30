@@ -17,7 +17,6 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
-import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.controls.TaskProgressIndicator;
@@ -29,6 +28,7 @@ import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfigu
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
+import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.OSGiManager;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
@@ -508,13 +508,14 @@ public class SlideshowFXController implements Initializable {
 
     @FXML
     private void insertChatQRCode(ActionEvent event) {
-        final String qrCode = String.format("<img src=\"http://%1$s:%2$s/images/chatQRCode.png\" />",
-                Chat.getIp(), Chat.getPort());
+        if(SlideshowFXServer.getSingleton() != null) {
+            final String qrCode = String.format("<img src=\"http://%1$s:%2$s/images/chatQRCode.png\" />",
+                    SlideshowFXServer.getSingleton().getHost(),
+                    SlideshowFXServer.getSingleton().getPort());
 
-
-        this.insertText(this.fieldValueText, qrCode, null);
-
-        this.fieldValueText.requestFocus();
+            this.insertText(this.fieldValueText, qrCode, null);
+            this.fieldValueText.requestFocus();
+        }
     }
 
     /**
@@ -801,8 +802,8 @@ public class SlideshowFXController implements Initializable {
     private void startChat() {
         Image icon;
 
-        if (Chat.isOpened()) {
-            Chat.close();
+        if (SlideshowFXServer.getSingleton() != null) {
+            SlideshowFXServer.getSingleton().stop();
 
             icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/start.png"));
         } else {
@@ -823,7 +824,7 @@ public class SlideshowFXController implements Initializable {
             this.chatIpAddress.setText(ip);
             this.chatPort.setText(port + "");
 
-            Chat.create(ip, port, this.twitterHashtag.getText());
+            new SlideshowFXServer(ip, port, this.twitterHashtag.getText());
 
             icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/shutdown.png"));
         }

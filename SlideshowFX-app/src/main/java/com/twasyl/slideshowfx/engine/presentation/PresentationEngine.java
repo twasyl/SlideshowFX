@@ -28,9 +28,8 @@ import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguratio
 import com.twasyl.slideshowfx.utils.DOMUtils;
 import com.twasyl.slideshowfx.utils.JSONHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
+import freemarker.template.*;
 import javafx.embed.swing.SwingFXUtils;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.vertx.java.core.json.JsonArray;
@@ -55,16 +54,16 @@ import java.util.logging.Logger;
 public class PresentationEngine extends AbstractEngine<PresentationConfiguration> {
 
     private static final Logger LOGGER = Logger.getLogger(PresentationEngine.class.getName());
-    private static final String VELOCITY_SLIDE_NUMBER_TOKEN = "slideNumber";
-    private static final String VELOCITY_SFX_CALLBACK_TOKEN = "sfxCallback";
-    private static final String VELOCITY_SFX_CONTENT_DEFINER_TOKEN = "sfxContentDefiner";
-    private static final String VELOCITY_SLIDE_ID_PREFIX_TOKEN = "slideIdPrefix";
+    private static final String TEMPLATE_SLIDE_NUMBER_TOKEN = "slideNumber";
+    private static final String TEMPLATE_SFX_CALLBACK_TOKEN = "sfxCallback";
+    private static final String TEMPLATE_SFX_CONTENT_DEFINER_TOKEN = "sfxContentDefiner";
+    private static final String TEMPLATE_SLIDE_ID_PREFIX_TOKEN = "slideIdPrefix";
 
-    private static final String VELOCITY_SFX_CONTENT_DEFINER_SCRIPT = "function setField(slide, what, value) {\n" +
+    private static final String TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT = "function setField(slide, what, value) {\n" +
             "\telement = document.getElementById(slide + \"-\" + what);\n" +
             "\telement.innerHTML = decodeURIComponent(escape(window.atob(value)));\n" +
             "}";
-    private static final String VELOCITY_SFX_CALLBACK_SCRIPT = "function sendInformationToSlideshowFX(source) {\n" +
+    private static final String TEMPLATE_SFX_CALLBACK_SCRIPT = "function sendInformationToSlideshowFX(source) {\n" +
             "\tdashIndex = source.id.indexOf(\"-\");\n" +
             "\tslideNumber = source.id.substring(0, dashIndex);\n" +
             "\tfieldName = source.id.substring(dashIndex+1);\n" +
@@ -72,7 +71,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             "\tsfx.prefillContentDefinition(slideNumber, fieldName, window.btoa(unescape(encodeURIComponent(source.innerHTML))));\n" +
             "}";
 
-    private static final String VELOCITY_SFX_CALLBACK_CALL = "sendInformationToSlideshowFX(this);";
+    private static final String TEMPLATE_SFX_CALLBACK_CALL = "sendInformationToSlideshowFX(this);";
 
     private TemplateEngine templateEngine;
 
@@ -109,7 +108,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                     try {
                         slide.setThumbnail(SwingFXUtils.toFXImage(ImageIO.read(new File(this.templateEngine.getConfiguration().getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png"))), null));
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.log(Level.INFO, "Error setting the thumbnail", e);
                     }
 
                     ((JsonObject) slideJson).getArray("elements")
@@ -191,58 +190,54 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         final PresentationConfiguration configuration = this.readConfiguration();
         this.setConfiguration(configuration);
 
-        Velocity.init();
-        VelocityContext context = new VelocityContext();
+        final Configuration templateConfiguration = this.buildTemplateConfiguration();
+        templateConfiguration.setDirectoryForTemplateLoading(this.templateEngine.getConfiguration().getFile().getParentFile());
 
-        // Replacing the velocity tokens
-        try(final InputStream inputStream = new FileInputStream(this.templateEngine.getConfiguration().getFile());
-            final Reader reader = new InputStreamReader(inputStream);
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            final Writer writer = new OutputStreamWriter(outputStream)) {
+        final Map tokens = new HashMap<>();
+        tokens.put(TEMPLATE_SFX_CONTENT_DEFINER_TOKEN, TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT);
+        tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_SCRIPT);
 
-            context.put(VELOCITY_SFX_CONTENT_DEFINER_TOKEN, VELOCITY_SFX_CONTENT_DEFINER_SCRIPT);
-            context.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_SCRIPT);
+        // Replacing the template tokens
+        try(final StringWriter writer = new StringWriter()) {
 
-            Velocity.evaluate(context, writer, "", reader);
-
+            final Template documentTemplate = templateConfiguration.getTemplate(this.templateEngine.getConfiguration().getFile().getName());
+            documentTemplate.process(tokens, writer);
             writer.flush();
-            outputStream.flush();
 
-            this.configuration.setDocument(Jsoup.parse(outputStream.toString("UTF8")));
+            this.configuration.setDocument(Jsoup.parse(writer.toString()));
 
             this.savePresentationFile();
+        } catch (TemplateException e) {
+            LOGGER.log(Level.SEVERE, "Can not parse template", e);
         }
 
         // Append the slides' content to the presentation
         LOGGER.fine("Building presentation file");
-        context = new VelocityContext();
-        context.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_CALL);
-        context.put(VELOCITY_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
+        tokens.clear();
+        tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_CALL);
+        tokens.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
 
         for(SlidePresentationConfiguration s : this.configuration.getSlides()) {
-            try (final ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
-                 final Writer outputWriter = new BufferedWriter(new OutputStreamWriter(arrayOutputStream));
-                 final FileReader slideReader = new FileReader(s.getTemplate().getFile())) {
+            templateConfiguration.setDirectoryForTemplateLoading(s.getTemplate().getFile().getParentFile());
 
-                context.put(VELOCITY_SLIDE_NUMBER_TOKEN, s.getSlideNumber());
-                Velocity.evaluate(context, outputWriter, "", slideReader);
+            try (final StringWriter writer = new StringWriter()) {
+                tokens.put(TEMPLATE_SLIDE_NUMBER_TOKEN, s.getSlideNumber());
 
-                outputWriter.flush();
-                arrayOutputStream.flush();
+                final Template slideTemplate = templateConfiguration.getTemplate(s.getTemplate().getFile().getName());
+                slideTemplate.process(tokens, writer);
+                writer.flush();
 
                 this.configuration.getDocument()
                         .getElementById(this.templateEngine.getConfiguration().getSlidesContainer())
-                        .append(arrayOutputStream.toString("UTF8"));
+                        .append(writer.toString());
 
                 s.getElements().values()
                         .stream()
                         .forEach(element -> this.configuration.getDocument()
                                 .getElementById(element.getId())
                                 .html(element.getHtmlContent()));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException | TemplateException e) {
+                LOGGER.log(Level.SEVERE, "Can not read slide's template", e);
             }
         }
 
@@ -295,26 +290,24 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         this.configuration = new PresentationConfiguration();
         this.configuration.setPresentationFile(new File(this.getWorkingDirectory(), PresentationConfiguration.DEFAULT_PRESENTATION_FILENAME));
 
-        Velocity.init();
-        VelocityContext context = new VelocityContext();
+        final Configuration templateConfiguration = this.buildTemplateConfiguration();
+        templateConfiguration.setDirectoryForTemplateLoading(this.templateEngine.getConfiguration().getFile().getParentFile());
 
-        // Replacing the velocity tokens
-        try(final InputStream inputStream = new FileInputStream(this.templateEngine.getConfiguration().getFile());
-            final Reader reader = new InputStreamReader(inputStream);
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            final Writer writer = new OutputStreamWriter(outputStream)) {
+        final Map tokens = new HashMap<>();
+        tokens.put(TEMPLATE_SFX_CONTENT_DEFINER_TOKEN, TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT);
+        tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_SCRIPT);
 
-            context.put(VELOCITY_SFX_CONTENT_DEFINER_TOKEN, VELOCITY_SFX_CONTENT_DEFINER_SCRIPT);
-            context.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_SCRIPT);
+        try(final StringWriter writer = new StringWriter()) {
 
-            Velocity.evaluate(context, writer, "", reader);
-
+            final Template documentTemplate = templateConfiguration.getTemplate(this.templateEngine.getConfiguration().getFile().getName());
+            documentTemplate.process(tokens, writer);
             writer.flush();
-            outputStream.flush();
 
-            this.configuration.setDocument(Jsoup.parse(outputStream.toString("UTF8")));
+            this.configuration.setDocument(Jsoup.parse(writer.toString()));
 
             this.savePresentationFile();
+        } catch (TemplateException e) {
+            LOGGER.log(Level.SEVERE, "Can not parse the template", e);
         }
     }
 
@@ -332,7 +325,6 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
      */
     public SlidePresentationConfiguration addSlide(SlideTemplateConfiguration template, String afterSlideNumber) throws IOException {
         if(template == null) throw new IllegalArgumentException("The templateConfiguration for creating a slide can not be null");
-        Velocity.init();
 
         final SlidePresentationConfiguration slide = new SlidePresentationConfiguration(template, System.currentTimeMillis() + "");
 
@@ -357,15 +349,13 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             }
         }
 
+        final Configuration templateConfiguration = this.buildTemplateConfiguration();
+        templateConfiguration.setDirectoryForTemplateLoading(template.getFile().getParentFile());
 
-        final Reader slideFileReader = new FileReader(template.getFile());
-        final ByteArrayOutputStream slideContentByte = new ByteArrayOutputStream();
-        final Writer slideContentWriter = new OutputStreamWriter(slideContentByte);
-
-        VelocityContext context = new VelocityContext();
-        context.put(VELOCITY_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
-        context.put(VELOCITY_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
-        context.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_CALL);
+        final Map tokens = new HashMap<>();
+        tokens.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
+        tokens.put(TEMPLATE_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
+        tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_CALL);
 
         if(template.getDynamicAttributes() != null && template.getDynamicAttributes().length > 0) {
             Scanner scanner = new Scanner(System.in);
@@ -376,31 +366,35 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                 value = scanner.nextLine();
 
                 if(value == null || value.trim().isEmpty()) {
-                    context.put(attribute.getTemplateExpression(), "");
+                    tokens.put(attribute.getTemplateExpression(), "");
                 } else {
-                    context.put(attribute.getTemplateExpression(), String.format("%1$s=\"%2$s\"", attribute.getAttribute(), value.trim()));
+                    tokens.put(attribute.getTemplateExpression(), String.format("%1$s=\"%2$s\"", attribute.getAttribute(), value.trim()));
                 }
             }
         }
 
-        Velocity.evaluate(context, slideContentWriter, "", slideFileReader);
-        slideContentWriter.flush();
-        slideContentWriter.close();
+        try(final StringWriter writer = new StringWriter()) {
+            final Template slideTemplate = templateConfiguration.getTemplate(template.getFile().getName());
+            slideTemplate.process(tokens, writer);
+            writer.flush();
 
-        Element htmlSlide = DOMUtils.convertToNode(slideContentByte.toString("UTF8"));
-        slide.setId(htmlSlide.id());
+            Element htmlSlide = DOMUtils.convertToNode(writer.toString());
+            slide.setId(htmlSlide.id());
 
-        if(afterSlideNumber == null || afterSlideNumber.isEmpty()) {
-            this.configuration.getDocument()
-                    .getElementById(this.templateEngine.getConfiguration().getSlidesContainer())
-                    .append(htmlSlide.outerHtml());
-        } else {
-            this.configuration.getDocument()
-                    .getElementById(this.configuration.getSlideByNumber(afterSlideNumber).getId())
-                    .after(htmlSlide.outerHtml());
+            if(afterSlideNumber == null || afterSlideNumber.isEmpty()) {
+                this.configuration.getDocument()
+                        .getElementById(this.templateEngine.getConfiguration().getSlidesContainer())
+                        .append(htmlSlide.outerHtml());
+            } else {
+                this.configuration.getDocument()
+                        .getElementById(this.configuration.getSlideByNumber(afterSlideNumber).getId())
+                        .after(htmlSlide.outerHtml());
+            }
+
+            this.savePresentationFile();
+        } catch (TemplateException e) {
+            LOGGER.log(Level.WARNING, "Error when parsing the slide's template", e);
         }
-
-        this.savePresentationFile();
 
         return slide;
     }
@@ -445,16 +439,16 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         }
 
         // Apply the templateConfiguration engine for replacing dynamic elements
-        final VelocityContext originalContext = new VelocityContext();
-        originalContext.put(VELOCITY_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
-        originalContext.put(VELOCITY_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
+        final Configuration templateConfiguration = this.buildTemplateConfiguration();
+        final Map originalContext = new HashMap<>();
+        originalContext.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
+        originalContext.put(TEMPLATE_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
 
-        final VelocityContext copyContext = new VelocityContext();
-        copyContext.put(VELOCITY_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
-        copyContext.put(VELOCITY_SLIDE_NUMBER_TOKEN, copy.getSlideNumber());
+        final Map copyContext = new HashMap<>();
+        copyContext.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
+        copyContext.put(TEMPLATE_SLIDE_NUMBER_TOKEN, copy.getSlideNumber());
 
-        try (ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-             Writer writer = new OutputStreamWriter(byteOutput)) {
+        try (final StringWriter writer = new StringWriter()) {
 
             String oldId, newId;
 
@@ -468,21 +462,22 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
              */
             List<SlideElementConfiguration> copySlideElements = new ArrayList<>();
             for(String dynamicId : slide.getTemplate().getDynamicIds()) {
-                Velocity.evaluate(originalContext, writer, "", dynamicId);
+                final Template idTemplate = new Template("dynamicIds", new StringReader(dynamicId), templateConfiguration);
+                idTemplate.process(originalContext, writer);
                 writer.flush();
 
-                oldId = new String(byteOutput.toByteArray());
-                byteOutput.reset();
+                oldId = writer.toString();
+                writer.getBuffer().setLength(0);
 
                 /**
                  * Manage slide elements IDs
                  */
                 if(copy.getElements().containsKey(oldId)) {
-                    Velocity.evaluate(copyContext, writer, "", dynamicId);
+                    idTemplate.process(copyContext, writer);
                     writer.flush();
 
-                    newId = new String(byteOutput.toByteArray());
-                    byteOutput.reset();
+                    newId = writer.toString();
+                    writer.getBuffer().setLength(0);
 
                     // Change IDs
                     copySlideElement = copy.getElements().get(oldId);
@@ -495,12 +490,11 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                  * Manage slide ID
                  */
                 if(copy.getId().equals(oldId)) {
-                    Velocity.evaluate(copyContext, writer, "", dynamicId);
+                    idTemplate.process(copyContext, writer);
                     writer.flush();
 
-                    newId = new String(byteOutput.toByteArray());
-                    byteOutput.reset();
-
+                    newId = writer.toString();
+                    writer.getBuffer().setLength(0);
                     copy.setId(newId);
                 }
             }
@@ -511,27 +505,25 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             }
 
             copySlideElements = null;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | TemplateException e) {
+            LOGGER.log(Level.SEVERE, "Can not duplicate slide", e);
         }
 
         /**
          * Add the slide to the document
          */
-        try(final ByteArrayOutputStream output = new ByteArrayOutputStream();
-            final Writer writer = new OutputStreamWriter(output);
-            final FileReader input = new FileReader(copy.getTemplate().getFile())) {
+        try(final Writer writer = new StringWriter()) {
 
-            copyContext.put(VELOCITY_SFX_CALLBACK_TOKEN, VELOCITY_SFX_CALLBACK_CALL);
+            templateConfiguration.setDirectoryForTemplateLoading(copy.getTemplate().getFile().getParentFile());
+            copyContext.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_CALL);
 
-            Velocity.evaluate(copyContext, writer, "", input);
-
+            final Template slideTemplate = templateConfiguration.getTemplate(copy.getTemplate().getFile().getName());
+            slideTemplate.process(copyContext, writer);
             writer.flush();
-            output.flush();
 
             this.configuration.getDocument()
                     .getElementById(slide.getId())
-                    .after(output.toString("UTF8"));
+                    .after(writer.toString());
 
             /**
              * Insert the content
@@ -541,8 +533,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                     .forEach(element -> this.configuration.getDocument()
                                                             .getElementById(element.getId())
                                                             .html(element.getHtmlContent()));
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | TemplateException e) {
+            LOGGER.log(Level.SEVERE, "Error when duplicating the slide", e);
         }
 
         /**
@@ -609,5 +601,14 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private Configuration buildTemplateConfiguration() {
+        final Configuration templateConfiguration = new Configuration();
+        templateConfiguration.setObjectWrapper(new DefaultObjectWrapper());
+        templateConfiguration.setDefaultEncoding("UTF-8");
+        templateConfiguration.setIncompatibleImprovements(new Version(2, 30, 20));
+
+        return templateConfiguration;
     }
 }

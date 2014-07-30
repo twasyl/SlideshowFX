@@ -6,7 +6,6 @@ import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**

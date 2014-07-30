@@ -17,10 +17,10 @@
 package com.twasyl.slideshowfx.app;
 
 import com.leapmotion.leap.Controller;
-import com.twasyl.slideshowfx.chat.Chat;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.io.DeleteFileVisitor;
 import com.twasyl.slideshowfx.leap.SlideshowFXLeapListener;
+import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.OSGiManager;
 import javafx.application.Application;
 import javafx.beans.property.*;
@@ -143,7 +143,7 @@ public class SlideshowFX extends Application {
         leapController.removeListener(slideshowFXLeapListener);
 
         LOGGER.info("Closing the chat");
-        Chat.close();
+        if(SlideshowFXServer.getSingleton() != null) SlideshowFXServer.getSingleton().stop();
 
         LOGGER.info("Stopping the MarkupManager");
         OSGiManager.stop();

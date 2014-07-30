@@ -14,8 +14,16 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.chat;
+package com.twasyl.slideshowfx.beans.chat;
 
+/**
+ * Represents the action supported for a {@link com.twasyl.slideshowfx.beans.chat.ChatMessage}. Currently the only action
+ * that is supported is marking a ChatMessage as read.
+ *
+ * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since 1.0
+ */
 public enum ChatMessageAction {
 
     MARK_READ("mark-read");

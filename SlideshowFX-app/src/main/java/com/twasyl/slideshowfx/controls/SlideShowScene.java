@@ -17,7 +17,7 @@
 package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
-import com.twasyl.slideshowfx.chat.Chat;
+import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.animation.TranslateTransition;
 import javafx.beans.property.ObjectProperty;
@@ -59,12 +59,14 @@ public class SlideShowScene extends Scene {
         super(new StackPane());
         this.browser.set(browser);
 
-        if(Chat.isOpened()) {
+        if(SlideshowFXServer.getSingleton() != null) {
             chatBrowser.set(new WebView());
             chatBrowser.get().setPrefSize(500, 320);
             chatBrowser.get().setMaxSize(500, 320);
             chatBrowser.get().setMinSize(500, 320);
-            chatBrowser.get().getEngine().load(String.format("http://%1$s:%2$s/slideshowfx/chat/presenter", Chat.getIp(), Chat.getPort()));
+            chatBrowser.get().getEngine().load(String.format("http://%1$s:%2$s/slideshowfx/chat/presenter",
+                        SlideshowFXServer.getSingleton().getHost(),
+                        SlideshowFXServer.getSingleton().getPort() + 1));
 
             chatBrowser.get().getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
                 @Override
@@ -95,7 +97,7 @@ public class SlideShowScene extends Scene {
         root.setAlignment(Pos.TOP_LEFT);
         root.getChildren().add(this.browser.get());
 
-        if(Chat.isOpened()) {
+       if(SlideshowFXServer.getSingleton() != null) {
             root.getChildren().add(this.chatBrowser.get());
             /* This binding is only useful when the scene is displayed. The property is unbind when the chat is
             opened/closed */

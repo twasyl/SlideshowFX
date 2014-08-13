@@ -27,6 +27,7 @@ import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfigu
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
 import com.twasyl.slideshowfx.utils.DOMUtils;
 import com.twasyl.slideshowfx.utils.JSONHelper;
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import freemarker.template.*;
 import javafx.embed.swing.SwingFXUtils;
@@ -56,20 +57,13 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     private static final Logger LOGGER = Logger.getLogger(PresentationEngine.class.getName());
     private static final String TEMPLATE_SLIDE_NUMBER_TOKEN = "slideNumber";
     private static final String TEMPLATE_SFX_CALLBACK_TOKEN = "sfxCallback";
+    private static final String TEMPLATE_SFX_QUIZZ_CALLER_TOKEN = "sfxQuizzCaller";
     private static final String TEMPLATE_SFX_CONTENT_DEFINER_TOKEN = "sfxContentDefiner";
     private static final String TEMPLATE_SLIDE_ID_PREFIX_TOKEN = "slideIdPrefix";
 
-    private static final String TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT = "function setField(slide, what, value) {\n" +
-            "\telement = document.getElementById(slide + \"-\" + what);\n" +
-            "\telement.innerHTML = decodeURIComponent(escape(window.atob(value)));\n" +
-            "}";
-    private static final String TEMPLATE_SFX_CALLBACK_SCRIPT = "function sendInformationToSlideshowFX(source) {\n" +
-            "\tdashIndex = source.id.indexOf(\"-\");\n" +
-            "\tslideNumber = source.id.substring(0, dashIndex);\n" +
-            "\tfieldName = source.id.substring(dashIndex+1);\n" +
-            "\n" +
-            "\tsfx.prefillContentDefinition(slideNumber, fieldName, window.btoa(unescape(encodeURIComponent(source.innerHTML))));\n" +
-            "}";
+    private static final String TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT = "/com/twasyl/slideshowfx/js/setField.js";
+    private static final String TEMPLATE_SFX_CALLBACK_SCRIPT = "/com/twasyl/slideshowfx/js/sendInformationToSlideshowFX.js";
+    private static final String TEMPLATE_SFX_QUIZZ_CALLER_SCRIPT = "/com/twasyl/slideshowfx/js/quizzCaller.js";
 
     private static final String TEMPLATE_SFX_CALLBACK_CALL = "sendInformationToSlideshowFX(this);";
 
@@ -194,8 +188,9 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         templateConfiguration.setDirectoryForTemplateLoading(this.templateEngine.getConfiguration().getFile().getParentFile());
 
         final Map tokens = new HashMap<>();
-        tokens.put(TEMPLATE_SFX_CONTENT_DEFINER_TOKEN, TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT);
-        tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_SCRIPT);
+        tokens.put(TEMPLATE_SFX_CONTENT_DEFINER_TOKEN, ResourceHelper.readResource(TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT));
+        tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, ResourceHelper.readResource(TEMPLATE_SFX_CALLBACK_SCRIPT));
+        tokens.put(TEMPLATE_SFX_QUIZZ_CALLER_TOKEN, ResourceHelper.readResource(TEMPLATE_SFX_QUIZZ_CALLER_SCRIPT));
 
         // Replacing the template tokens
         try(final StringWriter writer = new StringWriter()) {
@@ -294,8 +289,9 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         templateConfiguration.setDirectoryForTemplateLoading(this.templateEngine.getConfiguration().getFile().getParentFile());
 
         final Map tokens = new HashMap<>();
-        tokens.put(TEMPLATE_SFX_CONTENT_DEFINER_TOKEN, TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT);
-        tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_SCRIPT);
+        tokens.put(TEMPLATE_SFX_CONTENT_DEFINER_TOKEN, ResourceHelper.readResource(TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT));
+        tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, ResourceHelper.readResource(TEMPLATE_SFX_CALLBACK_SCRIPT));
+        tokens.put(TEMPLATE_SFX_QUIZZ_CALLER_TOKEN, ResourceHelper.readResource(TEMPLATE_SFX_QUIZZ_CALLER_SCRIPT));
 
         try(final StringWriter writer = new StringWriter()) {
 

@@ -17,6 +17,10 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
+import com.twasyl.slideshowfx.beans.quizz.Answer;
+import com.twasyl.slideshowfx.beans.quizz.Question;
+import com.twasyl.slideshowfx.beans.quizz.Quizz;
+import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.controls.TaskProgressIndicator;
@@ -48,13 +52,17 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import netscape.javascript.JSObject;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Tag;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -442,6 +450,14 @@ public class SlideshowFXController implements Initializable {
                 && this.presentationEngine.getConfiguration().getPresentationFile() != null
                 && this.presentationEngine.getConfiguration().getPresentationFile().exists()) {
             final WebView slideShowBrowser = new WebView();
+
+            slideShowBrowser.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
+                if (newState == Worker.State.SUCCEEDED) {
+                        JSObject window = (JSObject) slideShowBrowser.getEngine().executeScript("window");
+                        window.setMember("sfxServer", SlideshowFXServer.getSingleton());
+                }
+            });
+
             slideShowBrowser.getEngine().load(this.presentationEngine.getConfiguration().getPresentationFile().toURI().toASCIIString());
 
             final SlideShowScene subScene = new SlideShowScene(slideShowBrowser);
@@ -515,6 +531,95 @@ public class SlideshowFXController implements Initializable {
 
             this.insertText(this.fieldValueText, qrCode, null);
             this.fieldValueText.requestFocus();
+        }
+    }
+
+    @FXML
+    private void insertQuizz(ActionEvent event) {
+        final TextField questionTextField = new TextField();
+        questionTextField.setPromptText("Question?");
+
+        final TextField answerTextField = new TextField();
+        answerTextField.setPromptText("Answer");
+
+        final CheckBox correctAnswer = new CheckBox();
+
+        final HBox singleAnswerBox = new HBox(5, answerTextField, correctAnswer);
+
+        final Button addAnswerButton = new Button("+");
+
+        final VBox answersBox = new VBox(5, singleAnswerBox);
+
+        final ScrollPane answersScrollPane = new ScrollPane(answersBox);
+
+        final BorderPane content = new BorderPane();
+        content.setTop(questionTextField);
+        content.setCenter(answersScrollPane);
+        content.setBottom(addAnswerButton);
+
+        addAnswerButton.setOnAction(click -> {
+            final TextField complementaryAnswerTextField = new TextField();
+            complementaryAnswerTextField.setPromptText("Answer");
+
+            final CheckBox complementaryCorrectAnswer = new CheckBox();
+
+            final HBox complementaryAnswerBox = new HBox(5, complementaryAnswerTextField, complementaryCorrectAnswer);
+
+            answersBox.getChildren().add(complementaryAnswerBox);
+        });
+
+
+        Dialog.Response response = Dialog.showCancellableDialog(null, "Insert a quizz", content);
+
+        if(response != null && response.equals(Dialog.Response.OK)) {
+            final Quizz quizz = new Quizz();
+            quizz.setId(System.currentTimeMillis());
+
+            final Question question = new Question();
+            question.setQuizz(quizz);
+            question.setText(questionTextField.getText());
+            question.setId(System.currentTimeMillis());
+
+            quizz.setQuestion(question);
+
+            final Element divElement = new Element(Tag.valueOf("div"), "");
+            divElement.attr("id", "quizz-".concat(quizz.getId() + ""))
+                      .addClass("slideshowfx-quizz")
+                      .appendElement("span")
+                            .attr("id", System.currentTimeMillis() + "")
+                            .appendText(questionTextField.getText());
+
+            final Element ulElement = new Element(Tag.valueOf("ul"), "");
+            answersBox.getChildren()
+                    .stream()
+                    .map(node -> (HBox) node)
+                    .forEach(hbox -> {
+                        ulElement.appendElement("li")
+                                    .appendText(((TextField) hbox.getChildren().get(0)).getText());
+
+                        final Answer answer = new Answer();
+                        answer.setQuizz(quizz);
+                        answer.setText(((TextField) hbox.getChildren().get(0)).getText());
+                        answer.setCorrect(((CheckBox) hbox.getChildren().get(1)).isSelected());
+                        answer.setId(System.currentTimeMillis());
+
+                        quizz.getAnswers().add(answer);
+                    });
+
+            final Element startButton = new Element(Tag.valueOf("button"), "");
+            startButton.attr("onclick", "javascript:startQuizz('" + Base64.getEncoder().encodeToString(quizz.toJSON().encode().getBytes()) + "');")
+                        .attr("id", "startQuizzBtn-" + quizz.getId())
+                        .appendText("Start");
+
+            final Element stopButton = new Element(Tag.valueOf("button"), "");
+            stopButton.attr("onclick", "javascript:stopQuizz(" + quizz.getId() + ");")
+                        .attr("id", "stopQuizzBtn-" + quizz.getId())
+                        .appendText("Stop");
+
+            divElement.appendChild(ulElement);
+            divElement.appendChild(startButton).appendChild(stopButton);
+
+            SlideshowFXController.this.fieldValueText.appendText(divElement.toString());
         }
     }
 
@@ -842,6 +947,7 @@ public class SlideshowFXController implements Initializable {
                         && SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getJsObject() != null) {
                     JSObject window = (JSObject) browser.getEngine().executeScript("window");
                     window.setMember(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getJsObject(), SlideshowFXController.this);
+                    window.setMember("sfxServer", SlideshowFXServer.getSingleton());
                 }
 
                 taskInProgress.update(0, "Presentation loaded");

@@ -121,7 +121,7 @@ public class ChatMessage {
         ChatMessage message = new ChatMessage();
         message.setIp(ip);
 
-        JsonObject jsonObject = new JsonObject(json).getObject(JSON_MESSAGE_OBJECT);
+        JsonObject jsonObject = new JsonObject(json);
 
         message.setId(jsonObject.getString(JSON_MESSAGE_ID_ATTR));
         message.setAuthor(jsonObject.getString(JSON_MESSAGE_AUTHOR_ATTR));
@@ -138,7 +138,7 @@ public class ChatMessage {
      *
      * @return The JSON representation of this ChatMessage
      */
-    public String toJSON() { return getJSONObject().toString(); }
+    public JsonObject toJSON() { return getJSONObject(); }
 
     /**
      * Build the JSON representation of this ChatMessage. The given <code>ip</code> is used to determine who is the
@@ -148,14 +148,14 @@ public class ChatMessage {
      * @param ip The IP address used to determine the author of this message.
      * @return The JSON representation of this ChatMessage.
      */
-    public String toJSON(InetSocketAddress ip) {
+    public JsonObject toJSON(InetSocketAddress ip) {
         JsonObject jsonObject = getJSONObject();
 
         if(this.getIp() != null && this.getIp().equals(ip)) {
             jsonObject.getObject(JSON_MESSAGE_OBJECT).putString(JSON_MESSAGE_AUTHOR_ATTR, "I");
         }
 
-        return jsonObject.toString();
+        return jsonObject;
     }
 
     /**
@@ -179,9 +179,6 @@ public class ChatMessage {
 
         if(getStatus() != null) jsonMessage.putString(JSON_MESSAGE_STATUS_ATTR, getStatus().getAsString());
 
-        JsonObject json = new JsonObject();
-        json.putObject(JSON_MESSAGE_OBJECT, jsonMessage);
-
-        return json;
+        return jsonMessage;
     }
 }

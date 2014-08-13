@@ -14,5 +14,7 @@
  * limitations under the License.
  */
 
-include 'SlideshowFX-app', 'SlideshowFX-markup', 'SlideshowFX-html', 'SlideshowFX-markdown', 'SlideshowFX-textile',  'SlideshowFX-asciidoctor'
-
+function setField(slide, what, value) {
+    element = document.getElementById(slide + "-" + what);
+    element.innerHTML = decodeURIComponent(escape(window.atob(value)));
+}

@@ -1,0 +1,162 @@
+/*
+ * Copyright 2014 Thierry Wasylczenko
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.twasyl.slideshowfx.controls;
+
+import com.twasyl.slideshowfx.utils.ResourceHelper;
+import javafx.animation.TranslateTransition;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
+import javafx.scene.Node;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.util.Duration;
+
+/**
+ * This pane is used to display icons. If an icon is triggered, the content associated to this this icon is displayed
+ * by translating in the scene.
+ *
+ * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since 1.0
+ */
+public class CollapsibleToolPane extends Region {
+
+    private final ObjectProperty<Region> content = new SimpleObjectProperty<>();
+    private final ReadOnlyBooleanProperty collapsed = new SimpleBooleanProperty(true);
+    private final VBox toolbar = new VBox(5);
+    private final ToggleGroup iconsGroup = new ToggleGroup();
+
+    public CollapsibleToolPane() {
+        this.getStylesheets().add(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/css/collapsible-tool-pane.css"));
+
+        /* Ensure that when the scene is shown, the panel is placed completely
+         * on the right of the screen, only displaying the toolbar
+         */
+        this.sceneProperty().addListener((sceneValue, oldScene, newScene) -> {
+            if(newScene != null) {
+                newScene.widthProperty().addListener((widthValue, oldValue, newWidth) -> {
+                    if (newWidth != null) {
+                        this.setTranslateX(newWidth.doubleValue() - this.toolbar.getWidth());
+                    }
+                });
+
+                /*newScene.heightProperty().addListener((heightValue, oldHeight, newHeight) -> {
+                    CollapsibleToolPane.this.setPrefHeight(newHeight.doubleValue());
+                    CollapsibleToolPane.this.setMinHeight(newHeight.doubleValue());
+                    CollapsibleToolPane.this.setMaxHeight(newHeight.doubleValue());
+                });*/
+            }
+        });
+
+        this.toolbar.setLayoutX(0);
+        this.toolbar.setLayoutY(0);
+
+        // Ensure the content is always next to the toolbar
+        this.content.addListener((value, oldContent, newContent) -> {
+            if(oldContent != null) {
+                this.getChildren().remove(oldContent);
+            }
+
+            if(newContent != null) {
+                newContent.layoutXProperty().bind(this.toolbar.widthProperty());
+                newContent.setLayoutY(0);
+
+                this.getChildren().add(newContent);
+                this.layout();
+            }
+        });
+
+        this.getChildren().add(this.toolbar);
+    }
+
+    /**
+     * Indicates if this panel is collapse or not.
+     * @return The property indicating if this panel is collapsed.
+     */
+    public ReadOnlyBooleanProperty collapsedProperty() { return collapsed; }
+
+    /**
+     * Indicates if this panel is collapse or not.
+     * @return <code>true</code> if this panel is collapsed, <code>false</code> otherwise.
+     */
+    public boolean isCollapsed() { return collapsed.get(); }
+
+    /**
+     * Adds an icon associated to its content to this panel.
+     * @param icon The icon that will always be visible in the toolbar.
+     * @param content The content that will be displayed when the icon is triggered.
+     * @return Return this panel.
+     */
+    public CollapsibleToolPane addContent(final ImageView icon, final Region content) {
+        final ToggleButton button = new ToggleButton();
+        button.setToggleGroup(this.iconsGroup);
+        button.setGraphic(icon);
+
+        button.setOnAction(event -> {
+
+            // If the panel is already opened, close it and only open it if the current content is different of the given content
+            if(!this.isCollapsed()) {
+                final TranslateTransition translation = new TranslateTransition(Duration.millis(500), this);
+                translation.setByX(this.content.get().getWidth());
+
+                translation.setOnFinished(animationEvent -> {
+                    ((SimpleBooleanProperty) this.collapsedProperty()).set(true);
+
+                    // Reopen the panel if this content is different from the given one
+                    if(this.content.get() != content) {
+                        this.content.set(content);
+
+                        final TranslateTransition internalTranslation = new TranslateTransition(Duration.millis(500), this);
+                        internalTranslation.setByX(-this.content.get().getWidth());
+
+                        internalTranslation.setOnFinished(internalAnimationEvent -> {
+                            ((SimpleBooleanProperty) this.collapsedProperty()).set(false);
+                        });
+
+                        internalTranslation.play();
+                    }
+
+                });
+
+                translation.play();
+            } else {
+                this.content.set(content);
+
+                final TranslateTransition translation = new TranslateTransition(Duration.millis(500), this);
+                translation.setByX(-this.content.get().getWidth());
+
+                translation.setOnFinished(animationEvent -> {
+                    ((SimpleBooleanProperty) this.collapsedProperty()).set(false);
+                });
+
+                translation.play();
+            }
+        });
+
+        this.toolbar.getChildren().add(button);
+
+        return this;
+    }
+}

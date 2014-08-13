@@ -1,0 +1,43 @@
+.chat-panel {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.chat-bubble {
+    -fx-background-color: RGBA(128,128,128,0.8);
+    -fx-background-radius: 5px;
+
+}
+
+.chat-bubble:answered {
+    -fx-background-color: RGBA(208, 245, 169, 0.8);
+}
+
+.message-author {
+    -fx-text-fill: white;
+    -fx-color: -fx-text-fill;
+    -fx-fill: -fx-text-fill;
+    -fx-font-weight: bold;
+    -fx-text-alignment: left;
+    -fx-padding: 5px 0 0 5px;
+}
+
+.message-author:answered {
+    -fx-text-fill: black;
+    -fx-color: -fx-text-fill;
+    -fx-fill: -fx-text-fill;
+}
+
+.message-content {
+    -fx-text-fill: white;
+    -fx-color: -fx-text-fill;
+    -fx-fill: -fx-text-fill;
+    -fx-text-alignment: justify;
+    -fx-padding: 5px 0 0 15px;
+}
+
+.message-content:answered {
+    -fx-text-fill: black;
+    -fx-color: -fx-text-fill;
+    -fx-fill: -fx-text-fill;
+}

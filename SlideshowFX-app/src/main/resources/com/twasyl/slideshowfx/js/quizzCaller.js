@@ -14,5 +14,16 @@
  * limitations under the License.
  */
 
-include 'SlideshowFX-app', 'SlideshowFX-markup', 'SlideshowFX-html', 'SlideshowFX-markdown', 'SlideshowFX-textile',  'SlideshowFX-asciidoctor'
+function startQuizz(encodedQuizz) {
+    if(undefined != sfxServer) {
+        var data = '{ "service" : "slideshowfx.quizz.start", "data" : { "encoded-quizz" : "' + encodedQuizz + '" } }';
+        sfxServer.callService(data);
+    }
+}
 
+function stopQuizz(quizzId) {
+    if(undefined != sfxServer) {
+        var data = '{ "service" : "slideshowfx.quizz.stop", "data" : { "id" : ' + quizzId + ' } }';
+        sfxServer.callService(data);
+    }
+}

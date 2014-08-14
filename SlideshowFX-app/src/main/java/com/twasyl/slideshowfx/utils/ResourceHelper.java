@@ -18,6 +18,7 @@ package com.twasyl.slideshowfx.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,4 +58,11 @@ public class ResourceHelper {
     public static String getExternalForm(String url) {
         return ResourceHelper.class.getResource(url).toExternalForm();
     }
+
+    /**
+     * This method get the InputStream for the given internal resource <code>url</code>.
+     * @param url The URL of the resource to get the InputStream.
+     * @return The InputStream for the given <code>url</code.>
+     */
+    public static InputStream getInputStream(String url) { return ResourceHelper.class.getResourceAsStream(url); }
 }

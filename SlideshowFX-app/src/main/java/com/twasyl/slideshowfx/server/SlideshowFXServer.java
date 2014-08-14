@@ -17,10 +17,6 @@
 package com.twasyl.slideshowfx.server;
 
 import com.twasyl.slideshowfx.server.service.SlideshowFXService;
-import javafx.event.Event;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.DecodeException;

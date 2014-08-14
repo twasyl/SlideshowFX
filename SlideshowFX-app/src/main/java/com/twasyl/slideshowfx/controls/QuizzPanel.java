@@ -19,7 +19,6 @@ package com.twasyl.slideshowfx.controls;
 import com.twasyl.slideshowfx.beans.quizz.QuizzResult;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
-import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;

@@ -239,6 +239,16 @@
                             </ImageView>
                         </graphic>
                     </Button>
+                    <Button onAction="#insertQuizz">
+                        <tooltip>
+                            <Tooltip text="Insert a quizz" />
+                        </tooltip>
+                        <graphic>
+                            <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                                <Image url="@/com/twasyl/slideshowfx/images/quizz.png" />
+                            </ImageView>
+                        </graphic>
+                    </Button>
                 </ToolBar>
                 <VBox spacing="10">
                     <fx:define>

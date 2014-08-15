@@ -164,6 +164,11 @@
     -fx-background-color: app-color-input-background;
 }
 
+.scroll-pane {
+    -fx-background-color: app-color-background;
+    -fx-background: app-color-background;
+}
+
 .scroll-bar > .track-background {
     -fx-background-color: app-color-background;
 }

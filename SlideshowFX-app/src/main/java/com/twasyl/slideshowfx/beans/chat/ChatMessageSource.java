@@ -14,8 +14,16 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.chat;
+package com.twasyl.slideshowfx.beans.chat;
 
+/**
+ * The source of a {@link com.twasyl.slideshowfx.beans.chat.ChatMessage}.
+ * Currently the internal chat of SlideshowFX and Twitter can be the source of a ChatMessage
+ *
+ * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since 1.0
+ */
 public enum ChatMessageSource {
 
     CHAT("chat"),

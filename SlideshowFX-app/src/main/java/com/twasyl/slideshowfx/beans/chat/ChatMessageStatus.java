@@ -14,8 +14,16 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.chat;
+package com.twasyl.slideshowfx.beans.chat;
 
+/**
+ * The possible status of a {@link com.twasyl.slideshowfx.beans.chat.ChatMessage}. Currently a message can only be new or
+ * answered.
+ *
+ * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since 1.0
+ */
 public enum ChatMessageStatus {
     ANSWERED("answered"),
     NEW("new");

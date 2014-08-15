@@ -25,8 +25,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -52,7 +52,7 @@ public class Dialog extends Stage {
         initOwner(owner);
         initModality(Modality.APPLICATION_MODAL);
         initStyle(StageStyle.UTILITY);
-        setResizable(false);
+        setResizable(true);
         setScene(scene);
         getScene().getStylesheets().add(getClass().getResource("/com/twasyl/slideshowfx/css/Default.css").toExternalForm());
     }
@@ -166,9 +166,9 @@ public class Dialog extends Stage {
         buttonsBox.setAlignment(Pos.BASELINE_RIGHT);
         buttonsBox.getChildren().addAll(buttons);
 
-        final VBox dialogContent = new VBox(10);
-        dialogContent.getChildren().addAll(content, buttonsBox);
-        dialogContent.setPadding(new Insets(10, 10, 10, 10));
+        final BorderPane dialogContent = new BorderPane();
+        dialogContent.setCenter(content);
+        dialogContent.setBottom(buttonsBox);
         final Scene scene = PlatformHelper.createScene(dialogContent);
 
         Dialog dialog = null;

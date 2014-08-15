@@ -17,10 +17,7 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
-import com.twasyl.slideshowfx.chat.Chat;
-import com.twasyl.slideshowfx.controls.SlideMenuItem;
-import com.twasyl.slideshowfx.controls.SlideShowScene;
-import com.twasyl.slideshowfx.controls.TaskProgressIndicator;
+import com.twasyl.slideshowfx.controls.*;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
@@ -29,6 +26,7 @@ import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfigu
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
+import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.OSGiManager;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
@@ -442,6 +440,14 @@ public class SlideshowFXController implements Initializable {
                 && this.presentationEngine.getConfiguration().getPresentationFile() != null
                 && this.presentationEngine.getConfiguration().getPresentationFile().exists()) {
             final WebView slideShowBrowser = new WebView();
+
+            slideShowBrowser.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
+                if (newState == Worker.State.SUCCEEDED) {
+                        JSObject window = (JSObject) slideShowBrowser.getEngine().executeScript("window");
+                        window.setMember("sfxServer", SlideshowFXServer.getSingleton());
+                }
+            });
+
             slideShowBrowser.getEngine().load(this.presentationEngine.getConfiguration().getPresentationFile().toURI().toASCIIString());
 
             final SlideShowScene subScene = new SlideShowScene(slideShowBrowser);
@@ -508,13 +514,25 @@ public class SlideshowFXController implements Initializable {
 
     @FXML
     private void insertChatQRCode(ActionEvent event) {
-        final String qrCode = String.format("<img src=\"http://%1$s:%2$s/images/chatQRCode.png\" />",
-                Chat.getIp(), Chat.getPort());
+        if(SlideshowFXServer.getSingleton() != null) {
+            final String qrCode = String.format("<img src=\"http://%1$s:%2$s/images/chatQRCode.png\" />",
+                    SlideshowFXServer.getSingleton().getHost(),
+                    SlideshowFXServer.getSingleton().getPort());
 
+            this.insertText(this.fieldValueText, qrCode, null);
+            this.fieldValueText.requestFocus();
+        }
+    }
 
-        this.insertText(this.fieldValueText, qrCode, null);
+    @FXML
+    private void insertQuizz(ActionEvent event) {
+        final QuizzCreatorPanel quizzCreatorPanel = new QuizzCreatorPanel();
 
-        this.fieldValueText.requestFocus();
+        Dialog.Response response = Dialog.showCancellableDialog(null, "Insert a quizz", quizzCreatorPanel);
+
+        if(response != null && response.equals(Dialog.Response.OK)) {
+            SlideshowFXController.this.fieldValueText.appendText(quizzCreatorPanel.convertToHtml());
+        }
     }
 
     /**
@@ -801,8 +819,8 @@ public class SlideshowFXController implements Initializable {
     private void startChat() {
         Image icon;
 
-        if (Chat.isOpened()) {
-            Chat.close();
+        if (SlideshowFXServer.getSingleton() != null) {
+            SlideshowFXServer.getSingleton().stop();
 
             icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/start.png"));
         } else {
@@ -823,7 +841,7 @@ public class SlideshowFXController implements Initializable {
             this.chatIpAddress.setText(ip);
             this.chatPort.setText(port + "");
 
-            Chat.create(ip, port, this.twitterHashtag.getText());
+            new SlideshowFXServer(ip, port, this.twitterHashtag.getText());
 
             icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/shutdown.png"));
         }
@@ -841,6 +859,7 @@ public class SlideshowFXController implements Initializable {
                         && SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getJsObject() != null) {
                     JSObject window = (JSObject) browser.getEngine().executeScript("window");
                     window.setMember(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getJsObject(), SlideshowFXController.this);
+                    window.setMember("sfxServer", SlideshowFXServer.getSingleton());
                 }
 
                 taskInProgress.update(0, "Presentation loaded");

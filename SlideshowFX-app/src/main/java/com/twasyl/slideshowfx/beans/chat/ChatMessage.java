@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.chat;
+package com.twasyl.slideshowfx.beans.chat;
 
 import org.vertx.java.core.json.JsonObject;
 
@@ -24,6 +24,13 @@ import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This class represents a message that can be sent over the internal chat of SlideshowFX.
+ *
+ * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since 1.0
+ */
 public class ChatMessage {
     private static final Logger LOGGER = Logger.getLogger(ChatMessage.class.getName());
     private static final String JSON_MESSAGE_OBJECT = "message";
@@ -114,7 +121,7 @@ public class ChatMessage {
         ChatMessage message = new ChatMessage();
         message.setIp(ip);
 
-        JsonObject jsonObject = new JsonObject(json).getObject(JSON_MESSAGE_OBJECT);
+        JsonObject jsonObject = new JsonObject(json);
 
         message.setId(jsonObject.getString(JSON_MESSAGE_ID_ATTR));
         message.setAuthor(jsonObject.getString(JSON_MESSAGE_AUTHOR_ATTR));
@@ -126,18 +133,37 @@ public class ChatMessage {
         return message;
     }
 
-    public String toJSON() { return getJSONObject().toString(); }
+    /**
+     * Build the JSON representation of this ChatMessage.
+     *
+     * @return The JSON representation of this ChatMessage
+     */
+    public JsonObject toJSON() { return getJSONObject(); }
 
-    public String toJSON(InetSocketAddress ip) {
+    /**
+     * Build the JSON representation of this ChatMessage. The given <code>ip</code> is used to determine who is the
+     * author of this message. If the IP of the message is equal to the given <code>ip</code> then the author is
+     * identified as <code>I</code> in the JSON representation.
+     *
+     * @param ip The IP address used to determine the author of this message.
+     * @return The JSON representation of this ChatMessage.
+     */
+    public JsonObject toJSON(InetSocketAddress ip) {
         JsonObject jsonObject = getJSONObject();
 
         if(this.getIp() != null && this.getIp().equals(ip)) {
             jsonObject.getObject(JSON_MESSAGE_OBJECT).putString(JSON_MESSAGE_AUTHOR_ATTR, "I");
         }
 
-        return jsonObject.toString();
+        return jsonObject;
     }
 
+    /**
+     * Build the JsonObject associated to this ChatMessage. Only attributes of this ChatMessage that are not null are
+     * inserted in the JsonObject.
+     *
+     * @return The JSON object representing this ChatMessage.
+     */
     private JsonObject getJSONObject() {
         JsonObject jsonMessage = new JsonObject();
 
@@ -153,9 +179,6 @@ public class ChatMessage {
 
         if(getStatus() != null) jsonMessage.putString(JSON_MESSAGE_STATUS_ATTR, getStatus().getAsString());
 
-        JsonObject json = new JsonObject();
-        json.putObject(JSON_MESSAGE_OBJECT, jsonMessage);
-
-        return json;
+        return jsonMessage;
     }
 }

@@ -17,24 +17,24 @@
 package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
-import com.twasyl.slideshowfx.chat.Chat;
+import com.twasyl.slideshowfx.beans.chat.ChatMessage;
+import com.twasyl.slideshowfx.beans.quizz.QuizzResult;
+import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
-import javafx.animation.TranslateTransition;
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebView;
-import javafx.util.Duration;
-import netscape.javascript.JSObject;
+import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.json.JsonElement;
+import org.vertx.java.core.json.JsonObject;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -50,32 +50,21 @@ import java.util.logging.Logger;
 public class SlideShowScene extends Scene {
 
     private static final Logger LOGGER = Logger.getLogger(SlideShowScene.class.getName());
+    private static SlideShowScene singleton = null;
 
     private final ObjectProperty<WebView> browser = new SimpleObjectProperty<>();
-    private final ObjectProperty<WebView> chatBrowser = new SimpleObjectProperty<>();
     private final ObjectProperty<Circle> pointer = new SimpleObjectProperty<>();
+
+    private final ChatPanel chatPanel = new ChatPanel();
+    private final QuizzPanel quizzPanel = new QuizzPanel();
+    private final CollapsibleToolPane collapsibleToolPane = new CollapsibleToolPane();
 
     public SlideShowScene(WebView browser) {
         super(new StackPane());
+        SlideShowScene.singleton = this;
+
         this.browser.set(browser);
 
-        if(Chat.isOpened()) {
-            chatBrowser.set(new WebView());
-            chatBrowser.get().setPrefSize(500, 320);
-            chatBrowser.get().setMaxSize(500, 320);
-            chatBrowser.get().setMinSize(500, 320);
-            chatBrowser.get().getEngine().load(String.format("http://%1$s:%2$s/slideshowfx/chat/presenter", Chat.getIp(), Chat.getPort()));
-
-            chatBrowser.get().getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
-                @Override
-                public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State state2) {
-                    if (state2 == Worker.State.SUCCEEDED) {
-                        JSObject window = (JSObject) chatBrowser.get().getEngine().executeScript("window");
-                        window.setMember("scene", SlideShowScene.this);
-                    }
-                }
-            });
-        }
         this.setOnKeyReleased(keyEvent -> {
             if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
                 keyEvent.consume();
@@ -86,24 +75,51 @@ public class SlideShowScene extends Scene {
             }
         });
 
-        this.browser.get().getEngine().setOnError((WebErrorEvent event) -> {
-            LOGGER.warning("An error occurred in the slideshow's browser:");
-            LOGGER.warning(event.getMessage());
-        });
-
         final StackPane root = getSceneRoot();
         root.setAlignment(Pos.TOP_LEFT);
         root.getChildren().add(this.browser.get());
 
-        if(Chat.isOpened()) {
-            root.getChildren().add(this.chatBrowser.get());
-            /* This binding is only useful when the scene is displayed. The property is unbind when the chat is
-            opened/closed */
-            this.chatBrowser.get().translateYProperty().bind(root.heightProperty().subtract(this.chatBrowser.get().heightProperty()));
+       if(SlideshowFXServer.getSingleton() != null) {
+           this.initializeChatPanel();
+
+           final ImageView chatImage = new ImageView(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/images/chat.png"));
+           final ImageView quizzImage = new ImageView(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/images/quizz.png"));
+
+           this.collapsibleToolPane.addContent(chatImage, this.chatPanel)
+                                   .addContent(quizzImage, this.quizzPanel);
+
+           root.getChildren().add(this.collapsibleToolPane);
         }
 
         this.setCursor(null);
     }
+
+    /**
+     * Retrieve the chat history and display it in the {@link #chatPanel}.
+     */
+    private void initializeChatPanel() {
+        final JsonObject request = new JsonObject()
+                .putString("service", "slideshowfx.chat.attendee.history")
+                .putObject("data", new JsonObject());
+
+        final JsonElement history = SlideshowFXServer.getSingleton().callService(request.encode());
+
+        if(history != null) {
+            if(history.isArray()) {
+                JsonArray messages = history.asArray();
+
+                for(Object message : messages) {
+                    this.publishMessage((JsonObject) message);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the instance of the SlideShowScene.
+     * @return The instance of the SlideShowScene or null if none.
+     */
+    public static SlideShowScene getSingleton() { return singleton; }
 
     public ObjectProperty<WebView> browserProperty() { return browser; }
     public WebView getBrowser() { return this.browserProperty().get(); }
@@ -118,6 +134,7 @@ public class SlideShowScene extends Scene {
      */
     public void exitSlideshow() {
         PlatformHelper.run(() -> {
+            SlideShowScene.singleton = null;
             SlideshowFX.setSlideShowActive(false);
         });
     }
@@ -136,22 +153,27 @@ public class SlideShowScene extends Scene {
     }
 
     /**
-     * Display or hide the presenter chat on the presentation. The translateY property of the chat is unboud if needed.
-     * @param open if true, displays the chat, hide it otherwise.
+     * This method publish the given <code>chatMessage</code> to the presenter.
+     * @param chatMessage The message to publish.
+     * @throws java.lang.NullPointerException If the message is null
      */
-    public void displayChat(final boolean open) {
+    public void publishMessage(JsonObject chatMessage) {
+        if(chatMessage == null) throw new NullPointerException("The message to publish can not be null");
+
         PlatformHelper.run(() -> {
-            if(SlideShowScene.this.chatBrowser.get().translateYProperty().isBound()) {
-                SlideShowScene.this.chatBrowser.get().translateYProperty().unbind();
-            }
-
-            TranslateTransition translation = new TranslateTransition(Duration.millis(500), chatBrowser.get());
-
-            if (open) translation.setByY(-300);
-            else translation.setByY(300);
-
-            translation.play();
+            this.chatPanel.addMessage(ChatMessage.build(chatMessage.encode(), null));
         });
+    }
+
+    /**
+     * This method publish the given {@link com.twasyl.slideshowfx.beans.quizz.QuizzResult} to the scene.
+     * @param result The result to publish.
+     * @throws java.lang.NullPointerException If the result is null
+     */
+    public void publishQuizzResult(QuizzResult result) {
+        if(result == null) throw new NullPointerException("The QuizzResult to publish can not be null");
+
+        this.quizzPanel.setQuizzResult(result);
     }
 
     /**

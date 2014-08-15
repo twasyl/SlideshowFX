@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.chat;
+function startQuizz(encodedQuizz) {
+    if(undefined != sfxServer) {
+        var data = '{ "service" : "slideshowfx.quizz.start", "data" : { "encoded-quizz" : "' + encodedQuizz + '" } }';
+        sfxServer.callService(data);
+    }
+}
 
-public enum ChatMessageAction {
-
-    MARK_READ("mark-read");
-
-    private final String asString;
-
-    private ChatMessageAction(String action) { this.asString = action; }
-
-    public String getAsString() { return asString; }
-
-    public static ChatMessageAction fromString(String action) {
-       if(MARK_READ.getAsString().equals(action)) {
-            return MARK_READ;
-        } else {
-            return null;
-        }
+function stopQuizz(quizzId) {
+    if(undefined != sfxServer) {
+        var data = '{ "service" : "slideshowfx.quizz.stop", "data" : { "id" : ' + quizzId + ' } }';
+        sfxServer.callService(data);
     }
 }

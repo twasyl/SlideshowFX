@@ -513,18 +513,6 @@ public class SlideshowFXController implements Initializable {
     }
 
     @FXML
-    private void insertChatQRCode(ActionEvent event) {
-        if(SlideshowFXServer.getSingleton() != null) {
-            final String qrCode = String.format("<img src=\"http://%1$s:%2$s/images/chatQRCode.png\" />",
-                    SlideshowFXServer.getSingleton().getHost(),
-                    SlideshowFXServer.getSingleton().getPort());
-
-            this.insertText(this.fieldValueText, qrCode, null);
-            this.fieldValueText.requestFocus();
-        }
-    }
-
-    @FXML
     private void insertQuizz(ActionEvent event) {
         final QuizzCreatorPanel quizzCreatorPanel = new QuizzCreatorPanel();
 

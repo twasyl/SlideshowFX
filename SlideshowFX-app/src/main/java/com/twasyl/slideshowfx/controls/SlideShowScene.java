@@ -82,11 +82,13 @@ public class SlideShowScene extends Scene {
        if(SlideshowFXServer.getSingleton() != null) {
            this.initializeChatPanel();
 
+           final ImageView qrCode = new ImageView(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/images/qrcode.png"));
            final ImageView chatImage = new ImageView(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/images/chat.png"));
            final ImageView quizzImage = new ImageView(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/images/quizz.png"));
 
-           this.collapsibleToolPane.addContent(chatImage, this.chatPanel)
-                                   .addContent(quizzImage, this.quizzPanel);
+           this.collapsibleToolPane.addContent(qrCode, new QRCodePanel())
+                                    .addContent(chatImage, this.chatPanel)
+                                    .addContent(quizzImage, this.quizzPanel);
 
            root.getChildren().add(this.collapsibleToolPane);
         }

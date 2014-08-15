@@ -31,7 +31,6 @@ import javafx.scene.layout.VBox;
 public class ChatPanel extends ScrollPane {
 
     private final double WIDTH = 400;
-    private final double PADDING = 10;
     private final VBox messages = new VBox(5);
 
     public ChatPanel() {
@@ -53,25 +52,6 @@ public class ChatPanel extends ScrollPane {
 
                 ChatPanel.this.messages.prefHeightProperty().bind(newScene.heightProperty().subtract(10));
                 ChatPanel.this.prefHeightProperty().bind(newScene.heightProperty());
-
-               /* newScene.heightProperty().addListener((heightValue, oldHeight, newHeight) -> {
-                    if(newHeight != null) {
-                        ChatPanel.this.setPrefViewportHeight(newHeight.doubleValue());
-
-                        ChatPanel.this.messages.setPrefHeight(newHeight.doubleValue());
-                        ChatPanel.this.messages.setMinHeight(newHeight.doubleValue());
-                        ChatPanel.this.messages.setMaxHeight(newHeight.doubleValue());
-
-                        ChatPanel.this.setPrefHeight(newHeight.doubleValue());
-                        ChatPanel.this.setMinHeight(newHeight.doubleValue());
-                        ChatPanel.this.setMaxHeight(newHeight.doubleValue());
-
-                        System.out.println("Test: " + newHeight.doubleValue());
-
-                        this.layout();
-                    }
-                });
-                */
             }
         });
     }

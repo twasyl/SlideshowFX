@@ -1,0 +1,11 @@
+.qrcode-panel {
+    -fx-background-color: RGBA(128,128,128,0.8);
+    -fx-background-radius: 5px;
+}
+
+.panel-text {
+    -fx-text-fill: white;
+    -fx-fill: -fx-text-fill;
+    -fx-color: -fx-text-fill;
+    -fx-font-size: 15pt;
+}

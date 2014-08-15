@@ -57,12 +57,6 @@ public class CollapsibleToolPane extends Region {
                         this.setTranslateX(newWidth.doubleValue() - this.toolbar.getWidth());
                     }
                 });
-
-                /*newScene.heightProperty().addListener((heightValue, oldHeight, newHeight) -> {
-                    CollapsibleToolPane.this.setPrefHeight(newHeight.doubleValue());
-                    CollapsibleToolPane.this.setMinHeight(newHeight.doubleValue());
-                    CollapsibleToolPane.this.setMaxHeight(newHeight.doubleValue());
-                });*/
             }
         });
 

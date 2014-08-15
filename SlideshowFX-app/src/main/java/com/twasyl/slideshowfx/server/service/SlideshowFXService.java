@@ -109,16 +109,6 @@ public class SlideshowFXService extends Verticle {
                 request.response().setStatusCode(500).end();
             }
         })
-
-                // Route that gets the QR code
-        .get("/images/chatQRCode.png", request -> {
-            request.response().setChunked(true);
-            request.response().headers().set("Content-Type", "image/png");
-
-            Buffer buffer = new Buffer(this.generateQRCode(350));
-            request.response().write(buffer);
-            request.response().end();
-        })
         .get(URL.concat("/images/logo.png"), request -> {
             try (final InputStream in = AttendeeChatService.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/64.png")) {
 
@@ -190,46 +180,5 @@ public class SlideshowFXService extends Verticle {
         };
 
         return handler;
-    }
-
-    /**
-     * Generates the QR code that will be used to access the chat. Data of the QR code are simply the URL of the
-     * Chat taking into consideration the <code>Chat.ip</code> and the <code>Chat.port</code>. The URL is of this form:
-     * <code>http://ip:port/HTTP_CLIENT_CHAT_PATH</code>. For example: <code>http://127.0.0.1:8080/</code>
-     *
-     * @param size the size in pixel of the QR code to generate.
-     * @return The bytes corresponding to the image of the QR code.
-     */
-    public byte[] generateQRCode(int size) {
-        byte[] qrCode = null;
-
-        final Map serverInfo = this.vertx.sharedData().getMap(SlideshowFXServer.SHARED_DATA_SERVERS);
-
-        final String qrCodeData = String.format("http://%1$s:%2$s%3$s",
-                serverInfo.get(SlideshowFXServer.SHARED_DATA_HTTP_SERVER_HOST),
-                serverInfo.get(SlideshowFXServer.SHARED_DATA_HTTP_SERVER_PORT),
-                URL);
-
-        final QRCodeWriter qrWriter = new QRCodeWriter();
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        try {
-            final BitMatrix matrix = qrWriter.encode(qrCodeData, BarcodeFormat.QR_CODE, size, size);
-
-            MatrixToImageWriter.writeToStream(matrix, "png", out);
-
-            out.flush();
-            qrCode = out.toByteArray();
-        } catch (WriterException | IOException e) {
-            LOGGER.log(Level.WARNING, "Can not generate QR Code", e);
-        } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Can not close output stream that contains the QR Code", e);
-            }
-        }
-
-        return qrCode;
     }
 }

@@ -53,9 +53,9 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 | vertx-core | 2.1.2 |
 
-| zxing-core | 2.3.0 |
+| zxing-core | 3.1.0 |
 
-| zxing-jse | 2.3.0 |
+| zxing-jse | 3.1.0 |
 
 |===
 

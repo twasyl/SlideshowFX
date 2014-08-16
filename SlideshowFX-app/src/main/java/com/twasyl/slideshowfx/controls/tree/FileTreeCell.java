@@ -27,8 +27,13 @@ import java.util.logging.Logger;
 
 /**
  * This class is used to create TreeCell for a TreeView containing files.
+ * It defines a actions possible when the {@link javafx.scene.control.ContextMenu} is triggered for this cell.
+ * It also set the drag events defined in the parent {@link com.twasyl.slideshowfx.controls.tree.TemplateTreeView} to this
+ * cell.
  *
  * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since 1.0
  */
 public class FileTreeCell extends TreeCell<File> {
     private static final Logger LOGGER = Logger.getLogger(FileTreeCell.class.getName());
@@ -42,7 +47,11 @@ public class FileTreeCell extends TreeCell<File> {
         renameItem.setOnAction(event -> {
             try {
                 final TextField textField = new TextField();
+                textField.setText(this.getTreeItem().getValue() == null ? "" : this.getTreeItem().getValue().getName());
+
                 final Label label = new Label("New name: ");
+                label.setLabelFor(textField);
+
                 final HBox hbox = new HBox(5);
                 hbox.getChildren().addAll(label, textField);
 

@@ -31,9 +31,10 @@
         #48494a 100%
     );
     app-color-menu-in-use: #103750;
-
+    app-color-orange: #FF8000;
     -fx-background-color: app-color-background;
     -fx-text-fill: app-color-text-fill;
+
 }
 
 .text-area, .text-area .content, .text-field {
@@ -108,16 +109,43 @@
     -fx-border-radius: 3px;
     -fx-border-width: 1px;
     -fx-border-style: solid;
+    -fx-border-color: app-color-light-gray;
+}
+
+/* This class can be set to each button containing an image in order to "select" them and apply the style */
+.button.image {
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
     -fx-border-color: transparent;
 }
 
-.button:hover {
+.button:hover, .button.image:hover {
     -fx-background-color: app-color-mouse-over;
     -fx-border-color: app-color-mouse-over-border;
 }
 
 .button:pressed {
     -fx-background-color: app-color-input-background;
+}
+
+.toggle-button {
+    -fx-background-color: app-color-background;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-border-color: app-color-light-gray;
+    -fx-text-fill: app-color-text-fill;
+}
+
+.toggle-button:hover {
+    -fx-background-color: app-color-mouse-over;
+    -fx-border-color: app-color-mouse-over-border;
+}
+
+.toggle-button:selected {
+    -fx-background-color: app-color-input-background;
+    -fx-border-color: app-color-orange;
 }
 
 .split-menu-button {
@@ -141,8 +169,14 @@
     -fx-background-color: RGB(173,  173, 173);
 }
 
-.separator .line {
+.separator:vertical .line {
     -fx-border-color: transparent app-color-light-gray transparent transparent;
+    -fx-border-width: 2px;
+    -fx-border-style: dotted;
+}
+
+.separator:horizontal .line {
+    -fx-border-color: app-color-light-gray transparent;
     -fx-border-width: 2px;
     -fx-border-style: dotted;
 }
@@ -336,4 +370,10 @@
     -fx-border-color: app-color-light-gray;
     -fx-border-radius: 3px;
     -fx-background-color: app-color-input-background;
+}
+
+.text {
+    -fx-fill: app-color-text-fill;
+    -fx-color: -fx-fill;
+    -fx-text-fill: -fx-fill;
 }

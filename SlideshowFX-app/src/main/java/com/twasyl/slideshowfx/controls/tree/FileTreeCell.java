@@ -55,7 +55,7 @@ public class FileTreeCell extends TreeCell<File> {
                 final HBox hbox = new HBox(5);
                 hbox.getChildren().addAll(label, textField);
 
-                if(Dialog.showDialog(null, "Rename", hbox) == Dialog.Response.OK) {
+                if(Dialog.showDialog(true, null, "Rename", hbox) == Dialog.Response.OK) {
                     ((TemplateTreeView) this.getTreeView()).renameContentOfTreeView(this.getTreeItem(), textField.getText());
                 }
             } catch (IOException e) {

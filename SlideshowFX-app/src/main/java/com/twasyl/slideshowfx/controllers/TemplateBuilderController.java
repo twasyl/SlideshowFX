@@ -194,7 +194,7 @@ public class TemplateBuilderController implements Initializable {
                          try {
                              this.templateContentTreeView.deleteContentOfTreeView(item);
                          } catch (IOException e) {
-                             Dialog.showErrorDialog(null, "Error", "Can not delete the content");
+                             Dialog.showErrorDialog(true, this.getStage(), "Error", "Can not delete the content");
                          }
                      });
     }
@@ -210,7 +210,7 @@ public class TemplateBuilderController implements Initializable {
         final TextField field = new TextField();
         field.setPromptText("Directory name");
 
-        Dialog.Response response = Dialog.showCancellableDialog(this.getStage(), "Create a directory", field);
+        Dialog.Response response = Dialog.showCancellableDialog(true, this.getStage(), "Create a directory", field);
 
         if(response == Dialog.Response.OK) {
             if(!field.getText().trim().isEmpty()) {
@@ -263,7 +263,7 @@ public class TemplateBuilderController implements Initializable {
         final TextField field = new TextField();
         field.setPromptText("File name");
 
-        Dialog.Response response = Dialog.showCancellableDialog(this.getStage(), "Create a file", field);
+        Dialog.Response response = Dialog.showCancellableDialog(true, this.getStage(), "Create a file", field);
 
         if(response == Dialog.Response.OK) {
             if(!field.getText().trim().isEmpty()) {

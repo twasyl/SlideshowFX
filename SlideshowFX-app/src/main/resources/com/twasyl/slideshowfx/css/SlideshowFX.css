@@ -11,7 +11,3 @@
 .invalidDragOver {
     -fx-border-color: app-color-error;
 }
-
-#define-button {
-    -fx-border-color: app-color-input-background;
-}

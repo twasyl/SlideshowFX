@@ -73,6 +73,7 @@ public class QuizzCreatorPanel extends BorderPane {
         questionText.textProperty().bindBidirectional(this.quizz.get().getQuestion().textProperty());
 
         this.addAnswer.setGraphic(new ImageView(new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/add_button.png"), 15, 15, true, true)));
+        this.addAnswer.getStyleClass().add("image");
         this.addAnswer.setTooltip(new Tooltip("Add an answer to this quizz"));
         this.addAnswer.setOnAction(event -> this.addAnswer());
 

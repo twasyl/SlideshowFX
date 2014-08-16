@@ -476,29 +476,18 @@ public class SlideshowFXController implements Initializable {
 
     @FXML
     private void insertImage(ActionEvent event) {
-        FileChooser chooser = new FileChooser();
-        File imageFile = chooser.showOpenDialog(null);
+        if(this.presentationEngine != null && this.presentationEngine.getTemplateConfiguration() != null) {
+            final ImageChooserPanel chooserPanel = new ImageChooserPanel(this.presentationEngine);
 
-        if (imageFile != null) {
-            File targetFile;
-            if (imageFile.exists()) {
-                // If the file exists, add a timestamp to the source
-                targetFile = new File(this.presentationEngine.getTemplateConfiguration().getResourcesDirectory(), System.currentTimeMillis() + imageFile.getName());
-            } else {
-                targetFile = new File(this.presentationEngine.getTemplateConfiguration().getResourcesDirectory(), imageFile.getName());
-            }
+            final Dialog.Response response = Dialog.showCancellableDialog(true, SlideshowFX.getStage(), "Insert an image", chooserPanel);
+            final File selectedFile = chooserPanel.getSelectedFile();
 
-            try {
-                Files.copy(imageFile.toPath(), targetFile.toPath());
-
-                // Get the relative path of the resources folder from the template directory
+            if (response == Dialog.Response.OK && selectedFile != null) {
                 final String relativePath = this.presentationEngine.relativizeFromWorkingDirectory(this.presentationEngine.getTemplateConfiguration().getResourcesDirectory());
 
-                final String imgMarkup = String.format("<img src=\"%1$s/%2$s\" />", relativePath, targetFile.getName());
+                final String imgMarkup = String.format("<img src=\"%1$s/%2$s\" />", relativePath, selectedFile.getName());
 
                 this.insertText(this.fieldValueText, imgMarkup, null);
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -516,7 +505,7 @@ public class SlideshowFXController implements Initializable {
     private void insertQuizz(ActionEvent event) {
         final QuizzCreatorPanel quizzCreatorPanel = new QuizzCreatorPanel();
 
-        Dialog.Response response = Dialog.showCancellableDialog(null, "Insert a quizz", quizzCreatorPanel);
+        Dialog.Response response = Dialog.showCancellableDialog(true, SlideshowFX.getStage(), "Insert a quizz", quizzCreatorPanel);
 
         if(response != null && response.equals(Dialog.Response.OK)) {
             SlideshowFXController.this.fieldValueText.appendText(quizzCreatorPanel.convertToHtml());

@@ -47,11 +47,11 @@ public class Dialog extends Stage {
 
     private Response userResponse;
 
-    private Dialog(String title, Stage owner, Scene scene) {
+    private Dialog(String title, Stage owner, StageStyle style, Modality modality, Scene scene) {
         setTitle(title);
         initOwner(owner);
-        initModality(Modality.APPLICATION_MODAL);
-        initStyle(StageStyle.UTILITY);
+        initModality(modality);
+        initStyle(style);
         setResizable(true);
         setScene(scene);
         getScene().getStylesheets().add(getClass().getResource("/com/twasyl/slideshowfx/css/Default.css").toExternalForm());
@@ -88,10 +88,12 @@ public class Dialog extends Stage {
         this.userResponse = userResponse;
     }
 
-    public static Response showDialog(Stage owner, String title, Node content) {
+    public static Response showDialog(boolean isModal, Stage owner, String title, Node content) {
         final Button okButton = new Button("OK");
 
-        final Dialog dialog = buildDialog(owner, title, content, okButton);
+        final Dialog dialog = buildDialog(owner, title, StageStyle.UTILITY,
+                isModal ? Modality.APPLICATION_MODAL : Modality.NONE,
+                content, okButton);
 
         setButtonAction(okButton, Response.OK, dialog);
 
@@ -100,11 +102,13 @@ public class Dialog extends Stage {
         return dialog.getUserResponse();
     }
 
-    public static Response showCancellableDialog(Stage owner, String title, Node content) {
+    public static Response showCancellableDialog(boolean isModal, Stage owner, String title, Node content) {
         final Button okButton = new Button("OK");
         final Button cancelButton = new Button("Cancel");
 
-        final Dialog dialog = buildDialog(owner, title, content, cancelButton, okButton);
+        final Dialog dialog = buildDialog(owner, title, StageStyle.UTILITY,
+                isModal ? Modality.APPLICATION_MODAL : Modality.NONE,
+                content, cancelButton, okButton);
 
         setButtonAction(okButton, Response.OK, dialog);
         setButtonAction(cancelButton, Response.CANCEL, dialog);
@@ -123,7 +127,7 @@ public class Dialog extends Stage {
         messageText.setWrappingWidth(300);
         messageText.setStyle("-fx-fill: white;");
 
-        final Dialog dialog = buildDialog(owner, title, messageText, noButton, yesButton);
+        final Dialog dialog = buildDialog(owner, title, StageStyle.UTILITY, Modality.APPLICATION_MODAL, messageText, noButton, yesButton);
 
         setButtonAction(yesButton, Response.YES, dialog);
         setButtonAction(noButton, Response.NO, dialog);
@@ -133,7 +137,7 @@ public class Dialog extends Stage {
         return dialog.getUserResponse();
     }
 
-    public static Response showErrorDialog(Stage owner, String title, String message) {
+    public static Response showErrorDialog(boolean isModal, Stage owner, String title, String message) {
         final Button okButton = new Button("OK");
 
         final Text textMessage = new Text(message);
@@ -145,7 +149,9 @@ public class Dialog extends Stage {
         root.setPadding(new Insets(10));
         root.getChildren().addAll(textMessage, image);
 
-        final Dialog dialog = buildDialog(owner, title, root, okButton);
+        final Dialog dialog = buildDialog(owner, title, StageStyle.UTILITY,
+                isModal ? Modality.APPLICATION_MODAL : Modality.NONE,
+                root, okButton);
 
         setButtonAction(okButton, Response.OK, dialog);
 
@@ -161,7 +167,7 @@ public class Dialog extends Stage {
             });
     }
 
-    private static Dialog buildDialog(final Stage owner, final String title, final Node content, final Button ... buttons) {
+    private static Dialog buildDialog(final Stage owner, final String title, final StageStyle style, final Modality modality, final Node content, final Button ... buttons) {
         final HBox buttonsBox = new HBox(10);
         buttonsBox.setAlignment(Pos.BASELINE_RIGHT);
         buttonsBox.getChildren().addAll(buttons);
@@ -173,12 +179,12 @@ public class Dialog extends Stage {
 
         Dialog dialog = null;
         if(Platform.isFxApplicationThread()) {
-            dialog = new Dialog(title, owner, scene);
+            dialog = new Dialog(title, owner, style, modality, scene);
         } else {
             FutureTask<Dialog> future = new FutureTask<Dialog>(new Callable<Dialog>() {
                 @Override
                 public Dialog call() throws Exception {
-                    return new Dialog(title, owner, scene);
+                    return new Dialog(title, owner, style, modality, scene);
                 }
             });
             Platform.runLater(future);

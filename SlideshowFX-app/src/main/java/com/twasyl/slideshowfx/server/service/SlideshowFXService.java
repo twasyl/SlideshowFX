@@ -16,11 +16,6 @@
 
 package com.twasyl.slideshowfx.server.service;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import freemarker.template.*;
 import org.vertx.java.core.Handler;
@@ -34,7 +29,6 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.streams.Pump;
 import org.vertx.java.platform.Verticle;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;

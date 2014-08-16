@@ -58,7 +58,7 @@
                 </Menu>
             </MenuBar>
             <ToolBar>
-                <Button onAction="#loadTemplate">
+                <Button onAction="#loadTemplate" styleClass="image">
                     <tooltip>
                         <Tooltip text="New presentation" />
                     </tooltip>
@@ -69,7 +69,7 @@
                     </graphic>
                 </Button>
 
-                <Button onAction="#openPresentation">
+                <Button onAction="#openPresentation" styleClass="image">
                     <tooltip>
                         <Tooltip text="Open presentation" />
                     </tooltip>
@@ -89,7 +89,7 @@
                     </items>
                 </SplitMenuButton>
 
-                <Button onAction="#print">
+                <Button onAction="#print" styleClass="image">
                     <tooltip>
                         <Tooltip text="Print" />
                     </tooltip>
@@ -108,7 +108,7 @@
                     </tooltip>
                 </SplitMenuButton>
 
-                <Button onAction="#copySlide">
+                <Button onAction="#copySlide" styleClass="image">
                     <tooltip>
                         <Tooltip text="Copy slide" />
                     </tooltip>
@@ -125,7 +125,7 @@
                     </tooltip>
                 </SplitMenuButton>
 
-                <Button onAction="#deleteSlide">
+                <Button onAction="#deleteSlide" styleClass="image">
                     <tooltip>
                         <Tooltip text="Delete slide" />
                     </tooltip>
@@ -138,7 +138,7 @@
 
                 <Separator />
 
-                <Button onAction="#reload">
+                <Button onAction="#reload" styleClass="image">
                     <tooltip>
                         <Tooltip text="Reload" />
                     </tooltip>
@@ -149,7 +149,7 @@
                     </graphic>
                 </Button>
 
-                <Button  onAction="#slideShow">
+                <Button  onAction="#slideShow" styleClass="image">
                     <tooltip>
                         <Tooltip text="Slideshow" />
                     </tooltip>
@@ -186,7 +186,7 @@
 
                 <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" onKeyPressed="#startChatByKeyPressed" />
 
-                <Button onAction="#startChatByButton" fx:id="startChatButton">
+                <Button onAction="#startChatByButton" fx:id="startChatButton" styleClass="image">
                     <graphic>
                         <ImageView fitWidth="$TOOLBAR_ICON_WIDTH" fitHeight="$TOOLBAR_ICON_HEIGHT">
                             <Image url="@/com/twasyl/slideshowfx/images/start.png" preserveRatio="true" smooth="true" />
@@ -209,7 +209,7 @@
 
             <VBox spacing="10" minWidth="400">
                 <ToolBar>
-                    <Button onAction="#insertImage">
+                    <Button onAction="#insertImage" styleClass="image">
                         <tooltip>
                             <Tooltip text="Insert image" />
                         </tooltip>
@@ -219,7 +219,7 @@
                             </ImageView>
                         </graphic>
                     </Button>
-                    <Button onAction="#insertQuote">
+                    <Button onAction="#insertQuote" styleClass="image">
                         <tooltip>
                             <Tooltip text="Insert quote" />
                         </tooltip>
@@ -229,7 +229,7 @@
                             </ImageView>
                         </graphic>
                     </Button>
-                    <Button onAction="#insertQuizz">
+                    <Button onAction="#insertQuizz" styleClass="image">
                         <tooltip>
                             <Tooltip text="Insert a quizz" />
                         </tooltip>

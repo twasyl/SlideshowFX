@@ -78,7 +78,7 @@
                 </items>
             </SplitMenuButton>
 
-            <Button onAction="#deleteFromTreeView">
+            <Button onAction="#deleteFromTreeView" styleClass="image">
                 <tooltip>
                     <Tooltip text="Delete selection" />
                 </tooltip>

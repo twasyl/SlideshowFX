@@ -198,20 +198,25 @@
     -fx-background-color: app-color-input-background;
 }
 
-.scroll-pane {
+.scroll-pane, .scroll-pane .corner {
     -fx-background-color: app-color-background;
     -fx-background: app-color-background;
 }
 
-.scroll-bar > .track-background {
+.scroll-bar {
+    -fx-background-color: app-color-background;
+    -fx-background: app-color-background;
+}
+
+.scroll-bar .track, .scroll-bar .track-background {
     -fx-background-color: app-color-background;
 }
 
-.scroll-bar > .thumb {
+.scroll-bar .thumb {
     -fx-background-color: app-color-thumb;
 }
 
-.scroll-bar > .increment-button, .scroll-bar > .decrement-button {
+.scroll-bar .increment-button, .scroll-bar .decrement-button {
     -fx-background-color: app-color-background;
 }
 

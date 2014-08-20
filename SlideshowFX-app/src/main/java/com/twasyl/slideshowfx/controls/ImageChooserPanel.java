@@ -25,6 +25,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -52,11 +53,10 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since 1.0
  */
-public class ImageChooserPanel extends HBox {
+public class ImageChooserPanel extends VBox {
     private static Logger LOGGER = Logger.getLogger(ImageChooserPanel.class.getName());
 
     private final FlowPane imagesPane = new FlowPane(Orientation.HORIZONTAL, 5, 5);
-    private final VBox resourcesPane = new VBox(5);
     private final ToggleGroup imagesGroup = new ToggleGroup();
     private final ImageView preview = new ImageView();
 
@@ -84,24 +84,25 @@ public class ImageChooserPanel extends HBox {
                     ImageChooserPanel.this.chooseNewFile(engine);
                 }
             });
+        } else {
+            existingImages.forEach(image -> this.addFile(image));
         }
 
-        for(File image : existingImages) {
-            this.addFile(image);
-        }
-
-        final ScrollPane resourcesScrollPane = new ScrollPane(this.imagesPane);
-        resourcesScrollPane.setPrefWidth(400);
-        resourcesScrollPane.setPrefViewportWidth(400);
-        resourcesScrollPane.setPrefHeight(500);
-        resourcesScrollPane.setPrefViewportHeight(500);
-
-        this.resourcesPane.getChildren().addAll(currentFiles, resourcesScrollPane, new Separator(Orientation.HORIZONTAL), browseButton);
+        final ScrollPane imagesScrollPane = new ScrollPane(this.imagesPane);
+        imagesScrollPane.setPrefWidth(400);
+        imagesScrollPane.setMinWidth(400);
+        imagesScrollPane.setPrefViewportWidth(400);
+        imagesScrollPane.setPrefHeight(500);
+        imagesScrollPane.setPrefViewportHeight(500);
 
         final ScrollPane previewScrollPane = new ScrollPane(this.preview);
         previewScrollPane.setPrefSize(500, 500);
+        previewScrollPane.setMinWidth(500);
 
-        this.getChildren().addAll(this.resourcesPane, previewScrollPane);
+        final SplitPane splitPane = new SplitPane();
+        splitPane.getItems().addAll(imagesScrollPane, previewScrollPane);
+
+        this.getChildren().addAll(currentFiles, splitPane, browseButton);
     }
 
     /**
@@ -161,7 +162,7 @@ public class ImageChooserPanel extends HBox {
     }
 
     /**
-     * Opens a file chooser for chossing a new image that will be added to the list of resources and copied into the
+     * Opens a file chooser for choosing a new image that will be added to the list of resources and copied into the
      * directory of resources.
      * @param engine The presentation engine that will be used to determine the directory for the resources.
      */

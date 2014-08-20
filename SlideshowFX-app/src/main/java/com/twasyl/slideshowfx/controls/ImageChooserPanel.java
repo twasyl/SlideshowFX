@@ -21,9 +21,11 @@ import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.io.SlideshowFXFileFilter;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -53,8 +55,9 @@ import java.util.logging.Logger;
 public class ImageChooserPanel extends HBox {
     private static Logger LOGGER = Logger.getLogger(ImageChooserPanel.class.getName());
 
+    private final FlowPane imagesPane = new FlowPane(Orientation.HORIZONTAL, 5, 5);
     private final VBox resourcesPane = new VBox(5);
-    private final ToggleGroup resourcesGroup = new ToggleGroup();
+    private final ToggleGroup imagesGroup = new ToggleGroup();
     private final ImageView preview = new ImageView();
 
     public ImageChooserPanel(final PresentationEngine engine) {
@@ -68,7 +71,7 @@ public class ImageChooserPanel extends HBox {
         final Text currentFiles = new Text("Already existing images:");
         currentFiles.getStyleClass().add("text");
 
-        this.resourcesPane.getChildren().addAll(currentFiles, new Separator(Orientation.HORIZONTAL), browseButton);
+        this.imagesPane.setPrefWrapLength(350);
 
         final List<File> existingImages = this.lookupResources(engine);
 
@@ -87,14 +90,18 @@ public class ImageChooserPanel extends HBox {
             this.addFile(image);
         }
 
-        final ScrollPane resourcesScrollPane = new ScrollPane(this.resourcesPane);
-        resourcesScrollPane.setPrefWidth(320);
-        resourcesScrollPane.setPrefViewportWidth(320);
+        final ScrollPane resourcesScrollPane = new ScrollPane(this.imagesPane);
+        resourcesScrollPane.setPrefWidth(400);
+        resourcesScrollPane.setPrefViewportWidth(400);
+        resourcesScrollPane.setPrefHeight(500);
+        resourcesScrollPane.setPrefViewportHeight(500);
+
+        this.resourcesPane.getChildren().addAll(currentFiles, resourcesScrollPane, new Separator(Orientation.HORIZONTAL), browseButton);
 
         final ScrollPane previewScrollPane = new ScrollPane(this.preview);
         previewScrollPane.setPrefSize(500, 500);
 
-        this.getChildren().addAll(resourcesScrollPane, previewScrollPane);
+        this.getChildren().addAll(this.resourcesPane, previewScrollPane);
     }
 
     /**
@@ -106,13 +113,30 @@ public class ImageChooserPanel extends HBox {
      */
     private ToggleButton addFile(File file) {
 
-        final ToggleButton buttonFile = new ToggleButton(file.getName());
+        Node buttonGraphic = null;
+
+        try(final FileInputStream stream = new FileInputStream(file)) {
+            final Image image = new Image(stream, 80, 80, true, true);
+            buttonGraphic = new ImageView(image);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Can not load the image preview", e);
+        }
+
+        final ToggleButton buttonFile = new ToggleButton();
+
+        // If the image hasn't been load, set the text for this button.
+        if(buttonGraphic == null) {
+            buttonFile.setText(file.getName());
+        } else {
+            buttonFile.setGraphic(buttonGraphic);
+        }
+
         buttonFile.setTooltip(new Tooltip(file.getName()));
-        buttonFile.setPrefWidth(300);
-        buttonFile.setMinWidth(300);
-        buttonFile.setMaxWidth(300);
+        buttonFile.setPrefSize(100, 100);
+        buttonFile.setMinSize(100, 100);
+        buttonFile.setMaxSize(100, 100);
         buttonFile.setUserData(file);
-        buttonFile.setToggleGroup(this.resourcesGroup);
+        buttonFile.setToggleGroup(this.imagesGroup);
 
         /**
          * Defines the listener for the #selectedProperty.
@@ -131,7 +155,7 @@ public class ImageChooserPanel extends HBox {
         });
 
 
-        this.resourcesPane.getChildren().add(this.resourcesPane.getChildren().size() - 2, buttonFile);
+        this.imagesPane.getChildren().add(buttonFile);
 
         return buttonFile;
     }
@@ -189,8 +213,8 @@ public class ImageChooserPanel extends HBox {
     public File getSelectedFile() {
         File selection = null;
 
-        if(this.resourcesGroup.getSelectedToggle() != null) {
-            selection = (File) this.resourcesGroup.getSelectedToggle().getUserData();
+        if(this.imagesGroup.getSelectedToggle() != null) {
+            selection = (File) this.imagesGroup.getSelectedToggle().getUserData();
         }
 
         return selection;

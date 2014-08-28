@@ -20,7 +20,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:0.7.3'
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.0'
     }
 }
 
@@ -184,7 +184,7 @@ project(':SlideshowFX-asciidoctor') {
                     'Bundle-Description': 'Support asscidoctor for defining slide\'s content',
                     'Bundle-Version': '1.0.0',
                     'Bundle-Activator': 'com.twasyl.slideshowfx.markup.asciidoctor.activator.AsciidoctorActivator',
-                    'Bundle-ClassPath': 'slf4j-api-1.7.7.jar,slf4j-simple-1.7.7.jar,jruby-complete-1.7.9.jar,asciidoctorj-1.5.0.preview.7.jar,.',
+                    'Bundle-ClassPath': 'slf4j-api-1.7.7.jar,slf4j-simple-1.7.7.jar,jruby-complete-1.7.13.jar,asciidoctorj-1.5.0.jar,.',
                     'Bundle-Vendor': 'Thierry Wasylczenko',
                     'Export-Package': 'com.twasyl.slideshowfx.markup.asciidoctor,com.twasyl.slideshowfx.markup.asciidoctor.activator',
                     'Import-Package': 'org.osgi.framework')

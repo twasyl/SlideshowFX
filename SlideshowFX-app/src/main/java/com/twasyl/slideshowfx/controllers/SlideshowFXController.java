@@ -371,6 +371,8 @@ public class SlideshowFXController implements Initializable {
             FileChooser chooser = new FileChooser();
             chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
             presentationArchive = chooser.showSaveDialog(null);
+
+            this.presentationEngine.setArchive(presentationArchive);
         } else {
             presentationArchive = this.presentationEngine.getArchive();
         }

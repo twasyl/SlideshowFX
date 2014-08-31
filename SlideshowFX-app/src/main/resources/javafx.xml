@@ -69,8 +69,11 @@
                             fallbackClass="${fallbackClassName}"/>
 
             <fx:platform javafx="8.0+" j2se="8.0">
+                <fx:jvmarg value="-Xms512m" />
+                <fx:jvmarg value="-Xmx2048m" />
                 <fx:jvmarg value="-Dfile.encoding=UTF-8" />
                 <fx:jvmarg value="-Djavafx.preloader=com.twasyl.slideshowfx.app.SlideshowFXPreloader"/>
+                <fx:jvmarg value="-Ddynamic.java.library.path=true"/>
             </fx:platform>
 
             <fx:resources>

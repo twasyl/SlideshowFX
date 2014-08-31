@@ -75,6 +75,7 @@ asciidoctor {
                     'jackson-databind-version': '2.2.2',
                     'jrubycomplete-version': '1.7.16.1',
                     'jsoup-version': '1.8.1',
+                    'leapmotion-sdk-version': '2.2.1.24116',
                     'netty-all-version': '4.0.21.Final',
                     'wikitext-core-version': '2.2.0.N20140811-1615',
                     'wikitext-textile-core-version': '2.2.0.N20140702-2138',

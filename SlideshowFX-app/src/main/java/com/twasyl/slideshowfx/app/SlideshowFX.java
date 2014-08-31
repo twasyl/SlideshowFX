@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.app;
 
 import com.leapmotion.leap.Controller;
+import com.sun.javafx.PlatformUtil;
 import com.sun.javafx.application.LauncherImpl;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.io.DeleteFileVisitor;
@@ -37,12 +38,61 @@ import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SlideshowFX extends Application {
+
+    static {
+        /*
+         * Set the path of LeapMotion libraries when the application is packaged. This is mostly useful when the app is
+         * bundled as a Mac Bundle.
+         *
+         * We first look for a custom property "dynamic.java.library.path". If it is set to true, the hack will be performed.
+         * This property is useful to be sure the app is working inside an IDE and in production. Indeed, the custom
+         * property should only be used when the application is packaged.
+         */
+        final String defineDynamicJavaLibraryPath = System.getProperty("dynamic.java.library.path");
+
+        if("true".equals(defineDynamicJavaLibraryPath)) {
+            try {
+                // Trick to get the app JAR file
+                final File appJarFile = new File(SlideshowFX.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+
+                String platform = "";
+                if(PlatformUtil.isMac()) platform = "osx";
+
+                else if(PlatformUtil.isWindows()) {
+                    if("64".equals(System.getProperty("sun.arch.data.model"))) platform = "windows_x64";
+                    if("86".equals(System.getProperty("sun.arch.data.model"))) platform = "windows_x86";
+                }
+
+                else if(PlatformUtil.isLinux() || PlatformUtil.isUnix()) {
+                    if("64".equals(System.getProperty("sun.arch.data.model"))) platform = "linux_x64";
+                    if("86".equals(System.getProperty("sun.arch.data.model"))) platform = "linux_x86";
+                }
+
+                /*
+                 * Once we know where the JAR is, we assume the libraries are located next to it in a "Leap" folder and then
+                 * in a subfolder for each platform architecture.
+                 */
+                System.setProperty("java.library.path", new File(appJarFile.getParentFile(), "Leap/" + platform).getAbsolutePath());
+
+                Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+
+                if (fieldSysPath != null) {
+                    fieldSysPath.setAccessible(true);
+                    fieldSysPath.set(null, null);
+                }
+            } catch (URISyntaxException | IllegalAccessException | NoSuchFieldException e) {
+                Logger.getLogger(SlideshowFX.class.getName()).severe("Impossible to set java.library.path for LeapMotion");
+            }
+        }
+    }
 
     private static final Logger LOGGER = Logger.getLogger(SlideshowFX.class.getName());
     private static final ReadOnlyObjectProperty<Stage> stage = new SimpleObjectProperty<>();

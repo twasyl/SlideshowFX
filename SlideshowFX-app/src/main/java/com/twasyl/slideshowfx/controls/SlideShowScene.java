@@ -22,6 +22,7 @@ import com.twasyl.slideshowfx.beans.quizz.QuizzResult;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
@@ -217,43 +218,45 @@ public class SlideShowScene extends Scene {
      * of the pointer and takes into account a multiple screen environment.
      */
     public void click() {
-        if(this.pointer.get() != null && this.getSceneRoot().getChildren().contains(this.pointer.get())) {
+        Platform.runLater(() -> {
+            if (this.pointer.get() != null && this.getSceneRoot().getChildren().contains(this.pointer.get())) {
 
-            /**
-             * In a multi screen environment, we need to apply a delta on the coordinates. Indeed
-             * the location of the window (X and Y) takes in consideration this environment. For instance
-             * if you have 3 screens positioned horizontally and the main screen is the middle one:
-             * <ul>
-             *     <li>If the app is displayed on left screen, the X coordinate of the window will be negative
-             *     (according the width of the screen)</li>
-             *     <li>If the app is displayed on the right screen, the X coordinate of the window will be positive
-             *     (according the width of the screen)</li>
-             *     <li>If the app is displayed on the middle screen, the X coordinate will be 0</li>
-             * </ul>
-             */
+                /**
+                 * In a multi screen environment, we need to apply a delta on the coordinates. Indeed
+                 * the location of the window (X and Y) takes in consideration this environment. For instance
+                 * if you have 3 screens positioned horizontally and the main screen is the middle one:
+                 * <ul>
+                 *     <li>If the app is displayed on left screen, the X coordinate of the window will be negative
+                 *     (according the width of the screen)</li>
+                 *     <li>If the app is displayed on the right screen, the X coordinate of the window will be positive
+                 *     (according the width of the screen)</li>
+                 *     <li>If the app is displayed on the middle screen, the X coordinate will be 0</li>
+                 * </ul>
+                 */
 
-            double clickX = this.pointer.get().getTranslateX() + this.pointer.get().getRadius();
-            clickX += super.getWindow().getX();
+                double clickX = this.pointer.get().getTranslateX() + this.pointer.get().getRadius();
+                clickX += super.getWindow().getX();
 
-            double clickY = this.pointer.get().getTranslateY() + this.pointer.get().getRadius();
-            clickY += super.getWindow().getY();
+                double clickY = this.pointer.get().getTranslateY() - this.pointer.get().getRadius();
+                clickY += super.getWindow().getY();
 
-            /**
-             * The pointer has to be removed because if not, the click is performed on it, and not on elements
-             * of the scene. It will be added when click is performed.
-             */
-            SlideShowScene.this.getSceneRoot().getChildren().remove(SlideShowScene.this.pointer.get());
+                /**
+                 * The pointer has to be removed because if not, the click is performed on it, and not on elements
+                 * of the scene. It will be added when click is performed.
+                 */
+                SlideShowScene.this.getSceneRoot().getChildren().remove(SlideShowScene.this.pointer.get());
 
-            try {
-                Robot robot = new Robot(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
-                robot.mouseMove((int) clickX, (int) clickY);
-                robot.mousePress(InputEvent.BUTTON1_MASK);
-                robot.mouseRelease(InputEvent.BUTTON1_MASK);
-            } catch (AWTException e) {
-                LOGGER.log(Level.WARNING, "Can not simulate click", e);
-            } finally {
-                SlideShowScene.this.getSceneRoot().getChildren().add(SlideShowScene.this.pointer.get());
+                try {
+                    Robot robot = new Robot(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
+                    robot.mouseMove((int) clickX, (int) clickY);
+                    robot.mousePress(InputEvent.BUTTON1_MASK);
+                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
+                } catch (AWTException e) {
+                    LOGGER.log(Level.WARNING, "Can not simulate click", e);
+                } finally {
+                    SlideShowScene.this.getSceneRoot().getChildren().add(SlideShowScene.this.pointer.get());
+                }
             }
-        }
+        });
     }
 }

@@ -69,6 +69,12 @@ task jar(overwrite: true) << {
             into(libsDir)
         }
 
+        copy {
+            from(fileTree(dir: allLibs, include: "Leap/", exclude: "**/LeapJava.jar"))
+
+            into(libsDir)
+        }
+
         def classpath = ""
 
         fileTree(dir: libsDir, include: '*.jar', exclude: archivesBaseName + ".jar").each {

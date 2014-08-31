@@ -46,6 +46,8 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 | jsoup | {jsoup-version} |
 
+| LeapMotion SDK | {leapmotion-sdk-version} |
+
 | netty-all | {netty-all-version} |
 
 | org.eclipse.mylyn.wikitext.core | {wikitext-core-version} | Library used for textile support
@@ -76,9 +78,14 @@ The following plugins are currently used in the Gradle script:
 
 ==== Tasks
 
-In order to build the JavaFX native bundle, the `jar` task of the `SlideshowFX-app` project has been overriden. +
-Moreover a task named `buildJavaFXBundle` which depends on the JAR task has been created in the `SlideshowFX-app` project. This task creates the JavaFX bundle. +
-A task named `installMarkupPlugins` has been created in the root project in order to copy the markup supported to the directory of plugins.
+In order to build SlideshowFX, some gradle tasks have been created:
+
+- the `jar` task of the `SlideshowFX-app` project has been overriden in order to build the JavaFX native bundle ;
+- `buildJavaFXBundle` which depends on the JAR task has been created in the `SlideshowFX-app` project. This task creates the JavaFX bundle ;
+- `installMarkupPlugins` (in the root project) which copies the markup supported to the directory of plugins ;
+- `installContentExtensionPlugins` (in the root project) which copies the content extensions to the directory of plugins ;
+- `installUploaderPlugins` (in the root project) which copies the uploaders to the directory of plugins ;
+- `installSlideshowFX` (in the root project) which installs the markup, content extensions and uploaders in the directory of plugins and build the SlideshowFX native bundle.
 
 === Set up your environment
 
@@ -91,7 +98,15 @@ In order to build SlideshowFX, you will need to set *JAVA_HOME* to point to your
 If you are contributing to SlideshowFX and developing some features, you probably use an IDE (http://www.jetbrains.com/idea/[IntelliJ IDEA], https://netbeans.org/[NetBeans], http://www.eclipse.org/[eclipse], ...). +
 Because SlideshowFX uses LeapMotion, you have to set up a JVM argument which is 
 [source]
--Djava.library.path=./lib/Leap
+-Djava.library.path=./lib/Leap/<platform>
+
+Values for the platform are:
+
+- *osx*
+- *windows_x86*
+- *windows_x64*
+- *linux_x86*
+- *linux_x64*
 
 === Templates
 
@@ -306,7 +321,7 @@ The configuration of the presentation is wrapped into an JSON configuration file
           {
             "element-id": "1400836547234-twitter",
             "original-content-code": "HTML",
-            "original-content": "Q<content encoded in Base64>",
+            "original-content": "<content encoded in Base64>",
             "html-content": "<content encoded in Base64>"
           },
           {

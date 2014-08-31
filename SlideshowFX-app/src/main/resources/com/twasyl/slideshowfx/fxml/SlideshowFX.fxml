@@ -18,15 +18,14 @@
 
 <?import com.twasyl.slideshowfx.controls.SlideContentEditor?>
 <?import com.twasyl.slideshowfx.controls.TaskProgressIndicator?>
+<?import com.twasyl.slideshowfx.controls.TextFieldCheckMenuItem?>
+<?import com.twasyl.slideshowfx.utils.NetworkUtils?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.web.WebView?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
-<?import javafx.collections.FXCollections?>
-<?import com.twasyl.slideshowfx.controls.TextFieldCheckMenuItem?>
-<?import com.twasyl.slideshowfx.utils.NetworkUtils?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />

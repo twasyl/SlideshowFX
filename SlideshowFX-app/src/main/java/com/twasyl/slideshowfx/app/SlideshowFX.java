@@ -31,6 +31,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,8 +67,12 @@ public class SlideshowFX extends Application {
                 } else {
                     leapController.removeListener(slideshowFXLeapListener);
 
+                    getStage().close();
+
+                    ((SimpleObjectProperty) stageProperty()).set(new Stage(StageStyle.DECORATED));
                     getStage().setScene(presentationBuilderScene.get());
-                    getStage().setFullScreen(false);
+                    getStage().setMaximized(true);
+                    getStage().show();
                 }
             }
         });
@@ -110,6 +115,7 @@ public class SlideshowFX extends Application {
 
         stage.setTitle("SlideshowFX");
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.getIcons().addAll(
                 new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/16.png")),
                 new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/32.png")),

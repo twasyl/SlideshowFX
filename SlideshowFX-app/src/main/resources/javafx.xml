@@ -29,6 +29,8 @@
                             fallbackClass="${fallbackClassName}"/>
 
             <fx:platform javafx="8.0+" j2se="8.0">
+                <fx:jvmarg value="-Xms512m" />
+                <fx:jvmarg value="-Xmx2048" />
                 <fx:jvmarg value="-Dfile.encoding=UTF-8" />
             </fx:platform>
 

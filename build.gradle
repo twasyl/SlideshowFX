@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 buildscript {
     repositories {
         jcenter()
@@ -53,7 +52,7 @@ asciidoctor {
                     toc: '',
                     'javafx-version': 8,
                     'jdk-version': 8,
-                    'gradle-version': 2.0
+                    'gradle-version': 2.1
             ]
     ]
 }
@@ -71,7 +70,7 @@ def getBuildNumber() {
 }
 
 subprojects {
-	apply plugin: 'java'
+    apply plugin: 'java'
 	sourceCompatibility = 1.8
 	targetCompatibility= 1.8
 }
@@ -327,7 +326,7 @@ task cleanMarkupPlugins << {
 }
 
 task buildGradleWrapper(type: Wrapper) {
-    gradleVersion = '2.0'
+    gradleVersion = '2.1'
 }
 
 installMarkupPlugins.dependsOn ':SlideshowFX-markup:assemble'

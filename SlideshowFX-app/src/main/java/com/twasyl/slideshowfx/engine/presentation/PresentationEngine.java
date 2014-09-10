@@ -277,6 +277,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
      * @param templateArchive The template archive file to create the presentation from.
      */
     public void createFromTemplate(File templateArchive) throws IOException, IllegalAccessException {
+        this.setArchive(null);
+
         this.templateEngine = new TemplateEngine();
         this.templateEngine.loadArchive(templateArchive);
 

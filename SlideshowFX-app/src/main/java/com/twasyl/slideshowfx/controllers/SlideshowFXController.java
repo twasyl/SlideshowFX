@@ -32,6 +32,8 @@ import com.twasyl.slideshowfx.utils.OSGiManager;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import javafx.application.Platform;
+import javafx.beans.property.adapter.JavaBeanObjectProperty;
+import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -830,6 +832,35 @@ public class SlideshowFXController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Ensure the title bar of the application reflects the name of the presentation
+        try {
+            final JavaBeanObjectProperty<File> archiveFile = new JavaBeanObjectPropertyBuilder<File>()
+                    .bean(this.presentationEngine)
+                    .getter("getArchive")
+                    .setter("setArchive")
+                    .name("archiveFile")
+                    .build();
+
+            archiveFile.addListener((archiveValue, oldArchive, newArchive) -> {
+                if(newArchive != null) {
+                    SlideshowFX.getStage().setTitle("SlideshowFX - ".concat(newArchive.getName()));
+                } else {
+                    SlideshowFX.getStage().setTitle("SlideshowFX - Untitled");
+                }
+            });
+
+            SlideshowFX.stageProperty().addListener((stageValue, oldStage, newStage) -> {
+                if (this.presentationEngine.getArchive() != null) {
+                    SlideshowFX.getStage().setTitle("SlideshowFX - ".concat(this.presentationEngine.getArchive().getName()));
+                } else {
+                    SlideshowFX.getStage().setTitle("SlideshowFX - Untitled");
+                }
+            });
+        } catch (NoSuchMethodException e) {
+            LOGGER.log(Level.SEVERE, "Can not bind the presentation archive name to the application's title bar", e);
+        }
+
+
         // Make this controller available to JavaScript
         this.browser.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {

@@ -16,6 +16,8 @@
 
 package com.twasyl.slideshowfx.engine;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
 
@@ -26,6 +28,7 @@ import java.io.IOException;
  */
 public abstract class AbstractEngine<T extends IConfiguration> implements IEngine<T> {
 
+    protected final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     protected final String configurationFilename;
     protected final String archiveExtension;
     protected File archiveFile;
@@ -49,7 +52,11 @@ public abstract class AbstractEngine<T extends IConfiguration> implements IEngin
     @Override public String getArchiveExtension() { return this.archiveExtension; }
 
     @Override public File getArchive() { return this.archiveFile; }
-    @Override public void setArchive(File file) { this.archiveFile = file; }
+    @Override public void setArchive(File file) {
+        final File oldFile = this.archiveFile;
+        this.archiveFile = file;
+        this.propertyChangeSupport.firePropertyChange("archiveFile", oldFile, this.archiveFile);
+    }
 
     @Override
     public File generateWorkingDirectory() {
@@ -100,5 +107,21 @@ public abstract class AbstractEngine<T extends IConfiguration> implements IEngin
 
     @Override public void saveArchive() throws IllegalArgumentException, IOException {
         this.saveArchive(getArchive());
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        this.propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        this.propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        this.propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        this.propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 }

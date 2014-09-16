@@ -1,4 +1,4 @@
-h1. What is SlideshowFX ? !https://api.shippable.com/projects/53761b57d5084086002f3244/badge/master!:https://www.shippable.com/projects/53761b57d5084086002f3244
+h1. What is SlideshowFX ? !https://api.shippable.com/projects/540e6cdf3479c5ea8f9e42e3/badge?branchName=master&no=1410852971184!:https://api.shippable.com/projects/540e6cdf3479c5ea8f9e42e3/badge?branchName=master&no=1410852971184
 
 p. SlideshowFX is a tool allowing you to create slideshow using HTML5 frameworks. Maybe have you heard about "reveal.js":http://lab.hakim.se/reveal-js/ or "impress.js":https://github.com/bartaz/impress.js/ that allow you  to create beautiful slideshows, entirely customizable by using HTML5 and CSS3 technologies.
 

@@ -58,7 +58,7 @@ asciidoctor {
 }
 
 def getBuildNumber() {
-	ext.gitCommitIdCmd = "git --work-tree=\"${rootDir.absolutePath}\" --git-dir=\"${rootDir.absolutePath}${File.separator}.git\" rev-parse --short HEAD"
+	/*ext.gitCommitIdCmd = "git --work-tree=\"${rootDir.absolutePath}\" --git-dir=\"${rootDir.absolutePath}${File.separator}.git\" rev-parse --short HEAD"
     ext.gitCommitId = ext.gitCommitIdCmd.execute().text.trim()
 
     ext.isRepoDirtyCmd = "git --work-tree=\"${rootDir.absolutePath}\" --git-dir=\"${rootDir.absolutePath}${File.separator}.git\" status 2"
@@ -66,7 +66,8 @@ def getBuildNumber() {
 
     ext.appVersion = "${ext.gitCommitId}${ext.isRepoDirty ? '-unofficial' : ''}";
 
-    return ext.appVersion
+    return ext.appVersion */
+    return ""
 }
 
 subprojects {
@@ -191,6 +192,37 @@ project(':SlideshowFX-asciidoctor') {
     }
 }
 
+project(':SlideshowFX-content-extension') {
+
+    dependencies {
+        compile project(':SlideshowFX-markup')
+    }
+}
+
+project(':SlideshowFX-code-extension') {
+
+    dependencies {
+        compile project(':SlideshowFX-content-extension')
+        compile felix
+    }
+
+    jar {
+
+        manifest {
+            attributes('Manifest-Version': '1.0',
+                    'Bundle-ManifestVersion': '2',
+                    'Bundle-Name': 'SlideshowFX code extension',
+                    'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.code',
+                    'Bundle-Description': 'Support for inserting code in slides',
+                    'Bundle-Version': '1.0.0',
+                    'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.code.activator.CodeContentExtensionActivator',
+                    'Bundle-Vendor': 'Thierry Wasylczenko',
+                    'Export-Package': 'com.twasyl.slideshowfx.content.extension.code.controllers,com.twasyl.slideshowfx.content.extension.code,com.twasyl.slideshowfx.content.extension.code.activator',
+                    'Import-Package': 'org.osgi.framework')
+        }
+    }
+}
+
 project(':SlideshowFX-app') {
     apply plugin: 'application'
 
@@ -262,6 +294,7 @@ project(':SlideshowFX-app') {
 
 	dependencies {
 		compile project(':SlideshowFX-markup')
+		compile project(':SlideshowFX-content-extension')
 		compile felix
 		compile freemarker
 		compile jsoup
@@ -318,7 +351,25 @@ task installMarkupPlugins << {
 	}
 }
 
-task cleanMarkupPlugins << {
+task installContentExtensionPlugins << {
+    def codeExtensionProject = project(':SlideshowFX-code-extension')
+    def codeExtensionFile = new File(codeExtensionProject.libsDir, codeExtensionProject.archivesBaseName + ".jar")
+    if(!codeExtensionFile.exists()) throw new GradleException("The code extension JAR does not exist")
+
+    def pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
+    if(!pluginsFolder.exists()) pluginsFolder.mkdirs()
+
+    println "The following files will be copied to ${pluginsFolder.absolutePath}"
+    println "- ${codeExtensionFile.absolutePath}"
+
+    copy {
+        from codeExtensionFile
+
+        into pluginsFolder
+    }
+}
+
+task cleanPlugins << {
     def pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
     def felixCacheFolder = new File(System.getProperty("user.home"), '.SlideshowFX/felix-cache')
 
@@ -334,3 +385,6 @@ installMarkupPlugins.dependsOn ':SlideshowFX-html:assemble'
 installMarkupPlugins.dependsOn ':SlideshowFX-markdown:assemble'
 installMarkupPlugins.dependsOn ':SlideshowFX-textile:assemble'
 installMarkupPlugins.dependsOn ':SlideshowFX-asciidoctor:assemble'
+
+installContentExtensionPlugins.dependsOn ':SlideshowFX-content-extension:assemble'
+installContentExtensionPlugins.dependsOn ':SlideshowFX-code-extension:assemble'

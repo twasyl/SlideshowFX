@@ -169,6 +169,30 @@
     -fx-background-color: RGB(173,  173, 173);
 }
 
+.color-picker, .choice-box {
+    -fx-background-color: app-color-background;
+    -fx-border-color: app-color-light-gray;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.color-picker .text, .choice-box .text {
+    -fx-text-fill: app-color-text-fill;
+}
+
+.color-picker .arrow, .choice-box .arrow {
+    -fx-background-color: RGB(173,  173, 173);
+}
+
+.color-picker:showing, .choice-box:showing {
+    -fx-background-color: app-color-input-background;
+}
+
+.color-palette {
+    -fx-background-color: app-color-background;
+}
+
 .separator:vertical .line {
     -fx-border-color: transparent app-color-light-gray transparent transparent;
     -fx-border-width: 2px;
@@ -367,14 +391,6 @@
 
 .titled-pane:expanded > .content {
     -fx-border-width: 0;
-}
-
-.choice-box {
-    -fx-border-style: solid;
-    -fx-border-width: 1px;
-    -fx-border-color: app-color-light-gray;
-    -fx-border-radius: 3px;
-    -fx-background-color: app-color-input-background;
 }
 
 .text {

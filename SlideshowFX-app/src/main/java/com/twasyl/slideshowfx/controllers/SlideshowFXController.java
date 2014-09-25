@@ -17,12 +17,15 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
+import com.twasyl.slideshowfx.content.extension.IContentExtension;
+import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.controls.*;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
+import com.twasyl.slideshowfx.extension.ContentExtensionManager;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
@@ -142,6 +145,8 @@ public class SlideshowFXController implements Initializable {
     private TextField fieldName;
     @FXML
     private HBox markupContentTypeBox;
+    @FXML
+    private ToolBar contentExtensionToolBar;
     @FXML
     private ToggleGroup markupContentType;
     @FXML
@@ -695,6 +700,16 @@ public class SlideshowFXController implements Initializable {
         }
     }
 
+    /**
+     * Insert a text in the given {@code input}. If the {@code input} is empty, the text is added directly, if not, it
+     * is inserted where the caret is. If the given {@code moveCaretPosition} is not null, the current caret's position
+     * is moved with the value of the parameter. If it is null, the current caret's position is moved by the length of
+     * the given {@code textToInsert}.
+     * @param input The input control where the text will be inserted.
+     * @param textToInsert The text to insert in the input control.
+     * @param moveCaretPosition The number of characters to move the caret position. If null, the length of {@code textToInsert}
+     *                          is taken.
+     */
     private void insertText(TextInputControl input, String textToInsert, Integer moveCaretPosition) {
         if (!input.getText().isEmpty()) {
             final int currentCarret = input.getCaretPosition();
@@ -912,6 +927,11 @@ public class SlideshowFXController implements Initializable {
                 .forEach(markup -> createRadioButtonForMakup(markup));
 
 
+        // Creating buttons for each content extension bundle installed
+        ContentExtensionManager.getInstalledContentExtensions().stream()
+                .sorted((contentExtension1, contentExtension2) -> contentExtension1.getCode().compareTo(contentExtension2.getCode()))
+                .forEach(contentExtension -> createButtonForContentExtension(contentExtension));
+
         this.defineContent.disableProperty().bind(this.slideNumber.textProperty().isEmpty()
                 .or(this.fieldName.textProperty().isEmpty())
                 .or(this.markupContentType.selectedToggleProperty().isNull()));
@@ -929,6 +949,49 @@ public class SlideshowFXController implements Initializable {
 
         markupContentType.getToggles().add(button);
         markupContentTypeBox.getChildren().add(button);
+
+        return button;
+    }
+
+    /**
+     * Creates a Button for the given content extension so the user will be able to insert new type of content in a slide.
+     * The Button is added to the ToolBar of content extensions.
+     * @param contentExtension The content extension to create the Button for.
+     * @return The created Button.
+     */
+    private Button createButtonForContentExtension(final IContentExtension contentExtension) {
+        final Button button = new Button();
+        button.setUserData(contentExtension);
+        button.setTooltip(new Tooltip(contentExtension.getToolTip()));
+        button.getStyleClass().add("image");
+
+        final Image icon = new Image(contentExtension.getIcon(), 20, 20, true, true);
+        final ImageView view = new ImageView(icon);
+        button.setGraphic(view);
+
+        button.setOnAction(event -> {
+
+            final Dialog.Response response = Dialog.showCancellableDialog(true, SlideshowFX.getStage(), contentExtension.getTitle(), contentExtension.getUI());
+
+            if(response == Dialog.Response.OK) {
+                final String content = contentExtension.buildContentString(this.markupContentType.getSelectedToggle() != null ?
+                        (IMarkup) this.markupContentType.getSelectedToggle().getUserData() :
+                        null);
+
+                if (content != null) {
+                    this.insertText(this.fieldValueText, content, null);
+                    contentExtension.extractResources(this.presentationEngine.getTemplateConfiguration().getResourcesDirectory());
+
+                    contentExtension.getResources()
+                            .stream()
+                            .forEach(resource -> {
+                                this.presentationEngine.addCustomResource(resource);
+                            });
+                }
+            }
+        });
+
+        this.contentExtensionToolBar.getItems().add(button);
 
         return button;
     }

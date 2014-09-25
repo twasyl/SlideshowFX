@@ -208,7 +208,7 @@
             </StackPane>
 
             <VBox spacing="10" minWidth="400">
-                <ToolBar>
+                <ToolBar fx:id="contentExtensionToolBar">
                     <Button onAction="#insertImage" styleClass="image">
                         <tooltip>
                             <Tooltip text="Insert image" />

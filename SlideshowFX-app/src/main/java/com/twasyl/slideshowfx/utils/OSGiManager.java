@@ -16,11 +16,9 @@
 
 package com.twasyl.slideshowfx.utils;
 
+import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.markup.IMarkup;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
-import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.*;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.util.tracker.ServiceTracker;
@@ -48,7 +46,8 @@ public class OSGiManager {
 
     private static final File pluginsDirectory = new File(System.getProperty("user.home") + "/.SlideshowFX/plugins");
     private static Framework osgiFramework;
-    private static ServiceTracker serviceTracker;
+    private static ServiceTracker markupServiceTracker;
+    private static ServiceTracker contentExtensionServiceTracker;
 
     /**
      * Start the OSGi container.
@@ -61,7 +60,11 @@ public class OSGiManager {
         configurationMap.put("org.osgi.framework.storage.clean", "onFirstInit");
         configurationMap.put("org.osgi.framework.storage", System.getProperty("user.home") + "/.SlideshowFX/felix-cache");
         configurationMap.put("org.osgi.framework.bundle.parent", "app");
-        configurationMap.put("org.osgi.framework.bootdelegation", "com.twasyl.slideshowfx.markup,sun.misc,javax.*");
+        configurationMap.put("org.osgi.framework.bootdelegation", "com.twasyl.slideshowfx.markup," +
+                "com.twasyl.slideshowfx.content.extension," +
+                "sun.misc," +
+                "javax.*," +
+                "javafx.*");
         configurationMap.put("felix.auto.deploy.action", "install,start");
 
         // Starting OSGi
@@ -75,14 +78,24 @@ public class OSGiManager {
         }
 
         try {
-            serviceTracker = new ServiceTracker(
+            markupServiceTracker = new ServiceTracker(
                     osgiFramework.getBundleContext(),
                     osgiFramework.getBundleContext().createFilter("(objectClass=" + IMarkup.class.getName() + ")"),
                     null);
         } catch (InvalidSyntaxException e) {
             e.printStackTrace();
         }
-        serviceTracker.open();
+        markupServiceTracker.open();
+
+        try {
+            contentExtensionServiceTracker = new ServiceTracker(
+                    osgiFramework.getBundleContext(),
+                    osgiFramework.getBundleContext().createFilter("(objectClass=" + IContentExtension.class.getName() + ")"),
+                    null);
+        } catch (InvalidSyntaxException e) {
+            e.printStackTrace();
+        }
+        contentExtensionServiceTracker.open();
     }
 
     /**
@@ -155,11 +168,18 @@ public class OSGiManager {
             }
         }
 
+        Object service = null;
         if(bundle != null && bundle.getRegisteredServices() != null && bundle.getRegisteredServices().length > 0) {
-            return serviceTracker.getService(bundle.getRegisteredServices()[0]);
-        } else {
-            return null;
+            ServiceReference serviceReference = bundle.getRegisteredServices()[0];
+
+            if(serviceReference instanceof IMarkup) {
+                service = markupServiceTracker.getService(serviceReference);
+            } else if(serviceReference instanceof IContentExtension) {
+                service = contentExtensionServiceTracker.getService(serviceReference);
+            }
         }
+
+        return service;
     }
 
     /**
@@ -171,7 +191,13 @@ public class OSGiManager {
     public static <T> List<T> getInstalledServices(Class<T> serviceType) {
         List<T> services = new ArrayList<>();
 
-        Object[] allServices = serviceTracker.getServices();
+        Object[] allServices = null;
+
+        if(IMarkup.class.isAssignableFrom(serviceType)) {
+            allServices = markupServiceTracker.getServices();
+        } else if(IContentExtension.class.isAssignableFrom(serviceType)) {
+            allServices = contentExtensionServiceTracker.getServices();
+        }
 
         if(allServices != null && allServices.length > 0) {
             services = Arrays.stream(allServices)

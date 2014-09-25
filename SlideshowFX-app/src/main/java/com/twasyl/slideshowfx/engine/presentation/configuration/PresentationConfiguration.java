@@ -16,14 +16,13 @@
 
 package com.twasyl.slideshowfx.engine.presentation.configuration;
 
+import com.twasyl.slideshowfx.content.extension.Resource;
 import com.twasyl.slideshowfx.engine.IConfiguration;
 import javafx.scene.image.Image;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -35,6 +34,7 @@ public class PresentationConfiguration implements IConfiguration {
 
     private Document document;
     private File presentationFile;
+    private Set<Resource> customResources = new LinkedHashSet<>();
     private List<SlidePresentationConfiguration> slides = new ArrayList<>();
 
     public File getPresentationFile() { return presentationFile; }
@@ -45,6 +45,8 @@ public class PresentationConfiguration implements IConfiguration {
 
     public Document getDocument() { return document; }
     public void setDocument(Document document) { this.document = document; }
+
+    public Set<Resource> getCustomResources() { return customResources; }
 
     public void updateSlideThumbnail(String slideNumber, Image image) {
         if(slideNumber == null) throw new IllegalArgumentException("The slide number can not be null");

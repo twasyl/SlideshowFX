@@ -16,6 +16,8 @@
 
 package com.twasyl.slideshowfx.engine.presentation;
 
+import com.twasyl.slideshowfx.content.extension.Resource;
+import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.engine.AbstractEngine;
 import com.twasyl.slideshowfx.engine.EngineException;
 import com.twasyl.slideshowfx.engine.presentation.configuration.PresentationConfiguration;
@@ -32,6 +34,7 @@ import com.twasyl.slideshowfx.utils.ZipUtils;
 import freemarker.template.*;
 import javafx.embed.swing.SwingFXUtils;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -91,6 +94,18 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         JsonObject configurationJson = JSONHelper.readFromFile(configurationFile);
         JsonObject presentationJson = configurationJson.getObject("presentation");
 
+        if(presentationJson.getArray("custom-resources") != null) {
+            presentationJson.getArray("custom-resources")
+                    .forEach(customResource -> {
+                        final Resource resource = new Resource(
+                                ResourceType.valueOf(((JsonObject) customResource).getString("type")),
+                                new String(Base64.getDecoder().decode(((JsonObject) customResource).getString("content")))
+                        );
+
+                        presentationConfiguration.getCustomResources().add(resource);
+                    });
+        }
+
         presentationJson.getArray("slides")
                 .forEach(slideJson -> {
                     final SlidePresentationConfiguration slide = new SlidePresentationConfiguration();
@@ -129,6 +144,17 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         if(this.configuration != null) {
             final JsonObject presentationJson = new JsonObject();
             final JsonArray slidesJson = new JsonArray();
+            final JsonArray customResourcesJson = new JsonArray();
+
+            this.configuration.getCustomResources()
+                    .stream()
+                    .forEach(resource -> {
+                        final JsonObject resourceJson = new JsonObject()
+                                .putString("type", resource.getType().name())
+                                .putString("content", Base64.getEncoder().encodeToString(resource.getContent().getBytes()));
+
+                        customResourcesJson.addObject(resourceJson);
+                    });
 
             this.configuration.getSlides()
                     .stream()
@@ -156,6 +182,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                         slidesJson.addObject(slideJson);
                     });
 
+            presentationJson.putArray("custom-resources", customResourcesJson);
             presentationJson.putArray("slides", slidesJson);
 
             final JsonObject finalObject = new JsonObject();
@@ -206,8 +233,13 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             LOGGER.log(Level.SEVERE, "Can not parse template", e);
         }
 
-        // Append the slides' content to the presentation
         LOGGER.fine("Building presentation file");
+        // Append the custom resources
+        this.configuration.getCustomResources()
+                .stream()
+                .forEach(resource -> this.addCustomResource(resource));
+
+        // Append the slides' content to the presentation
         tokens.clear();
         tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_CALL);
         tokens.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
@@ -589,6 +621,31 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             }
 
             this.savePresentationFile();
+        }
+    }
+
+    /**
+     * This method adds the given resource to the collection of resources present in {@link #getConfiguration()} as well
+     * as in the presentation's document.
+     * @param resource The resource to add in the collection and the document.
+     */
+    public void addCustomResource(Resource resource) {
+        if(resource != null
+                && resource.getContent() != null
+                && !resource.getContent().trim().isEmpty()) {
+
+            this.configuration.getCustomResources().add(resource);
+
+            /*
+             * All of this ensure formatting using the HTML manipulation library.
+             */
+            final String location = this.relativizeFromWorkingDirectory(this.getTemplateConfiguration().getResourcesDirectory());
+            final String htmlString = resource.buildHTMLString(location);
+            final String resourceHtml = Jsoup.parseBodyFragment(htmlString).body().html();
+
+            if(!this.configuration.getDocument().head().html().contains(resourceHtml)) {
+                this.configuration.getDocument().head().append(htmlString);
+            }
         }
     }
 

@@ -17,7 +17,8 @@
 package com.twasyl.slideshowfx.content.extension;
 
 import java.io.*;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

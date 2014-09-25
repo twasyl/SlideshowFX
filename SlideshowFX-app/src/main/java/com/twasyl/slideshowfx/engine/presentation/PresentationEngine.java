@@ -34,7 +34,6 @@ import com.twasyl.slideshowfx.utils.ZipUtils;
 import freemarker.template.*;
 import javafx.embed.swing.SwingFXUtils;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;

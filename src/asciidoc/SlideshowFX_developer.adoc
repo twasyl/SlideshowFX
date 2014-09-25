@@ -275,6 +275,16 @@ The configuration of the presentation is wrapped into an JSON configuration file
 ----
 {
   "presentation": {
+    "custom-resources": [
+        {
+            "type": "<type>",
+            "content": "<content encoded in Base64>"
+        },
+        {
+           "type": "<type>",
+           "content": "<content encoded in Base64>"
+       }
+    ],
     "slides": [
       {
         "template-id": 1,
@@ -333,6 +343,9 @@ The configuration of the presentation is wrapped into an JSON configuration file
 
 The *presentation* JSON object is described below:
 
+* *custom-resources* : the JSON that will contain a JSON object for each custom resource of the presentation
+** *type* : the type of the resource. Possible values are *JAVASCRIPT_FILE*, *CSS_FILE*, *SCRIPT* and *CSS*
+** *content* : the content of the resource enconded in Base64
 * *slides* : the JSON array that will contain a JSON object for each slide of the presentation
 ** *template-id* : the ID of the Slide that serves as template
 ** *id* : the ID of the slide

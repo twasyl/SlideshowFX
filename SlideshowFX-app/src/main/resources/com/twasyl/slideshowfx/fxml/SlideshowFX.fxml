@@ -55,6 +55,7 @@
                         <MenuItem text="Open template" onAction="#openTemplate" />
                         <MenuItem text="Edit current template" onAction="#editTemplate" />
                     </Menu>
+                    <MenuItem text="Open current working directory" onAction="#openWorkingDirectory" />
                 </Menu>
             </MenuBar>
             <ToolBar>
@@ -209,26 +210,6 @@
 
             <VBox spacing="10" minWidth="400">
                 <ToolBar fx:id="contentExtensionToolBar">
-                    <Button onAction="#insertImage" styleClass="image">
-                        <tooltip>
-                            <Tooltip text="Insert image" />
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                                <Image url="@/com/twasyl/slideshowfx/images/image.png" />
-                            </ImageView>
-                        </graphic>
-                    </Button>
-                    <Button onAction="#insertQuote" styleClass="image">
-                        <tooltip>
-                            <Tooltip text="Insert quote" />
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                                <Image url="@/com/twasyl/slideshowfx/images/quote.png" />
-                            </ImageView>
-                        </graphic>
-                    </Button>
                     <Button onAction="#insertQuizz" styleClass="image">
                         <tooltip>
                             <Tooltip text="Insert a quizz" />

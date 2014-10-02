@@ -18,7 +18,9 @@ package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
+import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.controls.*;
+import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
@@ -28,9 +30,9 @@ import com.twasyl.slideshowfx.extension.ContentExtensionManager;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
+import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
-import com.twasyl.slideshowfx.utils.OSGiManager;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import javafx.application.Platform;
@@ -45,7 +47,11 @@ import javafx.fxml.Initializable;
 import javafx.print.PrinterJob;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.*;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -61,6 +67,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -251,6 +258,23 @@ public class SlideshowFXController implements Initializable {
             } catch (IOException e) {
                 this.taskInProgress.update(0, "Error when opening the template");
                 LOGGER.log(Level.SEVERE, "Error when opening the template", e);
+            }
+        }
+    }
+
+    /**
+     * Open the current working directory in the file explorer of the system.
+     * @param event The event associated to the request
+     */
+    @FXML
+    private void openWorkingDirectory(ActionEvent event) {
+        if(this.presentationEngine.getWorkingDirectory() != null && this.presentationEngine.getWorkingDirectory().exists()) {
+            if(Desktop.isDesktopSupported()) {
+                try {
+                    Desktop.getDesktop().open(this.presentationEngine.getWorkingDirectory());
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Can not open working directory", e);
+                }
             }
         }
     }
@@ -480,33 +504,6 @@ public class SlideshowFXController implements Initializable {
      */
     @FXML private void startChatByButton(ActionEvent event) {
         this.startChat();
-    }
-
-    @FXML
-    private void insertImage(ActionEvent event) {
-        if(this.presentationEngine != null && this.presentationEngine.getTemplateConfiguration() != null) {
-            final ImageChooserPanel chooserPanel = new ImageChooserPanel(this.presentationEngine);
-
-            final Dialog.Response response = Dialog.showCancellableDialog(true, SlideshowFX.getStage(), "Insert an image", chooserPanel);
-            final File selectedFile = chooserPanel.getSelectedFile();
-
-            if (response == Dialog.Response.OK && selectedFile != null) {
-                final String relativePath = this.presentationEngine.relativizeFromWorkingDirectory(this.presentationEngine.getTemplateConfiguration().getResourcesDirectory());
-
-                final String imgMarkup = String.format("<img src=\"%1$s/%2$s\" />", relativePath, selectedFile.getName());
-
-                this.insertText(this.fieldValueText, imgMarkup, null);
-            }
-        }
-    }
-
-    @FXML
-    private void insertQuote(ActionEvent event) {
-        String quoteMarkup = "<blockquote></blockquote>";
-
-        this.insertText(this.fieldValueText, quoteMarkup, 12);
-
-        this.fieldValueText.requestFocus();
     }
 
     @FXML
@@ -846,6 +843,8 @@ public class SlideshowFXController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        PresentationDAO.getInstance().setCurrentPresentation(this.presentationEngine);
+
         // Ensure the title bar of the application reflects the name of the presentation
         try {
             final JavaBeanObjectProperty<File> archiveFile = new JavaBeanObjectPropertyBuilder<File>()
@@ -964,8 +963,11 @@ public class SlideshowFXController implements Initializable {
         button.setTooltip(new Tooltip(contentExtension.getToolTip()));
         button.getStyleClass().add("image");
 
-        final Image icon = new Image(contentExtension.getIcon(), 20, 20, true, true);
+        final Image icon = new Image(contentExtension.getIcon());
         final ImageView view = new ImageView(icon);
+        view.setFitHeight(20);
+        view.setFitWidth(20);
+
         button.setGraphic(view);
 
         button.setOnAction(event -> {

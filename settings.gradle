@@ -14,5 +14,15 @@
  * limitations under the License.
  */
 
-include 'SlideshowFX-app', 'SlideshowFX-markup', 'SlideshowFX-html', 'SlideshowFX-markdown', 'SlideshowFX-textile', 'SlideshowFX-asciidoctor', 'SlideshowFX-content-extension', 'SlideshowFX-code-extension'
+include 'SlideshowFX-app'
 
+include 'SlideshowFX-asciidoctor'
+include 'SlideshowFX-html'
+include 'SlideshowFX-markdown'
+include 'SlideshowFX-markup'
+include 'SlideshowFX-textile'
+
+include 'SlideshowFX-content-extension'
+include 'SlideshowFX-code-extension'
+include 'SlideshowFX-image-extension'
+include 'SlideshowFX-quote-extension'

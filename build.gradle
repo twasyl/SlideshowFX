@@ -58,7 +58,8 @@ asciidoctor {
 }
 
 def getBuildNumber() {
-	/*ext.gitCommitIdCmd = "git --work-tree=\"${rootDir.absolutePath}\" --git-dir=\"${rootDir.absolutePath}${File.separator}.git\" rev-parse --short HEAD"
+	ext.gitCommitIdCmd = "git --work-tree=\"${rootDir.absolutePath}\" --git-dir=\"${rootDir.absolutePath}${File.separator}.git\" rev-parse --short HEAD"
+
     ext.gitCommitId = ext.gitCommitIdCmd.execute().text.trim()
 
     ext.isRepoDirtyCmd = "git --work-tree=\"${rootDir.absolutePath}\" --git-dir=\"${rootDir.absolutePath}${File.separator}.git\" status 2"
@@ -66,8 +67,7 @@ def getBuildNumber() {
 
     ext.appVersion = "${ext.gitCommitId}${ext.isRepoDirty ? '-unofficial' : ''}";
 
-    return ext.appVersion */
-    return ""
+    return ext.appVersion
 }
 
 subprojects {
@@ -223,6 +223,56 @@ project(':SlideshowFX-code-extension') {
     }
 }
 
+project(':SlideshowFX-image-extension') {
+
+    dependencies {
+        compile project(':SlideshowFX-content-extension')
+        compile project(':SlideshowFX-app')
+        compile felix
+    }
+
+    jar {
+
+        manifest {
+            attributes('Manifest-Version': '1.0',
+                    'Bundle-ManifestVersion': '2',
+                    'Bundle-Name': 'SlideshowFX image extension',
+                    'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.image',
+                    'Bundle-Description': 'Support for inserting image in slides',
+                    'Bundle-Version': '1.0.0',
+                    'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.image.activator.ImageContentExtensionActivator',
+                    'Bundle-Vendor': 'Thierry Wasylczenko',
+                    'Export-Package': 'com.twasyl.slideshowfx.content.extension.image.controllers,com.twasyl.slideshowfx.content.extension.image,com.twasyl.slideshowfx.content.extension.image.activator',
+                    'Import-Package': 'org.osgi.framework')
+        }
+    }
+}
+
+project(':SlideshowFX-quote-extension') {
+
+    dependencies {
+        compile project(':SlideshowFX-content-extension')
+        compile felix
+    }
+
+    jar {
+
+        manifest {
+            attributes('Manifest-Version': '1.0',
+                    'Bundle-ManifestVersion': '2',
+                    'Bundle-Name': 'SlideshowFX quote extension',
+                    'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.quote',
+                    'Bundle-Description': 'Support for inserting quote in slides',
+                    'Bundle-Version': '1.0.0',
+                    'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.quote.activator.QuoteContentExtensionActivator',
+                    'Bundle-Vendor': 'Thierry Wasylczenko',
+                    'Export-Package': 'com.twasyl.slideshowfx.content.extension.quote.controllers,com.twasyl.slideshowfx.content.extension.quote,com.twasyl.slideshowfx.content.extension.quote.activator',
+                    'Import-Package': 'org.osgi.framework')
+        }
+    }
+}
+
+
 project(':SlideshowFX-app') {
     apply plugin: 'application'
 
@@ -259,6 +309,7 @@ project(':SlideshowFX-app') {
         	// Copying libs
             copy {
             	from(new File(project(':SlideshowFX-markup').libsDir, project(':SlideshowFX-markup').archivesBaseName + ".jar"))
+                from(new File(project(':SlideshowFX-content-extension').libsDir, project(':SlideshowFX-content-extension').archivesBaseName + ".jar"))
 				from(felix.files)
 				from(freemarker.files)
 				from(jsoup.files)
@@ -295,6 +346,7 @@ project(':SlideshowFX-app') {
 	dependencies {
 		compile project(':SlideshowFX-markup')
 		compile project(':SlideshowFX-content-extension')
+
 		compile felix
 		compile freemarker
 		compile jsoup
@@ -352,18 +404,30 @@ task installMarkupPlugins << {
 }
 
 task installContentExtensionPlugins << {
-    def codeExtensionProject = project(':SlideshowFX-code-extension')
-    def codeExtensionFile = new File(codeExtensionProject.libsDir, codeExtensionProject.archivesBaseName + ".jar")
+    def extensionProject = project(':SlideshowFX-code-extension')
+    def codeExtensionFile = new File(extensionProject.libsDir, extensionProject.archivesBaseName + ".jar")
     if(!codeExtensionFile.exists()) throw new GradleException("The code extension JAR does not exist")
+
+    extensionProject = project(':SlideshowFX-quote-extension')
+    def quoteExtensionFile = new File(extensionProject.libsDir, extensionProject.archivesBaseName + ".jar")
+    if(!quoteExtensionFile.exists()) throw new GradleException("The quote extension JAR does not exist")
+
+    extensionProject = project(':SlideshowFX-image-extension')
+    def imageExtensionFile = new File(extensionProject.libsDir, extensionProject.archivesBaseName + ".jar")
+    if(!imageExtensionFile.exists()) throw new GradleException("The image extension JAR does not exist")
 
     def pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
     if(!pluginsFolder.exists()) pluginsFolder.mkdirs()
 
     println "The following files will be copied to ${pluginsFolder.absolutePath}"
     println "- ${codeExtensionFile.absolutePath}"
+    println "- ${quoteExtensionFile.absolutePath}"
+    println "- ${imageExtensionFile.absolutePath}"
 
     copy {
         from codeExtensionFile
+        from quoteExtensionFile
+        from imageExtensionFile
 
         into pluginsFolder
     }
@@ -388,3 +452,5 @@ installMarkupPlugins.dependsOn ':SlideshowFX-asciidoctor:assemble'
 
 installContentExtensionPlugins.dependsOn ':SlideshowFX-content-extension:assemble'
 installContentExtensionPlugins.dependsOn ':SlideshowFX-code-extension:assemble'
+installContentExtensionPlugins.dependsOn ':SlideshowFX-image-extension:assemble'
+installContentExtensionPlugins.dependsOn ':SlideshowFX-quote-extension:assemble'

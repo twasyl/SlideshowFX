@@ -32,6 +32,4 @@ public interface SlideshowFXExtensionFilter {
     public static FileChooser.ExtensionFilter PRESENTATION_FILES = new FileChooser.ExtensionFilter("Presentation files", "*.sfx");
 
     public static FileChooser.ExtensionFilter PLUGIN_FILES = new FileChooser.ExtensionFilter("Plugin files", "*.jar");
-
-    public static FileChooser.ExtensionFilter IMAGES_FILES = new FileChooser.ExtensionFilter("Image files", "*.png", "*.bmp", "*.jpg", "*.jpeg", "*.gif");
 }

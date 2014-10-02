@@ -16,13 +16,13 @@
 
 package com.twasyl.slideshowfx.markup;
 
-import com.twasyl.slideshowfx.utils.OSGiManager;
+import com.twasyl.slideshowfx.osgi.OSGiManager;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * This class allows operations on supported markup syntax. It also has helper methods accessing {@link com.twasyl.slideshowfx.utils.OSGiManager}.
+ * This class allows operations on supported markup syntax. It also has helper methods accessing {@link com.twasyl.slideshowfx.osgi.OSGiManager}.
  *
  * @author Thierry Wasylczenko
  * @version 1.0

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.utils;
+package com.twasyl.slideshowfx.osgi;
 
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.markup.IMarkup;
@@ -62,6 +62,7 @@ public class OSGiManager {
         configurationMap.put("org.osgi.framework.bundle.parent", "app");
         configurationMap.put("org.osgi.framework.bootdelegation", "com.twasyl.slideshowfx.markup," +
                 "com.twasyl.slideshowfx.content.extension," +
+                "com.twasyl.slideshowfx.osgi," +
                 "sun.misc," +
                 "javax.*," +
                 "javafx.*");
@@ -96,6 +97,9 @@ public class OSGiManager {
             e.printStackTrace();
         }
         contentExtensionServiceTracker.open();
+
+        // Deploying the OSGi DataServices
+        osgiFramework.getBundleContext().registerService(DataServices.class.getName(), new DataServices(), new Hashtable<>());
     }
 
     /**

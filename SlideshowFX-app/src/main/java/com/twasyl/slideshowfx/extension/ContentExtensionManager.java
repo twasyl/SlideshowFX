@@ -17,7 +17,7 @@
 package com.twasyl.slideshowfx.extension;
 
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
-import com.twasyl.slideshowfx.utils.OSGiManager;
+import com.twasyl.slideshowfx.osgi.OSGiManager;
 
 import java.util.List;
 

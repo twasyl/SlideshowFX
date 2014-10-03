@@ -248,6 +248,30 @@ project(':SlideshowFX-image-extension') {
     }
 }
 
+project(':SlideshowFX-link-extension') {
+
+    dependencies {
+        compile project(':SlideshowFX-content-extension')
+        compile felix
+    }
+
+    jar {
+
+        manifest {
+            attributes('Manifest-Version': '1.0',
+                    'Bundle-ManifestVersion': '2',
+                    'Bundle-Name': 'SlideshowFX link extension',
+                    'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.link',
+                    'Bundle-Description': 'Support for inserting links in slides',
+                    'Bundle-Version': '1.0.0',
+                    'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.link.activator.LinkContentExtensionActivator',
+                    'Bundle-Vendor': 'Thierry Wasylczenko',
+                    'Export-Package': 'com.twasyl.slideshowfx.content.extension.link.controllers,com.twasyl.slideshowfx.content.extension.link,com.twasyl.slideshowfx.content.extension.link.activator',
+                    'Import-Package': 'org.osgi.framework')
+        }
+    }
+}
+
 project(':SlideshowFX-quote-extension') {
 
     dependencies {
@@ -416,6 +440,10 @@ task installContentExtensionPlugins << {
     def imageExtensionFile = new File(extensionProject.libsDir, extensionProject.archivesBaseName + ".jar")
     if(!imageExtensionFile.exists()) throw new GradleException("The image extension JAR does not exist")
 
+    extensionProject = project(':SlideshowFX-link-extension')
+    def linkExtensionFile = new File(extensionProject.libsDir, extensionProject.archivesBaseName + ".jar")
+    if(!linkExtensionFile.exists()) throw new GradleException("The linke extension JAR does not exist")
+
     def pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
     if(!pluginsFolder.exists()) pluginsFolder.mkdirs()
 
@@ -423,11 +451,13 @@ task installContentExtensionPlugins << {
     println "- ${codeExtensionFile.absolutePath}"
     println "- ${quoteExtensionFile.absolutePath}"
     println "- ${imageExtensionFile.absolutePath}"
+    println "- ${linkExtensionFile.absolutePath}"
 
     copy {
         from codeExtensionFile
         from quoteExtensionFile
         from imageExtensionFile
+        from linkExtensionFile
 
         into pluginsFolder
     }
@@ -453,4 +483,5 @@ installMarkupPlugins.dependsOn ':SlideshowFX-asciidoctor:assemble'
 installContentExtensionPlugins.dependsOn ':SlideshowFX-content-extension:assemble'
 installContentExtensionPlugins.dependsOn ':SlideshowFX-code-extension:assemble'
 installContentExtensionPlugins.dependsOn ':SlideshowFX-image-extension:assemble'
+installContentExtensionPlugins.dependsOn ':SlideshowFX-link-extension:assemble'
 installContentExtensionPlugins.dependsOn ':SlideshowFX-quote-extension:assemble'

@@ -20,6 +20,7 @@ import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.controls.*;
+import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
@@ -921,9 +922,8 @@ public class SlideshowFXController implements Initializable {
 
         // Creating RadioButtons for each markup bundle installed
         MarkupManager.getInstalledMarkupSyntax().stream()
-                .sorted((markup1, markup2) -> markup1.getName().compareTo(markup2.getName()))
+                .sorted((markup1, markup2) -> markup1.getName().compareToIgnoreCase(markup2.getName()))
                 .forEach(markup -> createRadioButtonForMakup(markup));
-
 
         // Creating buttons for each content extension bundle installed
         ContentExtensionManager.getInstalledContentExtensions().stream()

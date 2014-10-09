@@ -18,10 +18,11 @@ package com.twasyl.slideshowfx.markup.asciidoctor;
 
 import com.twasyl.slideshowfx.markup.AbstractMarkup;
 import org.asciidoctor.Asciidoctor;
+import org.jruby.RubyInstanceConfig;
+import org.jruby.javasupport.JavaEmbedUtils;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -37,12 +38,20 @@ public class AsciidoctorMarkup extends AbstractMarkup {
     private static final Logger LOGGER = Logger.getLogger(AsciidoctorMarkup.class.getName());
     private final Asciidoctor asciidoctor;
 
-    private final List<String> loadPaths = new ArrayList<>();
-
     public AsciidoctorMarkup() {
         super("ASCIIDOCTOR", "asciidoctor");
 
-        this.asciidoctor = Asciidoctor.Factory.create();
+        /*
+         This part is absolutely mandatory in order to be able to instantiate asciidoctor in an
+         OSGi context. In someways it initialize Ruby for Java by getting/discovering the classpath.
+         Without it, in the OSGi context it will be impossible to find JRuby and asciidoctor gems.
+         */
+        RubyInstanceConfig config = new RubyInstanceConfig();
+        config.setLoader(AsciidoctorMarkup.class.getClassLoader());
+
+        JavaEmbedUtils.initialize(Arrays.asList("gems/asciidoctor-1.5.0/lib"), config);
+
+        this.asciidoctor = Asciidoctor.Factory.create(AsciidoctorMarkup.class.getClassLoader());
     }
 
     @Override

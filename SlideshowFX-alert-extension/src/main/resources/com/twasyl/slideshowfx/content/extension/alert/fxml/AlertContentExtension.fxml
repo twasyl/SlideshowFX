@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright 2014 Thierry Wasylczenko
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml" spacing="5" style="-fx-padding: 5px;" fx:controller="com.twasyl.slideshowfx.content.extension.alert.controllers.AlertContentExtensionController">
+    <fx:define>
+        <ToggleGroup fx:id="typeGroup" />
+    </fx:define>
+
+    <HBox spacing="5" alignment="BASELINE_LEFT">
+        <Label text="Title:" />
+        <TextField fx:id="title" prefColumnCount="15" />
+    </HBox>
+    <HBox spacing="5" alignment="BASELINE_LEFT">
+        <Label text="Additional text:" />
+        <TextField fx:id="text" />
+    </HBox>
+    <HBox spacing="5" alignment="BASELINE_LEFT">
+        <Label text="Type:" />
+        <RadioButton fx:id="infoRB" text="Info" selected="true" toggleGroup="$typeGroup" />
+        <RadioButton fx:id="successRB" text="Success" toggleGroup="$typeGroup" />
+        <RadioButton fx:id="warningRB" text="Warning" toggleGroup="$typeGroup" />
+        <RadioButton fx:id="errorRB" text="Error" toggleGroup="$typeGroup" />
+    </HBox>
+    <CheckBox fx:id="allowClickOutside" text="Allow click outside" />
+    <CheckBox fx:id="showCancelButton" text="Show cancel button" />
+    <HBox spacing="5" alignment="BASELINE_LEFT">
+        <Label text="Button's text:" />
+        <TextField fx:id="buttonText" prefColumnCount="15" />
+    </HBox>
+</VBox>
+

@@ -22,8 +22,10 @@ include 'SlideshowFX-markdown'
 include 'SlideshowFX-markup'
 include 'SlideshowFX-textile'
 
+include 'SlideshowFX-alert-extension'
 include 'SlideshowFX-content-extension'
 include 'SlideshowFX-code-extension'
 include 'SlideshowFX-image-extension'
 include 'SlideshowFX-link-extension'
 include 'SlideshowFX-quote-extension'
+

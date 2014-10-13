@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.app;
 
 import com.leapmotion.leap.Controller;
+import com.sun.javafx.application.LauncherImpl;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.io.DeleteFileVisitor;
 import com.twasyl.slideshowfx.leap.SlideshowFXLeapListener;
@@ -170,5 +171,7 @@ public class SlideshowFX extends Application {
     public static final SlideShowScene getSlideShowScene() { return slideShowSceneProperty().get(); }
     public static final void setSlideShowScene(SlideShowScene scene) { slideShowSceneProperty().set(scene); }
 
-    public static void main(String[] args) { SlideshowFX.launch(args); }
+    public static void main(String[] args) {
+        LauncherImpl.launchApplication(SlideshowFX.class, SlideshowFXPreloader.class, args);
+    }
 }

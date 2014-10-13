@@ -45,7 +45,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.print.PrinterJob;
+import javafx.print.*;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -74,6 +74,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Optional;
@@ -459,6 +460,17 @@ public class SlideshowFXController implements Initializable {
 
         if (job != null) {
             if (job.showPrintDialog(null)) {
+
+                if(this.presentationEngine.getArchive() != null) {
+                    final String extension = ".".concat(this.presentationEngine.getArchiveExtension());
+                    final int indexOfExtension = this.presentationEngine.getArchive().getName().indexOf(extension);
+                    final String jobName = this.presentationEngine.getArchive().getName().substring(0, indexOfExtension);
+                    job.getJobSettings().setJobName(jobName);
+                }
+
+                job.getJobSettings().setPrintQuality(PrintQuality.HIGH);
+                job.getJobSettings().setPageLayout(job.getPrinter().createPageLayout(Paper.A4, PageOrientation.LANDSCAPE, 0, 0, 0, 0));
+
                 this.browser.getEngine().print(job);
                 job.endJob();
             } else {

@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -33,5 +35,7 @@ public class LinkContentExtensionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        final String url = Clipboard.getSystemClipboard().getUrl();
+        if(url != null) this.address.setText(url);
     }
 }

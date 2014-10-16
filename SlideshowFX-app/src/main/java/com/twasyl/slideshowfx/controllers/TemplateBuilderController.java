@@ -17,10 +17,7 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.controls.Dialog;
-import com.twasyl.slideshowfx.controls.builder.editor.ConfigurationFileEditor;
-import com.twasyl.slideshowfx.controls.builder.editor.IFileEditor;
-import com.twasyl.slideshowfx.controls.builder.editor.ImageFileEditor;
-import com.twasyl.slideshowfx.controls.builder.editor.SimpleFileEditor;
+import com.twasyl.slideshowfx.controls.builder.editor.*;
 import com.twasyl.slideshowfx.controls.tree.FileTreeCell;
 import com.twasyl.slideshowfx.controls.tree.TemplateTreeView;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
@@ -404,7 +401,7 @@ public class TemplateBuilderController implements Initializable {
                                     String mimeType = Files.probeContentType(file.toPath());
 
                                     if(mimeType != null && mimeType.contains("image")) fileEditor = new ImageFileEditor();
-                                    else fileEditor = new SimpleFileEditor();
+                                    else fileEditor = new ACEFileEditor();
                                 } catch (IOException e) {
                                     LOGGER.log(Level.WARNING, "An error occurred while truing to determine the MIME type of the file to open", e);
                                     fileEditor = new SimpleFileEditor();

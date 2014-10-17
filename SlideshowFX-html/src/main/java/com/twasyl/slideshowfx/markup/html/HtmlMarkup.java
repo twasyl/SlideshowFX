@@ -26,7 +26,7 @@ import com.twasyl.slideshowfx.markup.AbstractMarkup;
  */
 public class HtmlMarkup extends AbstractMarkup {
 
-    public HtmlMarkup() { super("HTML", "HTML"); }
+    public HtmlMarkup() { super("HTML", "HTML", "ace/mode/html"); }
 
     /**
      * This methods convert the given <code>markupString</code> to HTML.

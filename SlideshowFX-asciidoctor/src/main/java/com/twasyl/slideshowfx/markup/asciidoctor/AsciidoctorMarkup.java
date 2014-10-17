@@ -39,7 +39,7 @@ public class AsciidoctorMarkup extends AbstractMarkup {
     private final Asciidoctor asciidoctor;
 
     public AsciidoctorMarkup() {
-        super("ASCIIDOCTOR", "asciidoctor");
+        super("ASCIIDOCTOR", "asciidoctor", "ace/mode/asciidoc");
 
         /*
          This part is absolutely mandatory in order to be able to instantiate asciidoctor in an

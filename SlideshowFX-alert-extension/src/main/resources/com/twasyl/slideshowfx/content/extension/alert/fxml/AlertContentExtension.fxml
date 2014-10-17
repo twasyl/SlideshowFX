@@ -17,8 +17,7 @@
   -->
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml" spacing="5" style="-fx-padding: 5px;" fx:controller="com.twasyl.slideshowfx.content.extension.alert.controllers.AlertContentExtensionController">
     <fx:define>
         <ToggleGroup fx:id="typeGroup" />

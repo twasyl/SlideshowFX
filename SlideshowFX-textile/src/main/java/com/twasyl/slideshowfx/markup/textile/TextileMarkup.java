@@ -64,7 +64,7 @@ public class TextileMarkup extends AbstractMarkup {
         }
     };
 
-    public TextileMarkup() { super("TEXTILE", "Textile"); }
+    public TextileMarkup() { super("TEXTILE", "Textile", "ace/mode/textile"); }
 
     /**
      * This methods convert the given <code>markupString</code> to HTML.

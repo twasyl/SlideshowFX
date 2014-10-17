@@ -20,7 +20,6 @@ import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.controls.*;
-import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
@@ -45,13 +44,15 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.print.*;
+import javafx.print.PageOrientation;
+import javafx.print.Paper;
+import javafx.print.PrintQuality;
+import javafx.print.PrinterJob;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -74,7 +75,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Optional;
@@ -157,8 +157,7 @@ public class SlideshowFXController implements Initializable {
     private ToolBar contentExtensionToolBar;
     @FXML
     private ToggleGroup markupContentType;
-    @FXML
-    private TextArea fieldValueText;
+    @FXML private SlideContentEditor contentEditor;
     @FXML
     private TextField chatIpAddress;
     @FXML
@@ -294,7 +293,7 @@ public class SlideshowFXController implements Initializable {
     @FXML
     private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
         RadioButton selectedMarkup = (RadioButton) this.markupContentType.getSelectedToggle();
-        this.updateSlide((IMarkup) selectedMarkup.getUserData(), this.fieldValueText.getText());
+        this.updateSlide((IMarkup) selectedMarkup.getUserData(), this.contentEditor.getContentEditorValue());
     }
 
     /**
@@ -526,7 +525,7 @@ public class SlideshowFXController implements Initializable {
         Dialog.Response response = Dialog.showCancellableDialog(true, SlideshowFX.getStage(), "Insert a quizz", quizzCreatorPanel);
 
         if(response != null && response.equals(Dialog.Response.OK)) {
-            SlideshowFXController.this.fieldValueText.appendText(quizzCreatorPanel.convertToHtml());
+            this.contentEditor.appendContentEditorValue(quizzCreatorPanel.convertToHtml());
         }
     }
 
@@ -709,40 +708,6 @@ public class SlideshowFXController implements Initializable {
         }
     }
 
-    /**
-     * Insert a text in the given {@code input}. If the {@code input} is empty, the text is added directly, if not, it
-     * is inserted where the caret is. If the given {@code moveCaretPosition} is not null, the current caret's position
-     * is moved with the value of the parameter. If it is null, the current caret's position is moved by the length of
-     * the given {@code textToInsert}.
-     * @param input The input control where the text will be inserted.
-     * @param textToInsert The text to insert in the input control.
-     * @param moveCaretPosition The number of characters to move the caret position. If null, the length of {@code textToInsert}
-     *                          is taken.
-     */
-    private void insertText(TextInputControl input, String textToInsert, Integer moveCaretPosition) {
-        if (!input.getText().isEmpty()) {
-            final int currentCarret = input.getCaretPosition();
-            final String firstPart = input.getText().substring(0, currentCarret);
-            final String secondPart = input.getText().substring(currentCarret);
-
-            input.setText(String.format("%1$s%2$s%3$s", firstPart, textToInsert, secondPart));
-
-            if (moveCaretPosition != null) {
-                input.positionCaret(currentCarret + moveCaretPosition);
-            } else {
-                input.positionCaret(currentCarret + textToInsert.length());
-            }
-        } else {
-            input.setText(textToInsert);
-
-            if (moveCaretPosition != null) {
-                input.positionCaret(input.getCaretPosition() + moveCaretPosition);
-            } else {
-                input.positionCaret(input.getCaretPosition() + textToInsert.length());
-            }
-        }
-    }
-
     private void updateSlideTemplatesSplitMenu() {
         this.addSlideButton.getItems().clear();
         if (this.presentationEngine.getTemplateConfiguration() != null) {
@@ -794,24 +759,24 @@ public class SlideshowFXController implements Initializable {
                  * the HTML content.
                  */
                 if (MarkupManager.isContentSupported(element.getOriginalContentCode())) {
-                    this.fieldValueText.setText(element.getOriginalContent());
+                    this.contentEditor.setContentEditorValue(element.getOriginalContent());
                 } else {
-                    this.fieldValueText.setText(element.getHtmlContent());
+                    this.contentEditor.setContentEditorValue(element.getHtmlContent());
                 }
 
                 this.selectMarkupRadioButton(element.getOriginalContentCode());
             } else {
                 try {
-                    this.fieldValueText.setText(new String(Base64.getDecoder().decode(currentElementContent), "UTF8"));
+                    this.contentEditor.setContentEditorValue(new String(Base64.getDecoder().decode(currentElementContent), "UTF8"));
                 } catch (UnsupportedEncodingException e) {
                     LOGGER.log(Level.WARNING, "Can not decode String in UTF8", e);
                 } finally {
                     this.selectMarkupRadioButton(null);
-                    this.fieldValueText.selectAll();
+                    this.contentEditor.selectAll();
                 }
             }
 
-            this.fieldValueText.requestFocus();
+            this.contentEditor.requestFocus();
         } else {
             LOGGER.info(String.format("Prefill information for the field %1$s of slide #%2$s is impossible: the slide is not found", field, slideNumber));
         }
@@ -942,9 +907,19 @@ public class SlideshowFXController implements Initializable {
                 .sorted((contentExtension1, contentExtension2) -> contentExtension1.getCode().compareTo(contentExtension2.getCode()))
                 .forEach(contentExtension -> createButtonForContentExtension(contentExtension));
 
+        // Change the mode for the content editor as the selection for markup language changes
+        this.markupContentType.selectedToggleProperty().addListener((value, oldToggle, newToggle) -> {
+            if(newToggle == null) {
+                this.contentEditor.setMode(null);
+            } else {
+                this.contentEditor.setMode(((IMarkup) newToggle.getUserData()).getAceMode());
+            }
+        });
+
         this.defineContent.disableProperty().bind(this.slideNumber.textProperty().isEmpty()
                 .or(this.fieldName.textProperty().isEmpty())
                 .or(this.markupContentType.selectedToggleProperty().isNull()));
+
     }
 
     /**
@@ -992,7 +967,7 @@ public class SlideshowFXController implements Initializable {
                         null);
 
                 if (content != null) {
-                    this.insertText(this.fieldValueText, content, null);
+                    this.contentEditor.appendContentEditorValue(content);
                     contentExtension.extractResources(this.presentationEngine.getTemplateConfiguration().getResourcesDirectory());
 
                     contentExtension.getResources()

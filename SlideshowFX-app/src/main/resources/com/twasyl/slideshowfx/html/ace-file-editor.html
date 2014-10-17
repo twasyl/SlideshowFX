@@ -34,10 +34,17 @@
     </style>
     <script type="text/javascript">
         // Set the content of the editor. The content is given in Base64
-
         function setContent(content) {
             var editor = ace.edit("editor");
             editor.setValue(decodeURIComponent(escape(window.atob(content))));
+            editor.clearSelection();
+            editor.resize();
+        }
+
+        // Insert the content where the cursor is
+        function appendContent(content) {
+            var editor = ace.edit("editor");
+            editor.insert(decodeURIComponent(escape(window.atob(content))));
             editor.clearSelection();
             editor.resize();
         }
@@ -48,9 +55,16 @@
             return window.btoa(unescape(encodeURIComponent(editor.getValue())));
         }
 
+        // Set the mode of this editor
         function setMode(newMode) {
             var editor = ace.edit("editor");
             editor.getSession().setMode(newMode);
+        }
+
+        // Select all text in the editor
+        function selectAll() {
+            var editor = ace.edit("editor");
+            editor.selectAll();
         }
     </script>
     <script src="../js/ace/ace.js"></script>
@@ -61,6 +75,7 @@
     <script type="text/javascript">
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/tomorrow_night");
+        editor.getSession().setUseWrapMode(true);
     </script>
 </body>
 </html>

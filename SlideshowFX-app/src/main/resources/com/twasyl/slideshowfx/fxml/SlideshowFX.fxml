@@ -16,6 +16,7 @@
   ~ limitations under the License.
   -->
 
+<?import com.twasyl.slideshowfx.controls.SlideContentEditor?>
 <?import com.twasyl.slideshowfx.controls.TaskProgressIndicator?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
@@ -237,7 +238,7 @@
                         <Label text="Content:" />
                     </HBox>
                     <VBox spacing="10">
-                        <TextArea fx:id="fieldValueText" prefColumnCount="50" prefRowCount="25" wrapText="true" />
+                        <SlideContentEditor fx:id="contentEditor" />
                         <Button fx:id="defineContent" text="Define" id="define-button" onAction="#updateSlideWithText" />
                     </VBox>
                 </VBox>

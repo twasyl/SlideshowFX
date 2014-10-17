@@ -29,7 +29,7 @@ import com.twasyl.slideshowfx.markup.AbstractMarkup;
  */
 public class MarkdownMarkup extends AbstractMarkup {
 
-    public MarkdownMarkup() { super("MARKDOWN", "Markdown"); }
+    public MarkdownMarkup() { super("MARKDOWN", "Markdown", "ace/mode/markdown"); }
 
     /**
      * This methods convert the given <code>markupString</code> to HTML.

@@ -46,4 +46,11 @@ public interface IMarkup {
      * @throws IllegalArgumentException If the given string is null or empty this exception is thrown.
      */
     String convertAsHtml(String markupString) throws IllegalArgumentException;
+
+    /**
+     * Return the ACE mode that is used for the editor available in SlideshowFX. The editor uses ACE (from Cloud9) in
+     * order to define slides' content. In order to get the right syntax highlighting, ACE needs the mode.
+     * @return The ACE mode corresponding to this markup language.
+     */
+    String getAceMode();
 }

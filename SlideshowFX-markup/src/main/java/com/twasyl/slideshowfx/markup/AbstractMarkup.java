@@ -19,7 +19,7 @@ package com.twasyl.slideshowfx.markup;
 /**
  * This class provides a default implementation for {@link com.twasyl.slideshowfx.markup.IMarkup}.
  * A basic implementation of a markup language should use this class instead of <code>IMarkup</code>. <code>IMarkup</code>
- * shoudl only be used for more complex markup language.
+ * should only be used for more complex markup language.
  *
  * @author Thierry Wasylczenko
  * @version 1.0
@@ -28,13 +28,17 @@ package com.twasyl.slideshowfx.markup;
 public abstract class AbstractMarkup implements IMarkup {
     protected String code;
     protected String name;
+    protected String aceMode;
 
-    protected AbstractMarkup(String code, String name) {
+    protected AbstractMarkup(String code, String name, String aceMode) {
         this.code = code;
         this.name = name;
+        this.aceMode = aceMode;
     }
 
     @Override public String getName() { return this.name; }
 
     @Override public String getCode() { return this.code; }
+
+    @Override public String getAceMode() { return this.aceMode; }
 }

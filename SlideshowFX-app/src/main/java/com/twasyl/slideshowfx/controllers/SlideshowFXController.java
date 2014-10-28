@@ -981,11 +981,18 @@ public class SlideshowFXController implements Initializable {
     /**
      * Creates a RadioButton for the given markup so the user will be able to select the new syntax. The RadioButton is
      * added to the panel of markups as well as in the ToggleGroup for all markups.
+     * Note that the RadioButton will not request focus when it is clicked. This avoid the cursor to leave an eventual
+     * text edition area.
      * @param markup The markup to create the RadioButton for
      * @return The created RadioButton.
      */
     private RadioButton createRadioButtonForMakup(IMarkup markup) {
-        final RadioButton button = new RadioButton(markup.getName());
+        final RadioButton button = new RadioButton(markup.getName()) {
+            @Override
+            public void requestFocus() {
+                // Avoid the button to get the focus. So if the cursor is in the editor it won't loose the focus
+            }
+        };
         button.setUserData(markup);
 
         markupContentType.getToggles().add(button);

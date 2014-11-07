@@ -33,7 +33,9 @@ public class LinkContentExtensionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        final String url = Clipboard.getSystemClipboard().getUrl();
-        if(url != null) this.address.setText(url);
+        if(Clipboard.getSystemClipboard().hasUrl()) {
+            final String url = Clipboard.getSystemClipboard().getUrl();
+            if (url != null) this.address.setText(url);
+        }
     }
 }

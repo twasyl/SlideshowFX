@@ -271,7 +271,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     }
 
     @Override
-    public void saveArchive(File file) throws IllegalArgumentException, IOException {
+    public synchronized void saveArchive(File file) throws IllegalArgumentException, IOException {
 
         this.writeConfiguration();
 

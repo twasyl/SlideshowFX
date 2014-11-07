@@ -20,6 +20,7 @@ import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
+import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
@@ -62,5 +63,20 @@ public class TaskProgressIndicator extends HBox {
         this.setText(text);
 
         PlatformHelper.run(() -> this.labelTransition.playFromStart());
+    }
+
+    /**
+     * Defines the given {@code task} as current task of this indicator. This method adds
+     * listeners to the {@link javafx.concurrent.Task#messageProperty()} and {@link javafx.concurrent.Task#progressProperty()}
+     * in order to reflect changes to the indicator.
+     * @param task The task to set to this indicator
+     */
+    public void setCurrentTask(final Task task) {
+        task.messageProperty().addListener((value, oldMessage, newMessage) -> {
+            this.update(task.getProgress(), newMessage);
+        });
+        task.progressProperty().addListener((value, oldProgress, newProgress) -> {
+            this.update(newProgress.doubleValue(), task.getMessage());
+        });
     }
 }

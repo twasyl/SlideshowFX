@@ -105,7 +105,7 @@ public abstract class AbstractEngine<T extends IConfiguration> implements IEngin
         this.loadArchive(getArchive());
     }
 
-    @Override public void saveArchive() throws IllegalArgumentException, IOException {
+    @Override public synchronized void saveArchive() throws IllegalArgumentException, IOException {
         this.saveArchive(getArchive());
     }
 

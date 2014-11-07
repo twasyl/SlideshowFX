@@ -24,6 +24,7 @@
 <?import javafx.scene.web.WebView?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
+<?import com.twasyl.slideshowfx.controls.TextFieldCheckMenuItem?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
@@ -49,6 +50,7 @@
                 </Menu>
                 <Menu text="Options">
                     <MenuItem text="Install plugin" onAction="#installPlugin" />
+                    <TextFieldCheckMenuItem fx:id="autoSaveItem" text="Auto save interval (min):" value="5" />
                 </Menu>
                 <Menu text="Tools">
                     <Menu text="Template builder">

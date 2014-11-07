@@ -17,10 +17,15 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
+import com.twasyl.slideshowfx.concurrent.LoadPresentationTask;
+import com.twasyl.slideshowfx.concurrent.LoadTemplateTask;
+import com.twasyl.slideshowfx.concurrent.ReloadPresentationViewTask;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.controls.*;
+import com.twasyl.slideshowfx.concurrent.SavePresentationTask;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
+import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
@@ -36,9 +41,14 @@ import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.adapter.JavaBeanObjectProperty;
 import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
+import javafx.concurrent.ScheduledService;
+import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -68,6 +78,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
+import javafx.util.converter.NumberStringConverter;
 import netscape.javascript.JSObject;
 import org.xml.sax.SAXException;
 
@@ -81,6 +93,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.text.NumberFormat;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -118,7 +131,10 @@ public class SlideshowFXController implements Initializable {
                     }
 
                     SlideshowFXController.this.presentationEngine.addSlide((SlideTemplateConfiguration) userData, slideNumber);
-                    SlideshowFXController.this.browser.getEngine().reload();
+
+                    final ReloadPresentationViewTask task = new ReloadPresentationViewTask(SlideshowFXController.this.browser);
+                    SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+                    TaskDAO.getInstance().startTask(task);
 
                     SlideshowFXController.this.updateSlideSplitMenu();
                 }
@@ -141,7 +157,10 @@ public class SlideshowFXController implements Initializable {
 
             SlideshowFXController.this.presentationEngine.moveSlide(slideToMove, beforeSlide);
 
-            SlideshowFXController.this.browser.getEngine().reload();
+            final ReloadPresentationViewTask task = new ReloadPresentationViewTask(SlideshowFXController.this.browser);
+            SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+            TaskDAO.getInstance().startTask(task);
+
             SlideshowFXController.this.updateSlideSplitMenu();
         }
     };
@@ -178,6 +197,7 @@ public class SlideshowFXController implements Initializable {
     @FXML
     private Button defineContent;
     @FXML private TaskProgressIndicator taskInProgress;
+    @FXML private TextFieldCheckMenuItem autoSaveItem;
 
     /**
      * Loads a SlideshowFX template. This method displays an open dialog which only allows to open template files (with
@@ -239,35 +259,29 @@ public class SlideshowFXController implements Initializable {
         if (!dataFile.exists()) throw new FileNotFoundException("The dataFile does not exist");
         if (!dataFile.canRead()) throw new IllegalAccessException("The dataFile can not be accessed");
 
+        Task loadingTask = null;
+
         if (dataFile.getName().endsWith(".sfx")) {
-            try {
-                this.taskInProgress.update(-1, "Opening presentation ...");
-
-                this.presentationEngine.loadArchive(dataFile);
-                this.browser.getEngine().load(this.presentationEngine.getConfiguration().getPresentationFile().toURI().toASCIIString());
-
-                this.updateSlideTemplatesSplitMenu();
-                this.updateSlideSplitMenu();
-
-                this.taskInProgress.update(0, "Presentation loaded");
-            } catch (IOException e) {
-                this.taskInProgress.update(0, "Error when opening the presentation");
-                LOGGER.log(Level.SEVERE, "Error when opening the presentation", e);
-            }
+            loadingTask = new LoadPresentationTask(this.presentationEngine, dataFile);
         } else if (dataFile.getName().endsWith(".sfxt")) {
-            try {
-                this.taskInProgress.update(-1, "Opening template ...");
+            loadingTask = new LoadTemplateTask(this.presentationEngine, dataFile);
+        }
 
-                this.presentationEngine.createFromTemplate(dataFile);
-                this.browser.getEngine().load(this.presentationEngine.getConfiguration().getPresentationFile().toURI().toASCIIString());
+        if(loadingTask != null) {
+            this.taskInProgress.setCurrentTask(loadingTask);
+            loadingTask.stateProperty().addListener((value, oldState, newState) -> {
+                if(newState != null && (
+                        newState == Worker.State.FAILED ||
+                        newState == Worker.State.CANCELLED ||
+                        newState == Worker.State.SUCCEEDED)) {
+                    this.browser.getEngine().load(this.presentationEngine.getConfiguration().getPresentationFile().toURI().toASCIIString());
 
-                this.updateSlideTemplatesSplitMenu();
+                    this.updateSlideTemplatesSplitMenu();
+                    this.updateSlideSplitMenu();
+                }
+            });
 
-                this.taskInProgress.update(0, "Template loaded");
-            } catch (IOException e) {
-                this.taskInProgress.update(0, "Error when opening the template");
-                LOGGER.log(Level.SEVERE, "Error when opening the template", e);
-            }
+            TaskDAO.getInstance().startTask(loadingTask);
         }
     }
 
@@ -410,7 +424,9 @@ public class SlideshowFXController implements Initializable {
 
         this.updateSlideSplitMenu();
 
-        this.browser.getEngine().reload();
+        final ReloadPresentationViewTask task = new ReloadPresentationViewTask(this.browser);
+        this.taskInProgress.setCurrentTask(task);
+        TaskDAO.getInstance().startTask(task);
     }
 
     /**
@@ -427,7 +443,10 @@ public class SlideshowFXController implements Initializable {
 
             try {
                 this.presentationEngine.deleteSlide(slideNumber);
-                SlideshowFXController.this.browser.getEngine().reload();
+
+                final ReloadPresentationViewTask task = new ReloadPresentationViewTask(SlideshowFXController.this.browser);
+                SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+                TaskDAO.getInstance().startTask(task);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -435,50 +454,40 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
-     * Simply releod the presentation by calling {@link javafx.scene.web.WebEngine#reload()}.
+     * Simply reload the presentation by calling {@link javafx.scene.web.WebEngine#reload()}.
      *
      * @param event
      */
     @FXML
     private void reload(ActionEvent event) {
-        this.browser.getEngine().reload();
+        final ReloadPresentationViewTask task = new ReloadPresentationViewTask(SlideshowFXController.this.browser);
+        SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+        TaskDAO.getInstance().startTask(task);
     }
 
     /**
      * Save the current presentation. If the presentation has never been saved a save dialog is displayed.
      * Then the presentation is saved where the user has chosen or opened the presentation.
-     * The saving is delegated to {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#saveArchive(java.io.File)}
+     * The saving is delegated to {@link #savePresentation(java.io.File)}
      *
      * @param event
      */
     @FXML
     private void save(ActionEvent event) {
         File presentationArchive = null;
+
         if (this.presentationEngine.getArchive() == null) {
             FileChooser chooser = new FileChooser();
             chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
             presentationArchive = chooser.showSaveDialog(null);
+        } else presentationArchive = this.presentationEngine.getArchive();
 
-            this.presentationEngine.setArchive(presentationArchive);
-        } else {
-            presentationArchive = this.presentationEngine.getArchive();
-        }
-
-        try {
-            this.taskInProgress.update(-1, "Saving presentation");
-
-            this.presentationEngine.saveArchive(presentationArchive);
-
-            this.taskInProgress.update(0, "Presentation saved");
-        } catch (IOException e) {
-            this.taskInProgress.update(0, "Error while saving the presentation");
-            LOGGER.log(Level.SEVERE, "Error while saving the presentation", e);
-        }
+        this.savePresentation(presentationArchive);
     }
 
     /**
      * Saves a copy of the existing presentation. A save dialog is displayed to the user.
-     * The saving is delegated to {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#saveArchive(java.io.File)}.
+     * The saving is delegated to {@link #savePresentation(java.io.File)}.
      *
      * @param event
      */
@@ -489,18 +498,25 @@ public class SlideshowFXController implements Initializable {
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
         presentationArchive = chooser.showSaveDialog(null);
 
-        if (presentationArchive != null) {
-            try {
-                this.taskInProgress.update(-1, "Saving presentation");
+        this.savePresentation(presentationArchive);
+    }
 
-                this.presentationEngine.setArchive(presentationArchive);
-                this.presentationEngine.saveArchive();
+    /**
+     * Save the presentation hosted in {@link #presentationEngine} to the given {@param archiveFile}. The process for
+     * saving the presentation is only started if the given {@param archiveFile} is not {@code null}. If the process is
+     * started, the given {@param archiveFile} is set as archive to this {@link #presentationEngine} using
+     * {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#setArchive(java.io.File)}. Then a
+     * {@link com.twasyl.slideshowfx.concurrent.SavePresentationTask} is instantiated and started.
+     * @param archiveFile The file to save the presentation in.
+     */
+    private void savePresentation(File archiveFile) {
+        if(archiveFile != null) {
+            this.presentationEngine.setArchive(archiveFile);
 
-                this.taskInProgress.update(0, "Presentation saved");
-            } catch (IOException e) {
-                this.taskInProgress.update(0, "Error while saving the presentation");
-                LOGGER.log(Level.SEVERE, "Error while saving the presentation", e);
-            }
+            final Task saveTask = new SavePresentationTask(this.presentationEngine);
+            this.taskInProgress.setCurrentTask(saveTask);
+
+            TaskDAO.getInstance().startTask(saveTask);
         }
     }
 
@@ -879,6 +895,55 @@ public class SlideshowFXController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         PresentationDAO.getInstance().setCurrentPresentation(this.presentationEngine);
 
+        // Add a listener for auto-saving the presentation
+        final ScheduledService<Void> service = new ScheduledService<Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                final SavePresentationTask task = new SavePresentationTask(SlideshowFXController.this.presentationEngine);
+                return task;
+            }
+
+            @Override
+            protected void executeTask(Task<Void> task) {
+                super.executeTask(task);
+                SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+            }
+        };
+        service.setRestartOnFailure(true);
+
+        this.autoSaveItem.selectedProperty().addListener((value, oldValue, newValue) -> {
+            if(!newValue) service.cancel();
+            else {
+                Integer interval = null;
+                try {
+                    interval = Integer.parseInt(this.autoSaveItem.getValue());
+                } catch(NumberFormatException e) {
+                    LOGGER.log(Level.FINE, "Can not parse auto save interval");
+                }
+
+                if(interval != null & interval > 0) {
+                    service.setDelay(Duration.minutes(interval.doubleValue()));
+                    service.setPeriod(Duration.minutes(interval.doubleValue()));
+                    service.restart();
+                }
+            }
+        });
+
+        this.autoSaveItem.valueProperty().addListener((value, oldValue, newValue) -> {
+            Integer interval = null;
+            try {
+                interval = Integer.parseInt(this.autoSaveItem.getValue());
+            } catch(NumberFormatException e) {
+                LOGGER.log(Level.FINE, "Can not parse auto save interval");
+            }
+
+            if(interval != null & interval > 0) {
+                service.setDelay(Duration.minutes(interval.doubleValue()));
+                service.setPeriod(Duration.minutes(interval.doubleValue()));
+                service.restart();
+            }
+        });
+
         // Ensure the title bar of the application reflects the name of the presentation
         try {
             final JavaBeanObjectProperty<File> archiveFile = new JavaBeanObjectPropertyBuilder<File>()
@@ -918,14 +983,6 @@ public class SlideshowFXController implements Initializable {
                     window.setMember(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getJsObject(), SlideshowFXController.this);
                     window.setMember("sfxServer", SlideshowFXServer.getSingleton());
                 }
-
-                taskInProgress.update(0, "Presentation loaded");
-            } else if (newState == Worker.State.RUNNING) {
-                taskInProgress.update(-1, "Loading presentation ...");
-            } else if (newState == Worker.State.CANCELLED) {
-                taskInProgress.update(0, "Presentation load aborted");
-            } else if (newState == Worker.State.CANCELLED || newState == Worker.State.FAILED) {
-                taskInProgress.update(0, "Error while loading presentation");
             }
         });
 

@@ -661,7 +661,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         final Configuration templateConfiguration = new Configuration();
         templateConfiguration.setObjectWrapper(new DefaultObjectWrapper());
         templateConfiguration.setDefaultEncoding("UTF-8");
-        templateConfiguration.setIncompatibleImprovements(new Version(2, 30, 20));
+        templateConfiguration.setIncompatibleImprovements(new Version(2, 3, 21));
 
         return templateConfiguration;
     }

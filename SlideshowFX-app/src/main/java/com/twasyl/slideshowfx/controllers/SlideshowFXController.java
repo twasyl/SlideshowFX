@@ -954,19 +954,23 @@ public class SlideshowFXController implements Initializable {
                     .build();
 
             archiveFile.addListener((archiveValue, oldArchive, newArchive) -> {
-                if(newArchive != null) {
-                    SlideshowFX.getStage().setTitle("SlideshowFX - ".concat(newArchive.getName()));
-                } else {
-                    SlideshowFX.getStage().setTitle("SlideshowFX - Untitled");
-                }
+                PlatformHelper.run(() -> {
+                    if(newArchive != null) {
+                        SlideshowFX.getStage().setTitle("SlideshowFX - ".concat(newArchive.getName()));
+                    } else {
+                        SlideshowFX.getStage().setTitle("SlideshowFX - Untitled");
+                    }
+                });
             });
 
             SlideshowFX.stageProperty().addListener((stageValue, oldStage, newStage) -> {
-                if (this.presentationEngine.getArchive() != null) {
-                    SlideshowFX.getStage().setTitle("SlideshowFX - ".concat(this.presentationEngine.getArchive().getName()));
-                } else {
-                    SlideshowFX.getStage().setTitle("SlideshowFX - Untitled");
-                }
+                PlatformHelper.run(() -> {
+                    if (this.presentationEngine.getArchive() != null) {
+                        SlideshowFX.getStage().setTitle("SlideshowFX - ".concat(this.presentationEngine.getArchive().getName()));
+                    } else {
+                        SlideshowFX.getStage().setTitle("SlideshowFX - Untitled");
+                    }
+                });
             });
         } catch (NoSuchMethodException e) {
             LOGGER.log(Level.SEVERE, "Can not bind the presentation archive name to the application's title bar", e);
@@ -1032,7 +1036,6 @@ public class SlideshowFXController implements Initializable {
         this.defineContent.disableProperty().bind(this.slideNumber.textProperty().isEmpty()
                 .or(this.fieldName.textProperty().isEmpty())
                 .or(this.markupContentType.selectedToggleProperty().isNull()));
-
     }
 
     /**

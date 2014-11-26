@@ -55,6 +55,12 @@
             return window.btoa(unescape(encodeURIComponent(editor.getValue())));
         }
 
+        // Get the selected content of the editor. The content is returned in Base64
+        function getSelectedContent() {
+            var editor = ace.edit("editor");
+            return window.btoa(unescape(encodeURIComponent(editor.getCopyText())));
+        }
+
         // Set the mode of this editor
         function setMode(newMode) {
             var editor = ace.edit("editor");

@@ -74,7 +74,8 @@ asciidoctor {
                     'txtmark-version': '0.11',
                     'vertx-version': '2.1.5',
                     'zxing-core-version': '3.1.0',
-                    'zxing-jse-version': '3.1.0'
+                    'zxing-jse-version': '3.1.0',
+                    'ace-version': '1.1.8'
             ]
     ]
 }

@@ -1,5 +1,9 @@
 package com.twasyl.slideshowfx.controls;
 
+import com.sun.javafx.PlatformUtil;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 
@@ -21,6 +25,33 @@ public class SlideContentEditor extends BorderPane {
 
     public SlideContentEditor() {
         this.browser.getEngine().load(SlideContentEditor.class.getResource("/com/twasyl/slideshowfx/html/ace-file-editor.html").toExternalForm());
+
+        this.browser.setOnKeyPressed(event -> {
+
+            /*
+             * Indicates if Command key on Mac or Control key on other platforms is down.
+             * It is used to realize copy/paste operations
+             */
+            boolean isMetaDown;
+
+            if(PlatformUtil.isMac()) {
+                isMetaDown = event.isMetaDown();
+            } else {
+                isMetaDown = event.isControlDown();
+            }
+
+            if(isMetaDown && event.getCode() == KeyCode.V) {
+                SlideContentEditor.this.appendContentEditorValue(Clipboard.getSystemClipboard().getString());
+            } else if(isMetaDown && event.getCode() == KeyCode.C) {
+                final String selection = SlideContentEditor.this.getSelectedContentEditorValue();
+                if(selection != null) {
+                    final ClipboardContent content = new ClipboardContent();
+                    content.putString(selection);
+                    Clipboard.getSystemClipboard().setContent(content);
+                }
+            }
+        });
+
         this.setCenter(this.browser);
     }
 
@@ -30,6 +61,25 @@ public class SlideContentEditor extends BorderPane {
      */
     public String getContentEditorValue() {
         final String valueAsBase64 = (String) this.browser.getEngine().executeScript("getContent();");
+        final byte[] valueAsBytes = Base64.getDecoder().decode(valueAsBase64);
+
+        String value = null;
+
+        try {
+            value = new String(valueAsBytes, "UTF8");
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.log(Level.INFO, "Can not get value for slide content", e);
+        }
+
+        return value;
+    }
+
+    /**
+     * This method retrieves the selected content of the Node allowing to define the content of the slide.
+     * @return The text contained in the Node for defining content of the slide.
+     */
+    public String getSelectedContentEditorValue() {
+        final String valueAsBase64 = (String) this.browser.getEngine().executeScript("getSelectedContent();");
         final byte[] valueAsBytes = Base64.getDecoder().decode(valueAsBase64);
 
         String value = null;

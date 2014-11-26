@@ -62,6 +62,8 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 | zxing-jse | {zxing-jse-version} |
 
+| http://ace.c9.io[ACE] | {ace-version} |
+
 |===
 
 === Gradle

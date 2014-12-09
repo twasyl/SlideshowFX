@@ -38,7 +38,7 @@
 
     <top>
         <VBox>
-            <MenuBar>
+            <MenuBar fx:id="menuBar">
                 <Menu text="File">
                     <MenuItem text="New" onAction="#loadTemplate" />
                     <MenuItem text="Open" onAction="#openPresentation" />
@@ -61,11 +61,12 @@
                     <MenuItem text="Open current working directory" onAction="#openWorkingDirectory" />
                 </Menu>
                 <Menu text="?">
+                    <MenuItem text="Take a tour" onAction="#takeTour" />
                     <MenuItem text="About" onAction="#displayAbout" />
                 </Menu>
             </MenuBar>
-            <ToolBar>
-                <Button onAction="#loadTemplate" styleClass="image">
+            <ToolBar fx:id="toolBar">
+                <Button fx:id="loadTemplate" onAction="#loadTemplate" styleClass="image">
                     <tooltip>
                         <Tooltip text="New presentation" />
                     </tooltip>
@@ -76,7 +77,7 @@
                     </graphic>
                 </Button>
 
-                <Button onAction="#openPresentation" styleClass="image">
+                <Button fx:id="openPresentation" onAction="#openPresentation" styleClass="image">
                     <tooltip>
                         <Tooltip text="Open presentation" />
                     </tooltip>
@@ -96,7 +97,7 @@
                     </items>
                 </SplitMenuButton>
 
-                <Button onAction="#print" styleClass="image">
+                <Button fx:id="printPresentation" onAction="#print" styleClass="image">
                     <tooltip>
                         <Tooltip text="Print" />
                     </tooltip>
@@ -115,7 +116,7 @@
                     </tooltip>
                 </SplitMenuButton>
 
-                <Button onAction="#copySlide" styleClass="image">
+                <Button fx:id="copySlide" onAction="#copySlide" styleClass="image">
                     <tooltip>
                         <Tooltip text="Copy slide" />
                     </tooltip>
@@ -132,7 +133,7 @@
                     </tooltip>
                 </SplitMenuButton>
 
-                <Button onAction="#deleteSlide" styleClass="image">
+                <Button fx:id="deleteSlide" onAction="#deleteSlide" styleClass="image">
                     <tooltip>
                         <Tooltip text="Delete slide" />
                     </tooltip>
@@ -145,7 +146,7 @@
 
                 <Separator />
 
-                <Button onAction="#reload" styleClass="image">
+                <Button fx:id="reloadPresentation" onAction="#reload" styleClass="image">
                     <tooltip>
                         <Tooltip text="Reload" />
                     </tooltip>
@@ -156,7 +157,7 @@
                     </graphic>
                 </Button>
 
-                <Button  onAction="#slideShow" styleClass="image">
+                <Button fx:id="slideshow" onAction="#slideShow" styleClass="image">
                     <tooltip>
                         <Tooltip text="Slideshow" />
                     </tooltip>
@@ -243,7 +244,7 @@
 
                 <SlideContentEditor fx:id="contentEditor" />
 
-                <Button fx:id="defineContent" text="Define" id="define-button" onAction="#updateSlideWithText" />
+                <Button fx:id="defineContent" text="Define" onAction="#updateSlideWithText" />
             </VBox>
         </SplitPane>
     </center>

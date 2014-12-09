@@ -20,10 +20,10 @@ import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.concurrent.LoadPresentationTask;
 import com.twasyl.slideshowfx.concurrent.LoadTemplateTask;
 import com.twasyl.slideshowfx.concurrent.ReloadPresentationViewTask;
+import com.twasyl.slideshowfx.concurrent.SavePresentationTask;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.controls.*;
-import com.twasyl.slideshowfx.concurrent.SavePresentationTask;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
@@ -41,14 +41,11 @@ import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import javafx.application.Platform;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.adapter.JavaBeanObjectProperty;
 import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -59,13 +56,16 @@ import javafx.print.PageOrientation;
 import javafx.print.Paper;
 import javafx.print.PrintQuality;
 import javafx.print.PrinterJob;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -73,13 +73,14 @@ import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import javafx.util.converter.NumberStringConverter;
 import netscape.javascript.JSObject;
 import org.xml.sax.SAXException;
 
@@ -93,7 +94,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.text.NumberFormat;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -300,6 +300,33 @@ public class SlideshowFXController implements Initializable {
                 }
             }
         }
+    }
+
+    @FXML private void takeTour(ActionEvent event) {
+        final Tour tour = new Tour(SlideshowFX.getStage().getScene());
+        tour.addStep(new Tour.Step("#menuBar", "The menu bar of SlideshowFX."))
+            .addStep(new Tour.Step("#toolBar", "The toolbar gives you access to most commons features of SlideshowFX."))
+            .addStep(new Tour.Step("#loadTemplate", "Create a new presentation from a template."))
+            .addStep(new Tour.Step("#openPresentation", "Open an already existent presentation."))
+            .addStep(new Tour.Step("#saveButton", "Save the current presentation."))
+            .addStep(new Tour.Step("#printPresentation", "Print the current presentation."))
+            .addStep(new Tour.Step("#addSlideButton", "Add a slide after the current slide in the presentation."))
+            .addStep(new Tour.Step("#copySlide", "Copy the current slide after it."))
+            .addStep(new Tour.Step("#moveSlideButton", "Move a slide before another."))
+            .addStep(new Tour.Step("#deleteSlide", "Delete the current slide."))
+            .addStep(new Tour.Step("#reloadPresentation", "Reload the current presentation."))
+            .addStep(new Tour.Step("#slideshow", "Enter in the presentation mode."))
+            .addStep(new Tour.Step("#leapMotionEnabled", "Enable or disable LeapMotion in the presentation mode. If enabled, you will be able to change slides using your index and middle fingers with a swipe, and show a pointer using your index finder."))
+            .addStep(new Tour.Step("#chatIpAddress", "The IP address of the embedded server. If nothing is provided, an automatic IP will be used."))
+            .addStep(new Tour.Step("#chatPort", "The port of the embedded server. If nothing is provided, 8080 will be used."))
+            .addStep(new Tour.Step("#twitterHashtag", "Look for the given hashtag on Twitter. If left blank, the Twitter service will not be started."))
+            .addStep(new Tour.Step("#startChatButton", "Start or stop the embedded server."))
+            .addStep(new Tour.Step("#browser", "Your presentation is displayed here."))
+            .addStep(new Tour.Step("#contentExtensionToolBar", "Extensions are added here. If you install new ones they will also appear here. An extension provides a feature that adds something to your presentation, like inserting an image."))
+            .addStep(new Tour.Step("#markupContentTypeBox", "The syntaxes available to define slides's content are located here. If you install new ones, they will also appear here."))
+            .addStep(new Tour.Step("#contentEditor", "It is here that you define the content for a slide."))
+            .addStep(new Tour.Step("#defineContent", "Define the content for the given element."))
+            .start();
     }
 
     /**
@@ -1026,7 +1053,7 @@ public class SlideshowFXController implements Initializable {
 
         // Change the mode for the content editor as the selection for markup language changes
         this.markupContentType.selectedToggleProperty().addListener((value, oldToggle, newToggle) -> {
-            if(newToggle == null) {
+            if (newToggle == null) {
                 this.contentEditor.setMode(null);
             } else {
                 this.contentEditor.setMode(((IMarkup) newToggle.getUserData()).getAceMode());

@@ -1,0 +1,53 @@
+/*
+ * Copyright 2014 Thierry Wasylczenko
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+version = '1.0.0'
+
+ext {
+    dropbox = fileTree(dir: allLibs, include: 'dropbox/*.jar')
+    jackson = fileTree(dir: allLibs, include: 'Vert.x/jackson-core-2.2.2.jar')
+}
+
+dependencies {
+    compile project(':SlideshowFX-uploader')
+
+    compile felix
+    compile dropbox
+    compile jackson
+}
+
+jar {
+    from( dropbox.files ) {
+        include '*'
+    }
+    from( jackson.files ) {
+        include '*'
+    }
+
+    manifest {
+        attributes('Manifest-Version': '1.0',
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'SlideshowFX Dropbox uploader',
+                'Bundle-SymbolicName': 'com.twasyl.slideshowfx.uploader.dropbox',
+                'Bundle-Description': 'Support for uploading presentations on Dropbox',
+                'Bundle-Version': version,
+                'Bundle-Activator': 'com.twasyl.slideshowfx.uploader.dropbox.activator.DropboxUploaderActivator',
+                'Bundle-ClassPath': 'jackson-core-2.2.2.jar,dropbox-core-sdk-1.7.7.jar,.',
+                'Bundle-Vendor': 'Thierry Wasylczenko',
+                'Export-Package': 'com.twasyl.slideshowfx.uploader.dropbox,com.twasyl.slideshowfx.uploader.dropbox.activator',
+                'Import-Package': 'org.osgi.framework')
+    }
+}

@@ -17,10 +17,7 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
-import com.twasyl.slideshowfx.concurrent.LoadPresentationTask;
-import com.twasyl.slideshowfx.concurrent.LoadTemplateTask;
-import com.twasyl.slideshowfx.concurrent.ReloadPresentationViewTask;
-import com.twasyl.slideshowfx.concurrent.SavePresentationTask;
+import com.twasyl.slideshowfx.concurrent.*;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.controls.*;
@@ -37,12 +34,15 @@ import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.uploader.IUploader;
+import com.twasyl.slideshowfx.uploader.UploaderManager;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import javafx.application.Platform;
 import javafx.beans.property.adapter.JavaBeanObjectProperty;
 import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
+import javafx.collections.FXCollections;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
@@ -56,16 +56,14 @@ import javafx.print.PageOrientation;
 import javafx.print.Paper;
 import javafx.print.PrintQuality;
 import javafx.print.PrinterJob;
-import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.BlendMode;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -73,8 +71,6 @@ import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -198,6 +194,7 @@ public class SlideshowFXController implements Initializable {
     private Button defineContent;
     @FXML private TaskProgressIndicator taskInProgress;
     @FXML private TextFieldCheckMenuItem autoSaveItem;
+    @FXML private Menu uploadersMenu;
 
     /**
      * Loads a SlideshowFX template. This method displays an open dialog which only allows to open template files (with
@@ -1063,6 +1060,11 @@ public class SlideshowFXController implements Initializable {
         this.defineContent.disableProperty().bind(this.slideNumber.textProperty().isEmpty()
                 .or(this.fieldName.textProperty().isEmpty())
                 .or(this.markupContentType.selectedToggleProperty().isNull()));
+
+        // Create the entries in the Upload menu
+        UploaderManager.getInstalledUploaders().stream()
+                .sorted((uploader1, uploader2) -> uploader1.getName().compareTo(uploader2.getName()))
+                .forEach(uploader -> createUploaderMenuItem(uploader));
     }
 
     /**
@@ -1132,6 +1134,54 @@ public class SlideshowFXController implements Initializable {
         this.contentExtensionToolBar.getItems().add(button);
 
         return button;
+    }
+
+    /**
+     * Create the MenuItem that will be placed in the menu for uploaders, for the given {@code uploader}. The {@code uploader}
+     * is set as user data of the created MenuItem. The created MenuItem is added to the Upload menu.
+     * @param uploader The uploader attached to the MenuItem that will be created.
+     * @return A MenuItem for the {@code uploader}
+     */
+    private MenuItem createUploaderMenuItem(final IUploader uploader) {
+        final MenuItem uploaderMenuItem = new MenuItem(uploader.getName());
+        uploaderMenuItem.setUserData(uploader);
+
+        uploaderMenuItem.setOnAction(event -> {
+            PlatformHelper.run(() -> {
+                if (!uploader.isAuthenticated()) {
+                    uploader.authenticate();
+                }
+
+                if (uploader.isAuthenticated()) {
+                    // Prompts the user where to upload the presentation
+                    this.taskInProgress.update(-1, "Fetching " + uploader.getName() + " folders");
+
+                    final ComboBox<File> folders = new ComboBox<>(FXCollections.observableArrayList(uploader.getFolders()));
+
+                    this.taskInProgress.update(0, "");
+
+                    final VBox content = new VBox(5);
+                    content.setStyle("-fx-margin: 5px");
+                    content.getChildren().addAll(new Label("Choose the destination folder:"),
+                            folders);
+
+                    final Dialog.Response answer = Dialog.showCancellableDialog(true, SlideshowFX.getStage(),
+                                            "Upload to " + uploader.getName(), content);
+
+                    if(answer == Dialog.Response.OK) {
+                        final UploadPresentationTask task = new UploadPresentationTask(PresentationDAO.getInstance().getCurrentPresentation(),
+                                uploader, folders.getValue());
+                        SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+                        TaskDAO.getInstance().startTask(task);
+                    }
+
+                }
+            });
+        });
+
+        this.uploadersMenu.getItems().add(uploaderMenuItem);
+
+        return uploaderMenuItem;
     }
 
     /**

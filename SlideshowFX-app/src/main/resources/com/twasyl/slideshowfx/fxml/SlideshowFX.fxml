@@ -46,6 +46,8 @@
                     <MenuItem text="Save" onAction="#save" />
                     <MenuItem text="Save as ..." onAction="#saveAs" />
                     <SeparatorMenuItem />
+                    <Menu text="Upload to" fx:id="uploadersMenu" />
+                    <SeparatorMenuItem />
                     <MenuItem text="Quit" onAction="#exitApplication" />
                 </Menu>
                 <Menu text="Options">

@@ -24,6 +24,7 @@ import com.twasyl.slideshowfx.io.DeleteFileVisitor;
 import com.twasyl.slideshowfx.leap.SlideshowFXLeapListener;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.uploader.UploaderManager;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -157,7 +158,11 @@ public class SlideshowFX extends Application {
         LOGGER.info("Closing the chat");
         if(SlideshowFXServer.getSingleton() != null) SlideshowFXServer.getSingleton().stop();
 
-        LOGGER.info("Stopping the MarkupManager");
+        LOGGER.info("Disconnecting from all uploaders");
+        UploaderManager.getInstalledUploaders()
+                .forEach(uploader -> uploader.disconnect());
+
+        LOGGER.info("Stopping the OSGi manager");
         OSGiManager.stop();
     }
 

@@ -23,6 +23,13 @@ buildscript {
     }
 }
 
+subprojects {
+    apply plugin: 'java'
+
+    sourceCompatibility = 1.8
+    targetCompatibility= 1.8
+}
+
 apply plugin: 'org.asciidoctor.gradle.asciidoctor'
 
 ext {
@@ -80,375 +87,6 @@ asciidoctor {
     ]
 }
 
-subprojects {
-    apply plugin: 'java'
-	sourceCompatibility = 1.8
-	targetCompatibility= 1.8
-}
-
-project(':SlideshowFX-markup') {
-    version = '1.0.0'
-}
-
-project(':SlideshowFX-html') {
-
-    version = '1.0.0'
-
-	dependencies {
-		compile project(':SlideshowFX-markup')
-		compile felix
-	}
-
-	jar {
-		manifest {
-
-			attributes('Manifest-Version': '1.0',
-                       'Bundle-ManifestVersion': '2',
-					   'Bundle-Name': 'SlideshowFX HTML support',
-                       'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.html',
-					   'Bundle-Description':'Support HTML for defining slide\'s content',
-					   'Bundle-Version': '1.0.0',
-					   'Bundle-Activator': 'com.twasyl.slideshowfx.markup.html.activator.HtmlActivator',
-					   'Bundle-Vendor': 'Thierry Wasylczenko',
-					   'Export-Package': 'com.twasyl.slideshowfx.markup.html,com.twasyl.slideshowfx.markup.html.activator',
-					   'Import-Package': 'org.osgi.framework')
-		}
-	}
-}
-
-project(':SlideshowFX-markdown') {
-
-    version = '1.0.0'
-
-	dependencies {
-		compile project(':SlideshowFX-markup')
-		compile felix
-		compile markdown
-	}
-
-	jar {
-		from( markdown.files ) {
-      		include '*'
-   		}
-
-		manifest {
-			attributes('Manifest-Version': '1.0',
-                       'Bundle-ManifestVersion': '2',
-					   'Bundle-Name': 'SlideshowFX markdown support',
-                       'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.markdown',
-					   'Bundle-Description': 'Support markdown for defining slide\'s content',
-					   'Bundle-Version': '1.0.0',
-					   'Bundle-Activator': 'com.twasyl.slideshowfx.markup.markdown.activator.MarkdownActivator',
-					   'Bundle-ClassPath': 'txtmark-0.11.jar,.',
-					   'Bundle-Vendor': 'Thierry Wasylczenko',
-					   'Export-Package': 'com.twasyl.slideshowfx.markup.markdown,com.twasyl.slideshowfx.markup.markdown.activator',
-					   'Import-Package': 'org.osgi.framework')
-		}
-	}
-}
-
-project(':SlideshowFX-textile') {
-
-    version = '1.0.0'
-
-    dependencies {
-		compile project(':SlideshowFX-markup')
-		compile felix
-		compile textile
-
-        testCompile junit
-	}	
-
-	jar {
-		from( textile.files ) {
-      		include '*'
-   		}
-
-		manifest {
-			attributes('Manifest-Version': '1.0',
-                       'Bundle-ManifestVersion': '2',
-					   'Bundle-Name': 'SlideshowFX Textile support',
-                       'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.textile',
-					   'Bundle-Description': 'Support Textile for defining slide\'s content',
-					   'Bundle-Version': '1.0.0',
-					   'Bundle-Activator': 'com.twasyl.slideshowfx.markup.textile.activator.TextileActivator',
-					   'Bundle-ClassPath': 'org.eclipse.mylyn.wikitext.core_2.2.0.N20140811-1615.jar,org.eclipse.mylyn.wikitext.textile.core_2.2.0.N20140702-2138.jar,.',
-					   'Bundle-Vendor': 'Thierry Wasylczenko',
-					   'Export-Package': 'com.twasyl.slideshowfx.markup.textile,com.twasyl.slideshowfx.markup.textile.activator',
-					   'Import-Package': 'org.osgi.framework')
-		}
-	}
-}
-
-project(':SlideshowFX-asciidoctor') {
-
-    version = '1.0.0'
-
-    dependencies {
-        compile project(':SlideshowFX-markup')
-        compile felix
-        compile asciidoctorj
-
-        testCompile junit
-        testCompile hamcrest
-    }
-
-    jar {
-        from( asciidoctorj.files ) {
-            include '*'
-        }
-
-        manifest {
-            attributes('Manifest-Version': '1.0',
-                    'Bundle-ManifestVersion': '2',
-                    'Bundle-Name': 'SlideshowFX asciidoctor support',
-                    'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.asciidoctor',
-                    'Bundle-Description': 'Support asscidoctor for defining slide\'s content',
-                    'Bundle-Version': '1.0.0',
-                    'Bundle-Activator': 'com.twasyl.slideshowfx.markup.asciidoctor.activator.AsciidoctorActivator',
-                    'Bundle-ClassPath': 'slf4j-api-1.7.7.jar,slf4j-simple-1.7.7.jar,jruby-complete-1.7.16.1.jar,asciidoctorj-1.5.1.jar,.',
-                    'Bundle-Vendor': 'Thierry Wasylczenko',
-                    'Export-Package': 'com.twasyl.slideshowfx.markup.asciidoctor,com.twasyl.slideshowfx.markup.asciidoctor.activator',
-                    'Import-Package': 'org.osgi.framework')
-        }
-    }
-}
-
-project(':SlideshowFX-content-extension') {
-
-    version = '1.0.0'
-
-    dependencies {
-        compile project(':SlideshowFX-markup')
-    }
-}
-
-project(':SlideshowFX-alert-extension') {
-
-    version = '1.0.0'
-
-    dependencies {
-        compile project(':SlideshowFX-content-extension')
-        compile felix
-    }
-
-    jar {
-
-        manifest {
-            attributes('Manifest-Version': '1.0',
-                    'Bundle-ManifestVersion': '2',
-                    'Bundle-Name': 'SlideshowFX alert extension',
-                    'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.alert',
-                    'Bundle-Description': 'Support for inserting alert in slides',
-                    'Bundle-Version': '1.0.0',
-                    'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.alert.activator.AlertContentExtensionActivator',
-                    'Bundle-Vendor': 'Thierry Wasylczenko',
-                    'Export-Package': 'com.twasyl.slideshowfx.content.extension.alert.controllers,com.twasyl.slideshowfx.content.extension.alert,com.twasyl.slideshowfx.content.extension.alert.activator',
-                    'Import-Package': 'org.osgi.framework')
-        }
-    }
-}
-
-project(':SlideshowFX-code-extension') {
-
-    version = '1.0.0'
-
-    dependencies {
-        compile project(':SlideshowFX-content-extension')
-        compile felix
-    }
-
-    jar {
-
-        manifest {
-            attributes('Manifest-Version': '1.0',
-                    'Bundle-ManifestVersion': '2',
-                    'Bundle-Name': 'SlideshowFX code extension',
-                    'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.code',
-                    'Bundle-Description': 'Support for inserting code in slides',
-                    'Bundle-Version': '1.0.0',
-                    'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.code.activator.CodeContentExtensionActivator',
-                    'Bundle-Vendor': 'Thierry Wasylczenko',
-                    'Export-Package': 'com.twasyl.slideshowfx.content.extension.code.controllers,com.twasyl.slideshowfx.content.extension.code,com.twasyl.slideshowfx.content.extension.code.activator',
-                    'Import-Package': 'org.osgi.framework')
-        }
-    }
-}
-
-project(':SlideshowFX-image-extension') {
-
-    version = '1.0.0'
-
-    dependencies {
-        compile project(':SlideshowFX-content-extension')
-        compile project(':SlideshowFX-app')
-        compile felix
-    }
-
-    jar {
-
-        manifest {
-            attributes('Manifest-Version': '1.0',
-                    'Bundle-ManifestVersion': '2',
-                    'Bundle-Name': 'SlideshowFX image extension',
-                    'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.image',
-                    'Bundle-Description': 'Support for inserting image in slides',
-                    'Bundle-Version': '1.0.0',
-                    'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.image.activator.ImageContentExtensionActivator',
-                    'Bundle-Vendor': 'Thierry Wasylczenko',
-                    'Export-Package': 'com.twasyl.slideshowfx.content.extension.image.controllers,com.twasyl.slideshowfx.content.extension.image,com.twasyl.slideshowfx.content.extension.image.activator',
-                    'Import-Package': 'org.osgi.framework')
-        }
-    }
-}
-
-project(':SlideshowFX-link-extension') {
-
-    version = '1.0.0'
-
-    dependencies {
-        compile project(':SlideshowFX-content-extension')
-        compile felix
-    }
-
-    jar {
-
-        manifest {
-            attributes('Manifest-Version': '1.0',
-                    'Bundle-ManifestVersion': '2',
-                    'Bundle-Name': 'SlideshowFX link extension',
-                    'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.link',
-                    'Bundle-Description': 'Support for inserting links in slides',
-                    'Bundle-Version': '1.0.0',
-                    'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.link.activator.LinkContentExtensionActivator',
-                    'Bundle-Vendor': 'Thierry Wasylczenko',
-                    'Export-Package': 'com.twasyl.slideshowfx.content.extension.link.controllers,com.twasyl.slideshowfx.content.extension.link,com.twasyl.slideshowfx.content.extension.link.activator',
-                    'Import-Package': 'org.osgi.framework')
-        }
-    }
-}
-
-project(':SlideshowFX-quote-extension') {
-
-    version = '1.0.0'
-
-    dependencies {
-        compile project(':SlideshowFX-content-extension')
-        compile felix
-    }
-
-    jar {
-
-        manifest {
-            attributes('Manifest-Version': '1.0',
-                    'Bundle-ManifestVersion': '2',
-                    'Bundle-Name': 'SlideshowFX quote extension',
-                    'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.quote',
-                    'Bundle-Description': 'Support for inserting quote in slides',
-                    'Bundle-Version': '1.0.0',
-                    'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.quote.activator.QuoteContentExtensionActivator',
-                    'Bundle-Vendor': 'Thierry Wasylczenko',
-                    'Export-Package': 'com.twasyl.slideshowfx.content.extension.quote.controllers,com.twasyl.slideshowfx.content.extension.quote,com.twasyl.slideshowfx.content.extension.quote.activator',
-                    'Import-Package': 'org.osgi.framework')
-        }
-    }
-}
-
-
-project(':SlideshowFX-app') {
-    apply plugin: 'application'
-
-    ant.importBuild "${project.projectDir.absolutePath}/src/main/resources/javafx.xml"
-
-    ant.classpath = "${jdk}/lib/ant-javafx.jar"
-    ant.mainClassName = 'com.twasyl.slideshowfx.app.SlideshowFX'
-    ant.preloaderClassName = 'com.twasyl.slideshowfx.app.SlideshowFXPreloader'
-    ant.fallbackClassName = 'com.javafx.main.NoJavaFXFallback'
-
-    ant.distDir = "${project.buildDir.absolutePath}${File.separator}${libsDir.name}"
-    ant.distName = "${project.archivesBaseName}"
-    ant.resourceDir = libsDir
-
-    ant.resourceExcludePattern = archivesBaseName + ".jar"
-
-    ant.applicationTitle = "SlideshowFX"
-    ant.applicationVendor = "Thierry Wasylczenko"
-    ant.applicationVersion = "1.0.0"
-
-    ant.applicationClasses = "${project.buildDir.absolutePath}/classes/main/"
-    ant.applicationClassesIncludes = "**/com/"
-    ant.applicationResources = "${project.buildDir.absolutePath}/resources/main/"
-    ant.applicationResourcesIncludes = "**/com/"
-
-    ant.deployOutDir = "${project.buildDir.absolutePath}${File.separator}packaging"
-    ant.deployResourcesDir = "${project.buildDir.absolutePath}${File.separator}${libsDir.name}"
-
-	task jar(overwrite: true) << {
-
-        if (jdk != null && !jdk.isEmpty()) {
-
-        	if(!libsDir.exists()) libsDir.mkdirs()
-
-        	// Copying libs
-            copy {
-            	from(project(':SlideshowFX-markup').jar.archivePath)
-                from(project(':SlideshowFX-content-extension').jar.archivePath)
-				from(felix.files)
-				from(freemarker.files)
-				from(jsoup.files)
-				from(leapmotion.files)
-				from(scribe.files)
-				from(twitter.files)
-				from(vertx.files)
-				from(zxing.files)
-
-            	into(libsDir)
-            }
-
-        	def classpath = ""
-        	
-        	fileTree(dir: libsDir, include: '*.jar', exclude: archivesBaseName + ".jar").each {
-        		f ->
-        		classpath += f.name + ","
-        	}
-
-        	classpath += "."
-
-            ant.resourceIncludePattern = classpath
-            javafxjar.execute()
-        }
-    }
-
-    task buildJavaFXBundle << {
-
-        if (jdk != null && !jdk.isEmpty()) {
-            javafxdeploy.execute()
-        }
-    }
-
-	dependencies {
-		compile project(':SlideshowFX-markup')
-		compile project(':SlideshowFX-content-extension')
-
-		compile felix
-		compile freemarker
-		compile jsoup
-		compile leapmotion
-		compile scribe
-        compile twitter
-		compile vertx
-		compile zxing
-
-        testCompile hamcrest
-		testCompile  junit
-	}	
-
-	tasks['jar'].dependsOn 'classes'
-	tasks['jar'].dependsOn ':SlideshowFX-markup:jar'
-	tasks['buildJavaFXBundle'].dependsOn 'jar'
-	tasks['assemble'].dependsOn 'buildJavaFXBundle'
-}
-
 task installMarkupPlugins(dependsOn: [':SlideshowFX-asciidoctor:jar',
                                       ':SlideshowFX-html:jar',
                                       ':SlideshowFX-markdown:jar',
@@ -481,6 +119,19 @@ task installContentExtensionPlugins(dependsOn: [':SlideshowFX-alert-extension:ja
     }
 }
 
+task installUploaderPlugins(dependsOn : [':SlideshowFX-dropbox-uploader:jar']) << {
+    copy {
+        from project(':SlideshowFX-dropbox-uploader').tasks['jar'].archivePath
+
+        into pluginsFolder
+    }
+}
+
+task installSlideshowFX(dependsOn : [':SlideshowFX-app:assemble',
+                                     ':installMarkupPlugins',
+                                     ':installContentExtensionPlugins',
+                                     ':installUploaderPlugins']) << {
+}
 
 task buildGradleWrapper(type: Wrapper) {
     gradleVersion = '2.2.1'

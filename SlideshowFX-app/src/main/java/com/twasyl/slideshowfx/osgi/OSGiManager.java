@@ -18,6 +18,7 @@ package com.twasyl.slideshowfx.osgi;
 
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.uploader.IUploader;
 import org.osgi.framework.*;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
@@ -48,6 +49,7 @@ public class OSGiManager {
     private static Framework osgiFramework;
     private static ServiceTracker markupServiceTracker;
     private static ServiceTracker contentExtensionServiceTracker;
+    private static ServiceTracker uploaderServiceTracker;
 
     /**
      * Start the OSGi container.
@@ -62,8 +64,11 @@ public class OSGiManager {
         configurationMap.put("org.osgi.framework.bundle.parent", "app");
         configurationMap.put("org.osgi.framework.bootdelegation", "com.twasyl.slideshowfx.markup," +
                 "com.twasyl.slideshowfx.content.extension," +
+                "com.twasyl.slideshowfx.uploader," +
                 "com.twasyl.slideshowfx.osgi," +
+                "com.twasyl.slideshowfx.engine.*," +
                 "sun.misc," +
+                "org.w3c.*," +
                 "javax.*," +
                 "javafx.*");
         configurationMap.put("felix.auto.deploy.action", "install,start");
@@ -97,6 +102,16 @@ public class OSGiManager {
             e.printStackTrace();
         }
         contentExtensionServiceTracker.open();
+
+        try {
+            uploaderServiceTracker = new ServiceTracker(
+                    osgiFramework.getBundleContext(),
+                    osgiFramework.getBundleContext().createFilter("(objectClass=" + IUploader.class.getName() + ")"),
+                    null);
+        } catch (InvalidSyntaxException e) {
+            e.printStackTrace();
+        }
+        uploaderServiceTracker.open();
 
         // Deploying the OSGi DataServices
         osgiFramework.getBundleContext().registerService(DataServices.class.getName(), new DataServices(), new Hashtable<>());
@@ -201,6 +216,8 @@ public class OSGiManager {
             allServices = markupServiceTracker.getServices();
         } else if(IContentExtension.class.isAssignableFrom(serviceType)) {
             allServices = contentExtensionServiceTracker.getServices();
+        } else if(IUploader.class.isAssignableFrom(serviceType)) {
+            allServices = uploaderServiceTracker.getServices();
         }
 
         if(allServices != null && allServices.length > 0) {

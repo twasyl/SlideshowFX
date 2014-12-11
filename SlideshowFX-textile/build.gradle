@@ -1,0 +1,45 @@
+/*
+ * Copyright 2014 Thierry Wasylczenko
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+version = '1.0.0'
+
+dependencies {
+    compile project(':SlideshowFX-markup')
+    compile felix
+    compile textile
+
+    testCompile junit
+}
+
+jar {
+    from( textile.files ) {
+        include '*'
+    }
+
+    manifest {
+        attributes('Manifest-Version': '1.0',
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'SlideshowFX Textile support',
+                'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.textile',
+                'Bundle-Description': 'Support Textile for defining slide\'s content',
+                'Bundle-Version': '1.0.0',
+                'Bundle-Activator': 'com.twasyl.slideshowfx.markup.textile.activator.TextileActivator',
+                'Bundle-ClassPath': 'org.eclipse.mylyn.wikitext.core_2.2.0.N20140811-1615.jar,org.eclipse.mylyn.wikitext.textile.core_2.2.0.N20140702-2138.jar,.',
+                'Bundle-Vendor': 'Thierry Wasylczenko',
+                'Export-Package': 'com.twasyl.slideshowfx.markup.textile,com.twasyl.slideshowfx.markup.textile.activator',
+                'Import-Package': 'org.osgi.framework')
+    }
+}

@@ -1,0 +1,121 @@
+/*
+ * Copyright 2014 Thierry Wasylczenko
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'application'
+
+version = '1.0.0'
+
+ant.importBuild "${project.projectDir.absolutePath}/src/main/resources/javafx.xml"
+
+ant.classpath = "${jdk}/lib/ant-javafx.jar"
+ant.mainClassName = 'com.twasyl.slideshowfx.app.SlideshowFX'
+ant.preloaderClassName = 'com.twasyl.slideshowfx.app.SlideshowFXPreloader'
+ant.fallbackClassName = 'com.javafx.main.NoJavaFXFallback'
+
+ant.distDir = "${project.buildDir.absolutePath}${File.separator}${libsDir.name}"
+ant.distName = "${project.archivesBaseName}"
+ant.resourceDir = libsDir
+
+ant.resourceExcludePattern = archivesBaseName + ".jar"
+
+ant.applicationTitle = "SlideshowFX"
+ant.applicationVendor = "Thierry Wasylczenko"
+ant.applicationVersion = "1.0.0"
+
+ant.applicationClasses = "${project.buildDir.absolutePath}/classes/main/"
+ant.applicationClassesIncludes = "**/com/"
+ant.applicationResources = "${project.buildDir.absolutePath}/resources/main/"
+ant.applicationResourcesIncludes = "**/com/"
+
+ant.deployOutDir = "${project.buildDir.absolutePath}${File.separator}packaging"
+ant.deployResourcesDir = "${project.buildDir.absolutePath}${File.separator}${libsDir.name}"
+
+task jar(overwrite: true) << {
+
+    if (jdk != null && !jdk.isEmpty()) {
+
+        if(!libsDir.exists()) libsDir.mkdirs()
+
+        // Copying libs
+        copy {
+            from(project(':SlideshowFX-utils').jar.archivePath)
+            from(project(':SlideshowFX-engines').jar.archivePath)
+            from(project(':SlideshowFX-markup').jar.archivePath)
+            from(project(':SlideshowFX-content-extension').jar.archivePath)
+            from(project(':SlideshowFX-uploader').jar.archivePath)
+            from(felix.files)
+            from(freemarker.files)
+            from(jsoup.files)
+            from(leapmotion.files)
+            from(scribe.files)
+            from(twitter.files)
+            from(vertx.files)
+            from(zxing.files)
+
+            into(libsDir)
+        }
+
+        def classpath = ""
+
+        fileTree(dir: libsDir, include: '*.jar', exclude: archivesBaseName + ".jar").each {
+            f ->
+                classpath += f.name + ","
+        }
+
+        classpath += "."
+
+        ant.resourceIncludePattern = classpath
+        javafxjar.execute()
+    }
+}
+
+task buildJavaFXBundle << {
+
+    if (jdk != null && !jdk.isEmpty()) {
+        javafxdeploy.execute()
+    }
+}
+
+dependencies {
+    compile project(':SlideshowFX-utils')
+    compile project(':SlideshowFX-engines')
+    compile project(':SlideshowFX-markup')
+    compile project(':SlideshowFX-content-extension')
+    compile project(':SlideshowFX-uploader')
+
+    compile felix
+    compile freemarker
+    compile jsoup
+    compile leapmotion
+    compile scribe
+    compile twitter
+    compile vertx
+    compile zxing
+
+    testCompile hamcrest
+    testCompile  junit
+}
+
+tasks['jar'].dependsOn 'classes'
+tasks['jar'].dependsOn ':SlideshowFX-engines:jar'
+tasks['jar'].dependsOn ':SlideshowFX-utils:jar'
+tasks['jar'].dependsOn ':SlideshowFX-markup:jar'
+tasks['jar'].dependsOn ':SlideshowFX-content-extension:jar'
+tasks['jar'].dependsOn ':SlideshowFX-uploader:jar'
+
+tasks['buildJavaFXBundle'].dependsOn 'jar'
+
+tasks['assemble'].dependsOn 'buildJavaFXBundle'

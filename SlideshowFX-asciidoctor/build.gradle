@@ -1,0 +1,46 @@
+/*
+ * Copyright 2014 Thierry Wasylczenko
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+version = '1.0.0'
+
+dependencies {
+    compile project(':SlideshowFX-markup')
+    compile felix
+    compile asciidoctorj
+
+    testCompile junit
+    testCompile hamcrest
+}
+
+jar {
+    from( asciidoctorj.files ) {
+        include '*'
+    }
+
+    manifest {
+        attributes('Manifest-Version': '1.0',
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'SlideshowFX asciidoctor support',
+                'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.asciidoctor',
+                'Bundle-Description': 'Support asscidoctor for defining slide\'s content',
+                'Bundle-Version': '1.0.0',
+                'Bundle-Activator': 'com.twasyl.slideshowfx.markup.asciidoctor.activator.AsciidoctorActivator',
+                'Bundle-ClassPath': 'slf4j-api-1.7.7.jar,slf4j-simple-1.7.7.jar,jruby-complete-1.7.16.1.jar,asciidoctorj-1.5.1.jar,.',
+                'Bundle-Vendor': 'Thierry Wasylczenko',
+                'Export-Package': 'com.twasyl.slideshowfx.markup.asciidoctor,com.twasyl.slideshowfx.markup.asciidoctor.activator',
+                'Import-Package': 'org.osgi.framework')
+    }
+}

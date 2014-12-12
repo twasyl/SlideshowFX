@@ -1157,6 +1157,7 @@ public class SlideshowFXController implements Initializable {
                     this.taskInProgress.update(-1, "Fetching " + uploader.getName() + " folders");
 
                     final ComboBox<File> folders = new ComboBox<>(FXCollections.observableArrayList(uploader.getFolders()));
+                    folders.setMaxWidth(500);
 
                     this.taskInProgress.update(0, "");
 

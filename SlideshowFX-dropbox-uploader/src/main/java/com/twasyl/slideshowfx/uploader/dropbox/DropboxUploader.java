@@ -23,7 +23,6 @@ import javafx.concurrent.Worker;
 import javafx.scene.Scene;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.w3c.dom.Element;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -42,19 +41,17 @@ import java.util.logging.Logger;
 public class DropboxUploader extends AbstractUploader {
     private static final Logger LOGGER = Logger.getLogger(DropboxUploader.class.getName());
 
-    private final String APP_KEY = "<APP_KEY>";
-    private final String APP_SECRET = "<APP_SECRET>";
+    private final String APP_KEY = "lua1gp2ria694by";
 
-    private final DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
     private final DbxRequestConfig dropboxConfiguration = new DbxRequestConfig("SlideshowFX", Locale.getDefault().toString());
 
     public DropboxUploader() { super("Dropbox"); }
 
     @Override
     public boolean authenticate() {
-        final DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(this.dropboxConfiguration, appInfo);
-
-        final StringBuilder builder = new StringBuilder();
+        final String authenticationUrl = String.format("https://www.dropbox.com/1/oauth2/authorize?client_id=%1$s&response_type=token&redirect_uri=%2$s",
+                APP_KEY,
+                "https://slideshowfx-app");
 
         final WebView browser = new WebView();
         final Scene scene = new Scene(browser);
@@ -62,28 +59,33 @@ public class DropboxUploader extends AbstractUploader {
 
         browser.setPrefSize(500, 500);
         browser.getEngine().getLoadWorker().stateProperty().addListener((stateValue, oldState, newState) -> {
-            if(newState == Worker.State.SUCCEEDED) {
-                final Element divAuth = browser.getEngine().getDocument().getElementById("auth-code");
-                if (divAuth != null) {
-                    builder.append(divAuth.getTextContent());
-                    stage.close();
+            if(newState == Worker.State.FAILED
+                    && browser.getEngine().getLocation().startsWith("https://slideshowfx-app")) {
+
+                final String requestParamAccessToken = "access_token=";
+                int paramIndex = browser.getEngine().getLocation().indexOf(requestParamAccessToken);
+
+                if(paramIndex != -1) {
+                    paramIndex += requestParamAccessToken.length();
+                    final int endOfParamIndex = browser.getEngine().getLocation().indexOf("&", paramIndex);
+
+                    this.accessToken = endOfParamIndex == -1 ?
+                            browser.getEngine().getLocation().substring(paramIndex) :
+                            browser.getEngine().getLocation().substring(paramIndex, endOfParamIndex);
+
+                    this.authenticated = true;
+                } else {
+                    this.authenticated = false;
                 }
+
+                stage.close();
             }
         });
-        browser.getEngine().load(webAuth.start());
+        browser.getEngine().load(authenticationUrl);
 
         stage.setScene(scene);
         stage.setTitle("Authorize SlideshowFX in Dropbox");
         stage.showAndWait();
-
-        try {
-            final DbxAuthFinish authFinish = webAuth.finish(builder.toString());
-            this.accessToken = authFinish.accessToken;
-            this.authenticated = true;
-        } catch (DbxException e) {
-            LOGGER.log(Level.SEVERE, "Error while authenticating to Dropbox", e);
-            this.authenticated = false;
-        }
 
         return this.authenticated;
     }
@@ -116,7 +118,7 @@ public class DropboxUploader extends AbstractUploader {
 
             try(final InputStream archiveStream = new FileInputStream(engine.getArchive())) {
                 final DbxEntry.File dropboxUpload = client.uploadFile(
-                        new File(folder, engine.getArchive().getName()).getPath(),
+                        new File(folder, engine.getArchive().getName()).getPath().replaceAll("\\\\", "/"),
                         DbxWriteMode.add(),
                         engine.getArchive().length(),
                         archiveStream);
@@ -133,17 +135,32 @@ public class DropboxUploader extends AbstractUploader {
         if(this.isAuthenticated()) {
             folders.add(new File("/"));
             final DbxClient client = new DbxClient(this.dropboxConfiguration, this.accessToken);
-            final List<DbxEntry> listing;
-
-            try {
-                listing = client.searchFileAndFolderNames("/", "/");
-                listing.stream()
-                        .filter(entry -> entry.isFolder())
-                        .forEach(entry -> folders.add(new File(entry.path)));
-            } catch (DbxException e) {
-                LOGGER.log(Level.SEVERE, "Error while retrieving the folders", e);
-            }
+            this.fillFoldersList(folders, "/", client);
         }
+
         return folders;
+    }
+
+    /**
+     * Fill the given {@code folders} list.
+     * @param folders The list of folders that will be filled.
+     * @param path The path that will serve for looking for folders
+     * @param client The client used for requesting the Dropbox API.
+     */
+    private void fillFoldersList(final List<File> folders, final String path, final DbxClient client) {
+        final DbxEntry.WithChildren listing;
+
+        try {
+            listing = client.getMetadataWithChildren(path);
+            listing.children
+                    .stream()
+                    .filter(entry -> entry.isFolder())
+                    .forEach(entry -> {
+                        folders.add(new File(entry.path));
+                        this.fillFoldersList(folders, entry.path, client);
+                    });
+        } catch (DbxException e) {
+            LOGGER.log(Level.SEVERE, "Error while retrieving the folders", e);
+        }
     }
 }

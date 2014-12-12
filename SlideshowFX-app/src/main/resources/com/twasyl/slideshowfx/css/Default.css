@@ -100,7 +100,9 @@
     -fx-border-style: solid;
 }
 
-.button, .split-menu-button, .split-menu-button .label, .split-menu-button .arrow-button {
+.button,
+.split-menu-button, .split-menu-button .label, .split-menu-button .arrow-button,
+.combo-box, .combo-box .label, .combo-box .arrow-button  {
     -fx-background-color: transparent;
     -fx-text-fill: app-color-text-fill;
 }
@@ -148,24 +150,25 @@
     -fx-border-color: app-color-orange;
 }
 
-.split-menu-button {
+.split-menu-button, .combo-box {
     -fx-border-color: app-color-light-gray;
     -fx-border-style: solid;
     -fx-border-width: 1px;
     -fx-border-radius: 3px;
 }
 
-.split-menu-button:hover {
+.split-menu-button:hover, .combo-box:hover {
     -fx-border-width: 1px;
     -fx-border-style: solid;
     -fx-border-color: app-color-mouse-over-border;
 }
 
-.split-menu-button:pressed, .split-menu-button:showing {
+.split-menu-button:pressed, .split-menu-button:showing,
+.combo-box:pressed, .combo-box:pressed .list-cell, .combo-box:showing, .combo-box:showing .list-cell {
     -fx-background-color: app-color-input-background;
 }
 
-.split-menu-button .arrow {
+.split-menu-button .arrow, .combo-box .arrow {
     -fx-background-color: RGB(173,  173, 173);
 }
 
@@ -329,12 +332,17 @@
     -fx-border-color: app-color-text-fill;
 }
 
-.tree-cell:filled, .tree-cell:empty {
+.tree-cell:filled, .tree-cell:empty,
+.list-cell:filled, .list-cell:empty {
     -fx-text-fill: app-color-text-fill;
     -fx-background-color: app-color-background;
 }
 
 .tree-cell:filled:selected {
+    -fx-background-color: app-color-menu-in-use;
+}
+
+.list-cell:filled:hover {
     -fx-background-color: app-color-menu-in-use;
 }
 

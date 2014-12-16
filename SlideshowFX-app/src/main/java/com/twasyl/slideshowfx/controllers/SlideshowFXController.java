@@ -36,6 +36,7 @@ import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.uploader.IUploader;
 import com.twasyl.slideshowfx.uploader.UploaderManager;
+import com.twasyl.slideshowfx.uploader.io.RemoteFile;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
@@ -1154,28 +1155,14 @@ public class SlideshowFXController implements Initializable {
 
                 if (uploader.isAuthenticated()) {
                     // Prompts the user where to upload the presentation
-                    this.taskInProgress.update(-1, "Fetching " + uploader.getName() + " folders");
+                    final RemoteFile destination = uploader.chooseDestinationFile();
 
-                    final ComboBox<File> folders = new ComboBox<>(FXCollections.observableArrayList(uploader.getFolders()));
-                    folders.setMaxWidth(500);
-
-                    this.taskInProgress.update(0, "");
-
-                    final VBox content = new VBox(5);
-                    content.setStyle("-fx-margin: 5px");
-                    content.getChildren().addAll(new Label("Choose the destination folder:"),
-                            folders);
-
-                    final Dialog.Response answer = Dialog.showCancellableDialog(true, SlideshowFX.getStage(),
-                                            "Upload to " + uploader.getName(), content);
-
-                    if(answer == Dialog.Response.OK) {
+                    if(destination != null) {
                         final UploadPresentationTask task = new UploadPresentationTask(PresentationDAO.getInstance().getCurrentPresentation(),
-                                uploader, folders.getValue());
+                                uploader, destination);
                         SlideshowFXController.this.taskInProgress.setCurrentTask(task);
                         TaskDAO.getInstance().startTask(task);
                     }
-
                 }
             });
         });

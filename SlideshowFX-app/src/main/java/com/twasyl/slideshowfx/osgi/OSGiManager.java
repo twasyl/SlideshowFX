@@ -65,6 +65,7 @@ public class OSGiManager {
         configurationMap.put("org.osgi.framework.bootdelegation", "com.twasyl.slideshowfx.markup," +
                 "com.twasyl.slideshowfx.content.extension," +
                 "com.twasyl.slideshowfx.uploader," +
+                "com.twasyl.slideshowfx.uploader.io," +
                 "com.twasyl.slideshowfx.osgi," +
                 "com.twasyl.slideshowfx.engine.*," +
                 "sun.misc," +

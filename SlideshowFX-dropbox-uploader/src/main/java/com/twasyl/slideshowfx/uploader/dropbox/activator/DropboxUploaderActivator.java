@@ -24,7 +24,7 @@ import org.osgi.framework.BundleContext;
 import java.util.Hashtable;
 
 /**
- * Activator class for the uploader that allows to upload presentations on Dropbox
+ * Activator class for the uploader that allows to upload presentations on Dropbox.
  *
  * @author Thierry Wasylczenko
  * @version 1.0

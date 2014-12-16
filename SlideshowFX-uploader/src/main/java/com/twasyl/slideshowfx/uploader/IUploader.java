@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.uploader;
 
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.uploader.io.RemoteFile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -77,11 +78,30 @@ public interface IUploader {
      *                                          is {@code null}.
      * @throws java.io.FileNotFoundException If the archive file does not already exist.
      */
-    void upload(PresentationEngine engine, File folder) throws FileNotFoundException;
+    void upload(PresentationEngine engine, RemoteFile folder) throws FileNotFoundException;
 
     /**
-     * List all folders already present on the cloud service.
-     * @return The list of all folders present remotely.
+     * Returns the root folder of the service.
+     * @return The root folder of the service.
      */
-    List<File> getFolders();
+    RemoteFile getRootFolder();
+
+    /**
+     * List all folders already present in the {@code parent} directory.
+     * @return The list of all folders present remotely in the parent.
+     * @throws java.lang.NullPointerException If {@code parent} is null.
+     */
+    List<RemoteFile> getSubfolders(RemoteFile parent);
+
+    /**
+     * Shows a dialog allowing the user to choose the destination for its upload.
+     * The root folder is obainted by {@link IUploader#getRootFolder()}.
+     * Each time a folder is opened in the dialog, this method calls
+     * {@link com.twasyl.slideshowfx.uploader.IUploader#getSubfolders(com.twasyl.slideshowfx.uploader.io.RemoteFile)} with the opened file as parent.
+     * If the dialog is cancelled or if no selection is done, {@code null} will be returned.
+     *
+     * @return The selected destination or {@code null} if the dialog is cancelled or if no selection is performed.
+     */
+    RemoteFile chooseDestinationFile();
+
 }

@@ -52,6 +52,7 @@ task jar(overwrite: true) << {
         // Copying libs
         copy {
             from(project(':SlideshowFX-utils').jar.archivePath)
+            from(project(':SlideshowFX-controls').jar.archivePath)
             from(project(':SlideshowFX-engines').jar.archivePath)
             from(project(':SlideshowFX-markup').jar.archivePath)
             from(project(':SlideshowFX-content-extension').jar.archivePath)
@@ -90,6 +91,7 @@ task buildJavaFXBundle << {
 }
 
 dependencies {
+    compile project(':SlideshowFX-controls')
     compile project(':SlideshowFX-utils')
     compile project(':SlideshowFX-engines')
     compile project(':SlideshowFX-markup')
@@ -111,6 +113,7 @@ dependencies {
 
 tasks['jar'].dependsOn 'classes'
 tasks['jar'].dependsOn ':SlideshowFX-engines:jar'
+tasks['jar'].dependsOn ':SlideshowFX-controls:jar'
 tasks['jar'].dependsOn ':SlideshowFX-utils:jar'
 tasks['jar'].dependsOn ':SlideshowFX-markup:jar'
 tasks['jar'].dependsOn ':SlideshowFX-content-extension:jar'

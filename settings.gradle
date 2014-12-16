@@ -16,6 +16,7 @@
 
 include 'SlideshowFX-app'
 include 'SlideshowFX-engines'
+include 'SlideshowFX-controls'
 include 'SlideshowFX-utils'
 
 include 'SlideshowFX-asciidoctor'

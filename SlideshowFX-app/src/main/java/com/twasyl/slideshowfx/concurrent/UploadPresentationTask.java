@@ -18,6 +18,7 @@ package com.twasyl.slideshowfx.concurrent;
 
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.uploader.IUploader;
+import com.twasyl.slideshowfx.uploader.io.RemoteFile;
 import javafx.concurrent.Task;
 
 import java.io.File;
@@ -40,9 +41,9 @@ public class UploadPresentationTask extends Task<Void> {
 
     private PresentationEngine engine;
     private IUploader uploader;
-    private File destination;
+    private RemoteFile destination;
 
-    public UploadPresentationTask(PresentationEngine engine, IUploader uploader, File destination) {
+    public UploadPresentationTask(PresentationEngine engine, IUploader uploader, RemoteFile destination) {
         this.engine = engine;
         this.uploader = uploader;
         this.destination = destination;

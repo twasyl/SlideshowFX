@@ -33,6 +33,12 @@ import java.util.List;
 public interface IUploader {
 
     /**
+     * Returns the code that uniquely identifies this uploader. The code must not contain spaces.
+     * @return The code of this uploader.
+     */
+    String getCode();
+
+    /**
      * The name of the uploader that will be used to identify it in the UI.
      * @return The name of the uploader.
      */

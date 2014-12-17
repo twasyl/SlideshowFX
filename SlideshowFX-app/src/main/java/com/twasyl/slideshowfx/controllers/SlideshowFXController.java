@@ -39,6 +39,7 @@ import com.twasyl.slideshowfx.uploader.UploaderManager;
 import com.twasyl.slideshowfx.uploader.io.RemoteFile;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import javafx.application.Platform;
 import javafx.beans.property.adapter.JavaBeanObjectProperty;
@@ -183,7 +184,7 @@ public class SlideshowFXController implements Initializable {
     private ToggleGroup markupContentType = new ToggleGroup();
     @FXML private SlideContentEditor contentEditor;
     @FXML
-    private TextField chatIpAddress;
+    private ComboBox<String> chatIpAddress;
     @FXML
     private TextField chatPort;
     @FXML
@@ -891,7 +892,7 @@ public class SlideshowFXController implements Initializable {
 
             icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/start.png"));
         } else {
-            String ip = this.chatIpAddress.getText();
+            String ip = this.chatIpAddress.getValue();
             if (ip == null || ip.isEmpty()) {
                 ip = NetworkUtils.getIP();
             }
@@ -905,7 +906,7 @@ public class SlideshowFXController implements Initializable {
                 }
             }
 
-            this.chatIpAddress.setText(ip);
+            this.chatIpAddress.setValue(ip);
             this.chatPort.setText(port + "");
 
             new SlideshowFXServer(ip, port, this.twitterHashtag.getText());
@@ -914,6 +915,8 @@ public class SlideshowFXController implements Initializable {
         }
 
         ((ImageView) this.startChatButton.getGraphic()).setImage(icon);
+        this.chatIpAddress.setDisable(!this.chatIpAddress.isDisable());
+        this.chatPort.setDisable(!this.chatPort.isDisable());
     }
 
     @Override
@@ -1016,7 +1019,7 @@ public class SlideshowFXController implements Initializable {
         });
 
         this.browser.getEngine().setJavaScriptEnabled(true);
-        this.browser.getEngine().load(getClass().getResource("/com/twasyl/slideshowfx/html/empty-webview.html").toExternalForm());
+        this.browser.getEngine().load(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/html/empty-webview.html"));
 
         this.saveButton.setGraphic(
                 new ImageView(

@@ -44,17 +44,15 @@ import java.util.logging.Logger;
 public class DropboxUploader extends AbstractUploader {
     private static final Logger LOGGER = Logger.getLogger(DropboxUploader.class.getName());
 
-    private DbxAppInfo appInfo;
+    private final DbxAppInfo appInfo;
     private final DbxRequestConfig dropboxConfiguration = new DbxRequestConfig("SlideshowFX", Locale.getDefault().toString());
 
     public DropboxUploader() {
-        super("Dropbox", new RemoteFile(null));
+        super("dropbox", "Dropbox", new RemoteFile(null));
 
-        try {
-            this.appInfo = DbxAppInfo.Reader.readFromFile(new File(System.getProperty("user.home"), ".SlideshowFX/.slideshowfx.uploader.dropbox.json"));
-        } catch (JsonReader.FileLoadException e) {
-            LOGGER.log(Level.SEVERE, "Can not load app configuration");
-        }
+        this.appInfo = new DbxAppInfo(
+                AbstractUploader.getProperty(this.getCode().concat(".consumer.key")),
+                AbstractUploader.getProperty(this.getCode().concat(".consumer.secret")));
     }
 
     @Override

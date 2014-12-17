@@ -24,7 +24,9 @@
 <?import javafx.scene.web.WebView?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
+<?import javafx.collections.FXCollections?>
 <?import com.twasyl.slideshowfx.controls.TextFieldCheckMenuItem?>
+<?import com.twasyl.slideshowfx.utils.NetworkUtils?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
@@ -187,7 +189,12 @@
                     <Image url="@/com/twasyl/slideshowfx/images/chat.png"  smooth="true" />
                 </ImageView>
 
-                <TextField prefColumnCount="8" promptText="IP address" fx:id="chatIpAddress" onKeyPressed="#startChatByKeyPressed" />
+                <ComboBox  promptText="IP address" fx:id="chatIpAddress">
+                    <items>
+                        <NetworkUtils fx:factory="getObservableIps" />
+                    </items>
+                </ComboBox>
+
                 <TextField prefColumnCount="3" promptText="Port" fx:id="chatPort" onKeyPressed="#startChatByKeyPressed" />
 
                 <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">

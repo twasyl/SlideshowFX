@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.utils.PlatformHelper;
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -54,7 +55,7 @@ public class Dialog extends Stage {
         initStyle(style);
         setResizable(true);
         setScene(scene);
-        getScene().getStylesheets().add(getClass().getResource("/com/twasyl/slideshowfx/css/Default.css").toExternalForm());
+        getScene().getStylesheets().add(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/css/Default.css"));
     }
 
     public void showDialog() {
@@ -143,7 +144,7 @@ public class Dialog extends Stage {
         final Text textMessage = new Text(message);
         textMessage.setStyle("-fx-fill: white; -fx-font-size: 15pt;");
 
-        final ImageView image = new ImageView(new Image(Dialog.class.getResource("/com/twasyl/slideshowfx/images/error.png").toExternalForm()));
+        final ImageView image = new ImageView(new Image(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/images/error.png")));
 
         final HBox root = new HBox(10);
         root.setPadding(new Insets(10));

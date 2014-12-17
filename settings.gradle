@@ -34,3 +34,4 @@ include 'SlideshowFX-quote-extension'
 
 include 'SlideshowFX-uploader'
 include 'SlideshowFX-dropbox-uploader'
+include 'SlideshowFX-drive-uploader'

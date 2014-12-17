@@ -18,31 +18,105 @@ package com.twasyl.slideshowfx.uploader;
 
 import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.uploader.io.RemoteFile;
-import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
-import java.io.File;
+import java.io.*;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The base class for implementing an {@link com.twasyl.slideshowfx.uploader.IUploader}.
  *
  *  @author Thierry Wasylczenko
  *  @version 1.0
- *  @since 1.0
+ *  @since SlideshowFX 1.0.0
  */
 public abstract class AbstractUploader implements IUploader {
+    private static final Logger LOGGER = Logger.getLogger(AbstractUploader.class.getName());
+    private static final File CONFIG_FILE = new File(System.getProperty("user.home"), ".SlideshowFX/.slideshowfx.uploader.properties");
+
+    protected final String code;
+    protected final String name;
     protected boolean authenticated;
     protected String accessToken;
-    protected final String name;
     protected final RemoteFile rootFolder;
 
-    protected AbstractUploader(String name, RemoteFile rootFolder) {
+    protected AbstractUploader(String code, String name, RemoteFile rootFolder) {
+        this.code = code;
         this.name = name;
         this.rootFolder = rootFolder;
     }
+
+    /**
+     * Get a property from the file containing all uploader properties. This methods return {@code null} is the property
+     * is not found or if the configuration file does not exist.
+     *
+     * @param propertyName The name of the property to retrieve.
+     * @return The value of the property or {@code null} if it is not found or the configuration does not exist.
+     * @throws java.lang.NullPointerException If the property name is null.
+     * @throws java.lang.IllegalArgumentException If the property name is empty.
+     */
+    protected final static String getProperty(final String propertyName) {
+        if(propertyName == null) throw new NullPointerException("The property name can not be null");
+        if(propertyName.trim().isEmpty()) throw new IllegalArgumentException("The property name can not be empty");
+
+        String value = null;
+
+        if(CONFIG_FILE.exists()) {
+            final Properties properties = new Properties();
+
+            try(final Reader reader = new FileReader(CONFIG_FILE)) {
+                properties.load(reader);
+                value = properties.getProperty(propertyName.trim());
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Can not load configuration file", e);
+            }
+        }
+
+        return value;
+    }
+
+    /**
+     * Save the given {@code propertyName} and {@code propertyValue} to the configuration file.
+     *
+     * @param propertyName The name of the property to save.
+     * @param propertyValue The value of the property to save.
+     * @throws java.lang.NullPointerException If the name or value of the property is null.
+     * @throws java.lang.IllegalArgumentException If the name or value of the property is empty.
+     */
+    protected final static void setProperty(final String propertyName, final String propertyValue) {
+        if(propertyName == null) throw new NullPointerException("The property name can not be null");
+        if(propertyValue == null) throw new NullPointerException("The property value can not be null");
+        if(propertyName.trim().isEmpty()) throw new IllegalArgumentException("The property name can not be empty");
+        if(propertyValue.trim().isEmpty()) throw new IllegalArgumentException("The property value can not be empty");
+
+        final Properties properties = new Properties();
+
+        // Load the current properties if they exist
+        if(CONFIG_FILE.exists()) {
+            try(final Reader reader = new FileReader(CONFIG_FILE)) {
+                properties.load(reader);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Can not load configuration file", e);
+            }
+        }
+
+        // Add the property
+        properties.put(propertyName.trim(), propertyValue);
+
+        // Store everything
+        try(final Writer writer = new FileWriter(CONFIG_FILE)) {
+            properties.store(writer, "");
+            writer.flush();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Can not save configuration", e);
+        }
+    }
+
+    @Override
+    public String getCode() { return this.code; }
 
     @Override
     public String getName() { return this.name; }
@@ -59,7 +133,6 @@ public abstract class AbstractUploader implements IUploader {
     @Override
     public RemoteFile chooseDestinationFile() {
 
-
         final TreeItem<RemoteFile> rootItem = this.buildCustomTreeItem(this.getRootFolder());
         /**
          * Get the subfolders of root and populate the root TreeItem
@@ -68,9 +141,7 @@ public abstract class AbstractUploader implements IUploader {
                 .stream()
                 .forEach(subfolder -> rootItem.getChildren().add(this.buildCustomTreeItem(subfolder)));
 
-        final TreeView<RemoteFile> treeView = new TreeView<>(rootItem);
-        treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        treeView.setPrefSize(500, 400);
+        final TreeView<RemoteFile> treeView = this.buildCustomTreeView(rootItem);
 
         final VBox content = new VBox(5);
         content.getChildren().addAll(new Label("Choose a destination:"), treeView);
@@ -84,6 +155,41 @@ public abstract class AbstractUploader implements IUploader {
         }
 
         return destination;
+    }
+
+    /**
+     * Build the {@code TreeView<RemoteFile>} that will host the list of folders available remotely.
+     * If the given {@code root} is null, it will not be added as root of the created TreeView.
+     *
+     * @param root The root that will be added to the created TreeView.
+     * @return The TreeView to host remote folders.
+     */
+    private TreeView<RemoteFile> buildCustomTreeView(final TreeItem<RemoteFile> root) {
+        final TreeView<RemoteFile> treeView = new TreeView<>();
+        treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+        /**
+         * Because the default implementation of a CellFactory calls the toString() method of the value, another
+         * implementation is created in order to simply display the {@link com.twasyl.slideshowfx.uploader.io.RemoteFile#getName()}.
+         */
+        treeView.setCellFactory(targetTreeView -> {
+            final TreeCell<RemoteFile> cell = new TreeCell<RemoteFile>() {
+                @Override
+                protected void updateItem(RemoteFile item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if(!empty && item != null) setText(item.isRoot() ? "/" : item.getName());
+                    else setText(null);
+                }
+            };
+
+            return cell;
+        });
+        treeView.setPrefSize(500, 400);
+
+        if(root != null) treeView.setRoot(root);
+
+        return treeView;
     }
 
     /**

@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.beans.chat.ChatMessage;
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
@@ -34,7 +35,7 @@ public class ChatPanel extends ScrollPane {
     private final VBox messages = new VBox(5);
 
     public ChatPanel() {
-        this.getStylesheets().add(getClass().getResource("/com/twasyl/slideshowfx/css/chat-panel.css").toExternalForm());
+        this.getStylesheets().add(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/css/chat-panel.css"));
         this.getStyleClass().add("chat-panel");
 
         this.setContent(this.messages);

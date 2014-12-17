@@ -16,6 +16,7 @@
 
 package com.twasyl.slideshowfx.controls.builder.editor;
 
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.concurrent.Worker;
 import javafx.scene.web.WebView;
 
@@ -41,7 +42,7 @@ public class ACEFileEditor extends AbstractFileEditor<WebView> {
         super();
 
         final WebView webView = new WebView();
-        webView.getEngine().load(ACEFileEditor.class.getResource("/com/twasyl/slideshowfx/html/ace-file-editor.html").toExternalForm());
+        webView.getEngine().load(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/html/ace-file-editor.html"));
 
         this.setFileContent(webView);
     }

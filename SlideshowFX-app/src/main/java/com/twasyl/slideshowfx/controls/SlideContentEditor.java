@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.controls;
 
 import com.sun.javafx.PlatformUtil;
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
@@ -40,7 +41,7 @@ public class SlideContentEditor extends BorderPane {
     private final WebView browser = new WebView();
 
     public SlideContentEditor() {
-        this.browser.getEngine().load(SlideContentEditor.class.getResource("/com/twasyl/slideshowfx/html/ace-file-editor.html").toExternalForm());
+        this.browser.getEngine().load(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/html/ace-file-editor.html"));
 
         this.browser.setOnKeyPressed(event -> {
 

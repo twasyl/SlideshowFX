@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.utils.PlatformHelper;
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
@@ -261,9 +262,9 @@ public class Tour extends StackPane {
      * @return The Node containing all the instructions necessary to use the tour.
      */
     private Node getInstructionsNode() {
-        final ImageView escKey = new ImageView(getClass().getResource("/com/twasyl/slideshowfx/images/esc_key.png").toExternalForm());
-        final ImageView leftKey = new ImageView(getClass().getResource("/com/twasyl/slideshowfx/images/left_key.png").toExternalForm());
-        final ImageView rightKey = new ImageView(getClass().getResource("/com/twasyl/slideshowfx/images/right_key.png").toExternalForm());
+        final ImageView escKey = new ImageView(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/images/esc_key.png"));
+        final ImageView leftKey = new ImageView(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/images/left_key.png"));
+        final ImageView rightKey = new ImageView(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/images/right_key.png"));
 
         final Label escLabel = new Label("Exit the tour");
         escLabel.setLabelFor(escKey);
@@ -289,7 +290,7 @@ public class Tour extends StackPane {
      * @return The Node for displaying the reload screen.
      */
     private Node getReloadNode() {
-        final ImageView reloadIcon = new ImageView(getClass().getResource("/com/twasyl/slideshowfx/images/reload_white.png").toExternalForm());
+        final ImageView reloadIcon = new ImageView(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/images/reload_white.png"));
 
         final Button  reloadButton = new Button();
         reloadButton.setGraphic(reloadIcon);

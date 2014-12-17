@@ -120,9 +120,11 @@ task installContentExtensionPlugins(dependsOn: [':SlideshowFX-alert-extension:ja
     }
 }
 
-task installUploaderPlugins(dependsOn : [':SlideshowFX-dropbox-uploader:jar']) << {
+task installUploaderPlugins(dependsOn : [':SlideshowFX-dropbox-uploader:jar',
+                                         ':SlideshowFX-drive-uploader:jar']) << {
     copy {
         from project(':SlideshowFX-dropbox-uploader').tasks['jar'].archivePath
+        from project(':SlideshowFX-drive-uploader').tasks['jar'].archivePath
 
         into pluginsFolder
     }

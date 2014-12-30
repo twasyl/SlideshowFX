@@ -16,12 +16,13 @@
 
 package com.twasyl.slideshowfx.concurrent;
 
+import com.twasyl.slideshowfx.controls.Dialog;
+import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.uploader.IUploader;
 import com.twasyl.slideshowfx.uploader.io.RemoteFile;
 import javafx.concurrent.Task;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +31,8 @@ import java.util.logging.Logger;
  * This tasks uploads a SlideshowFX presentation to a given service. It takes a {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine}
  * that will be uploaded to a service represented by a {@link com.twasyl.slideshowfx.uploader.IUploader}. The
  * presentation is uploaded in the given {@code #destination} or at the root if it is {@code null}.
- * Nothing will be done if the user is not authenticated.
+ * The user will also be asked to overwrite the presentation if already exists.
+ * Nothing will be done if the user is not authenticated or if the user doesn't want to overwrite an existing file.
  *
  * @author Thierry Wasylczenko
  * @version 1.0
@@ -56,12 +58,28 @@ public class UploadPresentationTask extends Task<Void> {
         if(this.engine != null && this.engine.getArchive() != null
                 && this.uploader.isAuthenticated()) {
 
-            try {
-                this.uploader.upload(this.engine, this.destination);
-                this.succeeded();
-            } catch (FileNotFoundException e) {
-                this.setException(e);
-                this.failed();
+            boolean overwrite = false;
+            boolean fileExist = this.uploader.fileExists(PresentationDAO.getInstance().getCurrentPresentation(), destination);
+
+            if(fileExist) {
+                final String message = String.format("The '%1$s' presentation already exist in '%2$s'.\n Do you want to overwrite it?",
+                        engine.getArchive().getName(), destination.toString());
+
+                final Dialog.Response answer = Dialog.showConfirmDialog(null, "Overwrite presentation", message);
+
+                overwrite = answer == Dialog.Response.YES;
+            }
+
+            if(fileExist && !overwrite) {
+                this.cancelled();
+            } else {
+                try {
+                    this.uploader.upload(this.engine, this.destination, overwrite);
+                    this.succeeded();
+                } catch (FileNotFoundException e) {
+                    this.setException(e);
+                    this.failed();
+                }
             }
         } else this.failed();
 

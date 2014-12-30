@@ -20,15 +20,14 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.FileContent;
-import com.google.api.client.http.HttpMediaType;
 import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.MultipartContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
-import com.google.api.services.drive.model.*;
+import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.ParentReference;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.uploader.AbstractUploader;
 import com.twasyl.slideshowfx.uploader.drive.io.GoogleFile;
@@ -39,23 +38,32 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.w3c.dom.html.HTMLInputElement;
 
-import java.io.*;
-import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * This uploader allows to upload presentations to Google Drive.
+ *
  * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since 1.0
  */
 public class DriveUploader extends AbstractUploader {
     private static final Logger LOGGER = Logger.getLogger(DriveUploader.class.getName());
 
     private GoogleCredential credential;
 
-    public DriveUploader() { super("googledrive", "Google Drive", new GoogleFile()); }
+    public DriveUploader() {
+        super("googledrive", "Google Drive", new GoogleFile());
+
+        this.accessToken = AbstractUploader.getProperty(this.ACCESS_TOKEN);
+    }
 
     @Override
     public boolean authenticate() {
@@ -64,8 +72,8 @@ public class DriveUploader extends AbstractUploader {
         final JsonFactory jsonFactory = new JacksonFactory();
 
         final GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory,
-                AbstractUploader.getProperty(this.getCode().concat(".consumer.key")),
-                AbstractUploader.getProperty(this.getCode().concat(".consumer.secret")),
+                AbstractUploader.getProperty(this.CONSUMER_KEY),
+                AbstractUploader.getProperty(this.CONSUMER_SECRET),
                 Arrays.asList(DriveScopes.DRIVE))
                 .setAccessType("online")
                 .setApprovalPrompt("auto")
@@ -85,15 +93,16 @@ public class DriveUploader extends AbstractUploader {
 
                     try {
                         final GoogleTokenResponse response = flow.newTokenRequest(authorizationCode.toString())
-                                .setRedirectUri(AbstractUploader.getProperty(this.getCode().concat(".redirecturi")))
+                                .setRedirectUri(AbstractUploader.getProperty(this.REDIRECT_URI))
                                 .execute();
 
                         this.credential = new GoogleCredential().setFromTokenResponse(response);
-                        this.authenticated = true;
+                        this.accessToken = this.credential.getAccessToken();
                     } catch (IOException e) {
                         LOGGER.log(Level.WARNING, "Failed to get access token", e);
-                        this.authenticated = false;
+                        this.accessToken = null;
                     } finally {
+                        AbstractUploader.setProperty(this.ACCESS_TOKEN, this.accessToken);
                         stage.close();
                     }
 
@@ -101,14 +110,39 @@ public class DriveUploader extends AbstractUploader {
             }
         });
         browser.getEngine().load(flow.newAuthorizationUrl()
-                                    .setRedirectUri(AbstractUploader.getProperty(this.getCode().concat(".redirecturi")))
+                                    .setRedirectUri(AbstractUploader.getProperty(this.REDIRECT_URI))
                                     .build());
 
         stage.setScene(scene);
         stage.setTitle("Authorize SlideshowFX in Google Drive");
         stage.showAndWait();
 
-        return this.authenticated;
+        return this.isAuthenticated();
+    }
+
+    @Override
+    public boolean checkAccessToken() {
+        boolean valid = false;
+
+        if(this.credential == null) {
+            this.credential = new GoogleCredential();
+            this.credential.setAccessToken(this.accessToken);
+        }
+
+        Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), this.credential)
+                .setApplicationName("SlideshowFX")
+                .build();
+
+        try {
+            service.about()
+                    .get()
+                    .execute();
+            valid = true;
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Can not determine if access token is valid", e);
+        }
+
+        return valid;
     }
 
     @Override
@@ -116,27 +150,55 @@ public class DriveUploader extends AbstractUploader {
     }
 
     @Override
-    public void upload(PresentationEngine engine) throws FileNotFoundException {
-        this.upload(engine, this.getRootFolder());
-    }
-
-    @Override
-    public void upload(PresentationEngine engine, RemoteFile folder) throws FileNotFoundException {
+    public void upload(PresentationEngine engine, RemoteFile folder, boolean overwrite) throws FileNotFoundException {
         if(this.isAuthenticated()) {
-            com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
-            body.setTitle(engine.getArchive().getName());
-            body.setMimeType("application/zip");
-            body.setParents(Arrays.asList(new ParentReference()
-                                                    .setId(((GoogleFile) folder).getId())
-                                         ));
-
-            FileContent mediaContent = new FileContent("application/zip", engine.getArchive());
-
             Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), this.credential)
                     .setApplicationName("SlideshowFX")
                     .build();
+
+            com.google.api.services.drive.model.File body = null;
+
+            if(overwrite) {
+                // Search for the file to get its ID and then delete it.
+                StringBuilder query = new StringBuilder()
+                        .append("mimeType != 'application/vnd.google-apps.folder'")
+                        .append(" and not trashed")
+                        .append(String.format(" and '%1$s' in parents", ((GoogleFile) folder).getId()))
+                        .append(String.format(" and title = '%1$s'", engine.getArchive().getName()));
+
+                try {
+                    FileList files = service.files()
+                            .list()
+                            .setQ(query.toString())
+                            .execute();
+
+                    if(!files.getItems().isEmpty()) {
+                        body = files.getItems().get(0);
+                    }
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Can not find file to overwrite", e);
+                }
+            } else {
+                final String nameWithoutExtension = engine.getArchive().getName().substring(0, engine.getArchive().getName().lastIndexOf("."));
+                final Calendar calendar = Calendar.getInstance();
+
+                body = new com.google.api.services.drive.model.File();
+                body.setTitle(String.format("%1$s %2$tF %2$tT.%3$s", nameWithoutExtension, calendar, engine.getArchiveExtension()));
+                body.setMimeType("application/zip");
+                body.setParents(Arrays.asList(new ParentReference()
+                                                .setId(((GoogleFile) folder).getId())
+                                             ));
+            }
+
+            FileContent mediaContent = new FileContent("application/zip", engine.getArchive());
+
             try {
-                service.files().insert(body, mediaContent).execute();
+                if(overwrite)
+                    service.files()
+                            .update(body.getId(), body, mediaContent)
+                            .setNewRevision(true)
+                            .execute();
+                else service.files().insert(body, mediaContent).execute();
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not upload presentation to Google Drive", e);
             }
@@ -157,26 +219,15 @@ public class DriveUploader extends AbstractUploader {
                     .build();
 
             try {
-                ChildList children = service.children().list(((GoogleFile) parent).getId()).execute();
+                FileList files = service.files()
+                        .list()
+                        .setQ(String.format("mimeType = 'application/vnd.google-apps.folder' and not trashed and '%1$s' in parents", ((GoogleFile) parent).getId()))
+                        .execute();
+
                 GoogleFile child;
-
-                for(ChildReference reference : children.getItems()) {
-
-                    // Execute a request to get the file info
-                    com.google.api.services.drive.model.File fileInfo = null;
-                    try {
-                        fileInfo = service.files().get(reference.getId()).execute();
-
-                        // This MIME type identifies a folder on Google Drive and also ensure the folder is not trashed
-                        if("application/vnd.google-apps.folder".equals(fileInfo.getMimeType())
-                                && (fileInfo.getLabels().getTrashed() == null
-                                    || !fileInfo.getLabels().getTrashed())) {
-                            child = new GoogleFile((GoogleFile) parent, fileInfo.getTitle(), fileInfo.getId());
-                            folders.add(child);
-                        }
-                    } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE, "Can not determine type of file on Google Drive", e);
-                    }
+                for(com.google.api.services.drive.model.File reference : files.getItems()) {
+                    child = new GoogleFile((GoogleFile) parent, reference.getTitle(), reference.getId());
+                    folders.add(child);
                 }
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not list folders of Google Drive", e);
@@ -184,5 +235,40 @@ public class DriveUploader extends AbstractUploader {
         }
 
         return folders;
+    }
+
+    @Override
+    public boolean fileExists(PresentationEngine engine, RemoteFile destination) {
+        if(engine == null) throw new NullPointerException("The engine can not be null");
+        if(engine.getArchive() == null) throw new NullPointerException("The archive file can not be null");
+        if(destination == null) throw new NullPointerException("The destination can not be null");
+        if(!(destination instanceof GoogleFile)) throw new IllegalArgumentException("The given destination must be a GoogleFile");
+
+        boolean exist = true;
+
+        if(this.isAuthenticated()) {
+            final Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), this.credential)
+                    .setApplicationName("SlideshowFX")
+                    .build();
+
+            try {
+                StringBuilder query = new StringBuilder()
+                        .append("mimeType != 'application/vnd.google-apps.folder'")
+                        .append(" and not trashed")
+                        .append(String.format(" and '%1$s' in parents", ((GoogleFile) destination).getId()))
+                        .append(String.format(" and title = '%1$s'", engine.getArchive().getName()));
+
+                FileList files = service.files()
+                        .list()
+                        .setQ(query.toString())
+                        .execute();
+
+                exist = !files.getItems().isEmpty();
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Can not list files of Google Drive", e);
+            }
+        }
+
+        return exist;
     }
 }

@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.uploader;
 
 import com.twasyl.slideshowfx.controls.Dialog;
+import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.uploader.io.RemoteFile;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -37,9 +38,16 @@ public abstract class AbstractUploader implements IUploader {
     private static final Logger LOGGER = Logger.getLogger(AbstractUploader.class.getName());
     private static final File CONFIG_FILE = new File(System.getProperty("user.home"), ".SlideshowFX/.slideshowfx.uploader.properties");
 
+    /*
+     * Constants for stored properties
+     */
+    protected final String CONSUMER_KEY;
+    protected final String CONSUMER_SECRET;
+    protected final String ACCESS_TOKEN;
+    protected final String REDIRECT_URI;
+
     protected final String code;
     protected final String name;
-    protected boolean authenticated;
     protected String accessToken;
     protected final RemoteFile rootFolder;
 
@@ -47,6 +55,11 @@ public abstract class AbstractUploader implements IUploader {
         this.code = code;
         this.name = name;
         this.rootFolder = rootFolder;
+
+        this.CONSUMER_KEY = this.code.concat(".consumer.key");
+        this.CONSUMER_SECRET = this.code.concat(".consumer.secret");
+        this.ACCESS_TOKEN = this.code.concat(".accesstoken");
+        this.REDIRECT_URI = this.code.concat(".redirecturi");
     }
 
     /**
@@ -122,13 +135,26 @@ public abstract class AbstractUploader implements IUploader {
     public String getName() { return this.name; }
 
     @Override
-    public boolean isAuthenticated() { return this.authenticated; }
+    public boolean isAuthenticated() {
+        boolean authenticated = false;
+
+        if(this.accessToken != null && !this.accessToken.trim().isEmpty()) {
+            authenticated = checkAccessToken();
+        }
+
+        return authenticated;
+    }
 
     @Override
     public String getAccessToken() { return this.accessToken; }
 
     @Override
     public RemoteFile getRootFolder() { return this.rootFolder; }
+
+    @Override
+    public void upload(PresentationEngine engine) throws FileNotFoundException {
+        this.upload(engine, this.getRootFolder(), false);
+    }
 
     @Override
     public RemoteFile chooseDestinationFile() {

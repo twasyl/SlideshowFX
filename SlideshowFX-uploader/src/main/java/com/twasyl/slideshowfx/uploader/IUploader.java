@@ -19,7 +19,6 @@ package com.twasyl.slideshowfx.uploader;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.uploader.io.RemoteFile;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
@@ -63,12 +62,19 @@ public interface IUploader {
     String getAccessToken();
 
     /**
+     * Checks if the current access token is valid or not.
+     * @return {@code true} is the access token is valid, {@code false} otherwise.
+     */
+    boolean checkAccessToken();
+
+    /**
      * Disconnect the user from the service.
      */
     void disconnect();
 
     /**
-     * Upload the given {@code engine} to the service. The presentation is uploaded to the root of the service.
+     * Upload the given {@code engine} to the service. The presentation is uploaded to the root of the service. The
+     * implementation should not overwrite the already existing file if any.
      * @param engine The presentation to upload.
      * @throws java.lang.NullPointerException If the {@code engine} is {@code null} or if {@code engine.getArchive()}
      *                                          is {@code null}.
@@ -80,11 +86,12 @@ public interface IUploader {
      * Upload the given {@code engine} to the service. The presentation is uploaded in the given {@code folder}.
      * @param engine The presentation to upload.
      * @param folder The folder where the presented will be uploaded.
+     * @param overwrite Indicates if it should overwrite the file if it already exists.
      * @throws java.lang.NullPointerException If the {@code engine} is {@code null} or if {@code engine.getArchive()}
      *                                          is {@code null}.
      * @throws java.io.FileNotFoundException If the archive file does not already exist.
      */
-    void upload(PresentationEngine engine, RemoteFile folder) throws FileNotFoundException;
+    void upload(PresentationEngine engine, RemoteFile folder, boolean overwrite) throws FileNotFoundException;
 
     /**
      * Returns the root folder of the service.
@@ -110,4 +117,14 @@ public interface IUploader {
      */
     RemoteFile chooseDestinationFile();
 
+    /**
+     * Tests if the file of the {@code engine} exists in the {@code destination} folder present remotely.
+     * @param engine The presentation to test the existence remotely.
+     * @param destination The folder where the presentation should be uploaded. The test will be performed in this folder.
+     * @return {@code true} if the file already exists in the {@code destination} folder, {@code false otherwise}.
+     *
+     * @throws java.lang.NullPointerException If either {@code engine},
+     * {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#getArchive()} or {@code destination} is null.
+     */
+    boolean fileExists(PresentationEngine engine, RemoteFile destination);
 }

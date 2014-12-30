@@ -16,8 +16,9 @@
 
 package com.twasyl.slideshowfx.uploader.io;
 
-import static org.testng.Assert.*;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.*;
 
 /**
  * Performs test on the {@link com.twasyl.slideshowfx.uploader.io.RemoteFile} class.

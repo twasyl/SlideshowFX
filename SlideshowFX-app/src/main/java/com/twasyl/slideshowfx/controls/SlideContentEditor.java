@@ -18,14 +18,13 @@ package com.twasyl.slideshowfx.controls;
 
 import com.sun.javafx.PlatformUtil;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyCode;
+import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,28 +43,21 @@ public class SlideContentEditor extends BorderPane {
         this.browser.getEngine().load(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/html/ace-file-editor.html"));
 
         this.browser.setOnKeyPressed(event -> {
+            final boolean isShortcutDown = event.isShortcutDown();
 
-            /*
-             * Indicates if Command key on Mac or Control key on other platforms is down.
-             * It is used to realize copy/paste operations
-             */
-            boolean isMetaDown;
+            if(isShortcutDown) {
+                if("A".equalsIgnoreCase(event.getText())) SlideContentEditor.this.selectAll();
 
-            if(PlatformUtil.isMac()) {
-                isMetaDown = event.isMetaDown();
-            } else {
-                isMetaDown = event.isControlDown();
-            }
-
-            if(isMetaDown && event.getCode() == KeyCode.V) {
-                SlideContentEditor.this.appendContentEditorValue(Clipboard.getSystemClipboard().getString());
-            } else if(isMetaDown && event.getCode() == KeyCode.C) {
-                final String selection = SlideContentEditor.this.getSelectedContentEditorValue();
-                if(selection != null) {
-                    final ClipboardContent content = new ClipboardContent();
-                    content.putString(selection);
-                    Clipboard.getSystemClipboard().setContent(content);
+                else if("C".equalsIgnoreCase(event.getText())) {
+                    final String selection = SlideContentEditor.this.getSelectedContentEditorValue();
+                    if (selection != null) {
+                        final ClipboardContent content = new ClipboardContent();
+                        content.putString(selection);
+                        Clipboard.getSystemClipboard().setContent(content);
+                    }
                 }
+
+                else if("V".equalsIgnoreCase(event.getText())) SlideContentEditor.this.appendContentEditorValue(Clipboard.getSystemClipboard().getString());
             }
         });
 

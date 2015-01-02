@@ -38,7 +38,7 @@ jar {
                 'Bundle-Description': 'Support asscidoctor for defining slide\'s content',
                 'Bundle-Version': '1.0.0',
                 'Bundle-Activator': 'com.twasyl.slideshowfx.markup.asciidoctor.activator.AsciidoctorActivator',
-                'Bundle-ClassPath': 'slf4j-api-1.7.7.jar,slf4j-simple-1.7.7.jar,jruby-complete-1.7.16.1.jar,asciidoctorj-1.5.1.jar,.',
+                'Bundle-ClassPath': 'slf4j-api-1.7.7.jar,slf4j-simple-1.7.7.jar,jruby-complete-1.7.18.jar,asciidoctorj-1.5.2.jar,.',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.markup.asciidoctor,com.twasyl.slideshowfx.markup.asciidoctor.activator',
                 'Import-Package': 'org.osgi.framework')

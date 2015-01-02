@@ -49,7 +49,7 @@ public class AsciidoctorMarkup extends AbstractMarkup {
         RubyInstanceConfig config = new RubyInstanceConfig();
         config.setLoader(AsciidoctorMarkup.class.getClassLoader());
 
-        JavaEmbedUtils.initialize(Arrays.asList("gems/asciidoctor-1.5.0/lib"), config);
+        JavaEmbedUtils.initialize(Arrays.asList("gems/asciidoctor-1.5.2/lib"), config);
 
         this.asciidoctor = Asciidoctor.Factory.create(AsciidoctorMarkup.class.getClassLoader());
     }
@@ -58,6 +58,6 @@ public class AsciidoctorMarkup extends AbstractMarkup {
     public String convertAsHtml(String markupString) throws IllegalArgumentException {
         if(markupString == null) throw new IllegalArgumentException("Can not convert " + getName() + " to HTML : the String is null");
 
-        return this.asciidoctor.render(markupString,new HashMap<String, Object>());
+        return this.asciidoctor.convert(markupString,new HashMap<String, Object>());
     }
 }

@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public abstract class AbstractContentExtension implements IContentExtension {
     private static final Logger LOGGER = Logger.getLogger(AbstractContentExtension.class.getName());

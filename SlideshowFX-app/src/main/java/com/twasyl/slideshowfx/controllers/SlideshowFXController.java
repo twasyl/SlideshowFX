@@ -106,7 +106,7 @@ import java.util.logging.Logger;
  *  
  *  @author Thierry Wasyczenko
  *  @version 1.0
- *  @since 1.0
+ *  @since SlideshowFX 1.0.0
  */
 public class SlideshowFXController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXController.class.getName());

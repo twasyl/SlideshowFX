@@ -20,7 +20,7 @@ package com.twasyl.slideshowfx.content.extension;
  * Indicates the type of resources contained in the content extension.
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public enum ResourceType {
     /**

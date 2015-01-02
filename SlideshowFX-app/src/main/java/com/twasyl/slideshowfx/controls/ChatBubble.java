@@ -34,7 +34,7 @@ import org.vertx.java.core.json.JsonObject;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class ChatBubble extends VBox {
 

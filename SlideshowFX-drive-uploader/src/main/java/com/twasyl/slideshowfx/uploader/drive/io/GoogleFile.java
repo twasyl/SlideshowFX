@@ -27,7 +27,7 @@ import com.twasyl.slideshowfx.uploader.io.RemoteFile;
  *
  * @author Thierry Wasylcznko
  * @version 1.0
- * @since SlideshowFX 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class GoogleFile extends RemoteFile {
 

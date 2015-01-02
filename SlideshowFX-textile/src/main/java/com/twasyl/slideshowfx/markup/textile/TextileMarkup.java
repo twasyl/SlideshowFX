@@ -35,7 +35,7 @@ import java.io.StringWriter;
  * This markup language is identified byt the code <code>TEXTILE</code> which is returned by {@link com.twasyl.slideshowfx.markup.IMarkup#getCode()}.
  *
  * @author Thierry Wasylczenko
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  * @version 1.0
  */
 public class TextileMarkup extends AbstractMarkup {

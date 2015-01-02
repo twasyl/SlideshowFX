@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class OSGiManager {
     private static final Logger LOGGER = Logger.getLogger(OSGiManager.class.getName());

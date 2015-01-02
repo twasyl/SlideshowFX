@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
  * This class is the controller used by the {@code AlertContentExtension.fxml} file.
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class AlertContentExtensionController implements Initializable {
 

@@ -22,7 +22,7 @@ package com.twasyl.slideshowfx.beans.chat;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public enum ChatMessageSource {
 

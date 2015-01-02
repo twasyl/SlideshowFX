@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.server.service;
 
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.utils.TemplateProcessor;
 import freemarker.template.*;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.VoidHandler;
@@ -42,7 +43,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class SlideshowFXService extends Verticle {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXService.class.getName());
@@ -76,12 +77,7 @@ public class SlideshowFXService extends Verticle {
         routeMatcher.get(URL, request -> {
             final Map templateTokens = this.vertx.sharedData().getMap(SlideshowFXServer.SHARED_DATA_TEMPLATE_TOKENS);
 
-            final Configuration configuration = new Configuration();
-            configuration.setObjectWrapper(new DefaultObjectWrapper());
-            configuration.setDefaultEncoding("UTF-8");
-
-            configuration.setIncompatibleImprovements(new Version(2, 30, 0));
-            configuration.setClassForTemplateLoading(AttendeeChatService.class, "/com/twasyl/slideshowfx/html/");
+            final Configuration configuration = TemplateProcessor.getHtmlConfiguration();
 
             final Map tokenValues = new HashMap();
             tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_HOST_TOKEN).toString(), serverInfo.get(SlideshowFXServer.SHARED_DATA_HTTP_SERVER_HOST).toString());

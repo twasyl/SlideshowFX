@@ -20,6 +20,7 @@ import com.twasyl.slideshowfx.beans.chat.ChatMessage;
 import com.twasyl.slideshowfx.beans.chat.ChatMessageAction;
 import com.twasyl.slideshowfx.beans.chat.ChatMessageStatus;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.utils.TemplateProcessor;
 import freemarker.template.*;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
@@ -42,7 +43,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class AttendeeChatService extends Verticle {
     private static final Logger LOGGER = Logger.getLogger(AttendeeChatService.class.getName());
@@ -89,12 +90,7 @@ public class AttendeeChatService extends Verticle {
         .get("/slideshowfx/chat/js/chatService.js", request -> {
             final Map templateTokens = this.vertx.sharedData().getMap(SlideshowFXServer.SHARED_DATA_TEMPLATE_TOKENS);
 
-            final Configuration configuration = new Configuration();
-            configuration.setObjectWrapper(new DefaultObjectWrapper());
-            configuration.setDefaultEncoding("UTF-8");
-
-            configuration.setIncompatibleImprovements(new Version(2, 30, 0));
-            configuration.setClassForTemplateLoading(AttendeeChatService.class, "/com/twasyl/slideshowfx/js/");
+            final Configuration configuration = TemplateProcessor.getJsConfiguration();
 
             final Map tokenValues = new HashMap();
             tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_HOST_TOKEN).toString(), serverInfo.get(SlideshowFXServer.SHARED_DATA_HTTP_SERVER_HOST).toString());

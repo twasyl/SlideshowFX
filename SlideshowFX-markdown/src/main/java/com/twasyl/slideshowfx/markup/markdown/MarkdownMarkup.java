@@ -24,7 +24,7 @@ import com.twasyl.slideshowfx.markup.AbstractMarkup;
  * This markup language is identified byt the code <code>MARKDOWN</code> which is returned by {@link com.twasyl.slideshowfx.markup.IMarkup#getCode()}.
  *
  * @author Thierry Wasylczenko
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  * @version 1.0
  */
 public class MarkdownMarkup extends AbstractMarkup {

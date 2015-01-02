@@ -21,7 +21,7 @@ package com.twasyl.slideshowfx.controls.builder.elements;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class ArrayTemplateElement extends ListTemplateElement {
 

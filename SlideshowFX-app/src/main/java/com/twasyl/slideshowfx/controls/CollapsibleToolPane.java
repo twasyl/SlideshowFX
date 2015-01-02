@@ -35,7 +35,7 @@ import javafx.util.Duration;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class CollapsibleToolPane extends Region {
 

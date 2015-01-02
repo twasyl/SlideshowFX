@@ -26,7 +26,7 @@ import java.io.File;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class DirectoryTemplateElement extends FileTemplateElement {
 

@@ -24,7 +24,7 @@ import com.twasyl.slideshowfx.dao.PresentationDAO;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class DataServices {
     public static final String PRESENTATION_FOLDER = "presentation.folder";

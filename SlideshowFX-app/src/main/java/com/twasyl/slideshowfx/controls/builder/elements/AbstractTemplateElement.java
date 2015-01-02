@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public abstract class AbstractTemplateElement<T extends Object> extends HBox implements ITemplateElement<T> {
 

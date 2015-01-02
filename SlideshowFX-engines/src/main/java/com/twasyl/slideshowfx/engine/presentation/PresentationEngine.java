@@ -27,10 +27,7 @@ import com.twasyl.slideshowfx.engine.template.DynamicAttribute;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
-import com.twasyl.slideshowfx.utils.DOMUtils;
-import com.twasyl.slideshowfx.utils.JSONHelper;
-import com.twasyl.slideshowfx.utils.ResourceHelper;
-import com.twasyl.slideshowfx.utils.ZipUtils;
+import com.twasyl.slideshowfx.utils.*;
 import freemarker.template.*;
 import javafx.embed.swing.SwingFXUtils;
 import org.jsoup.Jsoup;
@@ -52,7 +49,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class PresentationEngine extends AbstractEngine<PresentationConfiguration> {
 
@@ -210,7 +207,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         final PresentationConfiguration configuration = this.readConfiguration();
         this.setConfiguration(configuration);
 
-        final Configuration templateConfiguration = this.buildTemplateConfiguration();
+        final Configuration templateConfiguration = TemplateProcessor.getDefaultConfiguration();
         templateConfiguration.setDirectoryForTemplateLoading(this.templateEngine.getConfiguration().getFile().getParentFile());
 
         final Map tokens = new HashMap<>();
@@ -318,7 +315,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         this.configuration = new PresentationConfiguration();
         this.configuration.setPresentationFile(new File(this.getWorkingDirectory(), PresentationConfiguration.DEFAULT_PRESENTATION_FILENAME));
 
-        final Configuration templateConfiguration = this.buildTemplateConfiguration();
+        final Configuration templateConfiguration = TemplateProcessor.getDefaultConfiguration();
         templateConfiguration.setDirectoryForTemplateLoading(this.templateEngine.getConfiguration().getFile().getParentFile());
 
         final Map tokens = new HashMap<>();
@@ -378,7 +375,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             }
         }
 
-        final Configuration templateConfiguration = this.buildTemplateConfiguration();
+        final Configuration templateConfiguration = TemplateProcessor.getDefaultConfiguration();
         templateConfiguration.setDirectoryForTemplateLoading(template.getFile().getParentFile());
 
         final Map tokens = new HashMap<>();
@@ -468,7 +465,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         }
 
         // Apply the templateConfiguration engine for replacing dynamic elements
-        final Configuration templateConfiguration = this.buildTemplateConfiguration();
+        final Configuration templateConfiguration = TemplateProcessor.getDefaultConfiguration();
         final Map originalContext = new HashMap<>();
         originalContext.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
         originalContext.put(TEMPLATE_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
@@ -655,14 +652,5 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private Configuration buildTemplateConfiguration() {
-        final Configuration templateConfiguration = new Configuration();
-        templateConfiguration.setObjectWrapper(new DefaultObjectWrapper());
-        templateConfiguration.setDefaultEncoding("UTF-8");
-        templateConfiguration.setIncompatibleImprovements(new Version(2, 3, 21));
-
-        return templateConfiguration;
     }
 }

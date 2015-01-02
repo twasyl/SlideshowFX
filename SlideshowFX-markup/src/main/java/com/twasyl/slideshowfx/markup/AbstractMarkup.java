@@ -23,7 +23,7 @@ package com.twasyl.slideshowfx.markup;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public abstract class AbstractMarkup implements IMarkup {
     protected String code;

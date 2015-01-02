@@ -31,7 +31,7 @@ import javafx.scene.layout.HBox;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class TextFieldCheckMenuItem extends CustomMenuItem {
 

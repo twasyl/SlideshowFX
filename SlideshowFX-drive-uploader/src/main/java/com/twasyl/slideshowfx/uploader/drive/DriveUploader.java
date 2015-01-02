@@ -179,15 +179,20 @@ public class DriveUploader extends AbstractUploader {
                     LOGGER.log(Level.SEVERE, "Can not find file to overwrite", e);
                 }
             } else {
-                final String nameWithoutExtension = engine.getArchive().getName().substring(0, engine.getArchive().getName().lastIndexOf("."));
-                final Calendar calendar = Calendar.getInstance();
-
                 body = new com.google.api.services.drive.model.File();
-                body.setTitle(String.format("%1$s %2$tF %2$tT.%3$s", nameWithoutExtension, calendar, engine.getArchiveExtension()));
                 body.setMimeType("application/zip");
                 body.setParents(Arrays.asList(new ParentReference()
-                                                .setId(((GoogleFile) folder).getId())
-                                             ));
+                                .setId(((GoogleFile) folder).getId())
+                ));
+
+                if(this.fileExists(engine, folder)) {
+                    final String nameWithoutExtension = engine.getArchive().getName().substring(0, engine.getArchive().getName().lastIndexOf("."));
+                    final Calendar calendar = Calendar.getInstance();
+
+                    body.setTitle(String.format("%1$s %2$tF %2$tT.%3$s", nameWithoutExtension, calendar, engine.getArchiveExtension()));
+                } else {
+                    body.setTitle(engine.getArchive().getName());
+                }
             }
 
             FileContent mediaContent = new FileContent("application/zip", engine.getArchive());

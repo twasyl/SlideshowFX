@@ -147,9 +147,13 @@ public class DropboxUploader extends AbstractUploader {
                 }
             } else {
                 writeMode = DbxWriteMode.add();
-                fileName.append(engine.getArchive().getName())
-                        .append(String.format(" %1$tF %1$tT"))
-                        .append(".").append(engine.getArchiveExtension());
+                if(this.fileExists(engine, folder)) {
+                    fileName.append(engine.getArchive().getName())
+                            .append(String.format(" %1$tF %1$tT"))
+                            .append(".").append(engine.getArchiveExtension());
+                } else {
+                    fileName.append(engine.getArchive().getName());
+                }
             }
 
             try(final InputStream archiveStream = new FileInputStream(engine.getArchive())) {

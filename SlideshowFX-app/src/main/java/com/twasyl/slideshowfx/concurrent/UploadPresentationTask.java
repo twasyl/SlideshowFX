@@ -19,8 +19,8 @@ package com.twasyl.slideshowfx.concurrent;
 import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
-import com.twasyl.slideshowfx.uploader.IUploader;
-import com.twasyl.slideshowfx.uploader.io.RemoteFile;
+import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
+import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import javafx.concurrent.Task;
 
 import java.io.FileNotFoundException;
@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 /**
  * This tasks uploads a SlideshowFX presentation to a given service. It takes a {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine}
- * that will be uploaded to a service represented by a {@link com.twasyl.slideshowfx.uploader.IUploader}. The
+ * that will be uploaded to a service represented by a {@link com.twasyl.slideshowfx.hosting.connector.IHostingConnector}. The
  * presentation is uploaded in the given {@code #destination} or at the root if it is {@code null}.
  * The user will also be asked to overwrite the presentation if already exists.
  * Nothing will be done if the user is not authenticated or if the user doesn't want to overwrite an existing file.
@@ -42,12 +42,12 @@ public class UploadPresentationTask extends Task<Void> {
     private static final Logger LOGGER = Logger.getLogger(SavePresentationTask.class.getName());
 
     private PresentationEngine engine;
-    private IUploader uploader;
+    private IHostingConnector hostingConnector;
     private RemoteFile destination;
 
-    public UploadPresentationTask(PresentationEngine engine, IUploader uploader, RemoteFile destination) {
+    public UploadPresentationTask(PresentationEngine engine, IHostingConnector hostingConnector, RemoteFile destination) {
         this.engine = engine;
-        this.uploader = uploader;
+        this.hostingConnector = hostingConnector;
         this.destination = destination;
     }
 
@@ -56,10 +56,10 @@ public class UploadPresentationTask extends Task<Void> {
 
         // Ensure the presentation has already been saved
         if(this.engine != null && this.engine.getArchive() != null
-                && this.uploader.isAuthenticated()) {
+                && this.hostingConnector.isAuthenticated()) {
 
             boolean overwrite = false;
-            boolean fileExist = this.uploader.fileExists(PresentationDAO.getInstance().getCurrentPresentation(), destination);
+            boolean fileExist = this.hostingConnector.fileExists(PresentationDAO.getInstance().getCurrentPresentation(), destination);
 
             if(fileExist) {
                 final String message = String.format("The '%1$s' presentation already exist in '%2$s'.\n Do you want to overwrite it?",
@@ -74,7 +74,7 @@ public class UploadPresentationTask extends Task<Void> {
                 this.cancelled();
             } else {
                 try {
-                    this.uploader.upload(this.engine, this.destination, overwrite);
+                    this.hostingConnector.upload(this.engine, this.destination, overwrite);
                     this.succeeded();
                 } catch (FileNotFoundException e) {
                     this.setException(e);
@@ -89,21 +89,21 @@ public class UploadPresentationTask extends Task<Void> {
     @Override
     protected void succeeded() {
         super.succeeded();
-        this.updateMessage("Presentation uploaded to " + this.uploader.getName());
+        this.updateMessage("Presentation uploaded to " + this.hostingConnector.getName());
         this.updateProgress(0, 0);
     }
 
     @Override
     protected void running() {
         super.running();
-        this.updateMessage("Uploading presentation to " + this.uploader.getName());
+        this.updateMessage("Uploading presentation to " + this.hostingConnector.getName());
         this.updateProgress(-1, 0);
     }
 
     @Override
     protected void failed() {
         super.failed();
-        this.updateMessage("Error while uploading the presentation to " + this.uploader.getName());
+        this.updateMessage("Error while uploading the presentation to " + this.hostingConnector.getName());
         this.updateProgress(0, 0);
         LOGGER.log(Level.SEVERE, "Can not upload the presentation", this.getException());
     }

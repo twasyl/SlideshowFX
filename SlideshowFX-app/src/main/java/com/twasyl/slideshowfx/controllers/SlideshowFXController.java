@@ -29,14 +29,14 @@ import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentatio
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
 import com.twasyl.slideshowfx.extension.ContentExtensionManager;
+import com.twasyl.slideshowfx.hosting.connector.HostingConnectorManager;
+import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
+import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
-import com.twasyl.slideshowfx.uploader.IUploader;
-import com.twasyl.slideshowfx.uploader.UploaderManager;
-import com.twasyl.slideshowfx.uploader.io.RemoteFile;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
@@ -73,10 +73,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 import javafx.util.Duration;
 import netscape.javascript.JSObject;
 import org.xml.sax.SAXException;
@@ -196,6 +193,7 @@ public class SlideshowFXController implements Initializable {
     @FXML private TaskProgressIndicator taskInProgress;
     @FXML private TextFieldCheckMenuItem autoSaveItem;
     @FXML private Menu uploadersMenu;
+    @FXML private Menu downloadersMenu;
 
     /**
      * Loads a SlideshowFX template. This method displays an open dialog which only allows to open template files (with
@@ -1064,10 +1062,13 @@ public class SlideshowFXController implements Initializable {
                 .or(this.fieldName.textProperty().isEmpty())
                 .or(this.markupContentType.selectedToggleProperty().isNull()));
 
-        // Create the entries in the Upload menu
-        UploaderManager.getInstalledUploaders().stream()
-                .sorted((uploader1, uploader2) -> uploader1.getName().compareTo(uploader2.getName()))
-                .forEach(uploader -> createUploaderMenuItem(uploader));
+        // Create the entries in the Upload & Download menus
+        HostingConnectorManager.getInstalledHostingConnectors().stream()
+                .sorted((hostingConnector1, hostingConnector2) -> hostingConnector1.getName().compareTo(hostingConnector2.getName()))
+                .forEach(hostingConnector -> {
+                    createUploaderMenuItem(hostingConnector);
+                    createDownloaderMenuItem(hostingConnector);
+                });
     }
 
     /**
@@ -1140,28 +1141,28 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
-     * Create the MenuItem that will be placed in the menu for uploaders, for the given {@code uploader}. The {@code uploader}
+     * Create the MenuItem that will be placed in the menu for uploaders, for the given {@code hostingConnector}. The {@code hostingConnector}
      * is set as user data of the created MenuItem. The created MenuItem is added to the Upload menu.
-     * @param uploader The uploader attached to the MenuItem that will be created.
-     * @return A MenuItem for the {@code uploader}
+     * @param hostingConnector The hostingConnector attached to the MenuItem that will be created.
+     * @return A MenuItem for the {@code hostingConnector}
      */
-    private MenuItem createUploaderMenuItem(final IUploader uploader) {
-        final MenuItem uploaderMenuItem = new MenuItem(uploader.getName());
-        uploaderMenuItem.setUserData(uploader);
+    private MenuItem createUploaderMenuItem(final IHostingConnector hostingConnector) {
+        final MenuItem uploaderMenuItem = new MenuItem(hostingConnector.getName());
+        uploaderMenuItem.setUserData(hostingConnector);
 
         uploaderMenuItem.setOnAction(event -> {
             PlatformHelper.run(() -> {
-                if (!uploader.isAuthenticated()) {
-                    uploader.authenticate();
+                if (!hostingConnector.isAuthenticated()) {
+                    hostingConnector.authenticate();
                 }
 
-                if (uploader.isAuthenticated()) {
+                if (hostingConnector.isAuthenticated()) {
                     // Prompts the user where to upload the presentation
-                    final RemoteFile destination = uploader.chooseDestinationFile();
+                    final RemoteFile destination = hostingConnector.chooseFile(true, false);
 
                     if(destination != null) {
                         final UploadPresentationTask task = new UploadPresentationTask(PresentationDAO.getInstance().getCurrentPresentation(),
-                                uploader, destination);
+                                hostingConnector, destination);
                         SlideshowFXController.this.taskInProgress.setCurrentTask(task);
                         TaskDAO.getInstance().startTask(task);
                     }
@@ -1172,6 +1173,66 @@ public class SlideshowFXController implements Initializable {
         this.uploadersMenu.getItems().add(uploaderMenuItem);
 
         return uploaderMenuItem;
+    }
+
+    /**
+     * Create the MenuItem that will be placed in the menu for downloaders, for the given {@code hostingConnector}. The {@code hostingConnector}
+     * is set as user data of the created MenuItem. The created MenuItem is added to the Download menu.
+     * @param hostingConnector The hostingConnector attached to the MenuItem that will be created.
+     * @return A MenuItem for the {@code hostingConnector}
+     */
+    private MenuItem createDownloaderMenuItem(final IHostingConnector hostingConnector) {
+        final MenuItem downloaderMenuItem = new MenuItem(hostingConnector.getName());
+        downloaderMenuItem.setUserData(hostingConnector);
+
+        downloaderMenuItem.setOnAction(event -> {
+            PlatformHelper.run(() -> {
+                if (!hostingConnector.isAuthenticated()) {
+                    hostingConnector.authenticate();
+                }
+
+                if (hostingConnector.isAuthenticated()) {
+                    // Prompts the user which file to download
+                    final RemoteFile presentationFile = hostingConnector.chooseFile(true, true);
+
+                    if (presentationFile != null) {
+                        // Prompts the user where the file should be downloaded
+                        final DirectoryChooser chooser = new DirectoryChooser();
+                        chooser.setTitle("Choose directory");
+
+                        final File directory = chooser.showDialog(null);
+
+                        if (directory != null) {
+                            final DownloadPresentationTask task = new DownloadPresentationTask(
+                                    hostingConnector, directory, presentationFile);
+                            task.stateProperty().addListener((value, oldState, newState) -> {
+                                if(newState == Worker.State.SUCCEEDED && task.getValue() != null) {
+
+                                    final Dialog.Response answer = Dialog.showConfirmDialog(SlideshowFX.getStage(),
+                                                    "Open file",
+                                                    String.format("Do you want to open '%1$s' ?", task.getValue()));
+
+                                    if(answer == Dialog.Response.YES) {
+                                        try {
+                                            this.openTemplateOrPresentation(task.getValue());
+                                        } catch (IOException | IllegalAccessException e) {
+                                            LOGGER.log(Level.SEVERE, "Error when opening file", e);
+                                        }
+                                    }
+                                }
+                            });
+                            SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+                            TaskDAO.getInstance().startTask(task);
+
+                        }
+                    }
+                }
+            });
+        });
+
+        this.downloadersMenu.getItems().add(downloaderMenuItem);
+
+        return downloaderMenuItem;
     }
 
     /**

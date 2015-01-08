@@ -20,11 +20,11 @@ import com.leapmotion.leap.Controller;
 import com.sun.javafx.PlatformUtil;
 import com.sun.javafx.application.LauncherImpl;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
+import com.twasyl.slideshowfx.hosting.connector.HostingConnectorManager;
 import com.twasyl.slideshowfx.io.DeleteFileVisitor;
 import com.twasyl.slideshowfx.leap.SlideshowFXLeapListener;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
-import com.twasyl.slideshowfx.uploader.UploaderManager;
 import javafx.application.Application;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -203,9 +203,9 @@ public class SlideshowFX extends Application {
         LOGGER.info("Closing the chat");
         if(SlideshowFXServer.getSingleton() != null) SlideshowFXServer.getSingleton().stop();
 
-        LOGGER.info("Disconnecting from all uploaders");
-        UploaderManager.getInstalledUploaders()
-                .forEach(uploader -> uploader.disconnect());
+        LOGGER.info("Disconnecting from all hosting connectors");
+        HostingConnectorManager.getInstalledHostingConnectors()
+                .forEach(hostingConnector -> hostingConnector.disconnect());
 
         LOGGER.info("Stopping the OSGi manager");
         OSGiManager.stop();

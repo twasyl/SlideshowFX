@@ -121,11 +121,11 @@ task installContentExtensionPlugins(dependsOn: [':SlideshowFX-alert-extension:ja
     }
 }
 
-task installUploaderPlugins(dependsOn : [':SlideshowFX-dropbox-uploader:jar',
-                                         ':SlideshowFX-drive-uploader:jar']) << {
+task installHostingConnectorPlugins(dependsOn : [':SlideshowFX-dropbox-hosting-connector:jar',
+                                         ':SlideshowFX-drive-hosting-connector:jar']) << {
     copy {
-        from project(':SlideshowFX-dropbox-uploader').tasks['jar'].archivePath
-        from project(':SlideshowFX-drive-uploader').tasks['jar'].archivePath
+        from project(':SlideshowFX-dropbox-hosting-connector').tasks['jar'].archivePath
+        from project(':SlideshowFX-drive-hosting-connector').tasks['jar'].archivePath
 
         into pluginsFolder
     }
@@ -134,7 +134,7 @@ task installUploaderPlugins(dependsOn : [':SlideshowFX-dropbox-uploader:jar',
 task installSlideshowFX(dependsOn : [':SlideshowFX-app:assemble',
                                      ':installMarkupPlugins',
                                      ':installContentExtensionPlugins',
-                                     ':installUploaderPlugins']) << {
+                                     ':installHostingConnectorPlugins']) << {
 }
 
 task buildGradleWrapper(type: Wrapper) {

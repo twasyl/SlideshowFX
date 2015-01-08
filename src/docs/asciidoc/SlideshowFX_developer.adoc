@@ -69,6 +69,26 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 |===
 
+=== Project structure
+
+SlideshowFX contains the following modules:
+
+- *SlideshowFX-app* which is the module for the desktop client of SlideshowFX ;
+- *SlideshowFX-utils* which defines utilities classes that may be used in other modules ;
+- *SlideshowFX-engines* which defines the engines that are used in SlideshowFX for working with templates and presentations ;
+- *SlideshowFX-controls* which defines the custom graphical controls that may be used in other modules ;
+- *SlideshowFX-markup* which defines the base classes for creating an OSGi module for supporting a new markup syntax in SlideshowFX to define slides' content ;
+- *SlideshowFX-asciidoctor* which defines the implementation of SlideshowFX-markup to define slides' content in asciidoctor ;
+- *SlideshowFX-html* which defines the implementation of SlideshowFX-markup to define slides' content in HTML ;
+- *SlideshowFX-markdown* which defines the implementation of SlideshowFX-markup to define slides' content in markdown ;
+- *SlideshowFX-textile* which defines the implementation of SlideshowFX-markup to define slides' content in textile ;
+- *SlideshowFX-content-extension* which defines the base classes for creating an OSGi module for inserting specific content in slides (like images, ...) ;
+- *SlideshowFX-alert-extension* which defines the implementation of SlideshowFX-content-extension to insert beautiful alerts in slides ;
+- *SlideshowFX-code-extension* which defines the implementation of SlideshowFX-content-extension to insert code in slides ;
+- *SlideshowFX-image-extension* which defines the implementation of SlideshowFX-content-extension to insert images in slides ;
+- *SlideshowFX-link-extension* which defines the implementation of SlideshowFX-content-extension to insert HTML links in slides ;
+- *SlideshowFX-quote-extension* which defines the implementation of SlideshowFX-content-extension to insert quotes in slides ;
+
 === Gradle
 
 SlideshowFX uses http://www.gradle.org/[gradle] as build system. The version used is {gradle-version}. +
@@ -81,12 +101,12 @@ The following plugins are currently used in the Gradle script:
 
 In order to build SlideshowFX, some gradle tasks have been created:
 
-- the `jar` task of the `SlideshowFX-app` project has been overriden in order to build the JavaFX native bundle ;
+- the `jar` task of the `SlideshowFX-app` project has been overridden in order to build the JavaFX native bundle ;
 - `buildJavaFXBundle` which depends on the JAR task has been created in the `SlideshowFX-app` project. This task creates the JavaFX bundle ;
 - `installMarkupPlugins` (in the root project) which copies the markup supported to the directory of plugins ;
 - `installContentExtensionPlugins` (in the root project) which copies the content extensions to the directory of plugins ;
-- `installUploaderPlugins` (in the root project) which copies the uploaders to the directory of plugins ;
-- `installSlideshowFX` (in the root project) which installs the markup, content extensions and uploaders in the directory of plugins and build the SlideshowFX native bundle.
+- `installHostingConnectorPlugins` (in the root project) which copies the hosting connectors to the directory of plugins ;
+- `installSlideshowFX` (in the root project) which installs the markup, content extensions and hosting connectors in the directory of plugins and build the SlideshowFX native bundle.
 
 === Set up your environment
 

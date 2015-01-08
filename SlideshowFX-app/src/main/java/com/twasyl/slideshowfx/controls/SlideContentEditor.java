@@ -16,15 +16,14 @@
 
 package com.twasyl.slideshowfx.controls;
 
-import com.sun.javafx.PlatformUtil;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

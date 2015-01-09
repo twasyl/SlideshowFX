@@ -16,18 +16,26 @@
 
 version = '1.0.0'
 
+ext {
+    wikitextDep = fileTree(dir: new File(allLibs, 'WikiText'), include: '*.jar')
+}
+
 dependencies {
     compile project(':SlideshowFX-markup')
-    compile felix
-    compile textile
+    compile felixDep
+    compile wikitextDep
 
-    testCompile junit
+    testCompile testngDep
 }
 
 jar {
-    from( textile.files ) {
-        include '*'
+    from(wikitextDep) {
+        include '**/*.jar'
     }
+
+    def bundleClasspath = ""
+    wikitextDep.each {file -> bundleClasspath += file.name + ","}
+    bundleClasspath += "."
 
     manifest {
         attributes('Manifest-Version': '1.0',
@@ -37,7 +45,7 @@ jar {
                 'Bundle-Description': 'Support Textile for defining slide\'s content',
                 'Bundle-Version': '1.0.0',
                 'Bundle-Activator': 'com.twasyl.slideshowfx.markup.textile.activator.TextileActivator',
-                'Bundle-ClassPath': 'org.eclipse.mylyn.wikitext.core_2.2.0.N20140811-1615.jar,org.eclipse.mylyn.wikitext.textile.core_2.2.0.N20140702-2138.jar,.',
+                'Bundle-ClassPath': bundleClasspath,
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.markup.textile,com.twasyl.slideshowfx.markup.textile.activator',
                 'Import-Package': 'org.osgi.framework')

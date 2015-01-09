@@ -51,21 +51,7 @@ task jar(overwrite: true) << {
 
         // Copying libs
         copy {
-            from(project(':SlideshowFX-utils').jar.archivePath)
-            from(project(':SlideshowFX-controls').jar.archivePath)
-            from(project(':SlideshowFX-engines').jar.archivePath)
-            from(project(':SlideshowFX-markup').jar.archivePath)
-            from(project(':SlideshowFX-content-extension').jar.archivePath)
-            from(project(':SlideshowFX-hosting-connector').jar.archivePath)
-            from(felix.files)
-            from(freemarker.files)
-            from(jsoup.files)
-            from(leapmotion.files)
-            from(scribe.files)
-            from(twitter.files)
-            from(vertx.files)
-            from(zxing.files)
-
+            from configurations.compile
             into(libsDir)
         }
 
@@ -104,17 +90,15 @@ dependencies {
     compile project(':SlideshowFX-content-extension')
     compile project(':SlideshowFX-hosting-connector')
 
-    compile felix
-    compile freemarker
-    compile jsoup
-    compile leapmotion
-    compile scribe
-    compile twitter
-    compile vertx
-    compile zxing
+    compile felixDep
+    compile freemarkerDep
+    compile jsoupDep
+    compile leapmotionDep
+    compile twitter4jDep
+    compile vertxDep
+    compile zxingDep
 
-    testCompile hamcrest
-    testCompile  junit
+    testCompile testngDep
 }
 
 tasks['jar'].dependsOn 'classes'

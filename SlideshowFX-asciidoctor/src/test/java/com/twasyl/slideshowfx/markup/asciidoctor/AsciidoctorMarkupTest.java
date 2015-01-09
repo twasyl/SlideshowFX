@@ -16,8 +16,8 @@
 
 package com.twasyl.slideshowfx.markup.asciidoctor;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Performs tests for the Asciidoctor markup syntax.
@@ -37,7 +37,5 @@ public class AsciidoctorMarkupTest {
     public void testSimpleSyntax() {
         final String source = "==== Template configuration file";
         final String result = markup.convertAsHtml(source);
-
-        System.out.println(result);
     }
 }

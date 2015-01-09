@@ -23,6 +23,4 @@ repositories {
 dependencies {
     compile project(':SlideshowFX-controls')
     compile project(':SlideshowFX-engines')
-
-    testCompile "org.testng:testng:6.8.8"
 }

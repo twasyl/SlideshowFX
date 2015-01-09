@@ -19,25 +19,25 @@
 version = '1.0.0'
 
 ext {
-    dropbox = fileTree(dir: allLibs, include: 'dropbox/*.jar')
-    jackson = fileTree(dir: allLibs, include: 'Vert.x/jackson-core-2.2.2.jar')
+    dropboxDep = ['com.dropbox.core:dropbox-core-sdk:1.7.7', 'com.fasterxml.jackson.core:jackson-core:2.2.2']
 }
 
 dependencies {
     compile project(':SlideshowFX-hosting-connector')
 
-    compile felix
-    compile dropbox
-    compile jackson
+    compile felixDep
+    compile dropboxDep
 }
 
 jar {
-    from( dropbox.files ) {
+    def dependenciesFiles = configurations.compile.files { dep -> dep.name == 'dropbox-core-sdk' || dep.name == 'jackson-core' }
+    from(dependenciesFiles) {
         include '*'
     }
-    from( jackson.files ) {
-        include '*'
-    }
+
+    def bundleClasspath = ""
+    dependenciesFiles.each {file -> bundleClasspath += file.name + ","}
+    bundleClasspath += "."
 
     manifest {
         attributes('Manifest-Version': '1.0',
@@ -47,7 +47,7 @@ jar {
                 'Bundle-Description': 'Support for connecting to Dropbox',
                 'Bundle-Version': version,
                 'Bundle-Activator': 'com.twasyl.slideshowfx.hosting.connector.dropbox.activator.DropboxHostingConnectorActivator',
-                'Bundle-ClassPath': 'jackson-core-2.2.2.jar,dropbox-core-sdk-1.7.7.jar,.',
+                'Bundle-ClassPath': bundleClasspath,
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.hosting.connector.dropbox,com.twasyl.slideshowfx.hosting.connector.dropbox.activator',
                 'Import-Package': 'org.osgi.framework')

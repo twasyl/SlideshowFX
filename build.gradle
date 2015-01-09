@@ -17,6 +17,7 @@
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
     }
 
     dependencies {
@@ -29,26 +30,26 @@ subprojects {
     apply plugin: 'java'
 
     sourceCompatibility = 1.8
-    targetCompatibility= 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
 }
 
 apply plugin: 'org.asciidoctor.gradle.asciidoctor'
 
 ext {
 	allLibs = new File(rootDir, '/lib')
-    asciidoctorj = fileTree(dir: allLibs, include: 'asciidoctorj/*.jar')
-	felix = fileTree(dir: allLibs, include: 'Felix/*.jar')
-    freemarker = fileTree(dir: allLibs, include: 'freemarker/*.jar')
-    hamcrest = fileTree(dir: allLibs, include: 'hamcrest-core-1.3.jar')
-	jsoup = fileTree(dir: allLibs, include: 'jsoup-1.8.1.jar')
-	junit = fileTree(dir: allLibs, include: 'junit-4.11.jar')
-	leapmotion = fileTree(dir: allLibs, include: 'Leap/*')
-	markdown = fileTree(dir: allLibs, include: 'markdown/*.jar')
-	scribe = fileTree(dir: allLibs, include: 'Scribe/*.jar')
-    twitter = fileTree(dir: allLibs, include: 'Twitter/*.jar')
-	textile = fileTree(dir: allLibs, include: 'WikiText/*.jar')
-	vertx = fileTree(dir: allLibs, include: 'Vert.x/*.jar')		
-	zxing = fileTree(dir: allLibs, include: 'ZXing/*.jar')
+	leapmotionDep = fileTree(dir: allLibs, include: 'Leap/*')
+    felixDep = 'org.apache.felix:org.apache.felix.framework:4.4.1@jar'
+    freemarkerDep = 'org.freemarker:freemarker:2.3.21@jar'
+    jsoupDep = 'org.jsoup:jsoup:1.8.1@jar'
+    twitter4jDep = ['org.twitter4j:twitter4j-core:4.0.2@jar', 'org.twitter4j:twitter4j-stream:4.0.2@jar']
+    vertxDep = ['io.vertx:vertx-core:2.1.5@jar', 'io.vertx:vertx-platform:2.1.5@jar', 'io.netty:netty-all:4.0.21.Final', 'com.fasterxml.jackson.core:jackson-core:2.2.2', 'com.fasterxml.jackson.core:jackson-databind:2.2.2', 'com.fasterxml.jackson.core:jackson-annotations:2.2.2']
+    zxingDep = ['com.google.zxing:core:3.1.0@jar', 'com.google.zxing:javase:3.1.0@jar']
+    testngDep = 'org.testng:testng:6.8.13@jar'
 
 	jdk = System.env.'JAVA_HOME'
 

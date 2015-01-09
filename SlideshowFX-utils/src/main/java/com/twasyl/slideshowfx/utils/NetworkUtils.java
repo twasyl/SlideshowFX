@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Provides utility methods for working with IP address.
@@ -76,7 +78,7 @@ public class NetworkUtils {
     }
 
     /**
-     * Get IP addresses for every {@link java.net.NetworkInterface} on the machine. This method never returns {@code null}.
+     * Get IPv4 addresses for every {@link java.net.NetworkInterface} on the machine. This method never returns {@code null}.
      * If no interfaces are found, an empty list is returned.
      * The list of addresses is sorted lexicographically.
      *
@@ -85,7 +87,11 @@ public class NetworkUtils {
     public static List<String> getIPs() {
         final List<String> ips = new ArrayList<>();
 
+        final String ipAddressRegex = "[1-9][0-9]{0,2}\\.[0-9]{0,3}\\.[0-9]{0,3}\\.[0-9]{0,3}";
+        final Pattern ipAddressPattern = Pattern.compile(ipAddressRegex);
         final Enumeration<NetworkInterface> interfaces;
+        Matcher ipAddressMatcherMatcher;
+
         try {
             interfaces = NetworkInterface.getNetworkInterfaces();
 
@@ -98,7 +104,9 @@ public class NetworkUtils {
                 while(inetAddresses.hasMoreElements()) {
                     inet = inetAddresses.nextElement();
 
-                    ips.add(inet.getHostAddress());
+                    ipAddressMatcherMatcher = ipAddressPattern.matcher(inet.getHostAddress());
+
+                    if(ipAddressMatcherMatcher.matches()) ips.add(inet.getHostAddress());
                 }
             }
 

@@ -88,6 +88,9 @@ SlideshowFX contains the following modules:
 - *SlideshowFX-image-extension* which defines the implementation of SlideshowFX-content-extension to insert images in slides ;
 - *SlideshowFX-link-extension* which defines the implementation of SlideshowFX-content-extension to insert HTML links in slides ;
 - *SlideshowFX-quote-extension* which defines the implementation of SlideshowFX-content-extension to insert quotes in slides ;
+- *SlideshowFX-hosting-connector* which defines the base classes for creating an OSGi module for connecting to a file hosting service ;
+- *SlideshowFX-dropbox-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Dropbox ;
+- *SlideshowFX-drive-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Google Drive.
 
 === Gradle
 

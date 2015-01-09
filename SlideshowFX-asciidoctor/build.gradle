@@ -16,19 +16,27 @@
 
 version = '1.0.0'
 
+ext {
+    asciidoctorjDep = ['org.asciidoctor:asciidoctorj:1.5.2', 'org.slf4j:slf4j-simple:1.7.7']
+}
+
 dependencies {
     compile project(':SlideshowFX-markup')
-    compile felix
-    compile asciidoctorj
+    compile felixDep
+    compile asciidoctorjDep
 
-    testCompile junit
-    testCompile hamcrest
+    testCompile testngDep
 }
 
 jar {
-    from( asciidoctorj.files ) {
+    def dependenciesFiles = configurations.compile.files { dep -> dep.name == 'asciidoctorj' || dep.name == 'slf4j-simple' }
+    from(dependenciesFiles) {
         include '*'
     }
+
+    def bundleClasspath = ""
+    dependenciesFiles.each {file -> bundleClasspath += file.name + ","}
+    bundleClasspath += "."
 
     manifest {
         attributes('Manifest-Version': '1.0',
@@ -38,7 +46,7 @@ jar {
                 'Bundle-Description': 'Support asscidoctor for defining slide\'s content',
                 'Bundle-Version': '1.0.0',
                 'Bundle-Activator': 'com.twasyl.slideshowfx.markup.asciidoctor.activator.AsciidoctorActivator',
-                'Bundle-ClassPath': 'slf4j-api-1.7.7.jar,slf4j-simple-1.7.7.jar,jruby-complete-1.7.18.jar,asciidoctorj-1.5.2.jar,.',
+                'Bundle-ClassPath': bundleClasspath,
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.markup.asciidoctor,com.twasyl.slideshowfx.markup.asciidoctor.activator',
                 'Import-Package': 'org.osgi.framework')

@@ -17,7 +17,9 @@
 version = '1.0.0'
 
 dependencies {
-    compile freemarker
-    compile jsoup
-    compile vertx
+    compile freemarkerDep
+    compile jsoupDep
+    compile vertxDep
+
+    testCompile testngDep
 }

@@ -16,9 +16,9 @@
 
 package com.twasyl.slideshowfx.beans.quizz;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Perform tests on a quizz.

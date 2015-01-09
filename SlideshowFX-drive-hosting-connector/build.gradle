@@ -17,27 +17,24 @@
 version = '1.0.0'
 
 ext {
-    drive = fileTree(dir: allLibs, include: 'google-drive/*.jar')
+    drive = 'com.google.apis:google-api-services-drive:v2-rev155-1.19.1'
 }
 
 dependencies {
     compile project(':SlideshowFX-hosting-connector')
 
-    compile felix
+    compile felixDep
     compile drive
 }
 
 jar {
-    from( drive.files ) {
+    def dependenciesFiles = configurations.compile.files { dep -> dep.name == 'google-api-services-drive' }
+    from(dependenciesFiles) {
         include '*'
     }
 
     def bundleClasspath = ""
-
-    drive.each {
-        f -> bundleClasspath += f.name + ","
-    }
-
+    dependenciesFiles.each {file -> bundleClasspath += file.name + ","}
     bundleClasspath += "."
 
     manifest {

@@ -20,5 +20,5 @@ dependencies {
     compile project(':SlideshowFX-utils')
     compile project(':SlideshowFX-content-extension')
 
-    compile freemarker
+    compile freemarkerDep
 }

@@ -16,7 +16,7 @@
 
 package com.twasyl.slideshowfx.markup.textile;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 /**
  * @author Thierry Wasylczenko

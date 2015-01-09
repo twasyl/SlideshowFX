@@ -18,14 +18,16 @@ package com.twasyl.slideshowfx.io;
 
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.utils.ZipUtils;
-import org.junit.*;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Ignore
 public class ZipTest {
 
     private static final Logger LOGGER = Logger.getLogger(ZipTest.class.getName());
@@ -70,7 +72,7 @@ public class ZipTest {
 
     }
 
-    @Test
+    @Test(enabled = false)
     public void unzipRevealjsTemplate() throws IOException {
         try {
             templateEngine.loadArchive(revealjsTemplateFile);
@@ -80,12 +82,12 @@ public class ZipTest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void zipRevealjsTemplateFolder() throws IOException {
         ZipUtils.zip(reveljsTemplateFolder, revealjsTemplateFile);
     }
 
-    @Test
+    @Test(enabled = false)
     public void unzipImpressjsTemplate() throws IOException {
         try {
             templateEngine.loadArchive(impressjsTemplateFile);
@@ -95,12 +97,12 @@ public class ZipTest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void zipImpressjsTemplateFolder() throws IOException {
         ZipUtils.zip(impressjsTemplateFolder, impressjsTemplateFile);
     }
 
-    @Test
+    @Test(enabled = false)
     public void unzipBespokejsTemplate() throws IOException {
         try {
             templateEngine.loadArchive(bespokejsTemplateFile);
@@ -110,12 +112,12 @@ public class ZipTest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void zipBespokejsTemplateFolder() throws IOException {
         ZipUtils.zip(bespokejsTemplateFolder, bespokejsTemplateFile);
     }
 
-    @Test
+    @Test(enabled = false)
     public void zipPresentationExample() throws IOException {
         ZipUtils.zip(presentationExampleFolder, presentationExampleFile);
     }

@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-
-
 version = '1.0.0'
-
-ext {
-    dropboxDep = ['com.dropbox.core:dropbox-core-sdk:1.7.7', 'com.fasterxml.jackson.core:jackson-core:2.2.2']
-}
 
 dependencies {
     compile project(':SlideshowFX-hosting-connector')
 
-    compile felixDep
-    compile dropboxDep
+    compile libraries.felix
+    compile libraries.dropbox
 }
 
 jar {

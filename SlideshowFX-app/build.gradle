@@ -52,22 +52,15 @@ task jar(overwrite: true) << {
         // Copying libs
         copy {
             from configurations.compile
-            into(libsDir)
-        }
-
-        copy {
             from(fileTree(dir: allLibs, include: "Leap/", exclude: "**/LeapJava.jar"))
 
             into(libsDir)
         }
 
         def classpath = ""
-
-        fileTree(dir: libsDir, include: '*.jar', exclude: archivesBaseName + ".jar").each {
-            f ->
-                classpath += f.name + ","
-        }
-
+        configurations.compile.asFileTree
+                .filter {file -> file.name != archivesBaseName + '.jar' || file.name.endsWith('.jar') }
+                .each {f -> classpath += f.name + ','}
         classpath += "."
 
         ant.resourceIncludePattern = classpath
@@ -90,15 +83,15 @@ dependencies {
     compile project(':SlideshowFX-content-extension')
     compile project(':SlideshowFX-hosting-connector')
 
-    compile felixDep
-    compile freemarkerDep
-    compile jsoupDep
-    compile leapmotionDep
-    compile twitter4jDep
-    compile vertxDep
-    compile zxingDep
+    compile libraries.felix
+    compile libraries.freemarker
+    compile libraries.jsoup
+    compile libraries.leapmotion
+    compile libraries.twitter4j
+    compile libraries.vertx
+    compile libraries.zxing
 
-    testCompile testngDep
+    testCompile libraries.testng
 }
 
 tasks['jar'].dependsOn 'classes'

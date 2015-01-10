@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-
-
 version = '1.0.0'
 
 dependencies {
     compile project(':SlideshowFX-content-extension')
-    compile felixDep
+    compile libraries.felix
 }
 
 jar {

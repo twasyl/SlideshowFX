@@ -16,14 +16,11 @@
 
 version = '1.0.0'
 
-ext {
-    markdownDep = 'com.github.rjeschke:txtmark:0.11'
-}
-
 dependencies {
     compile project(':SlideshowFX-markup')
-    compile felixDep
-    compile markdownDep
+
+    compile libraries.felix
+    compile libraries.markdown
 }
 
 jar {

@@ -16,15 +16,11 @@
 
 version = '1.0.0'
 
-ext {
-    drive = 'com.google.apis:google-api-services-drive:v2-rev155-1.19.1'
-}
-
 dependencies {
     compile project(':SlideshowFX-hosting-connector')
 
-    compile felixDep
-    compile drive
+    compile libraries.felix
+    compile libraries.drive
 }
 
 jar {

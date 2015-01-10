@@ -16,25 +16,21 @@
 
 version = '1.0.0'
 
-ext {
-    wikitextDep = fileTree(dir: new File(allLibs, 'WikiText'), include: '*.jar')
-}
-
 dependencies {
     compile project(':SlideshowFX-markup')
-    compile felixDep
-    compile wikitextDep
+    compile libraries.felix
+    compile libraries.wikitext
 
-    testCompile testngDep
+    testCompile libraries.testng
 }
 
 jar {
-    from(wikitextDep) {
+    from(libraries.wikitext) {
         include '**/*.jar'
     }
 
     def bundleClasspath = ""
-    wikitextDep.each {file -> bundleClasspath += file.name + ","}
+    libraries.wikitext.each {file -> bundleClasspath += file.name + ","}
     bundleClasspath += "."
 
     manifest {

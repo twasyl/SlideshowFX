@@ -28,6 +28,7 @@ buildscript {
 
 subprojects {
     apply plugin: 'java'
+    group = "com.twasyl.slideshowfx"
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -42,20 +43,28 @@ apply plugin: 'org.asciidoctor.gradle.asciidoctor'
 
 ext {
 	allLibs = new File(rootDir, '/lib')
-	leapmotionDep = fileTree(dir: allLibs, include: 'Leap/*')
-    felixDep = 'org.apache.felix:org.apache.felix.framework:4.4.1@jar'
-    freemarkerDep = 'org.freemarker:freemarker:2.3.21@jar'
-    jsoupDep = 'org.jsoup:jsoup:1.8.1@jar'
-    twitter4jDep = ['org.twitter4j:twitter4j-core:4.0.2@jar', 'org.twitter4j:twitter4j-stream:4.0.2@jar']
-    vertxDep = ['io.vertx:vertx-core:2.1.5@jar', 'io.vertx:vertx-platform:2.1.5@jar', 'io.netty:netty-all:4.0.21.Final', 'com.fasterxml.jackson.core:jackson-core:2.2.2', 'com.fasterxml.jackson.core:jackson-databind:2.2.2', 'com.fasterxml.jackson.core:jackson-annotations:2.2.2']
-    zxingDep = ['com.google.zxing:core:3.1.0@jar', 'com.google.zxing:javase:3.1.0@jar']
-    testngDep = 'org.testng:testng:6.8.13@jar'
-
 	jdk = System.env.'JAVA_HOME'
 
     pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
     felixCacheFolder = new File(System.getProperty("user.home"), '.SlideshowFX/felix-cache')
 }
+
+ext.libraries = [
+    asciidoctorj: ['org.asciidoctor:asciidoctorj:1.5.2', 'org.slf4j:slf4j-simple:1.7.7'],
+    drive: 'com.google.apis:google-api-services-drive:v2-rev155-1.19.1',
+    dropbox:  ['com.dropbox.core:dropbox-core-sdk:1.7.7', 'com.fasterxml.jackson.core:jackson-core:2.2.2'],
+    felix: 'org.apache.felix:org.apache.felix.framework:4.4.1@jar',
+    freemarker: 'org.freemarker:freemarker:2.3.21@jar',
+    jsoup: 'org.jsoup:jsoup:1.8.1@jar',
+    leapmotion: fileTree(dir: allLibs, include: 'Leap/*'),
+    markdown: 'com.github.rjeschke:txtmark:0.11',
+    wikitext: fileTree(dir: new File(allLibs, 'WikiText'), include: '*.jar'),
+    twitter4j: ['org.twitter4j:twitter4j-core:4.0.2@jar', 'org.twitter4j:twitter4j-stream:4.0.2@jar'],
+    vertx: ['io.vertx:vertx-core:2.1.5@jar', 'io.vertx:vertx-platform:2.1.5@jar', 'io.netty:netty-all:4.0.21.Final', 'com.fasterxml.jackson.core:jackson-core:2.2.2', 'com.fasterxml.jackson.core:jackson-databind:2.2.2', 'com.fasterxml.jackson.core:jackson-annotations:2.2.2'],
+    zxing: ['com.google.zxing:core:3.1.0@jar', 'com.google.zxing:javase:3.1.0@jar'],
+
+    testng: 'org.testng:testng:6.8.13@jar'
+]
 
 asciidoctor {
     outputDir = new File("$buildDir/docs/asciidoctor")

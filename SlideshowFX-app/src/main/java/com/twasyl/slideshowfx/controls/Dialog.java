@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Thierry Wasylczenko
+ * Copyright 2015 Thierry Wasylczenko
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,6 +132,27 @@ public class Dialog extends Stage {
 
         setButtonAction(yesButton, Response.YES, dialog);
         setButtonAction(noButton, Response.NO, dialog);
+
+        dialog.showDialog();
+
+        return dialog.getUserResponse();
+    }
+
+    public static Response showConfirmCancellableDialog(Stage owner, String title, String message) {
+        final Button yesButton = new Button("Yes");
+        yesButton.requestFocus();
+        final Button noButton = new Button("No");
+        final Button cancelButton = new Button("Cancel");
+
+        final Text messageText = new Text(message);
+        messageText.setWrappingWidth(300);
+        messageText.setStyle("-fx-fill: white;");
+
+        final Dialog dialog = buildDialog(owner, title, StageStyle.UTILITY, Modality.APPLICATION_MODAL, messageText, cancelButton, noButton, yesButton);
+
+        setButtonAction(yesButton, Response.YES, dialog);
+        setButtonAction(noButton, Response.NO, dialog);
+        setButtonAction(cancelButton, Response.CANCEL, dialog);
 
         dialog.showDialog();
 

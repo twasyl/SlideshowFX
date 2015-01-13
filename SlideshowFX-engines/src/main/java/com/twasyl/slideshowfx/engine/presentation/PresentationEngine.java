@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Thierry Wasylczenko
+ * Copyright 2015 Thierry Wasylczenko
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.vertx.java.core.json.JsonObject;
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;

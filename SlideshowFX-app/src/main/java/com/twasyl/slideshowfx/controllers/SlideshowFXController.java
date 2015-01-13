@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Thierry Wasylczenko
+ * Copyright 2015 Thierry Wasylczenko
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,13 @@ import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
+import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
+import com.twasyl.slideshowfx.utils.concurrent.actions.DisableAction;
+import com.twasyl.slideshowfx.utils.concurrent.actions.EnableAction;
 import javafx.application.Platform;
 import javafx.beans.property.adapter.JavaBeanObjectProperty;
 import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
+import javafx.collections.ObservableList;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
@@ -85,6 +89,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -194,7 +200,9 @@ public class SlideshowFXController implements Initializable {
     @FXML private TextFieldCheckMenuItem autoSaveItem;
     @FXML private Menu uploadersMenu;
     @FXML private Menu downloadersMenu;
-
+    @FXML private ObservableList<Object> saveElementsGroup;
+    @FXML private ObservableList<Object> openElementsGroup;
+    @FXML private ObservableList<Object> whenNoDocumentOpened;
     /**
      * Loads a SlideshowFX template. This method displays an open dialog which only allows to open template files (with
      * .sfxt archiveExtension) and then call the {@link #openTemplateOrPresentation(java.io.File)} method.
@@ -264,6 +272,13 @@ public class SlideshowFXController implements Initializable {
         }
 
         if(loadingTask != null) {
+            TaskAction.forTask(loadingTask)
+                    .when().stateIs(Worker.State.RUNNING).perform(DisableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.READY).perform(DisableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.SUCCEEDED).perform(EnableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.FAILED).perform(EnableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.CANCELLED).perform(EnableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup));
+
             this.taskInProgress.setCurrentTask(loadingTask);
             loadingTask.stateProperty().addListener((value, oldState, newState) -> {
                 if(newState != null && (
@@ -537,6 +552,11 @@ public class SlideshowFXController implements Initializable {
             this.presentationEngine.setArchive(archiveFile);
 
             final Task saveTask = new SavePresentationTask(this.presentationEngine);
+            TaskAction.forTask(saveTask)
+                    .when().stateIs(Worker.State.RUNNING).perform(DisableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.SUCCEEDED).perform(EnableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.FAILED).perform(EnableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.CANCELLED).perform(EnableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup));
             this.taskInProgress.setCurrentTask(saveTask);
 
             TaskDAO.getInstance().startTask(saveTask);
@@ -1062,6 +1082,20 @@ public class SlideshowFXController implements Initializable {
                 .or(this.fieldName.textProperty().isEmpty())
                 .or(this.markupContentType.selectedToggleProperty().isNull()));
 
+        // We use reflection to disable all elements present in the list
+        this.whenNoDocumentOpened.forEach(element -> {
+            try {
+                final Method setDisable = element.getClass().getMethod("setDisable", boolean.class);
+                setDisable.invoke(element, true);
+            } catch (NoSuchMethodException e) {
+                LOGGER.log(Level.FINE, "No setDisableMethod found", e);
+            } catch (InvocationTargetException e) {
+                LOGGER.log(Level.WARNING, "Can not disable element", e);
+            } catch (IllegalAccessException e) {
+                LOGGER.log(Level.WARNING, "Can not disable element", e);
+            }
+        });
+
         // Create the entries in the Upload & Download menus
         HostingConnectorManager.getInstalledHostingConnectors().stream()
                 .sorted((hostingConnector1, hostingConnector2) -> hostingConnector1.getName().compareTo(hostingConnector2.getName()))
@@ -1206,13 +1240,13 @@ public class SlideshowFXController implements Initializable {
                             final DownloadPresentationTask task = new DownloadPresentationTask(
                                     hostingConnector, directory, presentationFile);
                             task.stateProperty().addListener((value, oldState, newState) -> {
-                                if(newState == Worker.State.SUCCEEDED && task.getValue() != null) {
+                                if (newState == Worker.State.SUCCEEDED && task.getValue() != null) {
 
                                     final Dialog.Response answer = Dialog.showConfirmDialog(SlideshowFX.getStage(),
-                                                    "Open file",
-                                                    String.format("Do you want to open '%1$s' ?", task.getValue()));
+                                            "Open file",
+                                            String.format("Do you want to open '%1$s' ?", task.getValue()));
 
-                                    if(answer == Dialog.Response.YES) {
+                                    if (answer == Dialog.Response.YES) {
                                         try {
                                             this.openTemplateOrPresentation(task.getValue());
                                         } catch (IOException | IllegalAccessException e) {

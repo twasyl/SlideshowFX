@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ Copyright 2014 Thierry Wasylczenko
+  ~ Copyright 2015 Thierry Wasylczenko
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 <?import javafx.scene.web.WebView?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
+<?import javafx.collections.FXCollections?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
@@ -33,22 +34,179 @@
     </stylesheets>
 
     <fx:define>
+        <!-- Global variables -->
         <Double fx:id="TOOLBAR_ICON_WIDTH" fx:value="20" />
         <Double fx:id="TOOLBAR_ICON_HEIGHT" fx:value="20" />
+
+        <!-- Global Menus & MenuItems -->
+        <MenuItem fx:id="newMenuItem" text="New" onAction="#loadTemplate" />
+        <MenuItem fx:id="openMenuItem" text="Open" onAction="#openPresentation" />
+        <MenuItem fx:id="saveMenuItem" text="Save" onAction="#save" />
+        <MenuItem fx:id="saveAsMenuItem" text="Save as ..." onAction="#saveAs" />
+        <Menu fx:id="downloadersMenu" text="Download from" />
+        <Menu fx:id="uploadersMenu" text="Upload to" />
+        <MenuItem fx:id="editCurrentTemplateMenuItem" text="Edit current template" onAction="#editTemplate" />
+        <MenuItem fx:id="openCurrentWorkingDirMenuItem" text="Open current working directory" onAction="#openWorkingDirectory" />
+
+        <!-- Global ToolBar buttons -->
+        <Button fx:id="openPresentation" onAction="#openPresentation" styleClass="image">
+            <tooltip>
+                <Tooltip text="Open presentation" />
+            </tooltip>
+            <graphic>
+                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                    <Image url="@/com/twasyl/slideshowfx/images/open.png" />
+                </ImageView>
+            </graphic>
+        </Button>
+
+        <SplitMenuButton fx:id="saveButton" onAction="#save">
+            <tooltip>
+                <Tooltip text="Save" />
+            </tooltip>
+            <items>
+                <MenuItem text="Save as ..." onAction="#saveAs" />
+            </items>
+        </SplitMenuButton>
+
+        <Button fx:id="printPresentation" onAction="#print" styleClass="image">
+            <tooltip>
+                <Tooltip text="Print" />
+            </tooltip>
+            <graphic>
+                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                    <Image url="@/com/twasyl/slideshowfx/images/print.png" />
+                </ImageView>
+            </graphic>
+        </Button>
+
+        <SplitMenuButton fx:id="addSlideButton">
+            <tooltip>
+                <Tooltip text="Add slide" />
+            </tooltip>
+        </SplitMenuButton>
+
+        <Button fx:id="copySlide" onAction="#copySlide" styleClass="image">
+            <tooltip>
+                <Tooltip text="Copy slide" />
+            </tooltip>
+            <graphic>
+                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                    <Image url="@/com/twasyl/slideshowfx/images/copy.png" />
+                </ImageView>
+            </graphic>
+        </Button>
+
+        <SplitMenuButton fx:id="moveSlideButton">
+            <tooltip>
+                <Tooltip  text="Move slide" />
+            </tooltip>
+        </SplitMenuButton>
+
+        <Button fx:id="deleteSlide" onAction="#deleteSlide" styleClass="image">
+            <tooltip>
+                <Tooltip text="Delete slide" />
+            </tooltip>
+            <graphic>
+                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                    <Image url="@/com/twasyl/slideshowfx/images/delete.png" />
+                </ImageView>
+            </graphic>
+        </Button>
+
+        <Button fx:id="reloadPresentation" onAction="#reload" styleClass="image">
+            <tooltip>
+                <Tooltip text="Reload" />
+            </tooltip>
+            <graphic>
+                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                    <Image url="@/com/twasyl/slideshowfx/images/reload.png" />
+                </ImageView>
+            </graphic>
+        </Button>
+
+        <Button fx:id="slideshow" onAction="#slideShow" styleClass="image">
+            <tooltip>
+                <Tooltip text="Slideshow" />
+            </tooltip>
+            <graphic>
+                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                    <Image url="@/com/twasyl/slideshowfx/images/slideshow.png" />
+                </ImageView>
+            </graphic>
+        </Button>
+
+        <!-- Content extension toolbar -->
+        <ToolBar fx:id="contentExtensionToolBar">
+            <Button onAction="#insertQuizz" styleClass="image">
+                <tooltip>
+                    <Tooltip text="Insert a quizz" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/quizz.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+        </ToolBar>
+
+        <!-- The container hosting all installed markup syntax for defining slide content -->
+        <HBox spacing="10" fx:id="markupContentTypeBox" alignment="BASELINE_LEFT">
+            <Label text="Content:" />
+        </HBox>
+
+        <!-- Elements indicating which part of the slide is being edited -->
+        <TextField fx:id="slideNumber" prefColumnCount="3" />
+        <TextField fx:id="fieldName" prefColumnCount="15" />
+
+        <!-- Lists of controls -->
+        <FXCollections fx:id="openElementsGroup" fx:factory="observableArrayList">
+            <fx:reference source="newMenuItem" />
+            <fx:reference source="openMenuItem" />
+            <fx:reference source="openPresentation" />
+            <fx:reference source="downloadersMenu" />
+        </FXCollections>
+
+        <FXCollections fx:id="saveElementsGroup" fx:factory="observableArrayList">
+            <fx:reference source="saveMenuItem" />
+            <fx:reference source="saveAsMenuItem" />
+            <fx:reference source="saveButton" />
+            <fx:reference source="uploadersMenu" />
+        </FXCollections>
+
+        <FXCollections fx:id="whenNoDocumentOpened" fx:factory="observableArrayList">
+            <fx:reference source="saveMenuItem" />
+            <fx:reference source="saveAsMenuItem" />
+            <fx:reference source="saveButton" />
+            <fx:reference source="uploadersMenu" />
+            <fx:reference source="editCurrentTemplateMenuItem" />
+            <fx:reference source="printPresentation" />
+            <fx:reference source="addSlideButton" />
+            <fx:reference source="copySlide" />
+            <fx:reference source="moveSlideButton" />
+            <fx:reference source="deleteSlide" />
+            <fx:reference source="reloadPresentation" />
+            <fx:reference source="slideshow" />
+            <fx:reference source="contentExtensionToolBar" />
+            <fx:reference source="markupContentTypeBox" />
+            <fx:reference source="slideNumber" />
+            <fx:reference source="fieldName" />
+            <fx:reference source="openCurrentWorkingDirMenuItem" />
+        </FXCollections>
     </fx:define>
 
     <top>
         <VBox>
             <MenuBar fx:id="menuBar">
                 <Menu text="File">
-                    <MenuItem text="New" onAction="#loadTemplate" />
-                    <MenuItem text="Open" onAction="#openPresentation" />
+                    <fx:reference source="newMenuItem" />
+                    <fx:reference source="openMenuItem" />
                     <SeparatorMenuItem />
-                    <MenuItem text="Save" onAction="#save" />
-                    <MenuItem text="Save as ..." onAction="#saveAs" />
+                    <fx:reference source="saveMenuItem" />
+                    <fx:reference source="saveAsMenuItem" />
                     <SeparatorMenuItem />
-                    <Menu text="Download from" fx:id="downloadersMenu" />
-                    <Menu text="Upload to" fx:id="uploadersMenu" />
+                    <fx:reference source="downloadersMenu" />
+                    <fx:reference source="uploadersMenu" />
                     <SeparatorMenuItem />
                     <MenuItem text="Quit" onAction="#exitApplication" />
                 </Menu>
@@ -60,9 +218,9 @@
                     <Menu text="Template builder">
                         <MenuItem text="Create template" onAction="#createTemplate" />
                         <MenuItem text="Open template" onAction="#openTemplate" />
-                        <MenuItem text="Edit current template" onAction="#editTemplate" />
+                        <fx:reference source="editCurrentTemplateMenuItem" />
                     </Menu>
-                    <MenuItem text="Open current working directory" onAction="#openWorkingDirectory" />
+                    <fx:reference source="openCurrentWorkingDirMenuItem" />
                 </Menu>
                 <Menu text="?">
                     <MenuItem text="Take a tour" onAction="#takeTour" />
@@ -81,96 +239,27 @@
                     </graphic>
                 </Button>
 
-                <Button fx:id="openPresentation" onAction="#openPresentation" styleClass="image">
-                    <tooltip>
-                        <Tooltip text="Open presentation" />
-                    </tooltip>
-                    <graphic>
-                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                            <Image url="@/com/twasyl/slideshowfx/images/open.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
+                <fx:reference source="openPresentation" />
 
-                <SplitMenuButton fx:id="saveButton" onAction="#save">
-                    <tooltip>
-                        <Tooltip text="Save" />
-                    </tooltip>
-                    <items>
-                        <MenuItem text="Save as ..." onAction="#saveAs" />
-                    </items>
-                </SplitMenuButton>
+                <fx:reference source="saveButton" />
 
-                <Button fx:id="printPresentation" onAction="#print" styleClass="image">
-                    <tooltip>
-                        <Tooltip text="Print" />
-                    </tooltip>
-                    <graphic>
-                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                            <Image url="@/com/twasyl/slideshowfx/images/print.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
+                <fx:reference source="printPresentation" />
 
                 <Separator />
 
-                <SplitMenuButton fx:id="addSlideButton">
-                    <tooltip>
-                        <Tooltip text="Add slide" />
-                    </tooltip>
-                </SplitMenuButton>
+                <fx:reference source="addSlideButton" />
 
-                <Button fx:id="copySlide" onAction="#copySlide" styleClass="image">
-                    <tooltip>
-                        <Tooltip text="Copy slide" />
-                    </tooltip>
-                    <graphic>
-                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                            <Image url="@/com/twasyl/slideshowfx/images/copy.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
+                <fx:reference source="copySlide" />
 
-                <SplitMenuButton fx:id="moveSlideButton">
-                    <tooltip>
-                        <Tooltip  text="Move slide" />
-                    </tooltip>
-                </SplitMenuButton>
+                <fx:reference source="moveSlideButton" />
 
-                <Button fx:id="deleteSlide" onAction="#deleteSlide" styleClass="image">
-                    <tooltip>
-                        <Tooltip text="Delete slide" />
-                    </tooltip>
-                    <graphic>
-                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                            <Image url="@/com/twasyl/slideshowfx/images/delete.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
+                <fx:reference source="deleteSlide" />
 
                 <Separator />
 
-                <Button fx:id="reloadPresentation" onAction="#reload" styleClass="image">
-                    <tooltip>
-                        <Tooltip text="Reload" />
-                    </tooltip>
-                    <graphic>
-                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                            <Image url="@/com/twasyl/slideshowfx/images/reload.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
+                <fx:reference source="reloadPresentation" />
 
-                <Button fx:id="slideshow" onAction="#slideShow" styleClass="image">
-                    <tooltip>
-                        <Tooltip text="Slideshow" />
-                    </tooltip>
-                    <graphic>
-                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                            <Image url="@/com/twasyl/slideshowfx/images/slideshow.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
+                <fx:reference source="slideshow" />
 
                 <CheckBox fx:id="leapMotionEnabled">
                     <tooltip>
@@ -225,31 +314,18 @@
             </StackPane>
 
             <VBox spacing="10" minWidth="400">
-                <ToolBar fx:id="contentExtensionToolBar">
-                    <Button onAction="#insertQuizz" styleClass="image">
-                        <tooltip>
-                            <Tooltip text="Insert a quizz" />
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                                <Image url="@/com/twasyl/slideshowfx/images/quizz.png" />
-                            </ImageView>
-                        </graphic>
-                    </Button>
-                </ToolBar>
+                <fx:reference source="contentExtensionToolBar" />
 
                 <Label text="Set text:" />
 
                 <HBox spacing="10" alignment="BASELINE_LEFT">
                     <Label text="Slide #:" labelFor="$slideNumber" />
-                    <TextField prefColumnCount="3" fx:id="slideNumber" />
+                    <fx:reference source="slideNumber" />
                     <Label text="Field:" labelFor="$fieldName"/>
-                    <TextField prefColumnCount="15" fx:id="fieldName" />
+                    <fx:reference source="fieldName" />
                 </HBox>
 
-                <HBox spacing="10" fx:id="markupContentTypeBox" alignment="BASELINE_LEFT">
-                    <Label text="Content:" />
-                </HBox>
+                <fx:reference source="markupContentTypeBox" />
 
                 <SlideContentEditor fx:id="contentEditor" />
 

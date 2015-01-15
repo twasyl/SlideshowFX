@@ -33,27 +33,31 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class LoadPresentationTask extends Task<Void> {
+public class LoadPresentationTask extends Task<PresentationEngine> {
     private static final Logger LOGGER = Logger.getLogger(LoadPresentationTask.class.getName());
-
-    private PresentationEngine engine;
     private File dataFile;
 
-    public LoadPresentationTask(PresentationEngine engine, File dataFile) {
-        this.engine = engine;
+    public LoadPresentationTask(File dataFile) {
         this.dataFile = dataFile;
     }
 
     @Override
-    protected Void call() throws Exception {
+    protected PresentationEngine call() throws Exception {
+        PresentationEngine engine = null;
 
         // Ensure the presentation has already been saved
-        if(this.engine != null && this.dataFile != null) {
-            if(this.dataFile.exists()) this.engine.loadArchive(this.dataFile);
-            else this.failed();
-        }
+        if(this.dataFile != null && this.dataFile.exists()) {
+            engine = new PresentationEngine();
+            try {
+                engine.loadArchive(this.dataFile);
+            } catch(Exception e) {
+                engine = null;
+                this.setException(e);
+                this.failed();
+            }
+        } else this.failed();
 
-        return null;
+        return engine;
     }
 
     @Override

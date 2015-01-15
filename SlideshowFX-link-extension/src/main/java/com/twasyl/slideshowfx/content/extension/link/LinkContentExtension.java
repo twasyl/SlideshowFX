@@ -43,7 +43,7 @@ public class LinkContentExtension extends AbstractContentExtension {
 
     public LinkContentExtension() {
         super("LINK", null,
-                LinkContentExtension.class.getResourceAsStream("/com/twasyl/slideshowfx/content/extension/link/images/icon.png"),
+                LinkContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/link/images/icon.png"),
                 "Insert a link",
                 "Insert a link");
     }

@@ -16,10 +16,12 @@
 
 package com.twasyl.slideshowfx.utils;
 
-import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
 import java.util.List;
+
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * This class provides tests for the class {@link com.twasyl.slideshowfx.utils.NetworkUtils}.

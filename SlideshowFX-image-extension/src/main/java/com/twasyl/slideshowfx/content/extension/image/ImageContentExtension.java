@@ -42,7 +42,7 @@ public class ImageContentExtension extends AbstractContentExtension {
 
     public ImageContentExtension() {
         super("IMAGE", null,
-                ImageContentExtension.class.getResourceAsStream("/com/twasyl/slideshowfx/content/extension/image/images/icon.png"),
+                ImageContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/image/images/icon.png"),
                 "Insert an image",
                 "Insert an image");
     }

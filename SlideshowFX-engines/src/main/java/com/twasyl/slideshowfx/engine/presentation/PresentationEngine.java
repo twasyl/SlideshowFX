@@ -40,7 +40,6 @@ import org.vertx.java.core.json.JsonObject;
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;

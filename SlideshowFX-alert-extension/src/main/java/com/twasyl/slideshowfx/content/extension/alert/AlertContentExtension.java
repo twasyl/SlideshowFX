@@ -45,7 +45,7 @@ public class AlertContentExtension extends AbstractContentExtension {
     public AlertContentExtension() {
         super("ALERT",
                 "/com/twasyl/slideshowfx/content/extension/alert/",
-                AlertContentExtension.class.getResourceAsStream("/com/twasyl/slideshowfx/content/extension/alert/images/icon.png"),
+                AlertContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/alert/images/icon.png"),
                 "Insert an alert",
                 "Insert an alert");
 

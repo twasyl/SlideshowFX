@@ -43,7 +43,7 @@ public class QuoteContentExtension extends AbstractContentExtension {
 
     public QuoteContentExtension() {
         super("QUOTE", null,
-                QuoteContentExtension.class.getResourceAsStream("/com/twasyl/slideshowfx/content/extension/quote/images/icon.png"),
+                QuoteContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/quote/images/icon.png"),
                 "Insert a quote",
                 "Insert a quote");
     }

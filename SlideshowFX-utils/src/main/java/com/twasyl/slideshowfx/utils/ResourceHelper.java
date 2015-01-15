@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,4 +66,11 @@ public class ResourceHelper {
      * @return The InputStream for the given <code>url</code.>
      */
     public static InputStream getInputStream(String url) { return ResourceHelper.class.getResourceAsStream(url); }
+
+    /**
+     * Get the URL object associated to the given resource.
+     * @param url The URL resource to get the URL object from.
+     * @return The URL object associated to {@code url}.
+     */
+    public static URL getURL(String url) { return ResourceHelper.class.getResource(url); }
 }

@@ -45,7 +45,7 @@ public class CodeContentExtension extends AbstractContentExtension {
     public CodeContentExtension() {
         super("CODE",
                 "/com/twasyl/slideshowfx/content/extension/code/",
-                CodeContentExtension.class.getResourceAsStream("/com/twasyl/slideshowfx/content/extension/code/images/icon.png"),
+                CodeContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/code/images/icon.png"),
                 "Insert code",
                 "Insert code");
 

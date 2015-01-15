@@ -20,7 +20,7 @@ import com.twasyl.slideshowfx.markup.IMarkup;
 import javafx.scene.layout.Pane;
 
 import java.io.File;
-import java.io.InputStream;
+import java.net.URL;
 import java.util.Set;
 
 /**
@@ -45,7 +45,7 @@ public interface IContentExtension {
      * Get the icon that will be used in the SlideshowFX UI to make the content extension available.
      * @return The InputStream corresponding of the icon of the content extension.
      */
-    InputStream getIcon();
+    URL getIcon();
 
     /**
      * Get the tooltip that will be used in the SlideshowFX UI to make the content extension available.

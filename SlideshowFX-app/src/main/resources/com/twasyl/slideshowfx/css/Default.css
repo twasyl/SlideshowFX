@@ -25,16 +25,15 @@
     );
     app-color-error: #BC3F3C;
     app-color-linear-gradient-background: linear-gradient(
-        from 0% 0%
-        to 100% 100%,
-        #4f4f50 0%,
-        #48494a 100%
+        from 50% 0%
+        to 50% 100%,
+        app-color-background 0%,
+        derive(app-color-background, -10%) 100%
     );
     app-color-menu-in-use: #103750;
     app-color-orange: #FF8000;
     -fx-background-color: app-color-background;
     -fx-text-fill: app-color-text-fill;
-
 }
 
 .text-area, .text-area .content, .text-field {
@@ -43,7 +42,7 @@
     -fx-prompt-text-fill: app-color-prompt-text-fill;
 }
 
-.menu-bar > .container > .menu-button .menu {
+.menu-bar .menu-button .menu {
     -fx-background-color: app-color-background;
     -fx-text-fill: app-color-text-fill;
 
@@ -52,8 +51,14 @@
     -fx-border-style: solid;
 }
 
-.menu-bar > .container > .menu:showing {
+.menu-bar .menu:showing, .context-menu .menu:showing {
     -fx-background-color: app-color-menu-in-use;
+}
+
+.menu-bar .menu:showing .context-menu {
+    -fx-border-style: solid none none none;
+    -fx-border-width: 1.5px 0 0 0;
+    -fx-border-color: app-color-menu-in-use;
 }
 
 .menu-bar, .menu-button .menu .menu-item {
@@ -68,6 +73,10 @@
     -fx-border-color: app-color-light-gray transparent transparent transparent;
     -fx-border-width: 2px;
     -fx-border-style: dotted;
+}
+
+.context-menu .menu, .context-menu .menu-item {
+    -fx-border-style: none;
 }
 
 .context-menu .menu .menu-item:hover, .context-menu .menu:hover {
@@ -94,10 +103,7 @@
 .tool-bar {
     -fx-background-color: app-color-background;
     -fx-text-fill: app-color-text-fill;
-
-    -fx-border-color: app-color-border-top transparent app-color-border-bottom transparent;
-    -fx-border-width: 1px;
-    -fx-border-style: solid;
+    -fx-border-style: none;
 }
 
 .button,
@@ -279,10 +285,16 @@
     -fx-background-color: app-color-linear-gradient-background;
 }
 
+.tab-pane .tab-content-area {
+    -fx-border-width: 2px 0 0 0;
+    -fx-border-style: solid none none none;
+    -fx-border-color: app-color-light-gray transparent transparent transparent;
+}
+
 .tab-pane .tab {
     -fx-background-color: app-color-background;
     -fx-text-fill: app-color-text-fill;
-    -fx-border-style: solid;
+    -fx-border-style: solid solid none solid;
     -fx-border-width: 1px;
     -fx-border-color: black;
     -fx-border-radius: 0;
@@ -294,13 +306,17 @@
 }
 
 .tab-pane .tab:selected {
-    -fx-background-color: linear-gradient(
-        from 50% 0%
-        to 50% 100%,
-        #666666 0%,
-        #4f4f4f 100%
-    );
-    -fx-border-color: black black transparent black;
+     -fx-background-color: linear-gradient(
+         from 50% 0%
+         to 50% 10%,
+         #666666 0%,
+         #4f4f4f 10%
+     );
+     -fx-border-color: app-color-light-gray app-color-light-gray transparent app-color-light-gray;
+ }
+
+.tab-pane .tab:focused {
+    -fx-border-color: app-color-light-gray app-color-light-gray transparent app-color-light-gray;
 }
 
 .tab-pane .tab-content-area .viewport {

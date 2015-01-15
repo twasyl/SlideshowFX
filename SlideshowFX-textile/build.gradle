@@ -22,6 +22,7 @@ dependencies {
     compile libraries.wikitext
 
     testCompile libraries.testng
+    testCompile libraries.jsoup
 }
 
 jar {

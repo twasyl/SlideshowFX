@@ -16,9 +16,9 @@
 
 package com.twasyl.slideshowfx.concurrent;
 
+import com.twasyl.slideshowfx.controllers.PresentationViewController;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.concurrent.Task;
-import javafx.scene.web.WebView;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,15 +34,15 @@ import java.util.logging.Logger;
 public class ReloadPresentationViewTask extends Task<Void> {
     private static final Logger LOGGER = Logger.getLogger(ReloadPresentationViewTask.class.getName());
 
-    private final WebView presentationView;
+    private final PresentationViewController presentationView;
 
-    public ReloadPresentationViewTask(WebView presentationView) {
+    public ReloadPresentationViewTask(final PresentationViewController presentationView) {
         this.presentationView = presentationView;
     }
 
     @Override
     protected Void call() throws Exception {
-        if(this.presentationView != null) PlatformHelper.run(() -> this.presentationView.getEngine().reload());
+        if(this.presentationView != null) PlatformHelper.run(() -> this.presentationView.reloadPresentationBrowser());
         else this.failed();
 
         return null;

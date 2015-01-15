@@ -16,6 +16,8 @@
 
 package com.twasyl.slideshowfx.engine;
 
+import com.twasyl.slideshowfx.utils.PlatformHelper;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -55,7 +57,7 @@ public abstract class AbstractEngine<T extends IConfiguration> implements IEngin
     @Override public void setArchive(File file) {
         final File oldFile = this.archiveFile;
         this.archiveFile = file;
-        this.propertyChangeSupport.firePropertyChange("archiveFile", oldFile, this.archiveFile);
+        PlatformHelper.run(() -> this.propertyChangeSupport.firePropertyChange("archiveFile", oldFile, this.archiveFile));
     }
 
     @Override

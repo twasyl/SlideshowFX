@@ -16,9 +16,11 @@
 
 package com.twasyl.slideshowfx.concurrent;
 
-import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.controllers.PresentationViewController;
 import javafx.concurrent.Task;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,19 +38,25 @@ import java.util.logging.Logger;
 public class SavePresentationTask extends Task<Void> {
     private static final Logger LOGGER = Logger.getLogger(SavePresentationTask.class.getName());
 
-    private PresentationEngine engine;
+    private final PresentationViewController presentation;
+    private final File archiveFile;
 
-    public SavePresentationTask(PresentationEngine engine) {
-        this.engine = engine;
+    public SavePresentationTask(final PresentationViewController presentation, final File archiveFile) {
+        this.presentation = presentation;
+        this.archiveFile = archiveFile;
     }
 
     @Override
     protected Void call() throws Exception {
-
         // Ensure the presentation has already been saved
-        if(this.engine != null && this.engine.getArchive() != null) {
-            this.engine.saveArchive();
-            this.succeeded();
+        if(this.presentation != null && this.archiveFile != null) {
+            try {
+                this.presentation.savePresentation(this.archiveFile);
+                this.succeeded();
+            } catch(IOException e) {
+                this.setException(e);
+                this.failed();
+            }
         } else this.failed();
 
         return null;

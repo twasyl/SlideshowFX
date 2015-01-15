@@ -16,17 +16,17 @@
   ~ limitations under the License.
   -->
 
-<?import com.twasyl.slideshowfx.controls.SlideContentEditor?>
 <?import com.twasyl.slideshowfx.controls.TaskProgressIndicator?>
 <?import com.twasyl.slideshowfx.controls.TextFieldCheckMenuItem?>
 <?import com.twasyl.slideshowfx.utils.NetworkUtils?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.web.WebView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
-<?import javafx.collections.FXCollections?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
@@ -64,6 +64,14 @@
             <tooltip>
                 <Tooltip text="Save" />
             </tooltip>
+            <graphic>
+                <ImageView>
+                    <image>
+                        <Image url="@/com/twasyl/slideshowfx/images/save.png" requestedWidth="$TOOLBAR_ICON_WIDTH"
+                               requestedHeight="$TOOLBAR_ICON_HEIGHT" preserveRatio="true" smooth="true" />
+                    </image>
+                </ImageView>
+            </graphic>
             <items>
                 <MenuItem text="Save as ..." onAction="#saveAs" />
             </items>
@@ -84,6 +92,14 @@
             <tooltip>
                 <Tooltip text="Add slide" />
             </tooltip>
+            <graphic>
+                <ImageView>
+                    <image>
+                        <Image url="@/com/twasyl/slideshowfx/images/add.png" requestedWidth="$TOOLBAR_ICON_WIDTH"
+                               requestedHeight="$TOOLBAR_ICON_HEIGHT" preserveRatio="true" smooth="true" />
+                    </image>
+                </ImageView>
+            </graphic>
         </SplitMenuButton>
 
         <Button fx:id="copySlide" onAction="#copySlide" styleClass="image">
@@ -101,6 +117,14 @@
             <tooltip>
                 <Tooltip  text="Move slide" />
             </tooltip>
+            <graphic>
+                <ImageView>
+                    <image>
+                        <Image url="@/com/twasyl/slideshowfx/images/move.png" requestedWidth="$TOOLBAR_ICON_WIDTH"
+                               requestedHeight="$TOOLBAR_ICON_HEIGHT" preserveRatio="true" smooth="true" />
+                    </image>
+                </ImageView>
+            </graphic>
         </SplitMenuButton>
 
         <Button fx:id="deleteSlide" onAction="#deleteSlide" styleClass="image">
@@ -135,20 +159,6 @@
                 </ImageView>
             </graphic>
         </Button>
-
-        <!-- Content extension toolbar -->
-        <ToolBar fx:id="contentExtensionToolBar">
-            <Button onAction="#insertQuizz" styleClass="image">
-                <tooltip>
-                    <Tooltip text="Insert a quizz" />
-                </tooltip>
-                <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/quizz.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
-        </ToolBar>
 
         <!-- The container hosting all installed markup syntax for defining slide content -->
         <HBox spacing="10" fx:id="markupContentTypeBox" alignment="BASELINE_LEFT">
@@ -187,7 +197,6 @@
             <fx:reference source="deleteSlide" />
             <fx:reference source="reloadPresentation" />
             <fx:reference source="slideshow" />
-            <fx:reference source="contentExtensionToolBar" />
             <fx:reference source="markupContentTypeBox" />
             <fx:reference source="slideNumber" />
             <fx:reference source="fieldName" />
@@ -304,34 +313,10 @@
     </top>
 
     <center>
-        <SplitPane>
-            <StackPane fx:id="browserStackPane" minWidth="500"
-                    styleClass="noDragActive">
-                <WebView fx:id="browser"
-                         onDragOver="#dragOverBrowser"
-                         onDragDropped="#dragDroppedOnBrowser"
-                         onDragExited="#onDragExitedBrowser" />
-            </StackPane>
-
-            <VBox spacing="10" minWidth="400">
-                <fx:reference source="contentExtensionToolBar" />
-
-                <Label text="Set text:" />
-
-                <HBox spacing="10" alignment="BASELINE_LEFT">
-                    <Label text="Slide #:" labelFor="$slideNumber" />
-                    <fx:reference source="slideNumber" />
-                    <Label text="Field:" labelFor="$fieldName"/>
-                    <fx:reference source="fieldName" />
-                </HBox>
-
-                <fx:reference source="markupContentTypeBox" />
-
-                <SlideContentEditor fx:id="contentEditor" />
-
-                <Button fx:id="defineContent" text="Define" onAction="#updateSlideWithText" />
-            </VBox>
-        </SplitPane>
+        <TabPane fx:id="openedPresentationsTabPane" styleClass="noDragActive"
+                 onDragOver="#dragOverUI"
+                 onDragDropped="#dragDroppedOnUI"
+                 onDragExited="#dragExitedUI" />
     </center>
 
     <bottom>

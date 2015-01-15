@@ -37,6 +37,11 @@ subprojects {
         jcenter()
         mavenCentral()
     }
+
+    test {
+        useTestNG()
+        reports.html.enabled = true
+    }
 }
 
 apply plugin: 'org.asciidoctor.gradle.asciidoctor'
@@ -63,7 +68,7 @@ ext.libraries = [
     vertx: ['io.vertx:vertx-core:2.1.5@jar', 'io.vertx:vertx-platform:2.1.5@jar', 'io.netty:netty-all:4.0.21.Final', 'com.fasterxml.jackson.core:jackson-core:2.2.2', 'com.fasterxml.jackson.core:jackson-databind:2.2.2', 'com.fasterxml.jackson.core:jackson-annotations:2.2.2'],
     zxing: ['com.google.zxing:core:3.1.0@jar', 'com.google.zxing:javase:3.1.0@jar'],
 
-    testng: 'org.testng:testng:6.8.13@jar'
+    testng: ['org.testng:testng:6.8.13@jar', 'com.beust:jcommander:1.47']
 ]
 
 asciidoctor {

@@ -18,23 +18,18 @@ package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.concurrent.*;
-import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.controls.*;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
-import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
-import com.twasyl.slideshowfx.extension.ContentExtensionManager;
 import com.twasyl.slideshowfx.hosting.connector.HostingConnectorManager;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
-import com.twasyl.slideshowfx.markup.IMarkup;
-import com.twasyl.slideshowfx.markup.MarkupManager;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
@@ -45,8 +40,8 @@ import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.DisableAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.EnableAction;
 import javafx.application.Platform;
-import javafx.beans.property.adapter.JavaBeanObjectProperty;
-import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
@@ -57,10 +52,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.print.PageOrientation;
-import javafx.print.Paper;
-import javafx.print.PrintQuality;
-import javafx.print.PrinterJob;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -71,32 +62,24 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebView;
 import javafx.stage.*;
 import javafx.util.Duration;
-import netscape.javascript.JSObject;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Base64;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -114,25 +97,18 @@ import java.util.logging.Logger;
 public class SlideshowFXController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXController.class.getName());
 
-    private final PresentationEngine presentationEngine = new PresentationEngine();
-
     private final EventHandler<ActionEvent> addSlideActionEvent = new EventHandler<ActionEvent>() {
         @Override
         public void handle(ActionEvent actionEvent) {
             try {
 
-                Object userData = ((MenuItem) actionEvent.getSource()).getUserData();
-                if (userData instanceof SlideTemplateConfiguration) {
-                    final String slideId = (String) SlideshowFXController.this.browser.getEngine().executeScript(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getGetCurrentSlideMethod() + "();");
-                    String slideNumber = null;
+                final PresentationViewController view = SlideshowFXController.this.getCurrentPresentationView();
+                final Object userData = ((MenuItem) actionEvent.getSource()).getUserData();
 
-                    if (slideId != null && !slideId.isEmpty()) {
-                        slideNumber = slideId.substring(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getSlideIdPrefix().length());
-                    }
+                if (userData instanceof SlideTemplateConfiguration && view != null) {
+                    view.addSlide((SlideTemplateConfiguration) userData);
 
-                    SlideshowFXController.this.presentationEngine.addSlide((SlideTemplateConfiguration) userData, slideNumber);
-
-                    final ReloadPresentationViewTask task = new ReloadPresentationViewTask(SlideshowFXController.this.browser);
+                    final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
                     SlideshowFXController.this.taskInProgress.setCurrentTask(task);
                     TaskDAO.getInstance().startTask(task);
 
@@ -147,70 +123,60 @@ public class SlideshowFXController implements Initializable {
     private final EventHandler<ActionEvent> moveSlideActionEvent = new EventHandler<ActionEvent>() {
         @Override
         public void handle(ActionEvent actionEvent) {
-            final SlideMenuItem menunItem = (SlideMenuItem) actionEvent.getSource();
+            final PresentationViewController view = SlideshowFXController.this.getCurrentPresentationView();
 
-            final String slideId = (String) SlideshowFXController.this.browser.getEngine()
-                    .executeScript(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getGetCurrentSlideMethod() + "();");
+            if(view != null) {
+                final SlideMenuItem menunItem = (SlideMenuItem) actionEvent.getSource();
+                final SlidePresentationConfiguration slideToMove = view.getCurrentSlidePresentationConfiguration();
+                final SlidePresentationConfiguration beforeSlide = menunItem.getSlide();
 
-            SlidePresentationConfiguration slideToMove = SlideshowFXController.this.presentationEngine.getConfiguration().getSlideById(slideId);
-            SlidePresentationConfiguration beforeSlide = menunItem.getSlide();
+                view.moveSlide(slideToMove, beforeSlide);
 
-            SlideshowFXController.this.presentationEngine.moveSlide(slideToMove, beforeSlide);
+                final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
+                SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+                TaskDAO.getInstance().startTask(task);
 
-            final ReloadPresentationViewTask task = new ReloadPresentationViewTask(SlideshowFXController.this.browser);
-            SlideshowFXController.this.taskInProgress.setCurrentTask(task);
-            TaskDAO.getInstance().startTask(task);
+                SlideshowFXController.this.updateSlideSplitMenu();
+            }
 
-            SlideshowFXController.this.updateSlideSplitMenu();
         }
     };
 
-    @FXML private StackPane browserStackPane;
-    @FXML
-    private WebView browser;
-    @FXML
-    private SplitMenuButton saveButton;
-    @FXML
-    private SplitMenuButton addSlideButton;
-    @FXML
-    private SplitMenuButton moveSlideButton;
-    @FXML
-    private TextField slideNumber;
-    @FXML
-    private TextField fieldName;
-    @FXML
-    private HBox markupContentTypeBox;
-    @FXML
-    private ToolBar contentExtensionToolBar;
-    @FXML
-    private ToggleGroup markupContentType = new ToggleGroup();
-    @FXML private SlideContentEditor contentEditor;
-    @FXML
-    private ComboBox<String> chatIpAddress;
-    @FXML
-    private TextField chatPort;
-    @FXML
-    private TextField twitterHashtag;
+    /* Main ToolBar elements */
+    @FXML private SplitMenuButton addSlideButton;
+    @FXML private SplitMenuButton moveSlideButton;
+    @FXML private ComboBox<String> chatIpAddress;
+    @FXML private TextField chatPort;
+    @FXML private TextField twitterHashtag;
     @FXML private Button startChatButton;
-    @FXML
-    private CheckBox leapMotionEnabled;
-    @FXML
-    private Button defineContent;
-    @FXML private TaskProgressIndicator taskInProgress;
+    @FXML private CheckBox leapMotionEnabled;
+
+    /* Main application UI elements */
+    @FXML private TabPane openedPresentationsTabPane;
+
+    /* Main application menu elements */
     @FXML private TextFieldCheckMenuItem autoSaveItem;
     @FXML private Menu uploadersMenu;
     @FXML private Menu downloadersMenu;
+
+    /* Notification center */
+    @FXML private TaskProgressIndicator taskInProgress;
+
+    /* List of controls */
     @FXML private ObservableList<Object> saveElementsGroup;
     @FXML private ObservableList<Object> openElementsGroup;
     @FXML private ObservableList<Object> whenNoDocumentOpened;
+
+
+    /* All methods called by the FXML */
+
     /**
      * Loads a SlideshowFX template. This method displays an open dialog which only allows to open template files (with
      * .sfxt archiveExtension) and then call the {@link #openTemplateOrPresentation(java.io.File)} method.
      *
      * @param event the event that triggered the call.
      */
-    @FXML
-    private void loadTemplate(ActionEvent event) {
+    @FXML private void loadTemplate(ActionEvent event) {
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.TEMPLATE_FILTER);
         File templateFile = chooser.showOpenDialog(null);
@@ -232,8 +198,7 @@ public class SlideshowFXController implements Initializable {
      *
      * @param event the event that triggered the call.
      */
-    @FXML
-    private void openPresentation(ActionEvent event) {
+    @FXML private void openPresentation(ActionEvent event) {
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
         File file = chooser.showOpenDialog(null);
@@ -250,64 +215,110 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
-     * Open the dataFile. If the name ends with <code>.sfx</code> the file is considered as a presentation,
-     * if it ends with <code>.sfxt</code> it is considered as a template.
+     * This method is called when a file is dropped on the main UI.
+     * It allows to open presentation or template to be opened by drag'n'drop.
      *
-     * @param dataFile the file corresponding to either a template or a presentation.
-     * @throws java.lang.IllegalArgumentException If the file is null.
-     * @throws java.io.FileNotFoundException      If dataFile does not exist.
-     * @throws java.lang.IllegalAccessException   If the file can not be accessed.
+     * @param dragEvent The drag event associated to the drag.
      */
-    private void openTemplateOrPresentation(final File dataFile) throws IllegalArgumentException, IllegalAccessException, FileNotFoundException {
-        if (dataFile == null) throw new IllegalArgumentException("The dataFile can not be null");
-        if (!dataFile.exists()) throw new FileNotFoundException("The dataFile does not exist");
-        if (!dataFile.canRead()) throw new IllegalAccessException("The dataFile can not be accessed");
+    @FXML private void dragDroppedOnUI(DragEvent dragEvent) {
+        Dragboard board = dragEvent.getDragboard();
+        boolean dragSuccess = false;
 
-        Task loadingTask = null;
+        if (board.hasFiles()) {
+            Optional<File> slideshowFXFile = board.getFiles().stream()
+                    .filter(file -> file.getName().endsWith(".sfx") || file.getName().endsWith(".sfxt"))
+                    .findFirst();
 
-        if (dataFile.getName().endsWith(".sfx")) {
-            loadingTask = new LoadPresentationTask(this.presentationEngine, dataFile);
-        } else if (dataFile.getName().endsWith(".sfxt")) {
-            loadingTask = new LoadTemplateTask(this.presentationEngine, dataFile);
-        }
-
-        if(loadingTask != null) {
-            TaskAction.forTask(loadingTask)
-                    .when().stateIs(Worker.State.RUNNING).perform(DisableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup))
-                    .when().stateIs(Worker.State.READY).perform(DisableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup))
-                    .when().stateIs(Worker.State.SUCCEEDED).perform(EnableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup))
-                    .when().stateIs(Worker.State.FAILED).perform(EnableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup))
-                    .when().stateIs(Worker.State.CANCELLED).perform(EnableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup));
-
-            this.taskInProgress.setCurrentTask(loadingTask);
-            loadingTask.stateProperty().addListener((value, oldState, newState) -> {
-                if(newState != null && (
-                        newState == Worker.State.FAILED ||
-                        newState == Worker.State.CANCELLED ||
-                        newState == Worker.State.SUCCEEDED)) {
-                    this.browser.getEngine().load(this.presentationEngine.getConfiguration().getPresentationFile().toURI().toASCIIString());
-
-                    this.updateSlideTemplatesSplitMenu();
-                    this.updateSlideSplitMenu();
+            if (slideshowFXFile != null && slideshowFXFile.isPresent()) {
+                try {
+                    SlideshowFXController.this.openTemplateOrPresentation(slideshowFXFile.get());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
                 }
-            });
 
-            TaskDAO.getInstance().startTask(loadingTask);
+                dragSuccess = true;
+            }
         }
+
+        dragEvent.setDropCompleted(dragSuccess);
+        dragEvent.consume();
+        PlatformHelper.run(() -> {
+            this.openedPresentationsTabPane.getStyleClass().remove("validDragOver");
+            this.openedPresentationsTabPane.getStyleClass().remove("invalidDragOver");
+        });
+    }
+
+    /**
+     * This method is called when a file is dragged over the main UI.
+     * It allows to open presentation or template to be opened by drag'n'drop.
+     *
+     * @param dragEvent The drag event associated to the drag.
+     */
+    @FXML private void dragOverUI(DragEvent dragEvent) {
+        if(dragEvent.getGestureSource() != this.openedPresentationsTabPane && dragEvent.getDragboard().hasFiles()) {
+            /**
+             * Check if either a template or a presentation is drag over the browser.
+             */
+            Optional<File> slideshowFXFile = dragEvent.getDragboard().getFiles().stream()
+                    .filter(file -> file.getName().endsWith(".sfx") || file.getName().endsWith(".sfxt"))
+                    .findFirst();
+
+            if (slideshowFXFile != null && slideshowFXFile.isPresent()) {
+                dragEvent.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+
+                PlatformHelper.run(() ->  {
+                    this.openedPresentationsTabPane.getStyleClass().remove("invalidDragOver");
+
+                    if(!this.openedPresentationsTabPane.getStyleClass().contains("validDragOver")) {
+                        this.openedPresentationsTabPane.getStyleClass().add("validDragOver");
+                    }
+                });
+
+            } else {
+                PlatformHelper.run(() -> {
+                    this.openedPresentationsTabPane.getStyleClass().remove("validDragOver");
+
+                    if (!this.openedPresentationsTabPane.getStyleClass().contains("invalidDragOver")) {
+                        this.openedPresentationsTabPane.getStyleClass().add("invalidDragOver");
+                    }
+                });
+            }
+
+            dragEvent.consume();
+        }
+    }
+
+    /**
+     * This method is called the drag exits the main UI.
+     *
+     * @param dragEvent The drag event associated to the drag.
+     */
+    @FXML private void dragExitedUI(DragEvent dragEvent) {
+        PlatformHelper.run(() -> {
+            this.openedPresentationsTabPane.getStyleClass().remove("validDragOver");
+            this.openedPresentationsTabPane.getStyleClass().remove("invalidDragOver");
+        });
     }
 
     /**
      * Open the current working directory in the file explorer of the system.
      * @param event The event associated to the request
      */
-    @FXML
-    private void openWorkingDirectory(ActionEvent event) {
-        if(this.presentationEngine.getWorkingDirectory() != null && this.presentationEngine.getWorkingDirectory().exists()) {
-            if(Desktop.isDesktopSupported()) {
-                try {
-                    Desktop.getDesktop().open(this.presentationEngine.getWorkingDirectory());
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "Can not open working directory", e);
+    @FXML private void openWorkingDirectory(ActionEvent event) {
+        final PresentationViewController view = this.getCurrentPresentationView();
+
+        if(view != null) {
+            final File workingDir = view.getWorkingDirectory();
+
+            if(workingDir != null && workingDir.exists()) {
+                if(Desktop.isDesktopSupported()) {
+                    try {
+                        Desktop.getDesktop().open(workingDir);
+                    } catch (IOException e) {
+                        LOGGER.log(Level.SEVERE, "Can not open working directory", e);
+                    }
                 }
             }
         }
@@ -389,82 +400,22 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
-     * This method is called by the <code>Define</code> button of the FXML. The selected syntax is retrieved as well as the content.
-     * The treatment is then delegated to the {@link #updateSlide(com.twasyl.slideshowfx.markup.IMarkup, String)} method.
-     *
-     * @param event
-     * @throws TransformerException
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     */
-    @FXML
-    private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
-        RadioButton selectedMarkup = (RadioButton) this.markupContentType.getSelectedToggle();
-        this.updateSlide((IMarkup) selectedMarkup.getUserData(), this.contentEditor.getContentEditorValue());
-    }
-
-    /**
-     * This method updates a slide of the presentation. It takes the <code>markup</code> to converte the <code>originalContent</code>
-     * in HTML and then the slide element is updated. The presentation is then saved temporary.
-     * The content is send to the page by calling the {@link com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration#getContentDefinerMethod()}
-     * with the HTML content converted in Base64.
-     * A screenshot of the slide is taken to update the menu of available slides.
-     *
-     * @param markup
-     * @param originalContent
-     * @throws TransformerException
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     */
-    private void updateSlide(final IMarkup markup, final String originalContent) throws TransformerException, IOException, ParserConfigurationException, SAXException {
-        final String htmlContent = markup.convertAsHtml(originalContent);
-
-        // Update the SlideElement
-        final SlidePresentationConfiguration slideToUpdate = this.presentationEngine.getConfiguration().getSlideByNumber(this.slideNumber.getText());
-        slideToUpdate.updateElement(
-                this.slideNumber.getText() + "-" + this.fieldName.getText(), markup.getCode(), originalContent, htmlContent
-        );
-
-        this.presentationEngine.getConfiguration().updateSlideInDocument(slideToUpdate);
-
-        this.presentationEngine.savePresentationFile();
-
-        String clearedContent = Base64.getEncoder().encodeToString(htmlContent.getBytes("UTF8"));
-        String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",
-                this.presentationEngine.getTemplateConfiguration().getContentDefinerMethod(),
-                this.slideNumber.getText(),
-                this.fieldName.getText(),
-                clearedContent);
-
-        this.browser.getEngine().executeScript(jsCommand);
-
-        // Take a thumbnail of the slide
-        WritableImage thumbnail = this.browser.snapshot(null, null);
-        this.presentationEngine.getConfiguration().updateSlideThumbnail(this.slideNumber.getText(), thumbnail);
-
-        updateSlideSplitMenu();
-    }
-
-    /**
      * Copy the slide, update the menu of available slides and reload the presentation.
      * The copy is delegated to {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#duplicateSlide(com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration)}.
      *
      * @param event
      */
-    @FXML
-    private void copySlide(ActionEvent event) {
-        final String slideId = (String) this.browser.getEngine().executeScript(this.presentationEngine.getTemplateConfiguration().getGetCurrentSlideMethod() + "();");
+    @FXML private void copySlide(ActionEvent event) {
+        final PresentationViewController view = this.getCurrentPresentationView();
 
-        SlidePresentationConfiguration slideToCopy = this.presentationEngine.getConfiguration().getSlideById(slideId);
-        this.presentationEngine.duplicateSlide(slideToCopy);
+        if(view != null) {
+            view.copyCurrentSlide();
+            this.updateSlideSplitMenu();
 
-        this.updateSlideSplitMenu();
-
-        final ReloadPresentationViewTask task = new ReloadPresentationViewTask(this.browser);
-        this.taskInProgress.setCurrentTask(task);
-        TaskDAO.getInstance().startTask(task);
+            final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
+            this.taskInProgress.setCurrentTask(task);
+            TaskDAO.getInstance().startTask(task);
+        }
     }
 
     /**
@@ -472,22 +423,15 @@ public class SlideshowFXController implements Initializable {
      *
      * @param event
      */
-    @FXML
-    private void deleteSlide(ActionEvent event) {
-        String slideId = this.browser.getEngine().executeScript(this.presentationEngine.getTemplateConfiguration().getGetCurrentSlideMethod() + "();").toString();
+    @FXML private void deleteSlide(ActionEvent event) {
+        final PresentationViewController view = this.getCurrentPresentationView();
 
-        if (slideId != null && !slideId.isEmpty()) {
-            String slideNumber = slideId.substring(this.presentationEngine.getTemplateConfiguration().getSlideIdPrefix().length());
+        if(view != null) {
+            view.deleteCurrentSlide();
 
-            try {
-                this.presentationEngine.deleteSlide(slideNumber);
-
-                final ReloadPresentationViewTask task = new ReloadPresentationViewTask(SlideshowFXController.this.browser);
-                SlideshowFXController.this.taskInProgress.setCurrentTask(task);
-                TaskDAO.getInstance().startTask(task);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
+            SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+            TaskDAO.getInstance().startTask(task);
         }
     }
 
@@ -496,11 +440,14 @@ public class SlideshowFXController implements Initializable {
      *
      * @param event
      */
-    @FXML
-    private void reload(ActionEvent event) {
-        final ReloadPresentationViewTask task = new ReloadPresentationViewTask(SlideshowFXController.this.browser);
-        SlideshowFXController.this.taskInProgress.setCurrentTask(task);
-        TaskDAO.getInstance().startTask(task);
+    @FXML private void reload(ActionEvent event) {
+        final PresentationViewController view = this.getCurrentPresentationView();
+
+        if(view != null) {
+            final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
+            SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+            TaskDAO.getInstance().startTask(task);
+        }
     }
 
     /**
@@ -510,17 +457,21 @@ public class SlideshowFXController implements Initializable {
      *
      * @param event
      */
-    @FXML
-    private void save(ActionEvent event) {
-        File presentationArchive = null;
+    @FXML private void save(ActionEvent event) {
 
-        if (this.presentationEngine.getArchive() == null) {
-            FileChooser chooser = new FileChooser();
-            chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
-            presentationArchive = chooser.showSaveDialog(null);
-        } else presentationArchive = this.presentationEngine.getArchive();
+        final PresentationViewController view = this.getCurrentPresentationView();
 
-        this.savePresentation(presentationArchive);
+        if(view != null) {
+            File presentationArchive = null;
+
+            if (!view.isPresentationAlreadySaved()) {
+                FileChooser chooser = new FileChooser();
+                chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
+                presentationArchive = chooser.showSaveDialog(SlideshowFX.getStage());
+            } else presentationArchive = view.getArchiveFile();
+
+            this.savePresentation(presentationArchive);
+        }
     }
 
     /**
@@ -529,90 +480,30 @@ public class SlideshowFXController implements Initializable {
      *
      * @param event
      */
-    @FXML
-    private void saveAs(ActionEvent event) {
+    @FXML private void saveAs(ActionEvent event) {
         File presentationArchive = null;
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
-        presentationArchive = chooser.showSaveDialog(null);
+        presentationArchive = chooser.showSaveDialog(SlideshowFX.getStage());
 
         this.savePresentation(presentationArchive);
     }
 
     /**
-     * Save the presentation hosted in {@link #presentationEngine} to the given {@param archiveFile}. The process for
-     * saving the presentation is only started if the given {@param archiveFile} is not {@code null}. If the process is
-     * started, the given {@param archiveFile} is set as archive to this {@link #presentationEngine} using
-     * {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#setArchive(java.io.File)}. Then a
-     * {@link com.twasyl.slideshowfx.concurrent.SavePresentationTask} is instantiated and started.
-     * @param archiveFile The file to save the presentation in.
-     */
-    private void savePresentation(File archiveFile) {
-        if(archiveFile != null) {
-            this.presentationEngine.setArchive(archiveFile);
-
-            final Task saveTask = new SavePresentationTask(this.presentationEngine);
-            TaskAction.forTask(saveTask)
-                    .when().stateIs(Worker.State.RUNNING).perform(DisableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup))
-                    .when().stateIs(Worker.State.SUCCEEDED).perform(EnableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup))
-                    .when().stateIs(Worker.State.FAILED).perform(EnableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup))
-                    .when().stateIs(Worker.State.CANCELLED).perform(EnableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup));
-            this.taskInProgress.setCurrentTask(saveTask);
-
-            TaskDAO.getInstance().startTask(saveTask);
-        }
-    }
-
-    /**
-     * Print the presentation displayed.
+     * Print the current presentation displayed.
      *
      * @param event
      */
-    @FXML
-    private void print(ActionEvent event) {
-        PrinterJob job = PrinterJob.createPrinterJob();
+    @FXML private void print(ActionEvent event) {
+        final PresentationViewController view = this.getCurrentPresentationView();
 
-        if (job != null) {
-            if (job.showPrintDialog(null)) {
-
-                if(this.presentationEngine.getArchive() != null) {
-                    final String extension = ".".concat(this.presentationEngine.getArchiveExtension());
-                    final int indexOfExtension = this.presentationEngine.getArchive().getName().indexOf(extension);
-                    final String jobName = this.presentationEngine.getArchive().getName().substring(0, indexOfExtension);
-                    job.getJobSettings().setJobName(jobName);
-                }
-
-                job.getJobSettings().setPrintQuality(PrintQuality.HIGH);
-                job.getJobSettings().setPageLayout(job.getPrinter().createPageLayout(Paper.A4, PageOrientation.LANDSCAPE, 0, 0, 0, 0));
-
-                this.browser.getEngine().print(job);
-                job.endJob();
-            } else {
-                job.cancelJob();
-            }
-        }
+        if(view != null) view.printPresentation();
     }
 
-    @FXML
-    private void slideShow(ActionEvent event) {
-        if (this.presentationEngine.getConfiguration() != null
-                && this.presentationEngine.getConfiguration().getPresentationFile() != null
-                && this.presentationEngine.getConfiguration().getPresentationFile().exists()) {
-            final WebView slideShowBrowser = new WebView();
+    @FXML private void slideShow(ActionEvent event) {
+        final PresentationViewController view = this.getCurrentPresentationView();
 
-            slideShowBrowser.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
-                if (newState == Worker.State.SUCCEEDED) {
-                        JSObject window = (JSObject) slideShowBrowser.getEngine().executeScript("window");
-                        window.setMember("sfxServer", SlideshowFXServer.getSingleton());
-                }
-            });
-
-            slideShowBrowser.getEngine().load(this.presentationEngine.getConfiguration().getPresentationFile().toURI().toASCIIString());
-
-            final SlideShowScene subScene = new SlideShowScene(slideShowBrowser);
-
-            SlideshowFX.setSlideShowScene(subScene);
-        }
+        if(view != null) view.startSlideshow();
     }
 
     /**
@@ -631,105 +522,6 @@ public class SlideshowFXController implements Initializable {
      */
     @FXML private void startChatByButton(ActionEvent event) {
         this.startChat();
-    }
-
-    @FXML
-    private void insertQuizz(ActionEvent event) {
-        final QuizzCreatorPanel quizzCreatorPanel = new QuizzCreatorPanel();
-
-        Dialog.Response response = Dialog.showCancellableDialog(true, SlideshowFX.getStage(), "Insert a quizz", quizzCreatorPanel);
-
-        if(response != null && response.equals(Dialog.Response.OK)) {
-            this.contentEditor.appendContentEditorValue(quizzCreatorPanel.convertToHtml());
-        }
-    }
-
-    /**
-     * This method is called when a file is dropped on the presentation's browser.
-     * It allows to open presentation or template to be opened by drag'n'drop.
-     *
-     * @param dragEvent The drag event associated to the drag.
-     */
-    @FXML private void dragDroppedOnBrowser(DragEvent dragEvent) {
-        Dragboard board = dragEvent.getDragboard();
-        boolean dragSuccess = false;
-
-        if (board.hasFiles()) {
-            Optional<File> slideshowFXFile = board.getFiles().stream()
-                    .filter(file -> file.getName().endsWith(".sfx") || file.getName().endsWith(".sfxt"))
-                    .findFirst();
-
-            if (slideshowFXFile != null && slideshowFXFile.isPresent()) {
-                try {
-                    SlideshowFXController.this.openTemplateOrPresentation(slideshowFXFile.get());
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-
-                dragSuccess = true;
-            }
-        }
-
-        dragEvent.setDropCompleted(dragSuccess);
-        dragEvent.consume();
-        PlatformHelper.run(() -> {
-            this.browserStackPane.getStyleClass().remove("validDragOver");
-            this.browserStackPane.getStyleClass().remove("invalidDragOver");
-        });
-    }
-
-    /**
-     * This method is called when a file is dragged over the presentation's browser.
-     * It allows to open presentation or template to be opened by drag'n'drop.
-     *
-     * @param dragEvent The drag event associated to the drag.
-     */
-    @FXML private void dragOverBrowser(DragEvent dragEvent) {
-        if(dragEvent.getGestureSource() != browser && dragEvent.getDragboard().hasFiles()) {
-            /**
-             * Check if either a template or a presentation is drag over the browser.
-             */
-            Optional<File> slideshowFXFile = dragEvent.getDragboard().getFiles().stream()
-                    .filter(file -> file.getName().endsWith(".sfx") || file.getName().endsWith(".sfxt"))
-                    .findFirst();
-
-            if (slideshowFXFile != null && slideshowFXFile.isPresent()) {
-                dragEvent.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-
-                PlatformHelper.run(() ->  {
-                    this.browserStackPane.getStyleClass().remove("invalidDragOver");
-
-                    if(!this.browserStackPane.getStyleClass().contains("validDragOver")) {
-                        this.browserStackPane.getStyleClass().add("validDragOver");
-                    }
-                });
-
-            } else {
-                PlatformHelper.run(() -> {
-                    this.browserStackPane.getStyleClass().remove("validDragOver");
-
-                    if (!this.browserStackPane.getStyleClass().contains("invalidDragOver")) {
-                        this.browserStackPane.getStyleClass().add("invalidDragOver");
-                    }
-                });
-            }
-
-            dragEvent.consume();
-        }
-    }
-
-    /**
-     * This method is called the drag exits the presentation's browser
-     *
-     * @param dragEvent The drag event associated to the drag.
-     */
-    @FXML private void onDragExitedBrowser(DragEvent dragEvent) {
-        PlatformHelper.run(() -> {
-            this.browserStackPane.getStyleClass().remove("validDragOver");
-            this.browserStackPane.getStyleClass().remove("invalidDragOver");
-        });
     }
 
     /**
@@ -766,7 +558,6 @@ public class SlideshowFXController implements Initializable {
             engine.setWorkingDirectory(engine.generateWorkingDirectory());
             engine.getWorkingDirectory().mkdir();
 
-
             try {
                 ZipUtils.unzip(file, engine.getWorkingDirectory());
 
@@ -782,10 +573,114 @@ public class SlideshowFXController implements Initializable {
      * @param event The event associated to the click that should open the template builder.
      */
     @FXML private void editTemplate(ActionEvent event) {
-        final TemplateEngine engine = new TemplateEngine();
-        engine.setWorkingDirectory(this.presentationEngine.getWorkingDirectory());
+        final PresentationViewController view = this.getCurrentPresentationView();
 
-        this.showTemplateBuilder(engine);
+        if(view != null) {
+            final TemplateEngine engine = new TemplateEngine();
+            engine.setWorkingDirectory(view.getWorkingDirectory());
+
+            this.showTemplateBuilder(engine);
+        }
+    }
+
+    /**
+     * This method exits the application.
+     *
+     * @param event
+     */
+    @FXML private void exitApplication(ActionEvent event) {
+        PlatformHelper.run(() -> Platform.exit());
+    }
+
+    /**
+     * This method shows an open dialog that allows to install plugin.
+     *
+     * @param event
+     */
+
+    @FXML
+    private void installPlugin(ActionEvent event) {
+        FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PLUGIN_FILES);
+        File bundleFile = chooser.showOpenDialog(null);
+
+        if(bundleFile != null) {
+            Object service = null;
+            try {
+                service = OSGiManager.deployBundle(bundleFile);
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Can not deploy the plugin", e);
+            }
+
+            if(service != null) {
+                this.openedPresentationsTabPane.getTabs()
+                        .stream()
+                        .filter(tab -> tab.getUserData() != null && tab.getUserData() instanceof PresentationViewController)
+                        .forEach(tab -> ((PresentationViewController) tab.getUserData()).refreshMarkupSyntax());
+            }
+        }
+    }
+
+    /* All instance methods */
+
+    /**
+     * Open the dataFile. If the name ends with <code>.sfx</code> the file is considered as a presentation,
+     * if it ends with <code>.sfxt</code> it is considered as a template.
+     *
+     * @param dataFile the file corresponding to either a template or a presentation.
+     * @throws java.lang.IllegalArgumentException If the file is null.
+     * @throws java.io.FileNotFoundException      If dataFile does not exist.
+     * @throws java.lang.IllegalAccessException   If the file can not be accessed.
+     */
+    private void openTemplateOrPresentation(final File dataFile) throws IllegalArgumentException, IllegalAccessException, FileNotFoundException {
+        if (dataFile == null) throw new IllegalArgumentException("The dataFile can not be null");
+        if (!dataFile.exists()) throw new FileNotFoundException("The dataFile does not exist");
+        if (!dataFile.canRead()) throw new IllegalAccessException("The dataFile can not be accessed");
+
+        final Task<PresentationEngine> loadingTask = dataFile.getName().endsWith(".sfx") ? new LoadPresentationTask(dataFile) :
+                dataFile.getName().endsWith(".sfxt") ? new LoadTemplateTask(dataFile) : null;
+
+
+        if(loadingTask != null) {
+            TaskAction.forTask(loadingTask)
+                    .when().stateIs(Worker.State.RUNNING).perform(DisableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.READY).perform(DisableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.SUCCEEDED).perform(EnableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.FAILED).perform(EnableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.CANCELLED).perform(EnableAction.forElements(this.whenNoDocumentOpened).and(this.openElementsGroup));
+
+            this.taskInProgress.setCurrentTask(loadingTask);
+            loadingTask.stateProperty().addListener((value, oldState, newState) -> {
+                if(newState != null && (
+                        newState == Worker.State.FAILED ||
+                                newState == Worker.State.CANCELLED ||
+                                newState == Worker.State.SUCCEEDED) &&
+                        loadingTask.getValue() != null) {
+
+                    final FXMLLoader loader = new FXMLLoader(ResourceHelper.getURL("/com/twasyl/slideshowfx/fxml/PresentationView.fxml"));
+                    try {
+                        final Parent parent = loader.load();
+                        final PresentationViewController controller = loader.getController();
+                        controller.definePresentation(loadingTask.getValue());
+
+                        final Tab tab = new Tab();
+                        tab.textProperty().bind(controller.getPresentationName());
+                        tab.setUserData(controller);
+                        tab.setContent(parent);
+
+                        this.openedPresentationsTabPane.getTabs().addAll(tab);
+                        this.openedPresentationsTabPane.getSelectionModel().select(tab);
+
+                        this.updateSlideTemplatesSplitMenu();
+                        this.updateSlideSplitMenu();
+                    } catch (IOException e) {
+                        LOGGER.log(Level.SEVERE, "Can not load the view", e);
+                    }
+                }
+            });
+
+            TaskDAO.getInstance().startTask(loadingTask);
+        }
     }
 
     /**
@@ -823,77 +718,74 @@ public class SlideshowFXController implements Initializable {
         }
     }
 
+    /**
+     * Update the control hosting the slides' templates. This method get the templates from the current displayed presentation.
+     * If no presentation is opened the list of templates is cleared.
+     */
     private void updateSlideTemplatesSplitMenu() {
         this.addSlideButton.getItems().clear();
-        if (this.presentationEngine.getTemplateConfiguration() != null) {
-            MenuItem item;
 
-            for (SlideTemplateConfiguration slideTemplateConfiguration : this.presentationEngine.getTemplateConfiguration().getSlideTemplateConfigurations()) {
-                item = new MenuItem();
-                item.setText(slideTemplateConfiguration.getName());
-                item.setUserData(slideTemplateConfiguration);
-                item.setOnAction(addSlideActionEvent);
-                this.addSlideButton.getItems().add(item);
+        final PresentationViewController view = this.getCurrentPresentationView();
+        if (view != null) {
+            SlideTemplateConfiguration[] templates = view.getSlideTemplates();
+
+            if(templates != null) {
+                MenuItem item;
+
+                for (SlideTemplateConfiguration template : templates) {
+                    item = new MenuItem();
+                    item.setText(template.getName());
+                    item.setUserData(template);
+                    item.setOnAction(addSlideActionEvent);
+                    this.addSlideButton.getItems().add(item);
+                }
             }
-        }
-    }
-
-    private void updateSlideSplitMenu() {
-        SlideshowFXController.this.moveSlideButton.getItems().clear();
-        SlideMenuItem menuItem;
-        for (SlidePresentationConfiguration slide : SlideshowFXController.this.presentationEngine.getConfiguration().getSlides()) {
-            menuItem = new SlideMenuItem(slide);
-            menuItem.setOnAction(SlideshowFXController.this.moveSlideActionEvent);
-            SlideshowFXController.this.moveSlideButton.getItems().add(menuItem);
         }
     }
 
     /**
-     * Prefill the information coming from the HTML page in the JavaFX UI.
-     *
-     * @param slideNumber
-     * @param field
-     * @param currentElementContent
+     * Update the list of existing slides for the current presentation. If no presentation is opened or no slides are
+     * defined, the control is cleared.
      */
-    public void prefillContentDefinition(String slideNumber, String field, String currentElementContent) {
-        this.slideNumber.setText(slideNumber);
-        this.fieldName.setText(field);
+    protected void updateSlideSplitMenu() {
+        SlideshowFXController.this.moveSlideButton.getItems().clear();
 
-        final SlidePresentationConfiguration slide = this.presentationEngine.getConfiguration().getSlideByNumber(slideNumber);
+        final PresentationViewController view = this.getCurrentPresentationView();
+        if (view != null) {
+            SlidePresentationConfiguration[] slides = view.getSlides();
 
-        if (slide != null) {
-            final SlideElementConfiguration element = slide.getElements().get(slideNumber + "-" + field);
+            if(slides != null) {
+                SlideMenuItem menuItem;
 
-            /**
-             * Prefill the content either with the element's content if it is not null, either with the given
-             * <code>currentElementContent</code>.
-             */
-            if (element != null) {
-                /**
-                 * Prefill the content with either the original content is it is still supported either
-                 * the HTML content.
-                 */
-                if (MarkupManager.isContentSupported(element.getOriginalContentCode())) {
-                    this.contentEditor.setContentEditorValue(element.getOriginalContent());
-                } else {
-                    this.contentEditor.setContentEditorValue(element.getHtmlContent());
-                }
-
-                this.selectMarkupRadioButton(element.getOriginalContentCode());
-            } else {
-                try {
-                    this.contentEditor.setContentEditorValue(new String(Base64.getDecoder().decode(currentElementContent), "UTF8"));
-                } catch (UnsupportedEncodingException e) {
-                    LOGGER.log(Level.WARNING, "Can not decode String in UTF8", e);
-                } finally {
-                    this.selectMarkupRadioButton(null);
-                    this.contentEditor.selectAll();
+                for (SlidePresentationConfiguration slide : slides) {
+                    menuItem = new SlideMenuItem(slide);
+                    menuItem.setOnAction(SlideshowFXController.this.moveSlideActionEvent);
+                    this.moveSlideButton.getItems().add(menuItem);
                 }
             }
+        }
+    }
 
-            this.contentEditor.requestFocus();
-        } else {
-            LOGGER.info(String.format("Prefill information for the field %1$s of slide #%2$s is impossible: the slide is not found", field, slideNumber));
+    /**
+     * Save the current opened presentation to the given {@param archiveFile}. The process for
+     * saving the presentation is only started if the given {@param archiveFile} is not {@code null}. If the process is
+     * started, a {@link com.twasyl.slideshowfx.concurrent.SavePresentationTask} is started with the current presentation
+     * and {@code archiveFile}.
+     * @param archiveFile The file to save the presentation in.
+     */
+    private void savePresentation(File archiveFile) {
+        if(archiveFile != null) {
+            final PresentationViewController view = this.getCurrentPresentationView();
+            final Task saveTask = new SavePresentationTask(view, archiveFile);
+
+            TaskAction.forTask(saveTask)
+                    .when().stateIs(Worker.State.RUNNING).perform(DisableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.SUCCEEDED).perform(EnableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.FAILED).perform(EnableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup))
+                    .when().stateIs(Worker.State.CANCELLED).perform(EnableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup));
+            this.taskInProgress.setCurrentTask(saveTask);
+
+            TaskDAO.getInstance().startTask(saveTask);
         }
     }
 
@@ -934,244 +826,6 @@ public class SlideshowFXController implements Initializable {
         ((ImageView) this.startChatButton.getGraphic()).setImage(icon);
         this.chatIpAddress.setDisable(!this.chatIpAddress.isDisable());
         this.chatPort.setDisable(!this.chatPort.isDisable());
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        PresentationDAO.getInstance().setCurrentPresentation(this.presentationEngine);
-
-        // Add a listener for auto-saving the presentation
-        final ScheduledService<Void> service = new ScheduledService<Void>() {
-            @Override
-            protected Task<Void> createTask() {
-                final SavePresentationTask task = new SavePresentationTask(SlideshowFXController.this.presentationEngine);
-                return task;
-            }
-
-            @Override
-            protected void executeTask(Task<Void> task) {
-                super.executeTask(task);
-                SlideshowFXController.this.taskInProgress.setCurrentTask(task);
-            }
-        };
-        service.setRestartOnFailure(true);
-
-        this.autoSaveItem.selectedProperty().addListener((value, oldValue, newValue) -> {
-            if(!newValue) service.cancel();
-            else {
-                Integer interval = null;
-                try {
-                    interval = Integer.parseInt(this.autoSaveItem.getValue());
-                } catch(NumberFormatException e) {
-                    LOGGER.log(Level.FINE, "Can not parse auto save interval");
-                }
-
-                if(interval != null & interval > 0) {
-                    service.setDelay(Duration.minutes(interval.doubleValue()));
-                    service.setPeriod(Duration.minutes(interval.doubleValue()));
-                    service.restart();
-                }
-            }
-        });
-
-        this.autoSaveItem.valueProperty().addListener((value, oldValue, newValue) -> {
-            Integer interval = null;
-            try {
-                interval = Integer.parseInt(this.autoSaveItem.getValue());
-            } catch(NumberFormatException e) {
-                LOGGER.log(Level.FINE, "Can not parse auto save interval");
-            }
-
-            if(interval != null & interval > 0) {
-                service.setDelay(Duration.minutes(interval.doubleValue()));
-                service.setPeriod(Duration.minutes(interval.doubleValue()));
-                service.restart();
-            }
-        });
-
-        // Ensure the title bar of the application reflects the name of the presentation
-        try {
-            final JavaBeanObjectProperty<File> archiveFile = new JavaBeanObjectPropertyBuilder<File>()
-                    .bean(this.presentationEngine)
-                    .getter("getArchive")
-                    .setter("setArchive")
-                    .name("archiveFile")
-                    .build();
-
-            archiveFile.addListener((archiveValue, oldArchive, newArchive) -> {
-                PlatformHelper.run(() -> {
-                    if(newArchive != null) {
-                        SlideshowFX.getStage().setTitle("SlideshowFX - ".concat(newArchive.getName()));
-                    } else {
-                        SlideshowFX.getStage().setTitle("SlideshowFX - Untitled");
-                    }
-                });
-            });
-
-            SlideshowFX.stageProperty().addListener((stageValue, oldStage, newStage) -> {
-                PlatformHelper.run(() -> {
-                    if (this.presentationEngine.getArchive() != null) {
-                        SlideshowFX.getStage().setTitle("SlideshowFX - ".concat(this.presentationEngine.getArchive().getName()));
-                    } else {
-                        SlideshowFX.getStage().setTitle("SlideshowFX - Untitled");
-                    }
-                });
-            });
-        } catch (NoSuchMethodException e) {
-            LOGGER.log(Level.SEVERE, "Can not bind the presentation archive name to the application's title bar", e);
-        }
-
-
-        // Make this controller available to JavaScript
-        this.browser.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
-            if (newState == Worker.State.SUCCEEDED) {
-                if(SlideshowFXController.this.presentationEngine != null
-                        && SlideshowFXController.this.presentationEngine.getTemplateConfiguration() != null
-                        && SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getJsObject() != null) {
-                    JSObject window = (JSObject) browser.getEngine().executeScript("window");
-                    window.setMember(SlideshowFXController.this.presentationEngine.getTemplateConfiguration().getJsObject(), SlideshowFXController.this);
-                    window.setMember("sfxServer", SlideshowFXServer.getSingleton());
-                }
-            }
-        });
-
-        this.browser.getEngine().setJavaScriptEnabled(true);
-        this.browser.getEngine().load(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/html/empty-webview.html"));
-
-        this.saveButton.setGraphic(
-                new ImageView(
-                        new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/save.png"), 20d, 20d, true, true)
-                )
-        );
-
-        this.addSlideButton.setGraphic(
-                new ImageView(
-                        new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/add.png"), 20d, 20d, true, true)
-                )
-        );
-
-        this.moveSlideButton.setGraphic(
-                new ImageView(
-                        new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/move.png"), 20d, 20d, true, true)
-                )
-        );
-
-        SlideshowFX.leapMotionAllowedProperty().bind(this.leapMotionEnabled.selectedProperty());
-        this.leapMotionEnabled.setSelected(true);
-
-        // Creating RadioButtons for each markup bundle installed
-        MarkupManager.getInstalledMarkupSyntax().stream()
-                .sorted((markup1, markup2) -> markup1.getName().compareToIgnoreCase(markup2.getName()))
-                .forEach(markup -> createRadioButtonForMakup(markup));
-
-        // Creating buttons for each content extension bundle installed
-        ContentExtensionManager.getInstalledContentExtensions().stream()
-                .sorted((contentExtension1, contentExtension2) -> contentExtension1.getCode().compareTo(contentExtension2.getCode()))
-                .forEach(contentExtension -> createButtonForContentExtension(contentExtension));
-
-        // Change the mode for the content editor as the selection for markup language changes
-        this.markupContentType.selectedToggleProperty().addListener((value, oldToggle, newToggle) -> {
-            if (newToggle == null) {
-                this.contentEditor.setMode(null);
-            } else {
-                this.contentEditor.setMode(((IMarkup) newToggle.getUserData()).getAceMode());
-            }
-        });
-
-        this.defineContent.disableProperty().bind(this.slideNumber.textProperty().isEmpty()
-                .or(this.fieldName.textProperty().isEmpty())
-                .or(this.markupContentType.selectedToggleProperty().isNull()));
-
-        // We use reflection to disable all elements present in the list
-        this.whenNoDocumentOpened.forEach(element -> {
-            try {
-                final Method setDisable = element.getClass().getMethod("setDisable", boolean.class);
-                setDisable.invoke(element, true);
-            } catch (NoSuchMethodException e) {
-                LOGGER.log(Level.FINE, "No setDisableMethod found", e);
-            } catch (InvocationTargetException e) {
-                LOGGER.log(Level.WARNING, "Can not disable element", e);
-            } catch (IllegalAccessException e) {
-                LOGGER.log(Level.WARNING, "Can not disable element", e);
-            }
-        });
-
-        // Create the entries in the Upload & Download menus
-        HostingConnectorManager.getInstalledHostingConnectors().stream()
-                .sorted((hostingConnector1, hostingConnector2) -> hostingConnector1.getName().compareTo(hostingConnector2.getName()))
-                .forEach(hostingConnector -> {
-                    createUploaderMenuItem(hostingConnector);
-                    createDownloaderMenuItem(hostingConnector);
-                });
-    }
-
-    /**
-     * Creates a RadioButton for the given markup so the user will be able to select the new syntax. The RadioButton is
-     * added to the panel of markups as well as in the ToggleGroup for all markups.
-     * Note that the RadioButton will not request focus when it is clicked. This avoid the cursor to leave an eventual
-     * text edition area.
-     * @param markup The markup to create the RadioButton for
-     * @return The created RadioButton.
-     */
-    private RadioButton createRadioButtonForMakup(IMarkup markup) {
-        final RadioButton button = new RadioButton(markup.getName()) {
-            @Override
-            public void requestFocus() {
-                // Avoid the button to get the focus. So if the cursor is in the editor it won't loose the focus
-            }
-        };
-        button.setUserData(markup);
-
-        markupContentType.getToggles().add(button);
-        markupContentTypeBox.getChildren().add(button);
-
-        return button;
-    }
-
-    /**
-     * Creates a Button for the given content extension so the user will be able to insert new type of content in a slide.
-     * The Button is added to the ToolBar of content extensions.
-     * @param contentExtension The content extension to create the Button for.
-     * @return The created Button.
-     */
-    private Button createButtonForContentExtension(final IContentExtension contentExtension) {
-        final Button button = new Button();
-        button.setUserData(contentExtension);
-        button.setTooltip(new Tooltip(contentExtension.getToolTip()));
-        button.getStyleClass().add("image");
-
-        final Image icon = new Image(contentExtension.getIcon());
-        final ImageView view = new ImageView(icon);
-        view.setFitHeight(20);
-        view.setFitWidth(20);
-
-        button.setGraphic(view);
-
-        button.setOnAction(event -> {
-
-            final Dialog.Response response = Dialog.showCancellableDialog(true, SlideshowFX.getStage(), contentExtension.getTitle(), contentExtension.getUI());
-
-            if(response == Dialog.Response.OK) {
-                final String content = contentExtension.buildContentString(this.markupContentType.getSelectedToggle() != null ?
-                        (IMarkup) this.markupContentType.getSelectedToggle().getUserData() :
-                        null);
-
-                if (content != null) {
-                    this.contentEditor.appendContentEditorValue(content);
-                    contentExtension.extractResources(this.presentationEngine.getTemplateConfiguration().getResourcesDirectory());
-
-                    contentExtension.getResources()
-                            .stream()
-                            .forEach(resource -> {
-                                this.presentationEngine.addCustomResource(resource);
-                            });
-                }
-            }
-        });
-
-        this.contentExtensionToolBar.getItems().add(button);
-
-        return button;
     }
 
     /**
@@ -1270,60 +924,142 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
-     * Select the RadioButton corresponding to the given <code>contentCode</code>. If the <code>contentCode</code> is null,
-     * every RadioButton is unselected.
-     *
-     * @param contentCode
+     * This method looks for the current focused view containing the presentation.
+     * In the current implementation the view is identified by the selected tab in the UI.
+     * @return The controller associated to the displayed view or {@code null} if no presentation is opened or focused.
      */
-    private void selectMarkupRadioButton(final String contentCode) {
-        // Clear the current selection
-        this.markupContentTypeBox.getChildren()
-                .stream()
-                .filter(child -> child instanceof RadioButton)
-                .map(child -> (RadioButton) child)
-                .forEach(button -> button.setSelected(false));
+    private PresentationViewController getCurrentPresentationView() {
+        PresentationViewController view = null;
 
-        Optional<RadioButton> radioButton = this.markupContentTypeBox.getChildren()
-                .stream()
-                .filter(child -> child instanceof RadioButton)
-                .map(child -> (RadioButton) child)
-                .filter(button -> ((IMarkup) button.getUserData()).getCode().equals(contentCode))
-                .findFirst();
+        final Tab selectedTab = this.openedPresentationsTabPane.getSelectionModel().getSelectedItem();
 
-        if (radioButton.isPresent()) radioButton.get().setSelected(true);
-    }
-
-    /**
-     * This method exits the application.
-     *
-     * @param event
-     */
-    @FXML private void exitApplication(ActionEvent event) {
-        PlatformHelper.run(() -> Platform.exit());
-    }
-
-    /**
-     * This method shows an open dialog that allows to install plugin.
-     *
-     * @param event
-     */
-    @FXML
-    private void installPlugin(ActionEvent event) {
-        FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PLUGIN_FILES);
-        File bundleFile = chooser.showOpenDialog(null);
-
-        if(bundleFile != null) {
-            Object service = null;
-            try {
-                service = OSGiManager.deployBundle(bundleFile);
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Can not deploy the plugin", e);
-            }
-
-            if(service != null) {
-                this.createRadioButtonForMakup((IMarkup) service);
+        if(selectedTab != null) {
+            final Object userData = selectedTab.getUserData();
+            if(userData != null && userData instanceof PresentationViewController) {
+                view = (PresentationViewController) userData;
             }
         }
+
+        return view;
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Add a listener for auto-saving the presentation
+        final ScheduledService<Void> service = new ScheduledService<Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                final PresentationViewController view = SlideshowFXController.this.getCurrentPresentationView();
+                final File archiveFile = view == null ? null : view.getArchiveFile();
+                final SavePresentationTask task = new SavePresentationTask(view, archiveFile);
+
+                return task;
+            }
+
+            @Override
+            protected void executeTask(Task<Void> task) {
+                super.executeTask(task);
+                SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+            }
+        };
+        service.setRestartOnFailure(true);
+
+        this.autoSaveItem.selectedProperty().addListener((value, oldValue, newValue) -> {
+            if (!newValue) service.cancel();
+            else {
+                Integer interval = null;
+                try {
+                    interval = Integer.parseInt(this.autoSaveItem.getValue());
+                } catch (NumberFormatException e) {
+                    LOGGER.log(Level.FINE, "Can not parse auto save interval");
+                }
+
+                if (interval != null & interval > 0) {
+                    service.setDelay(Duration.minutes(interval.doubleValue()));
+                    service.setPeriod(Duration.minutes(interval.doubleValue()));
+                    service.restart();
+                }
+            }
+        });
+
+        this.autoSaveItem.valueProperty().addListener((value, oldValue, newValue) -> {
+            Integer interval = null;
+            try {
+                interval = Integer.parseInt(this.autoSaveItem.getValue());
+            } catch (NumberFormatException e) {
+                LOGGER.log(Level.FINE, "Can not parse auto save interval");
+            }
+
+            if (interval != null & interval > 0) {
+                service.setDelay(Duration.minutes(interval.doubleValue()));
+                service.setPeriod(Duration.minutes(interval.doubleValue()));
+                service.restart();
+            }
+        });
+
+        SlideshowFX.leapMotionAllowedProperty().bind(this.leapMotionEnabled.selectedProperty());
+        this.leapMotionEnabled.setSelected(true);
+
+        // We use reflection to disable all elements present in the list
+        final Consumer<Object> disableElementLambda = element -> {
+            try {
+                final Method setDisable = element.getClass().getMethod("setDisable", boolean.class);
+                setDisable.invoke(element, true);
+            } catch (NoSuchMethodException e) {
+                LOGGER.log(Level.FINE, "No setDisableMethod found", e);
+            } catch (InvocationTargetException e) {
+                LOGGER.log(Level.WARNING, "Can not disable element", e);
+            } catch (IllegalAccessException e) {
+                LOGGER.log(Level.WARNING, "Can not disable element", e);
+            }
+        };
+
+        this.whenNoDocumentOpened.forEach(disableElementLambda);
+
+        // Create the entries in the Upload & Download menus
+        HostingConnectorManager.getInstalledHostingConnectors().stream()
+                .sorted((hostingConnector1, hostingConnector2) -> hostingConnector1.getName().compareTo(hostingConnector2.getName()))
+                .forEach(hostingConnector -> {
+                    createUploaderMenuItem(hostingConnector);
+                    createDownloaderMenuItem(hostingConnector);
+                });
+
+        this.openedPresentationsTabPane.getSelectionModel().selectedItemProperty().addListener((value, oldSelection, newSelection) -> {
+            if(newSelection != null) {
+                final Object userData = newSelection.getUserData();
+
+                if(userData != null && userData instanceof PresentationViewController) {
+                    final PresentationViewController view = (PresentationViewController) userData;
+                    view.setAsDefault();
+
+                    this.updateSlideSplitMenu();
+                    this.updateSlideTemplatesSplitMenu();
+
+                    // Bind the title of the presentation with the application bar title
+                    if(SlideshowFX.getStage().titleProperty().isBound()) SlideshowFX.getStage().titleProperty().unbind();
+                    SlideshowFX.getStage().titleProperty().bind(new SimpleStringProperty("SlideshowFX - ").concat(view.getPresentationName()));
+
+                } else {
+                    PresentationDAO.getInstance().setCurrentPresentation(null);
+                }
+            } else {
+                this.updateSlideSplitMenu();
+                this.updateSlideTemplatesSplitMenu();
+
+                this.whenNoDocumentOpened.forEach(disableElementLambda);
+
+                if(SlideshowFX.getStage().titleProperty().isBound()) SlideshowFX.getStage().titleProperty().unbind();
+                SlideshowFX.getStage().setTitle("SlideshowFX");
+            }
+        });
+
+        this.openedPresentationsTabPane.getTabs().addListener((ListChangeListener) change -> {
+            final  StackPane header = (StackPane) this.openedPresentationsTabPane.lookup(".tab-header-area");
+
+            if(header != null) {
+                if(this.openedPresentationsTabPane.getTabs().size() == 1) header.setPrefHeight(0);
+                else header.setPrefHeight(-1);
+            }
+        });
     }
 }

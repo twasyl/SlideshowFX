@@ -19,12 +19,14 @@ package com.twasyl.slideshowfx.controls;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.beans.chat.ChatMessage;
 import com.twasyl.slideshowfx.beans.quizz.QuizzResult;
+import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Worker;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
@@ -33,6 +35,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.web.WebView;
+import netscape.javascript.JSObject;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
@@ -53,6 +56,7 @@ public class SlideShowScene extends Scene {
     private static final Logger LOGGER = Logger.getLogger(SlideShowScene.class.getName());
     private static SlideShowScene singleton = null;
 
+    private final PresentationEngine presentation;
     private final ObjectProperty<WebView> browser = new SimpleObjectProperty<>();
     private final ObjectProperty<Circle> pointer = new SimpleObjectProperty<>();
 
@@ -60,11 +64,19 @@ public class SlideShowScene extends Scene {
     private final QuizzPanel quizzPanel = new QuizzPanel();
     private final CollapsibleToolPane collapsibleToolPane = new CollapsibleToolPane();
 
-    public SlideShowScene(WebView browser) {
+    public SlideShowScene(PresentationEngine presentationEngine) {
         super(new StackPane());
         SlideShowScene.singleton = this;
 
-        this.browser.set(browser);
+        this.presentation = presentationEngine;
+
+        this.browser.set(new WebView());
+        this.browser.get().getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                JSObject window = (JSObject) this.browser.get().getEngine().executeScript("window");
+                window.setMember("sfxServer", SlideshowFXServer.getSingleton());
+            }
+        });
 
         this.setOnKeyReleased(keyEvent -> {
             if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
@@ -95,6 +107,9 @@ public class SlideShowScene extends Scene {
         }
 
         this.setCursor(null);
+
+        this.browser.get().getEngine().load(this.presentation.getConfiguration().getPresentationFile().toURI().toASCIIString());
+
     }
 
     /**

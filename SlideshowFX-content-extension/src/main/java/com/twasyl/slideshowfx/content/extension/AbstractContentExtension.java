@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.content.extension;
 
 import java.io.*;
+import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -33,7 +34,7 @@ public abstract class AbstractContentExtension implements IContentExtension {
     private static final Logger LOGGER = Logger.getLogger(AbstractContentExtension.class.getName());
 
     protected final String code;
-    protected final InputStream icon;
+    protected final URL icon;
     protected final String toolTip;
     protected final String title;
     protected final String resourcesLocationPrefix;
@@ -48,7 +49,7 @@ public abstract class AbstractContentExtension implements IContentExtension {
      * @throws java.lang.NullPointerException If the code is null.
      * @throws java.lang.IllegalArgumentException If the code is empty.
      */
-    protected AbstractContentExtension(String code, String resourcesLocationPrefix, InputStream icon, String toolTip, String title) {
+    protected AbstractContentExtension(String code, String resourcesLocationPrefix, URL icon, String toolTip, String title) {
         if(code == null) throw new NullPointerException("The code of the content extension is null");
         if(code.trim().isEmpty()) throw new IllegalArgumentException("The code of the content extension can not be empty");
 
@@ -134,7 +135,7 @@ public abstract class AbstractContentExtension implements IContentExtension {
     }
 
     @Override
-    public InputStream getIcon() { return this.icon; }
+    public URL getIcon() { return this.icon; }
 
     @Override
     public String getToolTip() { return this.toolTip; }

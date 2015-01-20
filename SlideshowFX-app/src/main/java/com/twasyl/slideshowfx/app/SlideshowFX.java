@@ -59,9 +59,28 @@ public class SlideshowFX extends Application {
         final String defineDynamicJavaLibraryPath = System.getProperty("dynamic.java.library.path");
 
         if("true".equals(defineDynamicJavaLibraryPath)) {
+            /*
+             * We then look for a custom property "project.stage" in order to locate the folder containing the LeapMotion
+             * native libraries. Currently the only values that are considered as valid for the property are "test" and
+             * "development". Currently both values have the same result.
+             *
+             * If the property has a valid value, then the parent folder containing the LeapMotion libraries is considered
+             * to be the "lib" folder at the root of the SlideshowFX project.
+             * If the property has an invalid value, then the parent folder containing the LeapMotion libraries is
+             * considered to be the one containing the SlideshowFX application JAR file.
+             */
             try {
-                // Trick to get the app JAR file
-                final File appJarFile = new File(SlideshowFX.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+                File parentFolder;
+                final String projectStage = System.getProperty("project.stage");
+
+                if("test".equals(projectStage) || "development".equals(projectStage)) {
+                    parentFolder = new File("lib");
+                } else {
+                    // Trick to get the app JAR file
+                    final File appJarFile = new File(SlideshowFX.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+                    parentFolder = appJarFile.getParentFile();
+                }
+
 
                 String platform = "";
                 if(PlatformUtil.isMac()) platform = "osx";
@@ -80,7 +99,7 @@ public class SlideshowFX extends Application {
                  * Once we know where the JAR is, we assume the libraries are located next to it in a "Leap" folder and then
                  * in a subfolder for each platform architecture.
                  */
-                System.setProperty("java.library.path", new File(appJarFile.getParentFile(), "Leap/" + platform).getAbsolutePath());
+                System.setProperty("java.library.path", new File(parentFolder, "Leap/" + platform).getAbsolutePath());
 
                 Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
 

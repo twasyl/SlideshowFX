@@ -92,6 +92,8 @@ dependencies {
     compile libraries.zxing
 
     testCompile libraries.testng
+    testCompile libraries.testfx
+    testCompile libraries.cucumber
 }
 
 tasks['jar'].dependsOn 'classes'

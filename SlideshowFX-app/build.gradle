@@ -92,7 +92,7 @@ dependencies {
     compile libraries.zxing
 
     testCompile libraries.testng
-    testCompile libraries.testfx
+    testCompile libraries.automaton
     testCompile libraries.cucumber
 }
 

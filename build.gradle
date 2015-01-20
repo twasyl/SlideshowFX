@@ -70,7 +70,7 @@ ext.libraries = [
 
     testng: ['org.testng:testng:6.8.13@jar', 'com.beust:jcommander:1.47'],
     cucumber: ['info.cukes:cucumber-core:1.2.2', 'info.cukes:cucumber-java:1.2.2', 'info.cukes:cucumber-testng:1.2.2'],
-    testfx: 'org.loadui:testFx:3.1.0'
+    automaton: 'com.athaydes.automaton:Automaton:1.1.0'
 
 ]
 

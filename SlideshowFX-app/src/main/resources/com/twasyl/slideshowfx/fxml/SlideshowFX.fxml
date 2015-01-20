@@ -207,7 +207,7 @@
     <top>
         <VBox>
             <MenuBar fx:id="menuBar">
-                <Menu text="File">
+                <Menu text="File" fx:id="fileMenu">
                     <fx:reference source="newMenuItem" />
                     <fx:reference source="openMenuItem" />
                     <SeparatorMenuItem />
@@ -217,7 +217,7 @@
                     <fx:reference source="downloadersMenu" />
                     <fx:reference source="uploadersMenu" />
                     <SeparatorMenuItem />
-                    <MenuItem text="Quit" onAction="#exitApplication" />
+                    <MenuItem text="Quit" fx:id="quitMenuItem" onAction="#exitApplication" />
                 </Menu>
                 <Menu text="Options">
                     <MenuItem text="Install plugin" onAction="#installPlugin" />

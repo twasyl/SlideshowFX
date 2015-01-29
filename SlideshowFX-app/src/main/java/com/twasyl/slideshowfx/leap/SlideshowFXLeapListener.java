@@ -17,14 +17,15 @@
 package com.twasyl.slideshowfx.leap;
 
 import com.leapmotion.leap.*;
-import com.twasyl.slideshowfx.app.SlideshowFX;
+import com.twasyl.slideshowfx.controls.SlideShowScene;
 import javafx.scene.input.KeyCode;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
 
 /**
- * This class is used the LeapMotion listener for controlling the slideshow.
+ * This class is used the LeapMotion listener for controlling the slideshow. It has to be created using a
+ * {@link com.twasyl.slideshowfx.controls.SlideShowScene} instance with which LeapMotion will interact.
  *
  * @author Thierry Wasylczenko
  * @version 1.0
@@ -33,6 +34,8 @@ import java.util.logging.Logger;
 public class SlideshowFXLeapListener extends Listener {
 
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXLeapListener.class.getName());
+
+    private final SlideShowScene scene;
 
     /**
      * When performing a gesture, indicates the maximum angle from the X axis the gesture's direction could have.
@@ -45,6 +48,18 @@ public class SlideshowFXLeapListener extends Listener {
 
     private boolean tracking = false;
     private SwipeGesture lastSwipeGesture;
+
+    /**
+     * Creates a LeapMotion listener that will apply on a SlideShowScene. It will be used to change slides, show a pointer
+     * and click on the presentation using LeapMotion.
+     *
+     * @param scene The scene the listener will work on.
+     * @throws java.lang.NullPointerException If the given {@code scene} is null.
+     */
+    public SlideshowFXLeapListener(final SlideShowScene scene) {
+        super();
+        this.scene = scene;
+    }
 
     public boolean isTracking() { return tracking; }
     public void setTracking(boolean tracking) { this.tracking = tracking; }
@@ -83,7 +98,7 @@ public class SlideshowFXLeapListener extends Listener {
 
         if(frame.isValid()) {
             if(frame.pointables().isEmpty()) {
-                SlideshowFX.getSlideShowScene().hidePointer();
+                this.scene.hidePointer();
             }
         }
 
@@ -129,7 +144,6 @@ public class SlideshowFXLeapListener extends Listener {
 
                 boolean acceptSwipe = swipe.durationSeconds() >= 0.1;
 
-                System.out.println("Accept swipe ? " + (acceptSwipe) + "(duration: " + swipe.durationSeconds() + "s)");
                 changeSlide(controller, swipe);
 
                 this.lastSwipeGesture = null;
@@ -182,8 +196,8 @@ public class SlideshowFXLeapListener extends Listener {
                         final InteractionBox box = frame.interactionBox();
                         final Vector normalizedPosition = box.normalizePoint(indexFinger.tipPosition());
 
-                        double screenWidth = SlideshowFX.getSlideShowScene().getWidth();
-                        double screenHeight = SlideshowFX.getSlideShowScene().getHeight();
+                        double screenWidth = this.scene.getWidth();
+                        double screenHeight = this.scene.getHeight();
 
                         double computedX = normalizedPosition.getX() * screenWidth;
                         double computedY = screenHeight - (normalizedPosition.getY() * screenHeight);
@@ -200,7 +214,7 @@ public class SlideshowFXLeapListener extends Listener {
                         if(horizontalOrientation < 90) computedX -= xPadding;
                         else if(horizontalOrientation > 90) computedX += xPadding;
 
-                        SlideshowFX.getSlideShowScene().showPointer(computedX, computedY);
+                        this.scene.showPointer(computedX, computedY);
                         pointerHasMoved = true;
                     }
                 }
@@ -280,12 +294,12 @@ public class SlideshowFXLeapListener extends Listener {
                     if(xAxisCheck && zAxisAcheck) {
                         // Check the gesture is a swipe and determine direction
                         if(gesture.direction().getX() > 0) {
-                            SlideshowFX.getSlideShowScene().hidePointer();
-                            SlideshowFX.getSlideShowScene().sendKey(KeyCode.LEFT);
+                            this.scene.hidePointer();
+                            this.scene.sendKey(KeyCode.LEFT);
                             slideHasChanged = true;
                         } else if(gesture.direction().getX() < 0) {
-                            SlideshowFX.getSlideShowScene().hidePointer();
-                            SlideshowFX.getSlideShowScene().sendKey(KeyCode.RIGHT);
+                            this.scene.hidePointer();
+                            this.scene.sendKey(KeyCode.RIGHT);
                             slideHasChanged = true;
                         }
                     }
@@ -332,7 +346,7 @@ public class SlideshowFXLeapListener extends Listener {
                     fingersExtended = finger.isValid() && finger.isExtended();
                 }
 
-                SlideshowFX.getSlideShowScene().click();
+                this.scene.click();
                 clickPerformed = true;
             }
         }

@@ -94,7 +94,7 @@ asciidoctor {
             'jackson-databind-version': '2.2.2',
             'jrubycomplete-version': '1.7.18',
             'jsoup-version': '1.8.1',
-            'leapmotion-sdk-version': '2.2.1.24116',
+            'leapmotion-sdk-version': '2.2.2.24469',
             'netty-all-version': '4.0.21.Final',
             'wikitext-core-version': '2.2.0.N20140811-1615',
             'wikitext-textile-core-version': '2.2.0.N20140702-2138',
@@ -126,7 +126,8 @@ task installContentExtensionPlugins(dependsOn: [':SlideshowFX-alert-extension:ja
                                                ':SlideshowFX-code-extension:jar',
                                                ':SlideshowFX-image-extension:jar',
                                                ':SlideshowFX-link-extension:jar',
-                                               ':SlideshowFX-quote-extension:jar']) << {
+                                               ':SlideshowFX-quote-extension:jar',
+                                               ':SlideshowFX-snippet-extension:jar']) << {
 
     copy {
         from project(':SlideshowFX-alert-extension').tasks['jar'].archivePath
@@ -134,6 +135,7 @@ task installContentExtensionPlugins(dependsOn: [':SlideshowFX-alert-extension:ja
         from project(':SlideshowFX-image-extension').tasks['jar'].archivePath
         from project(':SlideshowFX-link-extension').tasks['jar'].archivePath
         from project(':SlideshowFX-quote-extension').tasks['jar'].archivePath
+        from project(':SlideshowFX-snippet-extension').tasks['jar'].archivePath
 
         into pluginsFolder
     }
@@ -149,10 +151,21 @@ task installHostingConnectorPlugins(dependsOn : [':SlideshowFX-dropbox-hosting-c
     }
 }
 
+task installSnippetExecutorPlugins(dependsOn : [':SlideshowFX-golo-executor:jar',
+                                                ':SlideshowFX-java-executor:jar']) << {
+    copy {
+        from project(':SlideshowFX-golo-executor').tasks['jar'].archivePath
+        from project(':SlideshowFX-java-executor').tasks['jar'].archivePath
+
+        into pluginsFolder
+    }
+}
+
 task installSlideshowFX(dependsOn : [':SlideshowFX-app:assemble',
                                      ':installMarkupPlugins',
                                      ':installContentExtensionPlugins',
-                                     ':installHostingConnectorPlugins']) << {
+                                     ':installHostingConnectorPlugins',
+                                     ':installSnippetExecutorPlugins']) << {
 }
 
 task buildGradleWrapper(type: Wrapper) {

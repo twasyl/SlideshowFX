@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
+import com.twasyl.slideshowfx.beans.properties.PresentationModifiedBinding;
 import com.twasyl.slideshowfx.concurrent.*;
 import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.controls.*;
@@ -26,7 +27,6 @@ import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
-import com.twasyl.slideshowfx.hosting.connector.HostingConnectorManager;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
@@ -40,6 +40,7 @@ import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.DisableAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.EnableAction;
 import javafx.application.Platform;
+import javafx.beans.binding.StringExpression;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -47,7 +48,9 @@ import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -211,6 +214,28 @@ public class SlideshowFXController implements Initializable {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * Close the current displayed presentation.
+     * @param event The event that triggered the call.
+     */
+    @FXML private void closePresentation(ActionEvent event) {
+        if(this.openedPresentationsTabPane.getSelectionModel().getSelectedItem() != null) {
+            final Tab tab = this.openedPresentationsTabPane.getSelectionModel().getSelectedItem();
+
+            // Fire a close request event on the tab if any EventHandler has been defined
+            final EventType<Event> closeRequestEventType = Tab.TAB_CLOSE_REQUEST_EVENT;
+            final Event closeRequestEvent = new Event(closeRequestEventType);
+            Event.fireEvent(tab, closeRequestEvent);
+
+            // Fire a closed event on the tab if any EventHandler has been defined
+            final EventType<Event> closedEventType = Tab.CLOSED_EVENT;
+            final Event closedEvent = new Event(closedEventType);
+            Event.fireEvent(tab, closedEvent);
+
+            this.openedPresentationsTabPane.getTabs().remove(tab);
         }
     }
 
@@ -557,6 +582,7 @@ public class SlideshowFXController implements Initializable {
             final TemplateEngine engine = new TemplateEngine();
             engine.setWorkingDirectory(engine.generateWorkingDirectory());
             engine.getWorkingDirectory().mkdir();
+            engine.setArchive(file);
 
             try {
                 ZipUtils.unzip(file, engine.getWorkingDirectory());
@@ -621,6 +647,26 @@ public class SlideshowFXController implements Initializable {
         }
     }
 
+    /**
+     * This method
+     * @param event
+     */
+    @FXML private void showOptionsDialog(ActionEvent event) {
+        FXMLLoader loader = new FXMLLoader(ResourceHelper.getURL("/com/twasyl/slideshowfx/fxml/OptionsVIew.fxml"));
+        try {
+            final Parent root = loader.load();
+            final OptionsViewController controller = loader.getController();
+
+            final Dialog.Response answer = Dialog.showCancellableDialog(false, SlideshowFX.getStage(), "Options", root);
+
+            if(answer == Dialog.Response.OK) {
+                controller.saveOptions();
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Can not open options view", e);
+        }
+    }
+
     /* All instance methods */
 
     /**
@@ -664,7 +710,9 @@ public class SlideshowFXController implements Initializable {
                         controller.definePresentation(loadingTask.getValue());
 
                         final Tab tab = new Tab();
-                        tab.textProperty().bind(controller.getPresentationName());
+                        final PresentationModifiedBinding presentationModifiedBinding = new PresentationModifiedBinding(controller.presentationModifiedProperty());
+                        final StringExpression tabTitle = controller.getPresentationName().concat(presentationModifiedBinding);
+                        tab.textProperty().bind(tabTitle);
                         tab.setUserData(controller);
                         tab.setContent(parent);
 
@@ -1017,7 +1065,8 @@ public class SlideshowFXController implements Initializable {
         this.whenNoDocumentOpened.forEach(disableElementLambda);
 
         // Create the entries in the Upload & Download menus
-        HostingConnectorManager.getInstalledHostingConnectors().stream()
+        OSGiManager.getInstalledServices(IHostingConnector.class)
+                .stream()
                 .sorted((hostingConnector1, hostingConnector2) -> hostingConnector1.getName().compareTo(hostingConnector2.getName()))
                 .forEach(hostingConnector -> {
                     createUploaderMenuItem(hostingConnector);

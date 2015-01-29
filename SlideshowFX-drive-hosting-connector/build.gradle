@@ -17,6 +17,7 @@
 version = '1.0.0'
 
 dependencies {
+    compile project(':SlideshowFX-global-configuration')
     compile project(':SlideshowFX-hosting-connector')
 
     compile libraries.felix

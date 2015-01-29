@@ -16,25 +16,25 @@
 
 package com.twasyl.slideshowfx.app;
 
-import com.leapmotion.leap.Controller;
 import com.sun.javafx.PlatformUtil;
 import com.sun.javafx.application.LauncherImpl;
 import com.twasyl.slideshowfx.controls.SlideShowScene;
-import com.twasyl.slideshowfx.hosting.connector.HostingConnectorManager;
+import com.twasyl.slideshowfx.controls.SlideshowStage;
+import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.io.DeleteFileVisitor;
-import com.twasyl.slideshowfx.leap.SlideshowFXLeapListener;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import javafx.application.Application;
-import javafx.beans.property.*;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.io.IOException;
@@ -116,60 +116,11 @@ public class SlideshowFX extends Application {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFX.class.getName());
     private static final ReadOnlyObjectProperty<Stage> stage = new SimpleObjectProperty<>();
     private static final ReadOnlyObjectProperty<Scene> presentationBuilderScene = new SimpleObjectProperty<>();
-    private static final ObjectProperty<SlideShowScene> slideShowScene = new SimpleObjectProperty<>();
-    private static final BooleanProperty slideShowActive = new SimpleBooleanProperty(false);
     private static final BooleanProperty leapMotionAllowed = new SimpleBooleanProperty();
 
-    private static Controller leapController;
-    private static SlideshowFXLeapListener slideshowFXLeapListener;
 
     @Override
     public void init() throws Exception {
-        // Init LeapMotion
-        slideshowFXLeapListener = new SlideshowFXLeapListener();
-        leapController = new Controller();
-
-        // The listener is added and removed each time the slideShowActive property changes
-        slideShowActiveProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean aBoolean2) {
-                if (aBoolean2) {
-                    leapController.addListener(slideshowFXLeapListener);
-                } else {
-                    leapController.removeListener(slideshowFXLeapListener);
-
-                    getStage().close();
-
-                    ((SimpleObjectProperty) stageProperty()).set(new Stage(StageStyle.DECORATED));
-                    getStage().setScene(presentationBuilderScene.get());
-                    getStage().setMaximized(true);
-                    getStage().show();
-                }
-            }
-        });
-
-        // LeapMotion controller should track gestures if it is enabled by the application and the slideshow is active
-        leapMotionAllowedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean aBoolean2) {
-                slideshowFXLeapListener.setTracking(aBoolean2);
-                LOGGER.finest(String.format("LeapMotion tracking has changed to %1$s", aBoolean2));
-            }
-        });
-
-        // Init the slideshow scene
-        slideShowSceneProperty().addListener(new ChangeListener<SlideShowScene>() {
-            @Override
-            public void changed(ObservableValue<? extends SlideShowScene> observableValue, SlideShowScene scene, SlideShowScene scene2) {
-                if (scene2 != null) {
-                    getStage().setScene(scene2);
-                    getStage().setFullScreen(true);
-
-                    SlideshowFX.setSlideShowActive(true);
-                }
-            }
-        });
-
         // Start the MarkupManager
         LOGGER.info("Starting Felix");
         OSGiManager.startAndDeploy();
@@ -205,7 +156,7 @@ public class SlideshowFX extends Application {
         File tempDirectory = new File(System.getProperty("java.io.tmpdir"));
 
         Arrays.stream(tempDirectory.listFiles())
-              .filter(file -> { return file.getName().startsWith("sfx-"); })
+              .filter(file -> file.getName().startsWith("sfx-"))
               .forEach(file -> {
                   try {
                       Files.walkFileTree(file.toPath(), new DeleteFileVisitor());
@@ -216,34 +167,38 @@ public class SlideshowFX extends Application {
                   }
               });
 
-        LOGGER.info("Stopping the LeapMotion controller correctly");
-        leapController.removeListener(slideshowFXLeapListener);
-
         LOGGER.info("Closing the chat");
         if(SlideshowFXServer.getSingleton() != null) SlideshowFXServer.getSingleton().stop();
 
         LOGGER.info("Disconnecting from all hosting connectors");
-        HostingConnectorManager.getInstalledHostingConnectors()
+        OSGiManager.getInstalledServices(IHostingConnector.class)
                 .forEach(hostingConnector -> hostingConnector.disconnect());
 
         LOGGER.info("Stopping the OSGi manager");
         OSGiManager.stop();
     }
 
+    /**
+     * Enter in the slideshow view by dislaying the current presentation {@code presentation} in fullscreen and manages
+     * if the LeapMotion should be activated or not.
+     *
+     * @param presentation The presentation to start the slideshow for.
+     */
+    public static void startSlideshow(final PresentationEngine presentation) {
+        if(presentation != null) {
+            final SlideShowScene scene = new SlideShowScene(presentation);
+            final SlideshowStage stage = new SlideshowStage(scene, isLeapMotionAllowed());
+
+            stage.show();
+        }
+    }
+
     public static ReadOnlyObjectProperty<Stage> stageProperty() { return stage; }
     public static Stage getStage() { return stageProperty().get(); }
-
-    public static final BooleanProperty slideShowActiveProperty() { return slideShowActive; }
-    public static final Boolean isSlideShowActive() { return slideShowActiveProperty().get(); }
-    public static final void setSlideShowActive(boolean active) { slideShowActiveProperty().set(active); }
 
     public static BooleanProperty leapMotionAllowedProperty() { return leapMotionAllowed; }
     public static boolean isLeapMotionAllowed() { return leapMotionAllowedProperty().get(); }
     public static void setLeapMotionAllowed(boolean leapMotionAllowed) { leapMotionAllowedProperty().set(leapMotionAllowed); }
-
-    public static final ObjectProperty<SlideShowScene> slideShowSceneProperty() { return slideShowScene; }
-    public static final SlideShowScene getSlideShowScene() { return slideShowSceneProperty().get(); }
-    public static final void setSlideShowScene(SlideShowScene scene) { slideShowSceneProperty().set(scene); }
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(SlideshowFX.class, SlideshowFXPreloader.class, args);

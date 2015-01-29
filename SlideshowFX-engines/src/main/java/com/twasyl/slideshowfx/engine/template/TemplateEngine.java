@@ -73,19 +73,11 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
         templateConfiguration.setResourcesDirectory(new File(getWorkingDirectory(), templateJson.getString("resources-directory")));
         LOGGER.fine("[Template configuration] resources-directory = " + templateConfiguration.getResourcesDirectory().getAbsolutePath());
 
-        templateJson.getArray("methods")
-                .forEach(method -> {
-                    if ("CONTENT_DEFINER".equals(((JsonObject) method).getString("type"))) {
-                        templateConfiguration.setContentDefinerMethod(((JsonObject) method).getString("name"));
-                        LOGGER.fine("[Template configuration] content definer method = " + templateConfiguration.getContentDefinerMethod());
-                    } else if ("GET_CURRENT_SLIDE".equals(((JsonObject) method).getString("type"))) {
-                        templateConfiguration.setGetCurrentSlideMethod(((JsonObject) method).getString("name"));
-                        LOGGER.fine("[Template configuration] get current slide method = " + templateConfiguration.getGetCurrentSlideMethod());
-                    }
-                });
-
-        templateConfiguration.setContentDefinerMethod("setField");
+        templateConfiguration.setContentDefinerMethod("slideshowFXSetField");
         LOGGER.fine("[Template configuration] content definer method = " + templateConfiguration.getContentDefinerMethod());
+
+        templateConfiguration.setGetCurrentSlideMethod("slideshowFXGetCurrentSlide");
+        LOGGER.fine("[Template configuration] content definer method = " + templateConfiguration.getGetCurrentSlideMethod());
 
         // Setting the slides
         templateConfiguration.setSlideTemplateConfigurations(new ArrayList<SlideTemplateConfiguration>());
@@ -164,7 +156,7 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
     public void writeConfiguration(File configurationFile) throws NullPointerException, IOException {
         if(configurationFile == null) throw new NullPointerException("The configuration to write into can not be null");
 
-        if(this.configuration != null) {
+        if (this.configuration != null) {
 
             final JsonObject configurationJson = new JsonObject()
                     .putObject("template", new JsonObject()
@@ -172,10 +164,6 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                             .putString("file", this.configuration.getFile() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getFile()))
                             .putString("js-object", this.configuration.getJsObject() == null ? "" : this.configuration.getJsObject())
                             .putString("resources-directory", this.configuration.getResourcesDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getResourcesDirectory()))
-                            .putArray("methods", new JsonArray()
-                                    .addObject(new JsonObject()
-                                            .putString("type", "GET_CURRENT_SLIDE")
-                                            .putString("name", this.configuration.getGetCurrentSlideMethod() == null ? "" : this.configuration.getGetCurrentSlideMethod())))
                             .putObject("slides", new JsonObject()
                                     .putObject("configuration", new JsonObject()
                                             .putString("slides-container", this.configuration.getSlidesContainer() == null ? "" : this.configuration.getSlidesContainer())

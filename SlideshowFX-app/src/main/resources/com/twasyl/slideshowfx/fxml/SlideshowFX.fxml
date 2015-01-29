@@ -41,6 +41,7 @@
         <!-- Global Menus & MenuItems -->
         <MenuItem fx:id="newMenuItem" text="New" onAction="#loadTemplate" />
         <MenuItem fx:id="openMenuItem" text="Open" onAction="#openPresentation" />
+        <MenuItem fx:id="closePresentationMenuItem" text="Close presentation" onAction="#closePresentation" />
         <MenuItem fx:id="saveMenuItem" text="Save" onAction="#save" />
         <MenuItem fx:id="saveAsMenuItem" text="Save as ..." onAction="#saveAs" />
         <Menu fx:id="downloadersMenu" text="Download from" />
@@ -185,6 +186,7 @@
         </FXCollections>
 
         <FXCollections fx:id="whenNoDocumentOpened" fx:factory="observableArrayList">
+            <fx:reference source="closePresentationMenuItem" />
             <fx:reference source="saveMenuItem" />
             <fx:reference source="saveAsMenuItem" />
             <fx:reference source="saveButton" />
@@ -210,6 +212,7 @@
                 <Menu text="File" fx:id="fileMenu">
                     <fx:reference source="newMenuItem" />
                     <fx:reference source="openMenuItem" />
+                    <fx:reference source="closePresentationMenuItem" />
                     <SeparatorMenuItem />
                     <fx:reference source="saveMenuItem" />
                     <fx:reference source="saveAsMenuItem" />
@@ -222,6 +225,7 @@
                 <Menu text="Options">
                     <MenuItem text="Install plugin" onAction="#installPlugin" />
                     <TextFieldCheckMenuItem fx:id="autoSaveItem" text="Auto save interval (min):" value="5" />
+                    <MenuItem text="Options" onAction="#showOptionsDialog" />
                 </Menu>
                 <Menu text="Tools">
                     <Menu text="Template builder">

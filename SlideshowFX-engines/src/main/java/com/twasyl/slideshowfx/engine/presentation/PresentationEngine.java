@@ -57,12 +57,12 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
     private static final Logger LOGGER = Logger.getLogger(PresentationEngine.class.getName());
     private static final String TEMPLATE_SLIDE_NUMBER_TOKEN = "slideNumber";
+    private static final String TEMPLATE_SFX_JAVASCRIPT_RESOURCES_TOKEN = "sfxJavascriptResources";
     private static final String TEMPLATE_SFX_CALLBACK_TOKEN = "sfxCallback";
-    private static final String TEMPLATE_SFX_QUIZZ_CALLER_TOKEN = "sfxQuizzCaller";
-    private static final String TEMPLATE_SFX_CONTENT_DEFINER_TOKEN = "sfxContentDefiner";
     private static final String TEMPLATE_SLIDE_ID_PREFIX_TOKEN = "slideIdPrefix";
 
     private static final String TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT = "/com/twasyl/slideshowfx/js/setField.js";
+    private static final String TEMPLATE_SFX_SNIPPET_EXECUTOR_SCRIPT = "/com/twasyl/slideshowfx/js/snippetExecutor.js";
     private static final String TEMPLATE_SFX_CALLBACK_SCRIPT = "/com/twasyl/slideshowfx/js/sendInformationToSlideshowFX.js";
     private static final String TEMPLATE_SFX_QUIZZ_CALLER_SCRIPT = "/com/twasyl/slideshowfx/js/quizzCaller.js";
 
@@ -213,9 +213,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         templateConfiguration.setDirectoryForTemplateLoading(this.templateEngine.getConfiguration().getFile().getParentFile());
 
         final Map tokens = new HashMap<>();
-        tokens.put(TEMPLATE_SFX_CONTENT_DEFINER_TOKEN, ResourceHelper.readResource(TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT));
-        tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, ResourceHelper.readResource(TEMPLATE_SFX_CALLBACK_SCRIPT));
-        tokens.put(TEMPLATE_SFX_QUIZZ_CALLER_TOKEN, ResourceHelper.readResource(TEMPLATE_SFX_QUIZZ_CALLER_SCRIPT));
+        tokens.put(TEMPLATE_SFX_JAVASCRIPT_RESOURCES_TOKEN, this.buildJavaScriptResourcesToInclude());
 
         // Replacing the template tokens
         try(final StringWriter writer = new StringWriter()) {
@@ -321,9 +319,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         templateConfiguration.setDirectoryForTemplateLoading(this.templateEngine.getConfiguration().getFile().getParentFile());
 
         final Map tokens = new HashMap<>();
-        tokens.put(TEMPLATE_SFX_CONTENT_DEFINER_TOKEN, ResourceHelper.readResource(TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT));
-        tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, ResourceHelper.readResource(TEMPLATE_SFX_CALLBACK_SCRIPT));
-        tokens.put(TEMPLATE_SFX_QUIZZ_CALLER_TOKEN, ResourceHelper.readResource(TEMPLATE_SFX_QUIZZ_CALLER_SCRIPT));
+        tokens.put(TEMPLATE_SFX_JAVASCRIPT_RESOURCES_TOKEN, this.buildJavaScriptResourcesToInclude());
 
         try(final StringWriter writer = new StringWriter()) {
 
@@ -654,5 +650,20 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * This method loads all JavaScript resources that should be inserted in a template and return them in a String.
+     * @return The String containing the content of all JavaScript resources needed for a template
+     */
+    private String buildJavaScriptResourcesToInclude() {
+        final StringBuilder builder = new StringBuilder();
+
+        builder.append(ResourceHelper.readResource(TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT)).append("\n\n")
+                .append(ResourceHelper.readResource(TEMPLATE_SFX_SNIPPET_EXECUTOR_SCRIPT)).append("\n\n")
+                .append(ResourceHelper.readResource(TEMPLATE_SFX_CALLBACK_SCRIPT)).append("\n\n")
+                .append(ResourceHelper.readResource(TEMPLATE_SFX_QUIZZ_CALLER_SCRIPT)).append("\n\n");
+
+        return builder.toString();
     }
 }

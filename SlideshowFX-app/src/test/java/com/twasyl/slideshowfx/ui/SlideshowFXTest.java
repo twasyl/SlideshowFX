@@ -20,7 +20,6 @@ import com.athaydes.automaton.FXApp;
 import com.athaydes.automaton.FXer;
 import com.athaydes.automaton.Speed;
 import com.twasyl.slideshowfx.app.SlideshowFX;
-import cucumber.api.testng.AbstractTestNGCucumberTests;
 import javafx.scene.Node;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -35,7 +34,7 @@ import static org.testng.Assert.*;
  *  @version 1.0
  *  @since SlideshowFX 1.0.0
  */
-public class SlideshowFXTest extends AbstractTestNGCucumberTests {
+public class SlideshowFXTest {
 
     private static FXer fxer;
 

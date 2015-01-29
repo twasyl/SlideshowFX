@@ -15,8 +15,10 @@
  */
 
 include 'SlideshowFX-app'
-include 'SlideshowFX-engines'
 include 'SlideshowFX-controls'
+include 'SlideshowFX-engines'
+include 'SlideshowFX-global-configuration'
+include 'SlideshowFX-osgi'
 include 'SlideshowFX-utils'
 
 include 'SlideshowFX-asciidoctor'
@@ -31,7 +33,13 @@ include 'SlideshowFX-code-extension'
 include 'SlideshowFX-image-extension'
 include 'SlideshowFX-link-extension'
 include 'SlideshowFX-quote-extension'
+include 'SlideshowFX-snippet-extension'
 
 include 'SlideshowFX-hosting-connector'
 include 'SlideshowFX-dropbox-hosting-connector'
 include 'SlideshowFX-drive-hosting-connector'
+
+include 'SlideshowFX-golo-executor'
+include 'SlideshowFX-java-executor'
+include 'SlideshowFX-snippet-executor'
+

@@ -104,7 +104,6 @@
                             <FileDragableTemplateElement text="Template's file" templateElementName="file" />
                             <StringDragableTemplateElement text="JS Object" templateElementName="js-object" />
                             <DirectoryDragableTemplateElement text="Resources directory" templateElementName="resources-directory" />
-                            <ArrayDragableTemplateElement text="Methods" templateElementName="methods" />
                             <ListDragableTemplateElement text="Slides" templateElementName="slides" />
                         </VBox>
                     </TitledPane>
@@ -112,19 +111,6 @@
 
                 <panes>
                     <fx:reference source="templateElements" />
-                    <TitledPane text="Methods elements">
-                        <VBox spacing="5">
-                            <ListDragableTemplateElement text="Method container" />
-                            <ChoiceBoxDragableTemplateElement text="Method's type" templateElementName="type">
-                                <values>
-                                    <FXCollections fx:factory="observableArrayList">
-                                        <String fx:value="GET_CURRENT_SLIDE" />
-                                    </FXCollections>
-                                </values>
-                            </ChoiceBoxDragableTemplateElement>
-                            <StringDragableTemplateElement text="Method's name" templateElementName="name" />
-                        </VBox>
-                    </TitledPane>
                     <TitledPane text="Slides' elements">
                         <VBox spacing="5">
                             <ListDragableTemplateElement text="Slides' configuration" templateElementName="configuration" />

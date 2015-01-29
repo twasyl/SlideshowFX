@@ -16,16 +16,20 @@
 
 package com.twasyl.slideshowfx.controls;
 
-import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.beans.chat.ChatMessage;
 import com.twasyl.slideshowfx.beans.quizz.QuizzResult;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
+import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -42,6 +46,9 @@ import org.vertx.java.core.json.JsonObject;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,17 +81,8 @@ public class SlideShowScene extends Scene {
         this.browser.get().getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 JSObject window = (JSObject) this.browser.get().getEngine().executeScript("window");
+                window.setMember(SlideShowScene.this.presentation.getTemplateConfiguration().getJsObject(), SlideShowScene.this);
                 window.setMember("sfxServer", SlideshowFXServer.getSingleton());
-            }
-        });
-
-        this.setOnKeyReleased(keyEvent -> {
-            if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
-                keyEvent.consume();
-
-                SlideShowScene.this.exitSlideshow();
-            } else if (keyEvent.getCode().equals(KeyCode.ENTER)) {
-                click();
             }
         });
 
@@ -110,6 +108,53 @@ public class SlideShowScene extends Scene {
 
         this.browser.get().getEngine().load(this.presentation.getConfiguration().getPresentationFile().toURI().toASCIIString());
 
+    }
+
+    /**
+     * This method is called by the presentation in order to execute a code snippet. The executor is identified by the
+     * {@code snippetExecutorCode} and retrieved in the OSGi context to get the {@link com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor}
+     * instance that will execute the code.
+     * The code to execute is passed to this method in Base64 using the {@code base64CodeSnippet} parameter. The execution
+     * result will be pushed back to the presentation in the HTML element {@code consoleOutputId}.
+     *
+     * @param snippetExecutorCode The unique identifier of the executor that will execute the code.
+     * @param base64CodeSnippet The code snippet to execute, given in Base64.
+     * @param consoleOutputId The HTML element that will be updated with the execution result.
+     */
+    public void executeCodeSnippet(final String snippetExecutorCode, final String base64CodeSnippet, final String consoleOutputId) {
+
+        if(snippetExecutorCode != null) {
+            final Optional<ISnippetExecutor> snippetExecutor = OSGiManager.getInstalledServices(ISnippetExecutor.class)
+                    .stream()
+                    .filter(executor -> snippetExecutorCode.equals(executor.getCode()))
+                    .findFirst();
+
+            if(snippetExecutor.isPresent()) {
+                try {
+                    final CodeSnippet codeSnippetDecoded = CodeSnippet.toObject(new String(Base64.getDecoder().decode(base64CodeSnippet), "UTF8"));
+                    final ObservableList<String> consoleOutput = snippetExecutor.get().execute(codeSnippetDecoded);
+
+                    consoleOutput.addListener((ListChangeListener<String>) change -> {
+                        // Push the execution result to the presentation.
+                        PlatformHelper.run(() -> {
+                            while (change.next()) {
+                                if (change.wasAdded()) {
+                                    change.getAddedSubList()
+                                            .stream()
+                                            .forEach(line ->
+                                                            this.browser.get().getEngine().executeScript(String.format("updateCodeSnippetConsole('%1$s', '%2$s');",
+                                                                    consoleOutputId, Base64.getEncoder().encodeToString(line.getBytes())))
+                                            );
+                                }
+                            }
+                            change.reset();
+                        });
+                    });
+                } catch (UnsupportedEncodingException e) {
+                    LOGGER.log(Level.SEVERE, "Can not decode code snippet", e);
+                }
+            }
+        }
     }
 
     /**
@@ -148,12 +193,11 @@ public class SlideShowScene extends Scene {
     }
 
     /**
-     * Exit the slide show mode. This method calls SlideshowFX#setSlideShowActive and set the value to <code>false</code>.
+     * Exit the slide show mode.
      */
     public void exitSlideshow() {
         PlatformHelper.run(() -> {
             SlideShowScene.singleton = null;
-            SlideshowFX.setSlideShowActive(false);
         });
     }
 

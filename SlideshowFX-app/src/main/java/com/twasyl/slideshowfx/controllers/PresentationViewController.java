@@ -21,21 +21,27 @@ import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.controls.QuizzCreatorPanel;
 import com.twasyl.slideshowfx.controls.SlideContentEditor;
-import com.twasyl.slideshowfx.controls.SlideShowScene;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
-import com.twasyl.slideshowfx.extension.ContentExtensionManager;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
+import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
+import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
+import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.beans.binding.FilenameBinding;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.adapter.JavaBeanObjectProperty;
 import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -81,6 +87,7 @@ public class PresentationViewController implements Initializable {
     private SlideshowFXController parent;
     private PresentationEngine presentationEngine;
     private final ReadOnlyStringProperty presentationName = new SimpleStringProperty();
+    private final ReadOnlyBooleanProperty presentationModified = new SimpleBooleanProperty(false);
 
     @FXML private WebView browser;
     @FXML private TextField slideNumber;
@@ -163,6 +170,8 @@ public class PresentationViewController implements Initializable {
         this.presentationEngine.getConfiguration().updateSlideThumbnail(this.slideNumber.getText(), thumbnail);
 
         if(this.parent != null) this.parent.updateSlideSplitMenu();
+
+        ((SimpleBooleanProperty) this.presentationModified).set(true);
     }
 
 
@@ -212,6 +221,53 @@ public class PresentationViewController implements Initializable {
             this.contentEditor.requestFocus();
         } else {
             LOGGER.info(String.format("Prefill information for the field %1$s of slide #%2$s is impossible: the slide is not found", field, slideNumber));
+        }
+    }
+
+    /**
+     * This method is called by the presentation in order to execute a code snippet. The executor is identified by the
+     * {@code snippetExecutorCode} and retrieved in the OSGi context to get the {@link com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor}
+     * instance that will execute the code.
+     * The code to execute is passed to this method in Base64 using the {@code base64CodeSnippet} parameter. The execution
+     * result will be pushed back to the presentation in the HTML element {@code consoleOutputId}.
+     *
+     * @param snippetExecutorCode The unique identifier of the executor that will execute the code.
+     * @param base64CodeSnippet The code snippet to execute, given in Base64.
+     * @param consoleOutputId The HTML element that will be updated with the execution result.
+     */
+    public void executeCodeSnippet(final String snippetExecutorCode, final String base64CodeSnippet, final String consoleOutputId) {
+
+        if(snippetExecutorCode != null) {
+            final Optional<ISnippetExecutor> snippetExecutor = OSGiManager.getInstalledServices(ISnippetExecutor.class)
+                    .stream()
+                    .filter(executor -> snippetExecutorCode.equals(executor.getCode()))
+                    .findFirst();
+
+            if(snippetExecutor.isPresent()) {
+                try {
+                    final CodeSnippet codeSnippetDecoded = CodeSnippet.toObject(new String(Base64.getDecoder().decode(base64CodeSnippet), "UTF8"));
+                    final ObservableList<String> consoleOutput = snippetExecutor.get().execute(codeSnippetDecoded);
+
+                    consoleOutput.addListener((ListChangeListener<String>) change -> {
+                        // Push the execution result to the presentation.
+                        PlatformHelper.run(() -> {
+                            while (change.next()) {
+                                if (change.wasAdded()) {
+                                    change.getAddedSubList()
+                                            .stream()
+                                            .forEach(line ->
+                                                            this.browser.getEngine().executeScript(String.format("updateCodeSnippetConsole('%1$s', '%2$s');",
+                                                                    consoleOutputId, Base64.getEncoder().encodeToString(line.getBytes())))
+                                            );
+                                }
+                            }
+                            change.reset();
+                        });
+                    });
+                } catch (UnsupportedEncodingException e) {
+                    LOGGER.log(Level.SEVERE, "Can not decode code snippet", e);
+                }
+            }
         }
     }
 
@@ -367,6 +423,7 @@ public class PresentationViewController implements Initializable {
         if(archiveFile != null) {
             this.presentationEngine.setArchive(archiveFile);
             this.presentationEngine.saveArchive();
+            PlatformHelper.run(() -> ((SimpleBooleanProperty) this.presentationModified).set(false));
         }
     }
 
@@ -410,6 +467,12 @@ public class PresentationViewController implements Initializable {
                     .build();
 
             ((SimpleStringProperty) this.presentationName).bind(new FilenameBinding(archiveFile));
+
+            /*
+             * Determine if the defined presentation is opened from a template or an existing presentation in order to
+             * indicate if it is considered as modified.
+             */
+            ((SimpleBooleanProperty) this.presentationModified).set(this.presentationEngine.getArchive() == null ? true : false);
         } catch (NoSuchMethodException e) {
             LOGGER.log(Level.SEVERE, "Can not create the property for the name of the presentation");
         }
@@ -421,6 +484,22 @@ public class PresentationViewController implements Initializable {
      * @return The name of this presentation.
      */
     public ReadOnlyStringProperty getPresentationName() { return this.presentationName; }
+
+    /**
+     * Indicates if the presentation has been modified since the latest time it has been saved.
+     *
+     * @return The property indicating if the presentation has been modified since the latest save.
+     */
+
+    public ReadOnlyBooleanProperty presentationModifiedProperty() { return presentationModified; }
+
+    /**
+     * Indicates if the presentation has been modified since the latest time it has been saved.
+     *
+     * @return {@code true} If the presentation has been modified but not saved, {@code false} is no modifications have
+     * been made on the presentation since the latest save.
+     */
+    public boolean isPresentationModified() { return presentationModified.get(); }
 
     /**
      * Get the slide number of the slide currently displayed.
@@ -599,10 +678,7 @@ public class PresentationViewController implements Initializable {
                 && this.presentationEngine.getConfiguration().getPresentationFile() != null
                 && this.presentationEngine.getConfiguration().getPresentationFile().exists()) {
 
-
-            final SlideShowScene subScene = new SlideShowScene(this.presentationEngine);
-
-            SlideshowFX.setSlideShowScene(subScene);
+            SlideshowFX.startSlideshow(this.presentationEngine);
         }
     }
 
@@ -638,7 +714,8 @@ public class PresentationViewController implements Initializable {
         this.refreshMarkupSyntax();
 
         // Creating buttons for each content extension bundle installed
-        ContentExtensionManager.getInstalledContentExtensions().stream()
+        OSGiManager.getInstalledServices(IContentExtension.class)
+                .stream()
                 .sorted((contentExtension1, contentExtension2) -> contentExtension1.getCode().compareTo(contentExtension2.getCode()))
                 .forEach(contentExtension -> createButtonForContentExtension(contentExtension));
 

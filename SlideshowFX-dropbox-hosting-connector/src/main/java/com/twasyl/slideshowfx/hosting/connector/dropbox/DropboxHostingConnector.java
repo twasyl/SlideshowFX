@@ -18,6 +18,7 @@ package com.twasyl.slideshowfx.hosting.connector.dropbox;
 
 import com.dropbox.core.*;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.hosting.connector.AbstractHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import javafx.concurrent.Worker;
@@ -50,10 +51,10 @@ public class DropboxHostingConnector extends AbstractHostingConnector {
         super("dropbox", "Dropbox", new RemoteFile(null));
 
         this.appInfo = new DbxAppInfo(
-                AbstractHostingConnector.getProperty(this.CONSUMER_KEY),
-                AbstractHostingConnector.getProperty(this.CONSUMER_SECRET));
+                GlobalConfiguration.getProperty(this.CONSUMER_KEY),
+                GlobalConfiguration.getProperty(this.CONSUMER_SECRET));
 
-        this.accessToken = AbstractHostingConnector.getProperty(this.getCode().concat(".accesstoken"));
+        this.accessToken = GlobalConfiguration.getProperty(this.ACCESS_TOKEN);
     }
 
     @Override
@@ -79,7 +80,7 @@ public class DropboxHostingConnector extends AbstractHostingConnector {
                         LOGGER.log(Level.SEVERE, "Can not finish authentication", e);
                         this.accessToken = null;
                     } finally {
-                        AbstractHostingConnector.setProperty(this.ACCESS_TOKEN, this.accessToken);
+                        GlobalConfiguration.setProperty(this.ACCESS_TOKEN, this.accessToken);
                         stage.close();
                     }
                 }

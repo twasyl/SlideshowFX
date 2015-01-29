@@ -31,6 +31,7 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.ParentReference;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.hosting.connector.AbstractHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.drive.io.GoogleFile;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
@@ -64,7 +65,7 @@ public class DriveHostingConnector extends AbstractHostingConnector {
     public DriveHostingConnector() {
         super("googledrive", "Google Drive", new GoogleFile());
 
-        this.accessToken = AbstractHostingConnector.getProperty(this.ACCESS_TOKEN);
+        this.accessToken = GlobalConfiguration.getProperty(this.ACCESS_TOKEN);
     }
 
     @Override
@@ -74,8 +75,8 @@ public class DriveHostingConnector extends AbstractHostingConnector {
         final JsonFactory jsonFactory = new JacksonFactory();
 
         final GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory,
-                AbstractHostingConnector.getProperty(this.CONSUMER_KEY),
-                AbstractHostingConnector.getProperty(this.CONSUMER_SECRET),
+                GlobalConfiguration.getProperty(this.CONSUMER_KEY),
+                GlobalConfiguration.getProperty(this.CONSUMER_SECRET),
                 Arrays.asList(DriveScopes.DRIVE))
                 .setAccessType("online")
                 .setApprovalPrompt("auto")
@@ -95,7 +96,7 @@ public class DriveHostingConnector extends AbstractHostingConnector {
 
                     try {
                         final GoogleTokenResponse response = flow.newTokenRequest(authorizationCode.toString())
-                                .setRedirectUri(AbstractHostingConnector.getProperty(this.REDIRECT_URI))
+                                .setRedirectUri(GlobalConfiguration.getProperty(this.REDIRECT_URI))
                                 .execute();
 
                         this.credential = new GoogleCredential().setFromTokenResponse(response);
@@ -104,7 +105,7 @@ public class DriveHostingConnector extends AbstractHostingConnector {
                         LOGGER.log(Level.WARNING, "Failed to get access token", e);
                         this.accessToken = null;
                     } finally {
-                        AbstractHostingConnector.setProperty(this.ACCESS_TOKEN, this.accessToken);
+                        GlobalConfiguration.setProperty(this.ACCESS_TOKEN, this.accessToken);
                         stage.close();
                     }
 
@@ -112,7 +113,7 @@ public class DriveHostingConnector extends AbstractHostingConnector {
             }
         });
         browser.getEngine().load(flow.newAuthorizationUrl()
-                                    .setRedirectUri(AbstractHostingConnector.getProperty(this.REDIRECT_URI))
+                                    .setRedirectUri(GlobalConfiguration.getProperty(this.REDIRECT_URI))
                                     .build());
 
         stage.setScene(scene);

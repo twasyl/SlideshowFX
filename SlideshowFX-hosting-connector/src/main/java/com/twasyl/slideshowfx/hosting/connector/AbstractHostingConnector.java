@@ -22,10 +22,7 @@ import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
-import java.io.*;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.FileNotFoundException;
 
 /**
  * The base class for implementing an {@link IHostingConnector}.
@@ -35,8 +32,10 @@ import java.util.logging.Logger;
  *  @since SlideshowFX 1.0.0
  */
 public abstract class AbstractHostingConnector implements IHostingConnector {
-    private static final Logger LOGGER = Logger.getLogger(AbstractHostingConnector.class.getName());
-    private static final File CONFIG_FILE = new File(System.getProperty("user.home"), ".SlideshowFX/.slideshowfx.hosting.connector.properties");
+    /*
+     * Constants for stored properties
+     */
+    private static final String PROPERTIES_PREFIX = "hosting.connector.";
 
     /*
      * Constants for stored properties
@@ -56,76 +55,10 @@ public abstract class AbstractHostingConnector implements IHostingConnector {
         this.name = name;
         this.rootFolder = rootFolder;
 
-        this.CONSUMER_KEY = this.code.concat(".consumer.key");
-        this.CONSUMER_SECRET = this.code.concat(".consumer.secret");
-        this.ACCESS_TOKEN = this.code.concat(".accesstoken");
-        this.REDIRECT_URI = this.code.concat(".redirecturi");
-    }
-
-    /**
-     * Get a property from the file containing all hosting connector properties. This methods return {@code null} is the property
-     * is not found or if the configuration file does not exist.
-     *
-     * @param propertyName The name of the property to retrieve.
-     * @return The value of the property or {@code null} if it is not found or the configuration does not exist.
-     * @throws java.lang.NullPointerException If the property name is null.
-     * @throws java.lang.IllegalArgumentException If the property name is empty.
-     */
-    protected final static String getProperty(final String propertyName) {
-        if(propertyName == null) throw new NullPointerException("The property name can not be null");
-        if(propertyName.trim().isEmpty()) throw new IllegalArgumentException("The property name can not be empty");
-
-        String value = null;
-
-        if(CONFIG_FILE.exists()) {
-            final Properties properties = new Properties();
-
-            try(final Reader reader = new FileReader(CONFIG_FILE)) {
-                properties.load(reader);
-                value = properties.getProperty(propertyName.trim());
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Can not load configuration file", e);
-            }
-        }
-
-        return value;
-    }
-
-    /**
-     * Save the given {@code propertyName} and {@code propertyValue} to the configuration file.
-     *
-     * @param propertyName The name of the property to save.
-     * @param propertyValue The value of the property to save.
-     * @throws java.lang.NullPointerException If the name or value of the property is null.
-     * @throws java.lang.IllegalArgumentException If the name or value of the property is empty.
-     */
-    protected final static void setProperty(final String propertyName, final String propertyValue) {
-        if(propertyName == null) throw new NullPointerException("The property name can not be null");
-        if(propertyValue == null) throw new NullPointerException("The property value can not be null");
-        if(propertyName.trim().isEmpty()) throw new IllegalArgumentException("The property name can not be empty");
-        if(propertyValue.trim().isEmpty()) throw new IllegalArgumentException("The property value can not be empty");
-
-        final Properties properties = new Properties();
-
-        // Load the current properties if they exist
-        if(CONFIG_FILE.exists()) {
-            try(final Reader reader = new FileReader(CONFIG_FILE)) {
-                properties.load(reader);
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Can not load configuration file", e);
-            }
-        }
-
-        // Add the property
-        properties.put(propertyName.trim(), propertyValue);
-
-        // Store everything
-        try(final Writer writer = new FileWriter(CONFIG_FILE)) {
-            properties.store(writer, "");
-            writer.flush();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not save configuration", e);
-        }
+        this.CONSUMER_KEY = PROPERTIES_PREFIX.concat(this.code).concat(".consumer.key");
+        this.CONSUMER_SECRET = PROPERTIES_PREFIX.concat(this.code).concat(".consumer.secret");
+        this.ACCESS_TOKEN = PROPERTIES_PREFIX.concat(this.code).concat(".accesstoken");
+        this.REDIRECT_URI = PROPERTIES_PREFIX.concat(this.code).concat(".redirecturi");
     }
 
     @Override

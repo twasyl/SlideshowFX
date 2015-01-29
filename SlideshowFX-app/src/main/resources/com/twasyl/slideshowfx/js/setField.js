@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Thierry Wasylczenko
+ * Copyright 2015 Thierry Wasylczenko
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function setField(slide, what, value) {
+function slideshowFXSetField(slide, what, value) {
     element = document.getElementById(slide + "-" + what);
     element.innerHTML = decodeURIComponent(escape(window.atob(value)));
 }

@@ -77,11 +77,15 @@ task buildJavaFXBundle << {
 
 dependencies {
     compile project(':SlideshowFX-controls')
-    compile project(':SlideshowFX-utils')
     compile project(':SlideshowFX-engines')
-    compile project(':SlideshowFX-markup')
+    compile project(':SlideshowFX-global-configuration')
+    compile project(':SlideshowFX-osgi')
+    compile project(':SlideshowFX-utils')
+
     compile project(':SlideshowFX-content-extension')
     compile project(':SlideshowFX-hosting-connector')
+    compile project(':SlideshowFX-markup')
+    compile project(':SlideshowFX-snippet-executor')
 
     compile libraries.felix
     compile libraries.freemarker
@@ -93,7 +97,6 @@ dependencies {
 
     testCompile libraries.testng
     testCompile libraries.automaton
-    testCompile libraries.cucumber
 }
 
 tasks['jar'].dependsOn 'classes'
@@ -101,8 +104,10 @@ tasks['jar'].dependsOn ':SlideshowFX-engines:jar'
 tasks['jar'].dependsOn ':SlideshowFX-controls:jar'
 tasks['jar'].dependsOn ':SlideshowFX-utils:jar'
 tasks['jar'].dependsOn ':SlideshowFX-markup:jar'
+tasks['jar'].dependsOn ':SlideshowFX-global-configuration:jar'
 tasks['jar'].dependsOn ':SlideshowFX-content-extension:jar'
 tasks['jar'].dependsOn ':SlideshowFX-hosting-connector:jar'
+tasks['jar'].dependsOn ':SlideshowFX-snippet-executor:jar'
 
 tasks['buildJavaFXBundle'].dependsOn 'jar'
 

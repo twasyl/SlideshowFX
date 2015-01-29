@@ -13,7 +13,8 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 - A chat is provided so your audience can send you questions using their smartphones and you will answer them whenever you want ;
 - A quizz creator so your audience can answer your quizz using their smartphones and you see results live ;
 - Present using your hands by changing slides with two fingers, have a "laser" pointer by using one finger. It's cool isn't it? All of this brought to you by LeapMotion.
-- Save your presentations on Dropbox or Google Drive
+- Save your presentations on Dropbox or Google Drive ;
+- Insert code snippets that can be executed directly from the presentation and console's output is displayed in the slide.
 
 == Developer guide
 
@@ -77,6 +78,8 @@ SlideshowFX contains the following modules:
 - *SlideshowFX-utils* which defines utilities classes that may be used in other modules ;
 - *SlideshowFX-engines* which defines the engines that are used in SlideshowFX for working with templates and presentations ;
 - *SlideshowFX-controls* which defines the custom graphical controls that may be used in other modules ;
+- *SlideshowFX-global-configuration* which defines the classes allowing to access and interact the SlideshowFX configuration ;
+- *SlideshowFX-osgi* which defines the OSGi classes that are useful for other modules ;
 - *SlideshowFX-markup* which defines the base classes for creating an OSGi module for supporting a new markup syntax in SlideshowFX to define slides' content ;
 - *SlideshowFX-asciidoctor* which defines the implementation of SlideshowFX-markup to define slides' content in asciidoctor ;
 - *SlideshowFX-html* which defines the implementation of SlideshowFX-markup to define slides' content in HTML ;
@@ -88,9 +91,13 @@ SlideshowFX contains the following modules:
 - *SlideshowFX-image-extension* which defines the implementation of SlideshowFX-content-extension to insert images in slides ;
 - *SlideshowFX-link-extension* which defines the implementation of SlideshowFX-content-extension to insert HTML links in slides ;
 - *SlideshowFX-quote-extension* which defines the implementation of SlideshowFX-content-extension to insert quotes in slides ;
+- *SlideshowFX-snippet-extension* which defines the implementation of SlideshowFX-content-extension to insert executable code snippet in slides ;
 - *SlideshowFX-hosting-connector* which defines the base classes for creating an OSGi module for connecting to a file hosting service ;
 - *SlideshowFX-dropbox-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Dropbox ;
-- *SlideshowFX-drive-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Google Drive.
+- *SlideshowFX-drive-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Google Drive ;
+- *SlideshowFX-snippet-executor* which defines the base classes for creating an OSGi module for executing code snippet in a presentation ;
+- *SlideshowFX-golo-executor* which defines the base classes for creating an OSGi module for executing Golo code snippet in a presentation ;
+- *SlideshowFX-java-executor* which defines the base classes for creating an OSGi module for executing Java code snippet in a presentation.
 
 === Gradle
 
@@ -109,6 +116,7 @@ In order to build SlideshowFX, some gradle tasks have been created:
 - `installMarkupPlugins` (in the root project) which copies the markup supported to the directory of plugins ;
 - `installContentExtensionPlugins` (in the root project) which copies the content extensions to the directory of plugins ;
 - `installHostingConnectorPlugins` (in the root project) which copies the hosting connectors to the directory of plugins ;
+- `installSnippetExecutor` (in the root project) which copies the snippet executors to the directory of plugins ;
 - `installSlideshowFX` (in the root project) which installs the markup, content extensions and hosting connectors in the directory of plugins and build the SlideshowFX native bundle.
 
 === Set up your environment
@@ -131,6 +139,12 @@ Values for the platform are:
 - *windows_x64*
 - *linux_x86*
 - *linux_x64*
+
+If you want SlideshowFX manage and look where LeapMotion native libraries are located, instead of defining the `-Djava.library.path` JVM argument you can define the two following:
+[source]
+-Ddynamic.java.library.path=true -Dproject.stage=development
+
+By doing so, SlideshowFX will automatically be looking for the folder `./lib/Leap/<platform>`.
 
 === Templates
 
@@ -170,13 +184,6 @@ The template configuration must be at the root of the archive and will contain a
     "file" : "template.html",
     "js-object" : "sfx",
     "resources-directory" : "resources",
-
-    "methods" : [
-      {
-        "type" : "GET_CURRENT_SLIDE",
-        "name" : "slideShowFXGetCurrentSlide"
-      }
-    ],
 
     "slides" : {
       "configuration" : {
@@ -243,10 +250,6 @@ The complete configuration is wrapped into a *template* JSON object. This object
 * *js-object* : is the name JavaScript object that will be used to callback to SlideshowFX
 * *slides-container* : is the ID of the HTML markup that will contain the slides
 * *resources-directory* : the folder that will contain the resources of the presentation, typically images file, sounds, etc
-* *methods* : indicates the name of methods that are required and called by SlideshowFX. Method with the type *GET_CURRENT_SLIDE* is mandatory.
-** *type* : the code that identifies the method for SlideshowFX. Currently one type is defined:
-*** *GET_CURRENT_SLIDE* : this type represents the methods that will return the ID of the current displayed slide. The implementation is specific for each HTLM presentation framework.
-** *name* : the name of the method that will be called.
 * *slides* : define the configuration of slides inside the presentation, as well as their template
 ** *configuration* : JSON object that will contain the configuration of the slides
 *** *slide-id-prefix* : is a prefix that will be placed in the ID attribute of an HTML slide element, prefixing the slide number
@@ -267,11 +270,9 @@ The complete configuration is wrapped into a *template* JSON object. This object
 
 The template file is the file that will host all slides, include all JavaScript libraries, CSS files and so on. In order to work, you have to:
 
-- insert the Velocity token *$\{sfxCallback\}* inside a *script* code block
-- insert the template engine token token *$\{sfxContentDefiner\}* inside a *script* block
-- insert the template engine token token *$\{sfxQuizzCaller\}* inside a *script* block
+- insert the freemarker token *$\{sfxJavascriptResources\}* inside a *script* code block
 - define an ID for the HTML element that will host all slides
-- insert the following javaScript function with the right implementation for changing slides using https://www.leapmotion.com/[LeapMotion]
+- insert the following JavaScript function with the right implementation for changing slides using https://www.leapmotion.com/[LeapMotion]
 
 [source,javascript]
 ----
@@ -280,7 +281,14 @@ function slideshowFXLeap(keyCode) {
 }
 ----
 
-- insert the JavaScript function that will return the current slide
+- insert the JavaScript function with the right implementation returning the current slide
+
+[source,javascript]
+----
+function slideshowFXGetCurrentSlide() {
+  // Return the current slide
+}
+----
 
 ==== Slide’s template file
 
@@ -302,8 +310,7 @@ The following template engine tokens are available for SlideshowFX:
 * *$\{slideIdPrefix\}* indicates the prefix that will be placed before the slide number for each slide
 * *$\{slideNumber\}* indicates the slide number generated by SlideshowFX
 * *$\{sfxCallback\}* indicates the function that will call SlideshowFX from JavaScript
-* *$\{sfxContentDefiner\}* indicates the JavaScript function that SlideshowFX will call in order to define the content of an element inside a slide
-* *$\{sfxQuizzCaller\}* indicates the functions that will inserted to perform operations for a quizz
+* *$\{sfxJavascriptResources\}* indicates the JavaScript resources SlideshowFX will insert in the presentation, like the one for inserting content, calling a quiz etc
 
 === Presentations
 

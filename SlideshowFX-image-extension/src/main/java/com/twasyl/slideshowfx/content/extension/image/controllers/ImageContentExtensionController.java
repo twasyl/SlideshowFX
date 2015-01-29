@@ -16,8 +16,7 @@
 
 package com.twasyl.slideshowfx.content.extension.image.controllers;
 
-import com.twasyl.slideshowfx.content.extension.image.ImageContentExtension;
-import com.twasyl.slideshowfx.osgi.DataServices;
+import com.twasyl.slideshowfx.osgi.OSGiManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -29,9 +28,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 
 import java.io.*;
 import java.net.URL;
@@ -71,22 +67,7 @@ public class ImageContentExtensionController implements Initializable {
     @FXML private FlowPane imagesPane;
     @FXML private ImageView preview;
 
-    private DataServices services = null;
     private final ToggleGroup imagesGroup = new ToggleGroup();
-
-    /**
-     * Gets the DataServices. If it is null, the method will look for it in the OSGi context.
-     * @return The DataServices.
-     */
-    private DataServices getServices() {
-        if(this.services == null) {
-            BundleContext bundle = FrameworkUtil.getBundle(ImageContentExtension.class).getBundleContext();
-            ServiceReference serviceReference = bundle.getServiceReference(DataServices.class.getName());
-            this.services = (DataServices) bundle.getService(serviceReference);
-        }
-
-        return services;
-    }
 
     @FXML
     private void chooseNewFile(ActionEvent event) {
@@ -98,11 +79,11 @@ public class ImageContentExtensionController implements Initializable {
 
         if (imageFile != null) {
 
-            File targetFile = new File((File) this.getServices().get(DataServices.PRESENTATION_RESOURCES_FOLDER), imageFile.getName());
+            File targetFile = new File((File) OSGiManager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER), imageFile.getName());
 
             if (targetFile.exists()) {
                 // If the file exists, add a timestamp to the source
-                targetFile = new File((File) this.getServices().get(DataServices.PRESENTATION_RESOURCES_FOLDER), System.currentTimeMillis() + imageFile.getName());
+                targetFile = new File((File) OSGiManager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER), System.currentTimeMillis() + imageFile.getName());
             }
 
             try {
@@ -123,7 +104,7 @@ public class ImageContentExtensionController implements Initializable {
     private List<File> lookupResources() {
         final List<File> images = new ArrayList<>();
 
-        for(File img : ((File) this.getServices().get(DataServices.PRESENTATION_RESOURCES_FOLDER)).listFiles(IMAGE_FILTER)) {
+        for(File img : ((File) OSGiManager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER)).listFiles(IMAGE_FILTER)) {
             images.add(img);
 
         }
@@ -210,7 +191,7 @@ public class ImageContentExtensionController implements Initializable {
 
         final File selection = this.getSelectedFile();
         if(selection != null) {
-            final File workingDir = (File) this.getServices().get(DataServices.PRESENTATION_FOLDER);
+            final File workingDir = (File) OSGiManager.getPresentationProperty(OSGiManager.PRESENTATION_FOLDER);
 
             url = workingDir.toPath().relativize(selection.toPath()).toString().replace(File.separator, "/");
         }

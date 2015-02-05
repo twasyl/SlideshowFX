@@ -18,9 +18,7 @@ package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
-import com.twasyl.slideshowfx.controls.Dialog;
-import com.twasyl.slideshowfx.controls.QuizzCreatorPanel;
-import com.twasyl.slideshowfx.controls.SlideContentEditor;
+import com.twasyl.slideshowfx.controls.*;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
@@ -673,12 +671,15 @@ public class PresentationViewController implements Initializable {
      *     returns a non null value and a file that exists</li>
      * </ul>
      */
-    public void startSlideshow() {
+    public void startSlideshow(final boolean leapMotionEnabled) {
         if (this.presentationEngine.getConfiguration() != null
                 && this.presentationEngine.getConfiguration().getPresentationFile() != null
                 && this.presentationEngine.getConfiguration().getPresentationFile().exists()) {
 
-            SlideshowFX.startSlideshow(this.presentationEngine);
+            final SlideshowScene scene = new SlideshowScene(this.presentationEngine);
+            final SlideshowStage stage = new SlideshowStage(scene, leapMotionEnabled);
+
+            stage.show();
         }
     }
 

@@ -27,7 +27,7 @@ import javafx.scene.layout.Region;
 
 /**
  * This class is used in order to display a Pie chart indicating the results for a ccurrent quizz.
- * This panel should be used in a {@link com.twasyl.slideshowfx.controls.SlideShowScene}.
+ * This panel should be used in a {@link SlideshowScene}.
  *
  * @author Thierry Wasylczenko
  * @version 1.0

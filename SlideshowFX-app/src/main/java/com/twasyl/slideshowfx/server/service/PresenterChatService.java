@@ -16,7 +16,7 @@
 
 package com.twasyl.slideshowfx.server.service;
 
-import com.twasyl.slideshowfx.controls.SlideShowScene;
+import com.twasyl.slideshowfx.controls.SlideshowScene;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
@@ -49,7 +49,7 @@ public class PresenterChatService extends Verticle {
         final Handler<Message<JsonObject>> handler = message -> {
             final JsonObject messageContent = message.body();
 
-            if(SlideShowScene.getSingleton() != null) SlideShowScene.getSingleton().publishMessage(messageContent);
+            if(SlideshowScene.getSingleton() != null) SlideshowScene.getSingleton().publishMessage(messageContent);
 
             message.reply();
         };

@@ -17,7 +17,7 @@
 package com.twasyl.slideshowfx.leap;
 
 import com.leapmotion.leap.*;
-import com.twasyl.slideshowfx.controls.SlideShowScene;
+import com.twasyl.slideshowfx.controls.SlideshowScene;
 import javafx.scene.input.KeyCode;
 
 import java.util.Iterator;
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 /**
  * This class is used the LeapMotion listener for controlling the slideshow. It has to be created using a
- * {@link com.twasyl.slideshowfx.controls.SlideShowScene} instance with which LeapMotion will interact.
+ * {@link com.twasyl.slideshowfx.controls.SlideshowScene} instance with which LeapMotion will interact.
  *
  * @author Thierry Wasylczenko
  * @version 1.0
@@ -35,7 +35,7 @@ public class SlideshowFXLeapListener extends Listener {
 
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXLeapListener.class.getName());
 
-    private final SlideShowScene scene;
+    private final SlideshowScene scene;
 
     /**
      * When performing a gesture, indicates the maximum angle from the X axis the gesture's direction could have.
@@ -50,13 +50,13 @@ public class SlideshowFXLeapListener extends Listener {
     private SwipeGesture lastSwipeGesture;
 
     /**
-     * Creates a LeapMotion listener that will apply on a SlideShowScene. It will be used to change slides, show a pointer
+     * Creates a LeapMotion listener that will apply on a SlideshowScene. It will be used to change slides, show a pointer
      * and click on the presentation using LeapMotion.
      *
      * @param scene The scene the listener will work on.
      * @throws java.lang.NullPointerException If the given {@code scene} is null.
      */
-    public SlideshowFXLeapListener(final SlideShowScene scene) {
+    public SlideshowFXLeapListener(final SlideshowScene scene) {
         super();
         this.scene = scene;
     }
@@ -81,7 +81,7 @@ public class SlideshowFXLeapListener extends Listener {
         super.onConnect(controller);
         LOGGER.finest("LeapMotion controller connected");
         controller.enableGesture(Gesture.Type.TYPE_SWIPE);
-        controller.enableGesture(Gesture.Type.TYPE_KEY_TAP);
+        controller.enableGesture(Gesture.Type.TYPE_SCREEN_TAP);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class SlideshowFXLeapListener extends Listener {
                             case TYPE_SWIPE:
                                 manageSwipe(controller, gesture);
                                 break;
-                            case TYPE_KEY_TAP:
+                            case TYPE_SCREEN_TAP:
                                 click(controller, gesture);
                                 break;
                         }
@@ -165,54 +165,31 @@ public class SlideshowFXLeapListener extends Listener {
 
         final Frame frame = controller.frame();
 
-        if(!frame.hands().isEmpty() && frame.hands().count() == 1) {
+        if (!frame.hands().isEmpty() && frame.hands().count() == 1) {
             final Hand hand = frame.hands().get(0);
 
-            if(hand.isValid()) {
+            if (hand.isValid()) {
 
-                // Only movePointer if we find an INDEX finger and if it is extended
-                if(!hand.fingers().isEmpty()) {
+                FingerList extendedFingers = hand.fingers().extended();
+                // Ensure we only have one extended finger
+                if (extendedFingers.count() == 1) {
+                    Pointable pointable = extendedFingers.get(0);
 
-                    Finger finger, indexFinger = null;
+                    // We just want the index finger
+                    if (pointable.isValid() && pointable.isFinger()
+                            && ((Finger) pointable).type() == Finger.Type.TYPE_INDEX) {
 
-                    boolean otherFingersClosed = true;
-                    boolean indexFingerValid = false;
-
-                    Iterator<Finger> fingerIterator = hand.fingers().iterator();
-
-                    while(fingerIterator.hasNext() && otherFingersClosed) {
-                        finger = fingerIterator.next();
-
-                        if(finger.type() != Finger.Type.TYPE_INDEX) {
-                            otherFingersClosed = !finger.isExtended();
-                        } else {
-                            indexFingerValid = finger.isExtended();
-                            indexFinger = finger;
-                        }
-                    }
-
-                    if(indexFingerValid && otherFingersClosed) {
-
+                        final Finger indexFinger = (Finger) pointable;
                         final InteractionBox box = frame.interactionBox();
-                        final Vector normalizedPosition = box.normalizePoint(indexFinger.tipPosition());
+
+                        Vector normalizedPosition = box.normalizePoint(indexFinger.stabilizedTipPosition());
+                        normalizedPosition = normalizedPosition.times(1.2f); // Scale the movement
 
                         double screenWidth = this.scene.getWidth();
                         double screenHeight = this.scene.getHeight();
 
                         double computedX = normalizedPosition.getX() * screenWidth;
-                        double computedY = screenHeight - (normalizedPosition.getY() * screenHeight);
-
-                        double verticalOrientation = Math.toDegrees(indexFinger.direction().angleTo(Vector.yAxis()));
-                        double yPadding = (verticalOrientation - 90) * 10;
-
-                        double horizontalOrientation = Math.toDegrees(indexFinger.direction().angleTo(Vector.xAxis()));
-                        double xPadding = (90 - horizontalOrientation) * 15;
-
-                        if(verticalOrientation > 90) computedY += yPadding;
-                        else if(verticalOrientation < 90) computedY -= yPadding;
-
-                        if(horizontalOrientation < 90) computedX -= xPadding;
-                        else if(horizontalOrientation > 90) computedX += xPadding;
+                        double computedY = (1 - normalizedPosition.getY()) * screenHeight;
 
                         this.scene.showPointer(computedX, computedY);
                         pointerHasMoved = true;
@@ -228,7 +205,7 @@ public class SlideshowFXLeapListener extends Listener {
      * Change slide if the given gesture respect the following criteria:
      * <ul>
      *     <li>Only one hand is visible and valid</li>
-     *     <li>Only two fingers are used and are valid, ie index and middle fingers are extended, others not.</li>
+     *     <li>Only the index and middle fingers are used and are valid</li>
      *     <li>The direction of the gesture is horizontal</li>
      * </ul>
      * @param controller
@@ -245,64 +222,51 @@ public class SlideshowFXLeapListener extends Listener {
             final Hand hand = frame.hands().get(0);
 
             // Only the index and middle fingers extended. All others should be closed.
-            if(hand.isValid() && !hand.fingers().isEmpty()) {
+            if(hand.isValid()) {
 
-                Finger finger;
-                boolean fingersAreValid = true;
-                boolean indexFingerValid = false;
-                boolean middleFingerValid = false;
+                final FingerList extendedFingers = hand.fingers().extended();
+                if (extendedFingers.count() == 2) {
+                    final Finger indexFinger = extendedFingers.fingerType(Finger.Type.TYPE_INDEX).get(0);
+                    final Finger middleFinger = extendedFingers.fingerType(Finger.Type.TYPE_MIDDLE).get(0);
 
-                Iterator<Finger> fingerIterator = hand.fingers().iterator();
+                    if (indexFinger != null && indexFinger.isValid()
+                            && middleFinger != null && middleFinger.isValid()) {
 
-                // Check that each finger is valid
-                while(fingerIterator.hasNext() && fingersAreValid) {
-                    finger = fingerIterator.next();
-                    fingersAreValid = finger.isValid();
+                        // The angle given by angleTo is always less or equal Pi radians (180°)
+                        double degree = Math.abs(Math.toDegrees(gesture.direction().angleTo(Vector.xAxis())));
 
-                    switch(finger.type()) {
-                        case TYPE_INDEX:
-                            indexFingerValid = finger.isExtended();
-                            break;
-                        case TYPE_MIDDLE:
-                            middleFingerValid = finger.isExtended();
-                            break;
-                        default:
-                            fingersAreValid = !finger.isExtended();
-                    }
-                }
+                        /*
+                         * The X direction angle is valid if the angle is
+                         * 0 >= ANGLE <= X_AXIS_DIRECTION_MAX_ANGLE
+                         * OR
+                         * 180° >= ANGLE <= 180° - X_AXIS_DIRECTION_MAX_ANGLE
+                         */
+                        boolean xAxisCheck = degree <= X_AXIS_DIRECTION_MAX_ANGLE || degree >= 180 - X_AXIS_DIRECTION_MAX_ANGLE;
+                        LOGGER.finest(String.format("SlideshowFXLeapListener#changeSlide : direction of the gesture compared to X axis : %1$s°", degree));
 
-                // If all good, try to change the side
-                if(fingersAreValid && indexFingerValid && middleFingerValid) {
+                        /*
+                         * The Z direction angle is valid if the angle is
+                         * 90° - Z_AXIS_DIRECTION_MAX_ANGLE >= ANGLE <= 90° + Z_AXIS_DIRECTION_MAX_ANGLE
+                         */
+                        degree = Math.abs(Math.toDegrees(gesture.direction().angleTo(Vector.zAxis())));
+                        boolean zAxisAcheck = (90 - Z_AXIS_DIRECTION_MAX_ANGLE) <= degree && (90 + Z_AXIS_DIRECTION_MAX_ANGLE) >= degree;
+                        LOGGER.finest(String.format("SlideshowFXLeapListener#changeSlide : direction of the gesture compared to Z axis : %1$s°", degree));
 
-                    // The angle given by angleTo is always less or equal Pi radians (180°)
-                    double degree = Math.abs(Math.toDegrees(gesture.direction().angleTo(Vector.xAxis())));
-
-                    /* The X direction angle is valid if the angle is
-                        0 >= ANGLE <= X_AXIS_DIRECTION_MAX_ANGLE
-                        OR
-                        180° >= ANGLE <= 180° - X_AXIS_DIRECTION_MAX_ANGLE */
-                    boolean xAxisCheck = degree <= X_AXIS_DIRECTION_MAX_ANGLE || degree >= 180 - X_AXIS_DIRECTION_MAX_ANGLE;
-                    LOGGER.finest(String.format("SlideshowFXLeapListener#changeSlide : direction of the gesture compared to X axis : %1$s°", degree));
-
-                    /* The Z direction angle is valid if the angle is
-                    * 90° - Z_AXIS_DIRECTION_MAX_ANGLE >= ANGLE <= 90° + Z_AXIS_DIRECTION_MAX_ANGLE*/
-                    degree = Math.abs(Math.toDegrees(gesture.direction().angleTo(Vector.zAxis())));
-                    boolean zAxisAcheck = (90 - Z_AXIS_DIRECTION_MAX_ANGLE) <= degree && (90 + Z_AXIS_DIRECTION_MAX_ANGLE) >= degree;
-                    LOGGER.finest(String.format("SlideshowFXLeapListener#changeSlide : direction of the gesture compared to Z axis : %1$s°", degree));
-
-                    // If the swipe is considered as horizontal
-                    if(xAxisCheck && zAxisAcheck) {
-                        // Check the gesture is a swipe and determine direction
-                        if(gesture.direction().getX() > 0) {
-                            this.scene.hidePointer();
-                            this.scene.sendKey(KeyCode.LEFT);
-                            slideHasChanged = true;
-                        } else if(gesture.direction().getX() < 0) {
-                            this.scene.hidePointer();
-                            this.scene.sendKey(KeyCode.RIGHT);
-                            slideHasChanged = true;
+                        // If the swipe is considered as horizontal
+                        if (xAxisCheck && zAxisAcheck) {
+                            // Check the gesture is a swipe and determine direction
+                            if (gesture.direction().getX() > 0) {
+                                this.scene.hidePointer();
+                                this.scene.sendKey(KeyCode.LEFT);
+                                slideHasChanged = true;
+                            } else if (gesture.direction().getX() < 0) {
+                                this.scene.hidePointer();
+                                this.scene.sendKey(KeyCode.RIGHT);
+                                slideHasChanged = true;
+                            }
                         }
                     }
+
                 }
             }
         }
@@ -324,7 +288,6 @@ public class SlideshowFXLeapListener extends Listener {
      * @return true if a click has been performed.
      */
     private boolean click(final Controller controller, Gesture gesture) {
-        final KeyTapGesture keyTap = new KeyTapGesture(gesture);
         boolean clickPerformed = false;
 
         final Frame frame = controller.frame();
@@ -333,19 +296,12 @@ public class SlideshowFXLeapListener extends Listener {
         if (frame.isValid() && !frame.hands().isEmpty() && frame.hands().count() == 1) {
             final Hand hand = frame.hands().get(0);
 
-            // Five fingers
-            if (hand.isValid() && !hand.fingers().isEmpty() && hand.fingers().count() == 5) {
+            // Only the index finger must be extended
+            FingerList extendedFingers = hand.fingers().extended();
+            Finger indexFinger = extendedFingers.fingerType(Finger.Type.TYPE_INDEX).get(0);
 
-                boolean fingersExtended = true;
-                Iterator<Finger> iterator = hand.fingers().iterator();
-                Finger finger;
-
-                while(iterator.hasNext() && fingersExtended) {
-                    finger = iterator.next();
-
-                    fingersExtended = finger.isValid() && finger.isExtended();
-                }
-
+            if(extendedFingers.count() == 1 && indexFinger != null && indexFinger.isValid()) {
+                System.out.println("Click");
                 this.scene.click();
                 clickPerformed = true;
             }

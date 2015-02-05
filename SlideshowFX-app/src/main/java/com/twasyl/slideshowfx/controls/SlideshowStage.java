@@ -17,14 +17,16 @@
 package com.twasyl.slideshowfx.controls;
 
 import com.leapmotion.leap.Controller;
+import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.leap.SlideshowFXLeapListener;
 import javafx.scene.input.KeyCode;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 /**
  * The stage is defined when the presentation enters in slideshow mode. It defines a stage with the expected behaviour
- * with LeapMotion and interaction with the keyboard. It is necessary to create the stage with a {@link com.twasyl.slideshowfx.controls.SlideShowScene}
+ * with LeapMotion and interaction with the keyboard. It is necessary to create the stage with a {@link SlideshowScene}
  * and indicating if LeapMotion should be enabled.
  *
  * @author Thierry Wasylczenko
@@ -37,11 +39,20 @@ public class SlideshowStage extends Stage {
     private final Controller controller;
     private final SlideshowFXLeapListener listener;
 
-    public SlideshowStage(final SlideShowScene scene, final boolean leapMotionEnabled) {
+    public SlideshowStage(final SlideshowScene scene, final boolean leapMotionEnabled) {
         super(StageStyle.UNDECORATED);
         this.setScene(scene);
-        this.setAlwaysOnTop(true);
-        this.setFullScreen(true);
+
+        // Setting the size of the stage according on which screen the main app is.
+        Screen screen = Screen.getScreensForRectangle(SlideshowFX.getStage().getX(),
+                SlideshowFX.getStage().getY(),
+                SlideshowFX.getStage().getWidth(),
+                SlideshowFX.getStage().getHeight()).get(0);
+
+        this.setX(screen.getBounds().getMinX());
+        this.setY(screen.getBounds().getMinY());
+        this.setWidth(screen.getBounds().getWidth());
+        this.setHeight(screen.getBounds().getHeight());
 
         /**
          * LeapMotion initialization
@@ -79,5 +90,7 @@ public class SlideshowStage extends Stage {
                 scene.click();
             }
         });
+
+        this.setAlwaysOnTop(true);
     }
 }

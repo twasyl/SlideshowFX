@@ -25,7 +25,6 @@ import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
-import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
@@ -33,6 +32,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
@@ -58,31 +58,49 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  */
-public class SlideShowScene extends Scene {
+public class SlideshowScene extends Scene {
 
-    private static final Logger LOGGER = Logger.getLogger(SlideShowScene.class.getName());
-    private static SlideShowScene singleton = null;
+    private static final Logger LOGGER = Logger.getLogger(SlideshowScene.class.getName());
+    private static SlideshowScene singleton = null;
 
     private final PresentationEngine presentation;
     private final ObjectProperty<WebView> browser = new SimpleObjectProperty<>();
     private final ObjectProperty<Circle> pointer = new SimpleObjectProperty<>();
+    private final ObjectProperty<ProgressIndicator> progressIndicator = new SimpleObjectProperty<>();
 
     private final ChatPanel chatPanel = new ChatPanel();
     private final QuizzPanel quizzPanel = new QuizzPanel();
     private final CollapsibleToolPane collapsibleToolPane = new CollapsibleToolPane();
 
-    public SlideShowScene(PresentationEngine presentationEngine) {
+    public SlideshowScene(PresentationEngine presentationEngine) {
         super(new StackPane());
-        SlideShowScene.singleton = this;
+        SlideshowScene.singleton = this;
+
+        this.getStylesheets().add(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/css/Default.css"));
 
         this.presentation = presentationEngine;
 
+        this.progressIndicator.set(new ProgressIndicator());
+        this.progressIndicator.get().setPrefSize(200, 200);
+        this.progressIndicator.get().setMinSize(200, 200);
+        this.progressIndicator.get().setMaxSize(200, 200);
+        this.progressIndicator.get().translateXProperty().bind(this.widthProperty().divide(2d).subtract(this.progressIndicator.get().widthProperty().divide(2)));
+        this.progressIndicator.get().translateYProperty().bind(this.heightProperty().divide(2d).subtract(this.progressIndicator.get().heightProperty().divide(2)));
+
         this.browser.set(new WebView());
         this.browser.get().getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
-            if (newState == Worker.State.SUCCEEDED) {
-                JSObject window = (JSObject) this.browser.get().getEngine().executeScript("window");
-                window.setMember(SlideShowScene.this.presentation.getTemplateConfiguration().getJsObject(), SlideShowScene.this);
-                window.setMember("sfxServer", SlideshowFXServer.getSingleton());
+            if(newState == Worker.State.RUNNING) {
+                this.progressIndicator.get().setProgress(-1d);
+                SlideshowScene.this.getSceneRoot().getChildren().add(this.progressIndicator.get());
+            } else {
+                this.progressIndicator.get().setProgress(0);
+                SlideshowScene.this.getSceneRoot().getChildren().remove(this.progressIndicator.get());
+
+                if (newState == Worker.State.SUCCEEDED) {
+                    JSObject window = (JSObject) this.browser.get().getEngine().executeScript("window");
+                    window.setMember(SlideshowScene.this.presentation.getTemplateConfiguration().getJsObject(), SlideshowScene.this);
+                    window.setMember("sfxServer", SlideshowFXServer.getSingleton());
+                }
             }
         });
 
@@ -179,10 +197,10 @@ public class SlideShowScene extends Scene {
     }
 
     /**
-     * Get the instance of the SlideShowScene.
-     * @return The instance of the SlideShowScene or null if none.
+     * Get the instance of the SlideshowScene.
+     * @return The instance of the SlideshowScene or null if none.
      */
-    public static SlideShowScene getSingleton() { return singleton; }
+    public static SlideshowScene getSingleton() { return singleton; }
 
     public ObjectProperty<WebView> browserProperty() { return browser; }
     public WebView getBrowser() { return this.browserProperty().get(); }
@@ -197,7 +215,7 @@ public class SlideShowScene extends Scene {
      */
     public void exitSlideshow() {
         PlatformHelper.run(() -> {
-            SlideShowScene.singleton = null;
+            SlideshowScene.singleton = null;
         });
     }
 
@@ -245,18 +263,18 @@ public class SlideShowScene extends Scene {
      */
     public void showPointer(double x, double y) {
         PlatformHelper.run(() -> {
-            if (SlideShowScene.this.pointer.get() == null) {
-                SlideShowScene.this.pointer.set(new Circle(10d, new Color(1, 0, 0, 0.5)));
+            if (SlideshowScene.this.pointer.get() == null) {
+                SlideshowScene.this.pointer.set(new Circle(10d, new Color(1, 0, 0, 0.5)));
             }
 
-            if (!SlideShowScene.this.getSceneRoot().getChildren().contains(SlideShowScene.this.pointer.get())) {
-                SlideShowScene.this.pointer.get().setLayoutX(0);
-                SlideShowScene.this.pointer.get().setLayoutY(0);
-                SlideShowScene.this.getSceneRoot().getChildren().add(SlideShowScene.this.pointer.get());
+            if (!SlideshowScene.this.getSceneRoot().getChildren().contains(SlideshowScene.this.pointer.get())) {
+                SlideshowScene.this.pointer.get().setLayoutX(0);
+                SlideshowScene.this.pointer.get().setLayoutY(0);
+                SlideshowScene.this.getSceneRoot().getChildren().add(SlideshowScene.this.pointer.get());
             }
 
-            SlideShowScene.this.pointer.get().setTranslateX(x - SlideShowScene.this.pointer.get().getRadius());
-            SlideShowScene.this.pointer.get().setTranslateY(y - SlideShowScene.this.pointer.get().getRadius());
+            SlideshowScene.this.pointer.get().setTranslateX(x - SlideshowScene.this.pointer.get().getRadius());
+            SlideshowScene.this.pointer.get().setTranslateY(y - SlideshowScene.this.pointer.get().getRadius());
         });
     }
 
@@ -266,7 +284,7 @@ public class SlideShowScene extends Scene {
     public void hidePointer() {
         if(this.pointer.get() != null) {
             PlatformHelper.run(() -> {
-                ((StackPane) SlideShowScene.this.getRoot()).getChildren().remove(SlideShowScene.this.pointer.get());
+                ((StackPane) SlideshowScene.this.getRoot()).getChildren().remove(SlideshowScene.this.pointer.get());
             });
         }
     }
@@ -277,7 +295,7 @@ public class SlideShowScene extends Scene {
      * of the pointer and takes into account a multiple screen environment.
      */
     public void click() {
-        Platform.runLater(() -> {
+        PlatformHelper.run(() -> {
             if (this.pointer.get() != null && this.getSceneRoot().getChildren().contains(this.pointer.get())) {
 
                 /**
@@ -296,24 +314,22 @@ public class SlideShowScene extends Scene {
                 double clickX = this.pointer.get().getTranslateX() + this.pointer.get().getRadius();
                 clickX += super.getWindow().getX();
 
-                double clickY = this.pointer.get().getTranslateY() - this.pointer.get().getRadius();
+                double clickY = this.pointer.get().getTranslateY() + this.pointer.get().getRadius();
                 clickY += super.getWindow().getY();
 
                 /**
                  * The pointer has to be removed because if not, the click is performed on it, and not on elements
-                 * of the scene. It will be added when click is performed.
+                 * of the scene.
                  */
-                SlideShowScene.this.getSceneRoot().getChildren().remove(SlideShowScene.this.pointer.get());
+                SlideshowScene.this.hidePointer();
 
                 try {
-                    Robot robot = new Robot(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
+                    Robot robot = new Robot();
                     robot.mouseMove((int) clickX, (int) clickY);
                     robot.mousePress(InputEvent.BUTTON1_MASK);
                     robot.mouseRelease(InputEvent.BUTTON1_MASK);
                 } catch (AWTException e) {
                     LOGGER.log(Level.WARNING, "Can not simulate click", e);
-                } finally {
-                    SlideShowScene.this.getSceneRoot().getChildren().add(SlideShowScene.this.pointer.get());
                 }
             }
         });

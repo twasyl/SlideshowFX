@@ -231,6 +231,10 @@
     -fx-background-color: app-color-input-background;
 }
 
+.progress-indicator {
+    -fx-progress-color: app-color-background;
+}
+
 .scroll-pane, .scroll-pane .corner {
     -fx-background-color: app-color-background;
     -fx-background: app-color-background;

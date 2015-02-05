@@ -528,7 +528,7 @@ public class SlideshowFXController implements Initializable {
     @FXML private void slideShow(ActionEvent event) {
         final PresentationViewController view = this.getCurrentPresentationView();
 
-        if(view != null) view.startSlideshow();
+        if(view != null) view.startSlideshow(this.leapMotionEnabled.isSelected());
     }
 
     /**
@@ -1044,9 +1044,6 @@ public class SlideshowFXController implements Initializable {
                 service.restart();
             }
         });
-
-        SlideshowFX.leapMotionAllowedProperty().bind(this.leapMotionEnabled.selectedProperty());
-        this.leapMotionEnabled.setSelected(true);
 
         // We use reflection to disable all elements present in the list
         final Consumer<Object> disableElementLambda = element -> {

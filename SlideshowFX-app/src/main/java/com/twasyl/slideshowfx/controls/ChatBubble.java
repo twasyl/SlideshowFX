@@ -30,7 +30,7 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 /**
- * This class is used to display a {@link com.twasyl.slideshowfx.beans.chat.ChatMessage} in the {@link com.twasyl.slideshowfx.controls.SlideShowScene}
+ * This class is used to display a {@link com.twasyl.slideshowfx.beans.chat.ChatMessage} in the {@link SlideshowScene}
  *
  * @author Thierry Wasylczenko
  * @version 1.0

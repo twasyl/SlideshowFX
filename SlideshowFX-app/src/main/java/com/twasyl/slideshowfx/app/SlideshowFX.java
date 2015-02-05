@@ -18,7 +18,7 @@ package com.twasyl.slideshowfx.app;
 
 import com.sun.javafx.PlatformUtil;
 import com.sun.javafx.application.LauncherImpl;
-import com.twasyl.slideshowfx.controls.SlideShowScene;
+import com.twasyl.slideshowfx.controls.SlideshowScene;
 import com.twasyl.slideshowfx.controls.SlideshowStage;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
@@ -116,7 +116,6 @@ public class SlideshowFX extends Application {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFX.class.getName());
     private static final ReadOnlyObjectProperty<Stage> stage = new SimpleObjectProperty<>();
     private static final ReadOnlyObjectProperty<Scene> presentationBuilderScene = new SimpleObjectProperty<>();
-    private static final BooleanProperty leapMotionAllowed = new SimpleBooleanProperty();
 
 
     @Override
@@ -178,27 +177,8 @@ public class SlideshowFX extends Application {
         OSGiManager.stop();
     }
 
-    /**
-     * Enter in the slideshow view by dislaying the current presentation {@code presentation} in fullscreen and manages
-     * if the LeapMotion should be activated or not.
-     *
-     * @param presentation The presentation to start the slideshow for.
-     */
-    public static void startSlideshow(final PresentationEngine presentation) {
-        if(presentation != null) {
-            final SlideShowScene scene = new SlideShowScene(presentation);
-            final SlideshowStage stage = new SlideshowStage(scene, isLeapMotionAllowed());
-
-            stage.show();
-        }
-    }
-
     public static ReadOnlyObjectProperty<Stage> stageProperty() { return stage; }
     public static Stage getStage() { return stageProperty().get(); }
-
-    public static BooleanProperty leapMotionAllowedProperty() { return leapMotionAllowed; }
-    public static boolean isLeapMotionAllowed() { return leapMotionAllowedProperty().get(); }
-    public static void setLeapMotionAllowed(boolean leapMotionAllowed) { leapMotionAllowedProperty().set(leapMotionAllowed); }
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(SlideshowFX.class, SlideshowFXPreloader.class, args);

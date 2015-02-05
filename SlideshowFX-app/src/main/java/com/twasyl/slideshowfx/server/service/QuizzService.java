@@ -18,7 +18,7 @@ package com.twasyl.slideshowfx.server.service;
 
 import com.twasyl.slideshowfx.beans.quizz.Quizz;
 import com.twasyl.slideshowfx.beans.quizz.QuizzResult;
-import com.twasyl.slideshowfx.controls.SlideShowScene;
+import com.twasyl.slideshowfx.controls.SlideshowScene;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.TemplateProcessor;
 import freemarker.template.Configuration;
@@ -172,7 +172,7 @@ public class QuizzService extends Verticle {
                 this.vertx.eventBus().send((String) textHandlerId, reply.encode());
             }
 
-            if(SlideShowScene.getSingleton() != null) SlideShowScene.getSingleton().publishQuizzResult(QuizzService.this.results.get(QuizzService.this.currentQuizz.getId()));
+            if(SlideshowScene.getSingleton() != null) SlideshowScene.getSingleton().publishQuizzResult(QuizzService.this.results.get(QuizzService.this.currentQuizz.getId()));
         };
 
         return handler;

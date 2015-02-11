@@ -26,10 +26,10 @@ import java.nio.file.Path;
 
 /**
  * The FileTemplateElement allows to choose a File as value in a text field.
- * It extends {@link com.twasyl.slideshowfx.controls.builder.elements.AbstractTemplateElement<File>}
+ * It extends {@link com.twasyl.slideshowfx.controls.builder.elements.AbstractTemplateElement}
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.0.0
  * @since SlideshowFX 1.0.0
  */
 public class FileTemplateElement extends AbstractTemplateElement<File> {
@@ -95,7 +95,7 @@ public class FileTemplateElement extends AbstractTemplateElement<File> {
 
     /**
      * This method performs action for the file that has been chosen by the user.
-     * It will relativize the chosen file according the {@see #getWorkingPath} if it is provided.
+     * It will relativize the chosen file according the {@link #getWorkingPath} if it is provided.
      * Be aware that these actions are only performed if the provided {@code chosenFile} is not null.
      *
      * @param chosenFile The chosen file by the user.

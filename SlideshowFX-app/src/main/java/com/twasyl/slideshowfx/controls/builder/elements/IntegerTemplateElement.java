@@ -22,7 +22,7 @@ import javafx.util.converter.IntegerStringConverter;
 
 /**
  * The StringTemplateElement allows to enter an integer as value in a text field.
- * It implements {@link com.twasyl.slideshowfx.controls.builder.elements.AbstractTemplateElement<Integer>}
+ * It implements {@link com.twasyl.slideshowfx.controls.builder.elements.AbstractTemplateElement}
  *
  * @author Thierry Wasylczenko
  * @version 1.0

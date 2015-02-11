@@ -119,7 +119,7 @@ public class NetworkUtils {
     }
 
     /**
-     * Get an {@link javafx.collections.ObservableList<String>} containing the list of IP addresses of the machine.
+     * Get an {@link javafx.collections.ObservableList} containing the list of IP addresses of the machine.
      * This method calls {@link #getIPs()} to get the addresses.
      * @return An observable list of all IP addresses of the machine.
      */

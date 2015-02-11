@@ -25,6 +25,10 @@ import java.util.Optional;
 
 /**
  * Represents a slide of the presentation
+ *
+ * @author Thierry Wasylczenko
+ * @version 1.0.0
+ * @since SlideshowFX 1.0.0
  */
 public class SlidePresentationConfiguration {
     private SlideTemplateConfiguration template;
@@ -60,7 +64,7 @@ public class SlidePresentationConfiguration {
     /**
      * The elements contained in the slide. The key represents the ID of each element in the slide.
      * The given content should not be given in Base64.
-     * @return
+     * @return The map containing the slide elements.
      */
     public Map<String, SlideElementConfiguration> getElements() { return elements; }
 

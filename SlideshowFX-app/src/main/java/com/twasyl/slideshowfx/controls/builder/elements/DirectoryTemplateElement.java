@@ -22,7 +22,7 @@ import java.io.File;
 
 /**
  * The DirectoryTemplateElement allows to choose a directory as value.
- * It extends {@link com.twasyl.slideshowfx.controls.builder.elements.FileTemplateElement<File>}
+ * It extends {@link com.twasyl.slideshowfx.controls.builder.elements.FileTemplateElement}.
  *
  * @author Thierry Wasylczenko
  * @version 1.0

@@ -190,13 +190,14 @@ public class SlideshowFXServer {
     }
 
     /**
-     * Call a service using the EventBus of Vert.x. The request must be a JSON object with a field named <code>service</code>
-     * representing the service to call, and a JSON object named <code>data</code> containing the data the service will
+     * Call a service using the EventBus of Vert.x. The request must be a JSON object with a field named {@code service}
+     * representing the service to call, and a JSON object named {@code data} containing the data the service will
      * consume.
      * @param request The JSON object corresponding to the service to call.
+     * @return The response corresponding to the request.
      * @throws java.lang.IllegalArgumentException If the request is invalid.
      */
-    public JsonElement callService(String request) {
+    public JsonElement callService(String request) throws IllegalArgumentException {
         JsonElement response = null;
 
         try {

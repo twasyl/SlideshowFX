@@ -164,9 +164,9 @@ public class OSGiManager {
     }
 
     /**
-     * Return the list of installed services which are from the given class.
-     * @param serviceType
-     * @param <T>
+     * Return the list of installed services which are from the given {@code serviceType} class.
+     * @param <T> The type of service.
+     * @param serviceType The class of service to look for.
      * @return the list of installed services or an empty list if there is no service corresponding to the given class.
      */
     public static <T> List<T> getInstalledServices(Class<T> serviceType) {

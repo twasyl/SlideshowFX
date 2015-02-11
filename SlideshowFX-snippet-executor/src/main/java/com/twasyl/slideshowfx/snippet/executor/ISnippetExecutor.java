@@ -35,6 +35,7 @@ public interface ISnippetExecutor {
     /**
      * Get the UI allowing to define the properties for this snippet executor. This method must take care of assuring
      * that the values entered for each properties in the UI are reflected inside the provided {@code codeSnippet}.
+     * @param codeSnippet The code snippet object to be displayed in the UI.
      * @return The Node containing the whole UI to define the properties for this snippet executor.
      */
     Parent getUI(final CodeSnippet codeSnippet);
@@ -81,6 +82,7 @@ public interface ISnippetExecutor {
      * {@link #setSdkHome(java.io.File)} to set the home.
      *
      * @param sdkHome The home of the SDK.
+     * @throws java.io.FileNotFoundException If the SDK home doesn't exist.
      */
     void saveSdkHome(File sdkHome) throws FileNotFoundException;
 

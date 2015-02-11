@@ -36,7 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Default behavior and implementation for {@see ITemplateElement}.
+ * Default behavior and implementation for {@link com.twasyl.slideshowfx.controls.builder.elements.ITemplateElement}.
  *
  * @author Thierry Wasylczenko
  * @version 1.0

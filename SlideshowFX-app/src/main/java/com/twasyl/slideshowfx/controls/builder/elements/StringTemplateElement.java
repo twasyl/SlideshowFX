@@ -20,7 +20,7 @@ import javafx.scene.control.TextField;
 
 /**
  * The StringTemplateElement allows to enter a String as value in a text field.
- * It implements {@link com.twasyl.slideshowfx.controls.builder.elements.AbstractTemplateElement<String>}
+ * It implements {@link com.twasyl.slideshowfx.controls.builder.elements.AbstractTemplateElement}
  *
  * @author Thierry Wasylczenko
  * @version 1.0

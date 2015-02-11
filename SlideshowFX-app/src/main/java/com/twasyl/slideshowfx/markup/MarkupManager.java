@@ -35,9 +35,9 @@ public class MarkupManager {
     }
 
     /**
-     * Test if the given <code>contentCode</code> is supported.
-     * @param contentCode
-     * @return
+     * Test if the given {@code contentCode} is supported.
+     * @param contentCode The code of the {@link com.twasyl.slideshowfx.markup.IMarkup} to test if it is supported.
+     * @return {@code true} if there is an OSGi bundle having the given code, {@code false} otherwise.
      */
     public static boolean isContentSupported(final String contentCode) {
         boolean supported = false;

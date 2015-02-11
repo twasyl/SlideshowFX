@@ -409,9 +409,9 @@ public class PresentationViewController implements Initializable {
     }
 
     /**
-     * Save the presentation hosted in this view to the given {@param archiveFile}. The process for
-     * saving the presentation is only started if the given {@param archiveFile} is not {@code null}. If the process is
-     * started, the given {@param archiveFile} is set as archive to this {@link #presentationEngine} using
+     * Save the presentation hosted in this view to the given {@code archiveFile}. The process for
+     * saving the presentation is only started if the given {@code archiveFile} is not {@code null}. If the process is
+     * started, the given {@code archiveFile} is set as archive to this {@link #presentationEngine} using
      * {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#setArchive(java.io.File)}. Then a
      * {@link com.twasyl.slideshowfx.concurrent.SavePresentationTask} is instantiated and started.
      * @param archiveFile The file to save the presentation in.
@@ -585,11 +585,7 @@ public class PresentationViewController implements Initializable {
         final String slideNumber = this.getCurrentSlideNumber();
 
         if(slideNumber != null && !slideNumber.isEmpty()) {
-            try {
-                this.presentationEngine.deleteSlide(slideNumber);
-            } catch (ParserConfigurationException e) {
-                LOGGER.log(Level.SEVERE, "Can not delete current slide", e);
-            }
+            this.presentationEngine.deleteSlide(slideNumber);
         }
     }
 
@@ -670,6 +666,7 @@ public class PresentationViewController implements Initializable {
      *     <li>{@link com.twasyl.slideshowfx.engine.presentation.configuration.PresentationConfiguration#getPresentationFile()}
      *     returns a non null value and a file that exists</li>
      * </ul>
+     * @param leapMotionEnabled Indicates if the LeapMotion controller should be enabled during the slideshow.
      */
     public void startSlideshow(final boolean leapMotionEnabled) {
         if (this.presentationEngine.getConfiguration() != null

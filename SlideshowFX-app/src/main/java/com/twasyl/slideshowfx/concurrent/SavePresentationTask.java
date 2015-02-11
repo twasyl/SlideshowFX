@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  * that hosts the presentation to save. {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#saveArchive()}
  * is called in order to save the presentation. If {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#getArchive()}
  * returns {@code null} or if {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine} is {@code null}, the
- * task is considered as failed and {@linf Task#failed} is called.
+ * task is considered as failed and {@link Task#failed} is called.
  *
  * @author Thierry Wasylczenko
  * @version 1.0

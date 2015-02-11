@@ -44,8 +44,10 @@ public abstract class AbstractContentExtension implements IContentExtension {
     /**
      * Creates a new instance of the content extension.
      * @param code The code of the content extension. Can not be null or empty.
+     * @param resourcesLocationPrefix The prefix where resources are stored.
      * @param icon The icon for this content extension that will be used in the SlideshowFX's UI.
      * @param toolTip The tooltip for this content extension that will be used in the SlideshowFX's UI.
+     * @param title The title of the window of this content extension.
      * @throws java.lang.NullPointerException If the code is null.
      * @throws java.lang.IllegalArgumentException If the code is empty.
      */

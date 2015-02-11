@@ -22,9 +22,9 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.ChoiceBox;
 
 /**
- * The ChoiceBoxTemplateElement allows to choose a value from a {@link javafx.scene.control.ChoiceBox<String>}.
- * It implements {@link com.twasyl.slideshowfx.controls.builder.elements.AbstractTemplateElement<String>}. The choices can be passed using
- * the {@link #addChoice(String...)}
+ * The ChoiceBoxTemplateElement allows to choose a value from a {@link javafx.scene.control.ChoiceBox}.
+ * It implements {@link com.twasyl.slideshowfx.controls.builder.elements.AbstractTemplateElement}. The choices can be passed using
+ * the {@link #addChoice(String...)} .
  *
  * @author Thierry Wasylczenko
  * @version 1.0

@@ -39,7 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class is the controller for the view {@see OptionsView.fxml}.
+ * This class is the controller for the view {@code OptionsView.fxml}.
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
@@ -72,7 +72,7 @@ public class OptionsViewController implements Initializable {
 
         final VBox snippetExecutors = (VBox) this.snippetExecutorTab.getContent();
 
-        /**
+        /*
          * Create a label and a TextField for each instance registered as a {@link com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor}
          * in order to define the SDK home for each ISnippetExecutor
          */

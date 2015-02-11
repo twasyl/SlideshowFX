@@ -34,6 +34,7 @@ public class JSONHelper {
      * @param file The file containing a JSON object.
      *
      * @return the JSON object corresponding to the content of the file.
+     * @throws java.io.IOException If an error occurs when reading the file.
      */
     public static JsonObject readFromFile(File file) throws IOException {
         if(file == null) throw new NullPointerException("The file to read can not be null.");
@@ -58,6 +59,7 @@ public class JSONHelper {
      *
      * @param object The object to save.
      * @param file The file where the JSON object is saved.
+     * @throws java.io.FileNotFoundException If the file is not found.
      */
     public static void writeObject(JsonObject object, File file) throws FileNotFoundException {
         if(object == null) throw new NullPointerException("The JSON object to save can not be null");

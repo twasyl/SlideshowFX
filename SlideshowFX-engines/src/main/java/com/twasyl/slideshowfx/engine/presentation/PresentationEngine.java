@@ -47,10 +47,10 @@ import java.util.logging.Logger;
 /**
  * This class manages presentations operation done with SlideshowFX. It is used to open them as well as add, update an
  * delete slides.
- * The extension of a presentation is <code>sfx</code>.
+ * The extension of a presentation is {@code sfx}.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.0.0
  * @since SlideshowFX 1.0.0
  */
 public class PresentationEngine extends AbstractEngine<PresentationConfiguration> {
@@ -303,6 +303,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
      * in order this engine to be used to create the new presentation.
      *
      * @param templateArchive The template archive file to create the presentation from.
+     * @throws java.io.IOException If an error occurred when processing the archive.
+     * @throws java.lang.IllegalAccessException If an error occurred when processing the archive.
      */
     public void createFromTemplate(File templateArchive) throws IOException, IllegalAccessException {
         this.setArchive(null);
@@ -343,9 +345,12 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     public TemplateConfiguration getTemplateConfiguration() { return this.templateEngine.getConfiguration(); }
 
     /**
-     * Add a slide to the presentation and save the presentation
-     * @param template
-     * @throws IOException
+     * Add a slide to the presentation and save the presentation. If {@code afterSlideNumber} is {@code null} or not
+     * found, the slide is added at the end of the presentation, otherwise it is added after the given slide number.
+     * @param template The template of slide to add.
+     * @param afterSlideNumber The slide number to insert the new slide after.
+     * @return The new added slide.
+     * @throws IOException If an error occurred when saving the presentation.
      */
     public SlidePresentationConfiguration addSlide(SlideTemplateConfiguration template, String afterSlideNumber) throws IOException {
         if(template == null) throw new IllegalArgumentException("The templateConfiguration for creating a slide can not be null");
@@ -424,10 +429,10 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     }
 
     /**
-     * Delete the slide with the slideNumber and save the presentation
-     * @param slideNumber
+     * Delete the slide with the slideNumber and save the presentation.
+     * @param slideNumber The slide number to delete.
      */
-    public void deleteSlide(String slideNumber) throws ParserConfigurationException {
+    public void deleteSlide(String slideNumber) {
         if(slideNumber == null) throw new IllegalArgumentException("Slide number can not be null");
 
         SlidePresentationConfiguration slideToRemove = this.configuration.getSlideByNumber(slideNumber);
@@ -442,6 +447,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
     /**
      * Duplicates the given slide and add it to the presentation. The presentation is temporary saved.
+     * @param slide The slide to duplicate.
+     * @return The duplicated slide.
      */
     public SlidePresentationConfiguration duplicateSlide(SlidePresentationConfiguration slide) {
         if(slide == null) throw new IllegalArgumentException("The slide to duplicate can not be null");

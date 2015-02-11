@@ -52,18 +52,18 @@ public class ResourceHelper {
     }
 
     /**
-     * This method get the external form of the given <code>url</code>.
+     * This method get the external form of the given {@code url}.
      * @param url The URL of the resource to get the external form.
-     * @return The string representing the external form of the given <code>url</code>
+     * @return The string representing the external form of the given {@code url}.
      */
     public static String getExternalForm(String url) {
         return ResourceHelper.class.getResource(url).toExternalForm();
     }
 
     /**
-     * This method get the InputStream for the given internal resource <code>url</code>.
+     * This method get the InputStream for the given internal resource {@code url}.
      * @param url The URL of the resource to get the InputStream.
-     * @return The InputStream for the given <code>url</code.>
+     * @return The InputStream for the given {@code url}.
      */
     public static InputStream getInputStream(String url) { return ResourceHelper.class.getResourceAsStream(url); }
 

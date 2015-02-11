@@ -94,8 +94,8 @@ public class ChatMessage {
 
     /**
      * Decode the given base64 content.
-     * @param contentToDecode
-     * @return the decoded content
+     * @param contentToDecode The content that must be decoded.
+     * @return The decoded content.
      */
     private String decodeContent(String contentToDecode) {
         if(contentToDecode != null) {
@@ -109,10 +109,11 @@ public class ChatMessage {
     }
 
     /**
-     * Build a ChatMessage according the JSON representation
-     * @param json The JSON representation of the message
-     * @return A ChatMessage according the JSON representation
-     * @throws IllegalArgumentException If the JSON representation is null or empty
+     * Build a ChatMessage according the JSON representation.
+     * @param json The JSON representation of the message.
+     * @param ip The IP address of the message.
+     * @return A ChatMessage according the JSON representation.
+     * @throws IllegalArgumentException If the JSON representation is {@code null} or empty.
      */
     public static ChatMessage build(String json, InetSocketAddress ip) throws IllegalArgumentException {
         if(json == null) throw new IllegalArgumentException("The JSON can not be null");

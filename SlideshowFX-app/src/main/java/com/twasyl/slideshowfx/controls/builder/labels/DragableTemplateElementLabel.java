@@ -29,7 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class represents a {@see Label} that can be dragable for a {@link com.twasyl.slideshowfx.controls.builder.elements.ITemplateElement}
+ * This class represents a {@link javafx.scene.control.Label} that can be draggable for a {@link com.twasyl.slideshowfx.controls.builder.elements.ITemplateElement}
  *
  * @author Thierry Wasylczenko
  * @version 1.0

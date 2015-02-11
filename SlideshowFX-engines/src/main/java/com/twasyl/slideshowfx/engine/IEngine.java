@@ -25,6 +25,8 @@ import java.io.IOException;
  * It will be useful for the Presentation engine as well as the template engine.
  *
  * @author Thierry Wasylczenko
+ * @version 1.0.0
+ * @since SlideshowFX 1.0.0
  */
 public interface IEngine<T extends IConfiguration> {
 
@@ -107,7 +109,7 @@ public interface IEngine<T extends IConfiguration> {
 
     /**
      * Get the working directory of this engine archive. Generally the working folder should be a generated temporary folder.
-     * @return
+     * @return The file corresponding to the working directory of this engine.
      */
     File getWorkingDirectory();
 
@@ -153,6 +155,10 @@ public interface IEngine<T extends IConfiguration> {
     /**
      * This methods load an archive for this engine. This method calls {@link #loadArchive(java.io.File)}
      * with the current archive file.
+     * @throws IllegalArgumentException If the archiveExtension of the archive is not valid.
+     * @throws NullPointerException If the given file is null.
+     * @throws java.io.IOException If the file is not found.
+     * @throws IllegalAccessException If the file can not be read.
      */
     void loadArchive() throws IllegalArgumentException, NullPointerException, IOException, IllegalAccessException;
 
@@ -173,7 +179,8 @@ public interface IEngine<T extends IConfiguration> {
      * This method calls {@link #saveArchive(java.io.File)} with the
      * current archive file.
      *
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException If an error occurred when saving the archive.
+     * @throws java.io.IOException If an error occurred when saving the archive.
      */
     void saveArchive() throws IllegalArgumentException, IOException;
 
@@ -184,6 +191,7 @@ public interface IEngine<T extends IConfiguration> {
      *
      * @param file The file archive where the engine's content will be saved.
      * @throws java.lang.IllegalArgumentException If the given file has not the correct archiveExtension for this engine.
+     * @throws java.io.IOException If an error occurred when saving the archive.
      */
     void saveArchive(File file) throws IllegalArgumentException, IOException;
 }

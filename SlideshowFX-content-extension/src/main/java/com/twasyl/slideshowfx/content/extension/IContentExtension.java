@@ -90,12 +90,12 @@ public interface IContentExtension {
      * The default behavior will extract the resources in the in {@code directory/#getExtractBaseDirectory()}.
      * @param directory The directory where the resources will be extracted.
      * @throws java.lang.NullPointerException If the given directory is null.
-     * @throws java.io.FileNotFoundException If the directory doesn't exist.
      */
     void extractResources(File directory);
 
     /**
      * Get the UI allowing to specify parameters for creating the evolved content.
+     * @return The pane containing the UI for this content extension.
      */
     Pane getUI();
 

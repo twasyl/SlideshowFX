@@ -63,8 +63,8 @@ public class PresentationConfiguration implements IConfiguration {
 
     /**
      * Get a slide by it's slide number.
-     * @param slideNumber
-     * @return The slide or null if not found
+     * @param slideNumber The slide number og the slide to get.
+     * @return The slide or null if not found.
      */
     public SlidePresentationConfiguration getSlideByNumber(String slideNumber) {
         SlidePresentationConfiguration slide = null;
@@ -80,8 +80,8 @@ public class PresentationConfiguration implements IConfiguration {
 
     /**
      * Get a slide by it's ID.
-     * @param id
-     * @return The slide or null if not found
+     * @param id The ID of the slide to get.
+     * @return The slide or null if not found.
      */
     public SlidePresentationConfiguration getSlideById(String id) {
         SlidePresentationConfiguration slide = null;
@@ -96,8 +96,9 @@ public class PresentationConfiguration implements IConfiguration {
     }
 
     /**
-     * In the HTML document update the given slide.
-     * @param slide
+     * Update the given {@code slide} in the HTML file. Each {@link com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration}
+     * of the {@code slide} in the HTML document.
+     * @param slide The slide to update in the HTML document.
      */
     public void updateSlideInDocument(SlidePresentationConfiguration slide) {
         if(slide == null) throw new IllegalArgumentException("The slide can not be null");

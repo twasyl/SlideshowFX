@@ -28,7 +28,7 @@ import javafx.scene.layout.VBox;
 
 /**
  * The StringTemplateElement allows to enter a String as value in a text field.
- * It extends {@link com.twasyl.slideshowfx.controls.builder.elements.AbstractTemplateElement<javafx.collections.ObservableList<com.twasyl.slideshowfx.controls.builder.elements.ITemplateElement>}
+ * It extends {@link com.twasyl.slideshowfx.controls.builder.elements.AbstractTemplateElement}
  *
  * @author Thierry Wasylczenko
  * @version 1.0
@@ -44,7 +44,7 @@ public class ListTemplateElement extends AbstractTemplateElement<ObservableList<
 
         this.name.set(name);
 
-        /**
+        /*
          * Create the pane that will host the value and accept drag'n'drop events.
          */
         final VBox content = new VBox(5);

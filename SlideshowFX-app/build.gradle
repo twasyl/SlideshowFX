@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-apply plugin: 'application'
-
 version = '1.0.0'
 
 ant.importBuild "${project.projectDir.absolutePath}/src/main/resources/javafx.xml"

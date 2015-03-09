@@ -426,3 +426,7 @@
     -fx-color: -fx-fill;
     -fx-text-fill: -fx-fill;
 }
+
+.dialog-pane .header-panel {
+    -fx-background-color: transparent;
+}

@@ -16,7 +16,7 @@
 
 package com.twasyl.slideshowfx.controls.tree;
 
-import com.twasyl.slideshowfx.controls.Dialog;
+import com.twasyl.slideshowfx.utils.DialogHelper;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
@@ -55,7 +55,8 @@ public class FileTreeCell extends TreeCell<File> {
                 final HBox hbox = new HBox(5);
                 hbox.getChildren().addAll(label, textField);
 
-                if(Dialog.showDialog(true, null, "Rename", hbox) == Dialog.Response.OK) {
+                final ButtonType response = DialogHelper.showCancellableDialog("Rename", hbox);
+                if(response != null && response == ButtonType.OK) {
                     ((TemplateTreeView) this.getTreeView()).renameContentOfTreeView(this.getTreeItem(), textField.getText());
                 }
             } catch (IOException e) {

@@ -16,12 +16,12 @@
 
 package com.twasyl.slideshowfx.controllers;
 
-import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.controls.builder.editor.*;
 import com.twasyl.slideshowfx.controls.tree.FileTreeCell;
 import com.twasyl.slideshowfx.controls.tree.TemplateTreeView;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
+import com.twasyl.slideshowfx.utils.DialogHelper;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -191,7 +191,7 @@ public class TemplateBuilderController implements Initializable {
                          try {
                              this.templateContentTreeView.deleteContentOfTreeView(item);
                          } catch (IOException e) {
-                             Dialog.showErrorDialog(true, this.getStage(), "Error", "Can not delete the content");
+                             DialogHelper.showError("Error", "Can not delete the content");
                          }
                      });
     }
@@ -207,9 +207,9 @@ public class TemplateBuilderController implements Initializable {
         final TextField field = new TextField();
         field.setPromptText("Directory name");
 
-        Dialog.Response response = Dialog.showCancellableDialog(true, this.getStage(), "Create a directory", field);
+        ButtonType response = DialogHelper.showCancellableDialog("Create a directory", field);
 
-        if(response == Dialog.Response.OK) {
+        if(response != null && response == ButtonType.OK) {
             if(!field.getText().trim().isEmpty()) {
                 TreeItem<File> parent = this.templateContentTreeView.getSelectionModel().getSelectedItem();
 
@@ -260,9 +260,9 @@ public class TemplateBuilderController implements Initializable {
         final TextField field = new TextField();
         field.setPromptText("File name");
 
-        Dialog.Response response = Dialog.showCancellableDialog(true, this.getStage(), "Create a file", field);
+        ButtonType response = DialogHelper.showCancellableDialog("Create a file", field);
 
-        if(response == Dialog.Response.OK) {
+        if(response != null && response == ButtonType.OK) {
             if(!field.getText().trim().isEmpty()) {
                 TreeItem<File> parent = this.templateContentTreeView.getSelectionModel().getSelectedItem();
 

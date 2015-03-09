@@ -16,12 +16,13 @@
 
 package com.twasyl.slideshowfx.concurrent;
 
-import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
+import com.twasyl.slideshowfx.utils.DialogHelper;
 import javafx.concurrent.Task;
+import javafx.scene.control.ButtonType;
 
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
@@ -65,9 +66,9 @@ public class UploadPresentationTask extends Task<Void> {
                 final String message = String.format("The '%1$s' presentation already exist in '%2$s'.\n Do you want to overwrite it?",
                         engine.getArchive().getName(), destination.toString());
 
-                final Dialog.Response answer = Dialog.showConfirmDialog(null, "Overwrite presentation", message);
+                final ButtonType response = DialogHelper.showConfirmationAlert("Overwrite presentation", message);
 
-                overwrite = answer == Dialog.Response.YES;
+                overwrite = response != null && response == ButtonType.YES;
             }
 
             if(fileExist && !overwrite) {

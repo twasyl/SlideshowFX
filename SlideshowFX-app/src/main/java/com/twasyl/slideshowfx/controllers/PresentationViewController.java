@@ -16,9 +16,11 @@
 
 package com.twasyl.slideshowfx.controllers;
 
-import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
-import com.twasyl.slideshowfx.controls.*;
+import com.twasyl.slideshowfx.controls.QuizzCreatorPanel;
+import com.twasyl.slideshowfx.controls.SlideContentEditor;
+import com.twasyl.slideshowfx.controls.SlideshowScene;
+import com.twasyl.slideshowfx.controls.SlideshowStage;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
@@ -30,6 +32,7 @@ import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
+import com.twasyl.slideshowfx.utils.DialogHelper;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.beans.binding.FilenameBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -120,9 +123,9 @@ public class PresentationViewController implements Initializable {
     @FXML private void insertQuizz(ActionEvent event) {
         final QuizzCreatorPanel quizzCreatorPanel = new QuizzCreatorPanel();
 
-        Dialog.Response response = Dialog.showCancellableDialog(true, SlideshowFX.getStage(), "Insert a quizz", quizzCreatorPanel);
+        final ButtonType response = DialogHelper.showCancellableDialog("Insert a quizz", quizzCreatorPanel);
 
-        if(response != null && response.equals(Dialog.Response.OK)) {
+        if(response != null && response == ButtonType.OK) {
             this.contentEditor.appendContentEditorValue(quizzCreatorPanel.convertToHtml());
         }
     }
@@ -323,9 +326,9 @@ public class PresentationViewController implements Initializable {
 
         button.setOnAction(event -> {
 
-            final Dialog.Response response = Dialog.showCancellableDialog(true, SlideshowFX.getStage(), contentExtension.getTitle(), contentExtension.getUI());
+            final ButtonType response = DialogHelper.showCancellableDialog(contentExtension.getTitle(), contentExtension.getUI());
 
-            if(response == Dialog.Response.OK) {
+            if(response != null && response == ButtonType.OK) {
                 final String content = contentExtension.buildContentString(this.markupContentType.getSelectedToggle() != null ?
                         (IMarkup) this.markupContentType.getSelectedToggle().getUserData() :
                         null);
@@ -577,15 +580,18 @@ public class PresentationViewController implements Initializable {
         }
     }
 
-
     /**
-     * Delete the current displayed slide. If no slide is present, nthing is performed.
+     * Delete the current displayed slide. If no slide is present, nothing is performed.
      */
     public void deleteCurrentSlide() {
-        final String slideNumber = this.getCurrentSlideNumber();
+        final ButtonType response = DialogHelper.showConfirmationAlert("Delete slide", "Are you sure you want to delete the current slide?");
 
-        if(slideNumber != null && !slideNumber.isEmpty()) {
-            this.presentationEngine.deleteSlide(slideNumber);
+        if(response != null && response == ButtonType.YES) {
+            final String slideNumber = this.getCurrentSlideNumber();
+
+            if(slideNumber != null && !slideNumber.isEmpty()) {
+                this.presentationEngine.deleteSlide(slideNumber);
+            }
         }
     }
 

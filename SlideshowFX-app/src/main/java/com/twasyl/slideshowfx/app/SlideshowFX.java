@@ -18,21 +18,19 @@ package com.twasyl.slideshowfx.app;
 
 import com.sun.javafx.PlatformUtil;
 import com.sun.javafx.application.LauncherImpl;
-import com.twasyl.slideshowfx.controls.SlideshowScene;
-import com.twasyl.slideshowfx.controls.SlideshowStage;
-import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.io.DeleteFileVisitor;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.utils.DialogHelper;
 import javafx.application.Application;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 

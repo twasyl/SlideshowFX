@@ -19,8 +19,10 @@ package com.twasyl.slideshowfx.controllers;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.beans.properties.PresentationModifiedBinding;
 import com.twasyl.slideshowfx.concurrent.*;
-import com.twasyl.slideshowfx.controls.Dialog;
-import com.twasyl.slideshowfx.controls.*;
+import com.twasyl.slideshowfx.controls.SlideMenuItem;
+import com.twasyl.slideshowfx.controls.TaskProgressIndicator;
+import com.twasyl.slideshowfx.controls.TextFieldCheckMenuItem;
+import com.twasyl.slideshowfx.controls.Tour;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
@@ -32,10 +34,7 @@ import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
-import com.twasyl.slideshowfx.utils.NetworkUtils;
-import com.twasyl.slideshowfx.utils.PlatformHelper;
-import com.twasyl.slideshowfx.utils.ResourceHelper;
-import com.twasyl.slideshowfx.utils.ZipUtils;
+import com.twasyl.slideshowfx.utils.*;
 import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.DisableAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.EnableAction;
@@ -657,9 +656,9 @@ public class SlideshowFXController implements Initializable {
             final Parent root = loader.load();
             final OptionsViewController controller = loader.getController();
 
-            final Dialog.Response answer = Dialog.showCancellableDialog(false, SlideshowFX.getStage(), "Options", root);
+            final ButtonType response = DialogHelper.showCancellableDialog("Options", root);
 
-            if(answer == Dialog.Response.OK) {
+            if(response != null && response == ButtonType.OK) {
                 controller.saveOptions();
             }
         } catch (IOException e) {
@@ -943,12 +942,9 @@ public class SlideshowFXController implements Initializable {
                                     hostingConnector, directory, presentationFile);
                             task.stateProperty().addListener((value, oldState, newState) -> {
                                 if (newState == Worker.State.SUCCEEDED && task.getValue() != null) {
+                                    ButtonType response = DialogHelper.showConfirmationAlert("Open file?", String.format("Do you want to open '%1$s' ?", task.getValue()));
 
-                                    final Dialog.Response answer = Dialog.showConfirmDialog(SlideshowFX.getStage(),
-                                            "Open file",
-                                            String.format("Do you want to open '%1$s' ?", task.getValue()));
-
-                                    if (answer == Dialog.Response.YES) {
+                                    if(response != null && response == ButtonType.YES) {
                                         try {
                                             this.openTemplateOrPresentation(task.getValue());
                                         } catch (IOException | IllegalAccessException e) {

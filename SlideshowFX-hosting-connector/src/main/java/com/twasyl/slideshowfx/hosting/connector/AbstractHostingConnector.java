@@ -16,9 +16,9 @@
 
 package com.twasyl.slideshowfx.hosting.connector;
 
-import com.twasyl.slideshowfx.controls.Dialog;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
+import com.twasyl.slideshowfx.utils.DialogHelper;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
@@ -106,9 +106,9 @@ public abstract class AbstractHostingConnector implements IHostingConnector {
         content.getChildren().addAll(new Label("Choose a destination:"), treeView);
 
         RemoteFile destination = null;
-        final Dialog.Response answer = Dialog.showCancellableDialog(true, null, "Choose destination", content);
+        final ButtonType response = DialogHelper.showCancellableDialog("Choose destination", content);
 
-        if(answer == Dialog.Response.OK) {
+        if(response != null && response == ButtonType.OK) {
             final TreeItem<RemoteFile> selection = treeView.getSelectionModel().getSelectedItem();
             if(selection != null) destination = selection.getValue();
         }

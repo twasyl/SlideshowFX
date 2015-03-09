@@ -15,7 +15,6 @@
  */
 
 include 'SlideshowFX-app'
-include 'SlideshowFX-controls'
 include 'SlideshowFX-engines'
 include 'SlideshowFX-global-configuration'
 include 'SlideshowFX-osgi'

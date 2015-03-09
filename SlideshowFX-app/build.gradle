@@ -74,7 +74,6 @@ task buildJavaFXBundle << {
 }
 
 dependencies {
-    compile project(':SlideshowFX-controls')
     compile project(':SlideshowFX-engines')
     compile project(':SlideshowFX-global-configuration')
     compile project(':SlideshowFX-osgi')
@@ -99,7 +98,6 @@ dependencies {
 
 tasks['jar'].dependsOn 'classes'
 tasks['jar'].dependsOn ':SlideshowFX-engines:jar'
-tasks['jar'].dependsOn ':SlideshowFX-controls:jar'
 tasks['jar'].dependsOn ':SlideshowFX-utils:jar'
 tasks['jar'].dependsOn ':SlideshowFX-markup:jar'
 tasks['jar'].dependsOn ':SlideshowFX-global-configuration:jar'

@@ -96,7 +96,7 @@ public class DialogHelper extends Stage {
             return alert;
         });
 
-        Platform.runLater(future);
+        PlatformHelper.run(future);
 
         Alert alert = null;
         try {

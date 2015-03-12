@@ -674,12 +674,12 @@ public class PresentationViewController implements Initializable {
      * </ul>
      * @param leapMotionEnabled Indicates if the LeapMotion controller should be enabled during the slideshow.
      */
-    public void startSlideshow(final boolean leapMotionEnabled) {
+    public void startSlideshow(final boolean leapMotionEnabled, final String fromSlideId) {
         if (this.presentationEngine.getConfiguration() != null
                 && this.presentationEngine.getConfiguration().getPresentationFile() != null
                 && this.presentationEngine.getConfiguration().getPresentationFile().exists()) {
 
-            final SlideshowScene scene = new SlideshowScene(this.presentationEngine);
+            final SlideshowScene scene = new SlideshowScene(this.presentationEngine, fromSlideId);
             final SlideshowStage stage = new SlideshowStage(scene, leapMotionEnabled);
 
             stage.show();

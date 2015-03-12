@@ -527,7 +527,13 @@ public class SlideshowFXController implements Initializable {
     @FXML private void slideShow(ActionEvent event) {
         final PresentationViewController view = this.getCurrentPresentationView();
 
-        if(view != null) view.startSlideshow(this.leapMotionEnabled.isSelected());
+        if(view != null) view.startSlideshow(this.leapMotionEnabled.isSelected(), null);
+    }
+
+    @FXML private void slideshowFromCurrentSlide(ActionEvent event) {
+        final PresentationViewController view = this.getCurrentPresentationView();
+
+        if(view != null) view.startSlideshow(this.leapMotionEnabled.isSelected(), view.getCurrentSlideId());
     }
 
     /**

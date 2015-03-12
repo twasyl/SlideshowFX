@@ -150,16 +150,22 @@
             </graphic>
         </Button>
 
-        <Button fx:id="slideshow" onAction="#slideShow" styleClass="image">
+        <SplitMenuButton fx:id="slideshow" onAction="#slideShow" styleClass="image">
             <tooltip>
                 <Tooltip text="Slideshow" />
             </tooltip>
             <graphic>
                 <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                    <Image url="@/com/twasyl/slideshowfx/images/slideshow.png" />
+                    <image>
+                        <Image url="@/com/twasyl/slideshowfx/images/slideshow.png" requestedWidth="$TOOLBAR_ICON_WIDTH"
+                               requestedHeight="$TOOLBAR_ICON_HEIGHT" preserveRatio="true" smooth="true" />
+                    </image>
                 </ImageView>
             </graphic>
-        </Button>
+            <items>
+                <MenuItem text="Slideshow from current slide" onAction="#slideshowFromCurrentSlide" />
+            </items>
+        </SplitMenuButton>
 
         <!-- The container hosting all installed markup syntax for defining slide content -->
         <HBox spacing="10" fx:id="markupContentTypeBox" alignment="BASELINE_LEFT">

@@ -72,7 +72,15 @@ public class SlideshowScene extends Scene {
     private final QuizzPanel quizzPanel = new QuizzPanel();
     private final CollapsibleToolPane collapsibleToolPane = new CollapsibleToolPane();
 
-    public SlideshowScene(PresentationEngine presentationEngine) {
+    /**
+     * Creates a SlideshowScene object for the given {@code presentationEngine}. The slideshow will be started at the
+     * given {@code startAtSlideId}. In order to start at the beginning of the presentation, {@code startAtSlideId} should
+     * ne {@code null}.
+     *
+     * @param presentationEngine The presentation to start the slideshow for.
+     * @param startAtSlideId The ID of the slide to start the presentation at.
+     */
+    public SlideshowScene(PresentationEngine presentationEngine, final String startAtSlideId) {
         super(new StackPane());
         SlideshowScene.singleton = this;
 
@@ -100,6 +108,10 @@ public class SlideshowScene extends Scene {
                     JSObject window = (JSObject) this.browser.get().getEngine().executeScript("window");
                     window.setMember(SlideshowScene.this.presentation.getTemplateConfiguration().getJsObject(), SlideshowScene.this);
                     window.setMember("sfxServer", SlideshowFXServer.getSingleton());
+
+                    if(startAtSlideId != null) {
+                        this.browser.get().getEngine().executeScript(String.format("slideshowFXGotoSlide('%1$s');", startAtSlideId));
+                    }
                 }
             }
         });

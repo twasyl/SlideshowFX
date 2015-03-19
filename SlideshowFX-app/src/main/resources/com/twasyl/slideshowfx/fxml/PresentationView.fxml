@@ -47,6 +47,16 @@
                     </ImageView>
                 </graphic>
             </Button>
+            <Button onAction="#definePresentationVariables" styleClass="image">
+                <tooltip>
+                    <Tooltip text="Insert a variable" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <Image url="@/com/twasyl/slideshowfx/images/function.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
         </ToolBar>
 
         <!-- The container hosting all installed markup syntax for defining slide content -->

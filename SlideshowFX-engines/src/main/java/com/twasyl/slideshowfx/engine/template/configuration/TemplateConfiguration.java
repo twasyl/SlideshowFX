@@ -17,9 +17,11 @@
 package com.twasyl.slideshowfx.engine.template.configuration;
 
 import com.twasyl.slideshowfx.engine.IConfiguration;
+import com.twasyl.slideshowfx.utils.beans.Pair;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -34,6 +36,7 @@ public class TemplateConfiguration implements IConfiguration {
 
     private String name;
     private File file;
+    private Set<Pair<String, String>> defaultVariables;
     private List<SlideTemplateConfiguration> slideTemplateConfigurations;
     private String contentDefinerMethod;
     private String getCurrentSlideMethod;
@@ -53,6 +56,9 @@ public class TemplateConfiguration implements IConfiguration {
 
     public File getFile() { return file;  }
     public void setFile(File file) { this.file = file; }
+
+    public Set<Pair<String, String>> getDefaultVariables() { return defaultVariables; }
+    public void setDefaultVariables(Set<Pair<String, String>> defaultVariables) { this.defaultVariables = defaultVariables; }
 
     public List<SlideTemplateConfiguration> getSlideTemplateConfigurations() { return slideTemplateConfigurations; }
     public void setSlideTemplateConfigurations(List<SlideTemplateConfiguration> slideTemplateConfigurations) { this.slideTemplateConfigurations = slideTemplateConfigurations; }

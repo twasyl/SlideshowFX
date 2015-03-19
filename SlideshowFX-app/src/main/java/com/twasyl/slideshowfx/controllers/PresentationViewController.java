@@ -17,10 +17,7 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
-import com.twasyl.slideshowfx.controls.QuizzCreatorPanel;
-import com.twasyl.slideshowfx.controls.SlideContentEditor;
-import com.twasyl.slideshowfx.controls.SlideshowScene;
-import com.twasyl.slideshowfx.controls.SlideshowStage;
+import com.twasyl.slideshowfx.controls.*;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
@@ -34,6 +31,7 @@ import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.utils.DialogHelper;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
+import com.twasyl.slideshowfx.utils.beans.Pair;
 import com.twasyl.slideshowfx.utils.beans.binding.FilenameBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -131,6 +129,38 @@ public class PresentationViewController implements Initializable {
     }
 
     /**
+     * Define and manages variables that are available for the presentation. Variable allow to insert elements which
+     * values will be replaced inside the presentation.
+     * @param event The source event calling this method.
+     */
+    @FXML private void definePresentationVariables(ActionEvent event) {
+        final PresentationVariablesPanel variablesPanel = new PresentationVariablesPanel(this.presentationEngine.getConfiguration());
+
+        final ButtonType insert = new ButtonType("Insert", ButtonBar.ButtonData.OTHER);
+
+        final ButtonType answer = DialogHelper.showDialog("Insert a variable", variablesPanel, ButtonType.CANCEL, insert, ButtonType.OK);
+
+        // Insert the token inside the editor
+        if(answer != null && answer == insert) {
+            final Pair<String, String> variable = variablesPanel.getSelectedVariable();
+
+            if(variable != null) this.contentEditor.appendContentEditorValue(String.format("${%1$s}", variable.getKey()));
+        }
+
+        // If cancel wasn't clicked, updates all variables in the presentation and updates it the presentation file
+        if(answer != ButtonType.CANCEL) {
+            this.presentationEngine.getConfiguration().setVariables(variablesPanel.getVariables());
+
+            this.presentationEngine.getConfiguration()
+                    .getSlides()
+                    .forEach(slide -> this.presentationEngine.getConfiguration().updateSlideInDocument(slide));
+
+            this.presentationEngine.savePresentationFile();
+            this.reloadPresentationBrowser();
+        }
+    }
+
+    /**
      * This method updates a slide of the presentation. It takes the <code>markup</code> to converte the <code>originalContent</code>
      * in HTML and then the slide element is updated. The presentation is then saved temporary.
      * The content is send to the page by calling the {@link com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration#getContentDefinerMethod()}
@@ -145,17 +175,19 @@ public class PresentationViewController implements Initializable {
      * @throws org.xml.sax.SAXException
      */
     private void updateSlide(final IMarkup markup, final String originalContent) throws TransformerException, IOException, ParserConfigurationException, SAXException {
-        final String htmlContent = markup.convertAsHtml(originalContent);
+        final String elementId = String.format("%1$s-%2$s", this.slideNumber.getText(), this.fieldName.getText());
+        String htmlContent = markup.convertAsHtml(originalContent);
 
         // Update the SlideElement
         final SlidePresentationConfiguration slideToUpdate = this.presentationEngine.getConfiguration().getSlideByNumber(this.slideNumber.getText());
-        slideToUpdate.updateElement(
-                this.slideNumber.getText() + "-" + this.fieldName.getText(), markup.getCode(), originalContent, htmlContent
-        );
+        slideToUpdate.updateElement(elementId, markup.getCode(), originalContent, htmlContent);
 
         this.presentationEngine.getConfiguration().updateSlideInDocument(slideToUpdate);
 
         this.presentationEngine.savePresentationFile();
+
+        // Clear the HTML of any variables
+        htmlContent = slideToUpdate.getElements().get(elementId).getClearedHtmlContent(this.presentationEngine.getConfiguration().getVariables());
 
         String clearedContent = Base64.getEncoder().encodeToString(htmlContent.getBytes("UTF8"));
         String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",

@@ -26,6 +26,7 @@ import org.vertx.java.core.json.JsonObject;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +48,8 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
 
     private static final String[] DIRECTORIES_ATTRIBUTES = {"presentation-directory", "resources-directory",
             "template-directory", "thumbnail-directory"};
+
+    private static final String[] BASE64_ATTRIBUTES = {"value"};
 
     public ConfigurationFileEditor() {
         super();
@@ -87,8 +90,6 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
                 JsonObject object = new JsonObject(builder.toString());
                 ITemplateElement templateElement = this.buildTemplateElementStructure(object);
                 this.setFileContent((ListTemplateElement) templateElement);
-            } else {
-
             }
 
         } catch (IOException e) {
@@ -125,7 +126,8 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
                     element.setWorkingPath(this.getWorkingPath());
                     element.setValue(((Number) value).intValue());
                 } else {
-                    element = new StringTemplateElement(null);
+                    if(this.isBase64Field(fieldName, value.toString())) element = new Base64TemplateElement(null);
+                    else element = new StringTemplateElement(null);
                     element.setWorkingPath(this.getWorkingPath());
                     element.setValue(value.toString());
                 }
@@ -153,7 +155,8 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
                     element.setWorkingPath(this.getWorkingPath());
                     element.setValue(((Number) value).intValue());
                 } else {
-                    element = new StringTemplateElement(null);
+                    if(this.isBase64Field(null, value.toString())) element = new Base64TemplateElement(null);
+                    else element = new StringTemplateElement(null);
                     element.setWorkingPath(this.getWorkingPath());
                     element.setValue(value.toString());
                 }
@@ -180,5 +183,27 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Can not save the content", e);
         }
+    }
+
+    /**
+     * Determine if a JSON field identified by its name and value is a Base64 field. In order to check it, the method
+     * tries to decode the value and if it succeeds and the name of the field is the one of the identified Base64 field,
+     * then the field is considered as a Base64 field.
+     * @param fieldName The name of the JSON field to identify.
+     * @param fieldValue The value of the JSON field to identify
+     * @return {@code true} if the field is identified as a Base64 one, {@code false} otherwise.
+     */
+    private boolean isBase64Field(final String fieldName, final String fieldValue) {
+        boolean result = Arrays.binarySearch(BASE64_ATTRIBUTES, fieldName) >= 0;
+
+        if(result) {
+            try {
+                Base64.getDecoder().decode(fieldValue);
+            } catch(IllegalArgumentException e) {
+                result = false;
+            }
+        }
+
+        return result;
     }
 }

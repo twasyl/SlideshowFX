@@ -18,3 +18,16 @@ Are you a big lover of quizs? If yes you can even create quizs in your presentat
 And developers aren't forgotten in SlideshowFX! Sometimes you display code snippets right? You would like to see the results right? In SlideshowFX, insert executable code snippets and see the console's output directly in your presentation!
 
 With SlideshowFX, bring a presentation to the next level of interactivity.
+
+h1. How to get started
+
+p. As SlideshowFX is a still young project, you will need to build it manually in order to test it. In order to do so, you will need:
+
+* A JDK 8 update 40 ;
+* The @JAVA_HOME@ system variable set to point to you JDK 8 update 40 installation.
+
+p. Then in order to build the application:
+
+* Open a command line in the repository folder ;
+* Execute the command @gradle installSlideshowFX@ and wait for it to finish successfully ;
+* Go in @REPOSITORY_HOME/SlideshowFX-app/build/packaging/bundles/SlideshowFX@ in order to have the SlideshowFX binaries.

@@ -17,10 +17,25 @@
 package com.twasyl.slideshowfx.engine.presentation.configuration;
 
 
+import com.twasyl.slideshowfx.utils.TemplateProcessor;
+import com.twasyl.slideshowfx.utils.beans.Pair;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class SlideElementConfiguration {
+    private static final Logger LOGGER = Logger.getLogger(SlideElementConfiguration.class.getName());
+
     private String id;
     private String htmlContent;
     private String originalContent;
@@ -41,6 +56,31 @@ public class SlideElementConfiguration {
         }
 
         return base64;
+    }
+
+    /**
+     * Replace all variables stored in the given {@code variables} in the HTML content and return a variable free
+     * HTML content. If the current HTML content is {@code null} or empty, an empty String is returned.
+     * The original HTML content is not affected by the modification.
+     * @return A variable free HTML content.
+     */
+    public String getClearedHtmlContent(Set<Pair<String, String>> variables) {
+        final StringBuilder builder = new StringBuilder();
+
+        if(this.htmlContent != null && !this.htmlContent.isEmpty()) {
+            final Map<String, String> tokens = variables.stream().collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+
+            try (StringWriter writer = new StringWriter()) {
+                final Template template = new Template("variable", new StringReader(this.getHtmlContent()), TemplateProcessor.getDefaultConfiguration());
+                template.process(tokens, writer);
+                writer.flush();
+
+                builder.append(writer.toString());
+            } catch (IOException | TemplateException e) {
+                LOGGER.log(Level.SEVERE, "Can not get a variable free HTML content", e);
+            }
+        }
+        return builder.toString();
     }
 
     public void setHtmlContent(String htmlContent) { this.htmlContent = htmlContent; }

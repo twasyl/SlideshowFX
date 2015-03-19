@@ -102,6 +102,7 @@
                             <FileDragableTemplateElement text="Template's file" templateElementName="file" />
                             <StringDragableTemplateElement text="JS Object" templateElementName="js-object" />
                             <DirectoryDragableTemplateElement text="Resources directory" templateElementName="resources-directory" />
+                            <ArrayDragableTemplateElement text="Default variables" templateElementName="default-variables" />
                             <ListDragableTemplateElement text="Slides" templateElementName="slides" />
                         </VBox>
                     </TitledPane>
@@ -109,6 +110,13 @@
 
                 <panes>
                     <fx:reference source="templateElements" />
+                    <TitledPane text="Default variables">
+                        <VBox spacing="5">
+                            <ListDragableTemplateElement text="Variable's container" />
+                            <StringDragableTemplateElement text="Variable's name" templateElementName="name" />
+                            <Base64DragableTemplateElement text="Variable's value" templateElementName="value" />
+                        </VBox>
+                    </TitledPane>
                     <TitledPane text="Slides' elements">
                         <VBox spacing="5">
                             <ListDragableTemplateElement text="Slides' configuration" templateElementName="configuration" />

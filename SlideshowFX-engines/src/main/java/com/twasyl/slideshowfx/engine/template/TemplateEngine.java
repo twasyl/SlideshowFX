@@ -22,15 +22,24 @@ import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfigu
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
 import com.twasyl.slideshowfx.utils.JSONHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
+import com.twasyl.slideshowfx.utils.beans.Pair;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * This class is used to managed the templates provided by SlideshowFX.
@@ -78,6 +87,23 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
 
         templateConfiguration.setGetCurrentSlideMethod("slideshowFXGetCurrentSlide");
         LOGGER.fine("[Template configuration] content definer method = " + templateConfiguration.getGetCurrentSlideMethod());
+
+        // Settings the default variables
+        templateConfiguration.setDefaultVariables(new HashSet<>());
+        JsonArray defaultVariablesJson = templateJson.getArray("default-variables");
+
+        if(defaultVariablesJson != null) {
+            LOGGER.fine("Reading default variables");
+
+            defaultVariablesJson.forEach(variable -> {
+                final JsonObject variableJson = (JsonObject) variable;
+                templateConfiguration.getDefaultVariables().add(
+                        new Pair<>(
+                                variableJson.getString("name"),
+                                new String(Base64.getDecoder().decode(variableJson.getString("value")), StandardCharsets.UTF_8)
+                        ));
+            });
+        }
 
         // Setting the slides
         templateConfiguration.setSlideTemplateConfigurations(new ArrayList<SlideTemplateConfiguration>());
@@ -164,6 +190,7 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                             .putString("file", this.configuration.getFile() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getFile()))
                             .putString("js-object", this.configuration.getJsObject() == null ? "" : this.configuration.getJsObject())
                             .putString("resources-directory", this.configuration.getResourcesDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getResourcesDirectory()))
+                            .putArray("default-variables", new JsonArray())
                             .putObject("slides", new JsonObject()
                                     .putObject("configuration", new JsonObject()
                                             .putString("slides-container", this.configuration.getSlidesContainer() == null ? "" : this.configuration.getSlidesContainer())
@@ -172,6 +199,17 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                                             .putString("presentation-directory", this.configuration.getSlidesPresentationDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getSlidesTemplateDirectory()))
                                             .putString("thumbnail-directory", this.configuration.getSlidesThumbnailDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getSlidesThumbnailDirectory())))
                                     .putArray("slides-definition", new JsonArray())));
+
+            final JsonArray defaultVariablesJson = configurationJson.getObject("template")
+                                                                .getArray("default-variables");
+
+            this.configuration.getDefaultVariables()
+                    .forEach(variable -> {
+                        defaultVariablesJson.addObject(new JsonObject()
+                                .putString("name", variable.getKey())
+                                .putString("value", Base64.getEncoder().encodeToString(variable.getValue().getBytes(StandardCharsets.UTF_8))));
+
+                    });
 
             final JsonArray slidesDefinitionJson = configurationJson.getObject("template")
                                                                 .getObject("slides")

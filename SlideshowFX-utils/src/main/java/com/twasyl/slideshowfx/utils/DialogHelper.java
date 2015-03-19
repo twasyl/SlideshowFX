@@ -16,7 +16,6 @@
 
 package com.twasyl.slideshowfx.utils;
 
-import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -25,7 +24,6 @@ import javafx.stage.Stage;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,7 +47,7 @@ public class DialogHelper extends Stage {
      * @return The answer of the user or {@code null} if no answer has been made.
      */
     public static ButtonType showConfirmationAlert(final String title, final String text) {
-        return showDialog(buildAlert(Alert.AlertType.CONFIRMATION, title, text, ButtonType.NO, ButtonType.YES));
+        return displayDialog(buildAlert(Alert.AlertType.CONFIRMATION, title, text, ButtonType.NO, ButtonType.YES));
     }
 
     /**
@@ -61,7 +59,7 @@ public class DialogHelper extends Stage {
      * @return The answer of the user or {@code null} if no answer has been made.
      */
     public static ButtonType showError(final String title, final String text) {
-        return showDialog(buildAlert(Alert.AlertType.ERROR, title, text, ButtonType.OK));
+        return displayDialog(buildAlert(Alert.AlertType.ERROR, title, text, ButtonType.OK));
     }
 
     /**
@@ -74,7 +72,18 @@ public class DialogHelper extends Stage {
      * @return The answer of the user or {@code null} if no answer has been made.
      */
     public static ButtonType showCancellableDialog(final String title, final Node content) {
-        return showDialog(buildDialog(title, content, ButtonType.CANCEL, ButtonType.OK));
+        return displayDialog(buildDialog(title, content, ButtonType.CANCEL, ButtonType.OK));
+    }
+
+    /**
+     * Show a dialog that contains the given {@code title}, {@code content} and with the given {@code buttons}.
+     * @param title The title of the dialog.
+     * @param content The content of the dialog.
+     * @param buttons The buttons of the dialog.
+     * @return The answer of the user or {@code null} if no answer has been made.
+     */
+    public static ButtonType showDialog(final String title, final Node content, ButtonType ... buttons) {
+        return displayDialog(buildDialog(title, content, buttons));
     }
 
     /**
@@ -147,7 +156,7 @@ public class DialogHelper extends Stage {
      * @param dialog The dialog to show.
      * @return The answer of the user or {@code null} if no answer has been made.
      */
-    private static ButtonType showDialog(Dialog<ButtonType> dialog) {
+    private static ButtonType displayDialog(Dialog<ButtonType> dialog) {
         Optional<ButtonType> response = null;
 
         if(dialog != null) {

@@ -68,6 +68,13 @@ public class SlidePresentationConfiguration {
      */
     public Map<String, SlideElementConfiguration> getElements() { return elements; }
 
+    /**
+     * Update the slide element identified by its {@code elementId} with the provided content.
+     * @param elementId The ID of the element to update.
+     * @param code The code corresponding to the markup syntax used to define the original content.
+     * @param originalContent The original content if the element.
+     * @param htmlContent The HTML content of this element.
+     */
     public void updateElement(String elementId, String code, String originalContent, String htmlContent) {
         Optional<SlideElementConfiguration> slideElement = getElements().entrySet()
                 .stream().filter(entry -> entry.getKey().equals(elementId))

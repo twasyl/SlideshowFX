@@ -28,6 +28,7 @@ import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
 import com.twasyl.slideshowfx.utils.*;
+import com.twasyl.slideshowfx.utils.beans.Pair;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -38,11 +39,11 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import javax.imageio.ImageIO;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * This class manages presentations operation done with SlideshowFX. It is used to open them as well as add, update an
@@ -104,6 +105,16 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                     });
         }
 
+        if(presentationJson.getArray("variables") != null) {
+            presentationJson.getArray("variables")
+                    .forEach(variableJson -> {
+                        final Pair<String, String> variable = new Pair<>();
+                        variable.setKey(((JsonObject) variableJson).getString("name"));
+                        variable.setValue(new String(Base64.getDecoder().decode(((JsonObject) variableJson).getString("value"))));
+                        presentationConfiguration.getVariables().add(variable);
+                    });
+        }
+
         presentationJson.getArray("slides")
                 .forEach(slideJson -> {
                     final SlidePresentationConfiguration slide = new SlidePresentationConfiguration();
@@ -143,6 +154,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             final JsonObject presentationJson = new JsonObject();
             final JsonArray slidesJson = new JsonArray();
             final JsonArray customResourcesJson = new JsonArray();
+            final JsonArray variablesJson = new JsonArray();
 
             this.configuration.getCustomResources()
                     .stream()
@@ -152,6 +164,15 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                                 .putString("content", Base64.getEncoder().encodeToString(resource.getContent().getBytes()));
 
                         customResourcesJson.addObject(resourceJson);
+                    });
+
+            this.configuration.getVariables()
+                    .forEach(variable -> {
+                        final JsonObject variableJson = new JsonObject()
+                                .putString("name", variable.getKey())
+                                .putString("value", Base64.getEncoder().encodeToString(variable.getValue().getBytes()));
+
+                        variablesJson.addObject(variableJson);
                     });
 
             this.configuration.getSlides()
@@ -181,6 +202,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                     });
 
             presentationJson.putArray("custom-resources", customResourcesJson);
+            presentationJson.putArray("variables", variablesJson);
             presentationJson.putArray("slides", slidesJson);
 
             final JsonObject finalObject = new JsonObject();
@@ -206,7 +228,13 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         this.templateEngine.setWorkingDirectory(this.getWorkingDirectory());
         this.templateEngine.setConfiguration(this.templateEngine.readConfiguration());
 
+        // Configure the PresentationConfiguration
         final PresentationConfiguration configuration = this.readConfiguration();
+        configuration.getVariables().addAll(this.getTemplateConfiguration().getDefaultVariables()
+                .stream()
+                .filter(defVariable -> !configuration.getVariables().contains(defVariable))
+                .collect(Collectors.toList()));
+
         this.setConfiguration(configuration);
 
         final Configuration templateConfiguration = TemplateProcessor.getDefaultConfiguration();
@@ -258,7 +286,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                         .stream()
                         .forEach(element -> this.configuration.getDocument()
                                 .getElementById(element.getId())
-                                .html(element.getHtmlContent()));
+                                .html(element.getClearedHtmlContent(this.getConfiguration().getVariables())));
             } catch (IOException | TemplateException e) {
                 LOGGER.log(Level.SEVERE, "Can not read slide's template", e);
             }

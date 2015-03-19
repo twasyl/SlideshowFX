@@ -38,7 +38,7 @@ public class TemplateProcessor {
      */
     public static synchronized Configuration getDefaultConfiguration() {
         if(configurationSingleton == null) {
-            configurationSingleton = new Configuration(Configuration.VERSION_2_3_21);
+            configurationSingleton = new Configuration(Configuration.VERSION_2_3_22);
             configurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
             configurationSingleton.setDefaultEncoding("UTF-8");
         }
@@ -55,7 +55,7 @@ public class TemplateProcessor {
      */
     public static synchronized Configuration getJsConfiguration() {
         if(jsConfigurationSingleton == null) {
-            jsConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_21);
+            jsConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_22);
             jsConfigurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
             jsConfigurationSingleton.setDefaultEncoding("UTF-8");
             jsConfigurationSingleton.setClassForTemplateLoading(TemplateProcessor.class, "/com/twasyl/slideshowfx/js/");
@@ -73,7 +73,7 @@ public class TemplateProcessor {
      */
     public static synchronized Configuration getHtmlConfiguration() {
         if(htmlConfigurationSingleton == null) {
-            htmlConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_21);
+            htmlConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_22);
             htmlConfigurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
             htmlConfigurationSingleton.setDefaultEncoding("UTF-8");
             htmlConfigurationSingleton.setClassForTemplateLoading(TemplateProcessor.class, "/com/twasyl/slideshowfx/html/");

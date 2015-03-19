@@ -22,6 +22,7 @@ buildscript {
 
     dependencies {
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.2'
+        classpath 'org.asciidoctor:asciidoctorj:1.5.2'
         classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.6'
     }
 }
@@ -44,7 +45,7 @@ subprojects {
     }
 }
 
-apply plugin: 'org.asciidoctor.gradle.asciidoctor'
+apply plugin: 'org.asciidoctor.convert'
 
 ext {
 	allLibs = new File(rootDir, '/lib')
@@ -59,7 +60,7 @@ ext.libraries = [
     drive: 'com.google.apis:google-api-services-drive:v2-rev155-1.19.1',
     dropbox:  ['com.dropbox.core:dropbox-core-sdk:1.7.7', 'com.fasterxml.jackson.core:jackson-core:2.2.2'],
     felix: 'org.apache.felix:org.apache.felix.framework:4.4.1@jar',
-    freemarker: 'org.freemarker:freemarker:2.3.21@jar',
+    freemarker: 'org.freemarker:freemarker:2.3.22@jar',
     jsoup: 'org.jsoup:jsoup:1.8.1@jar',
     leapmotion: fileTree(dir: allLibs, include: 'Leap/*'),
     markdown: 'com.github.rjeschke:txtmark:0.11',
@@ -74,14 +75,18 @@ ext.libraries = [
 
 ]
 
+asciidoctorj {
+    version = '1.5.2'
+}
+
 asciidoctor {
     outputDir = new File("$buildDir/docs/asciidoctor")
     backends = ['html5','pdf']
     attributes = [
             'source-highlighter': 'coderay',
             toc: '',
-            'javafx-version': 8,
-            'jdk-version': 8,
+            'javafx-version': '8 update 40',
+            'jdk-version': '8 update 40',
             'gradle-version': '2.2.1',
             'asciidoctorj-version': '1.5.2',
             'apache-felix-version': '4.4.1',

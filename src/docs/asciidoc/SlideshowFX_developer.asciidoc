@@ -1,6 +1,7 @@
 = SlideshowFX developer documentation
 :linkcss:
 :numbered:
+:icons:
 
 == Introduction
 
@@ -111,13 +112,12 @@ The following plugins are currently used in the Gradle script:
 
 In order to build SlideshowFX, some gradle tasks have been created:
 
-- the `jar` task of the `SlideshowFX-app` project has been overridden in order to build the JavaFX native bundle ;
 - `buildJavaFXBundle` which depends on the JAR task has been created in the `SlideshowFX-app` project. This task creates the JavaFX bundle ;
 - `installMarkupPlugins` (in the root project) which copies the markup supported to the directory of plugins ;
 - `installContentExtensionPlugins` (in the root project) which copies the content extensions to the directory of plugins ;
 - `installHostingConnectorPlugins` (in the root project) which copies the hosting connectors to the directory of plugins ;
 - `installSnippetExecutor` (in the root project) which copies the snippet executors to the directory of plugins ;
-- `installSlideshowFX` (in the root project) which installs the markup, content extensions and hosting connectors in the directory of plugins and build the SlideshowFX native bundle.
+- `packageSlideshowFX` (in the root project) which packages the application, markups, extensions and documentation together.
 
 === Set up your environment
 

@@ -16,63 +16,6 @@
 
 version = '1.0.0'
 
-ant.importBuild "${project.projectDir.absolutePath}/src/main/resources/javafx.xml"
-
-ant.classpath = "${jdk}/lib/ant-javafx.jar"
-ant.mainClassName = 'com.twasyl.slideshowfx.app.SlideshowFX'
-ant.preloaderClassName = 'com.twasyl.slideshowfx.app.SlideshowFXPreloader'
-ant.fallbackClassName = 'com.javafx.main.NoJavaFXFallback'
-
-ant.distDir = "${project.buildDir.absolutePath}${File.separator}${libsDir.name}"
-ant.distName = "${project.archivesBaseName}"
-ant.resourceDir = libsDir
-
-ant.resourceExcludePattern = archivesBaseName + ".jar"
-
-ant.applicationTitle = "SlideshowFX"
-ant.applicationVendor = "Thierry Wasylczenko"
-ant.applicationVersion = "1.0.0"
-
-ant.applicationClasses = "${project.buildDir.absolutePath}/classes/main/"
-ant.applicationClassesIncludes = "**/com/"
-ant.applicationResources = "${project.buildDir.absolutePath}/resources/main/"
-ant.applicationResourcesIncludes = "**/com/"
-
-ant.deployOutDir = "${project.buildDir.absolutePath}${File.separator}packaging"
-ant.deployResourcesDir = "${project.buildDir.absolutePath}${File.separator}${libsDir.name}"
-
-task jar(overwrite: true) << {
-
-    if (jdk != null && !jdk.isEmpty()) {
-
-        if(!libsDir.exists()) libsDir.mkdirs()
-
-        // Copying libs
-        copy {
-            from configurations.compile
-            from(fileTree(dir: allLibs, include: "Leap/", exclude: "**/LeapJava.jar"))
-
-            into(libsDir)
-        }
-
-        def classpath = ""
-        configurations.compile.asFileTree
-                .filter {file -> file.name != archivesBaseName + '.jar' || file.name.endsWith('.jar') }
-                .each {f -> classpath += f.name + ','}
-        classpath += "."
-
-        ant.resourceIncludePattern = classpath
-        javafxjar.execute()
-    }
-}
-
-task buildJavaFXBundle << {
-
-    if (jdk != null && !jdk.isEmpty()) {
-        javafxdeploy.execute()
-    }
-}
-
 dependencies {
     compile project(':SlideshowFX-engines')
     compile project(':SlideshowFX-global-configuration')
@@ -96,15 +39,14 @@ dependencies {
     testCompile libraries.automaton
 }
 
-tasks['jar'].dependsOn 'classes'
-tasks['jar'].dependsOn ':SlideshowFX-engines:jar'
-tasks['jar'].dependsOn ':SlideshowFX-utils:jar'
-tasks['jar'].dependsOn ':SlideshowFX-markup:jar'
-tasks['jar'].dependsOn ':SlideshowFX-global-configuration:jar'
-tasks['jar'].dependsOn ':SlideshowFX-content-extension:jar'
-tasks['jar'].dependsOn ':SlideshowFX-hosting-connector:jar'
-tasks['jar'].dependsOn ':SlideshowFX-snippet-executor:jar'
-
-tasks['buildJavaFXBundle'].dependsOn 'jar'
-
-tasks['assemble'].dependsOn 'buildJavaFXBundle'
+jar {
+    manifest {
+        attributes("Implementation-Title": "SlideshowFX",
+                   "Implementation-Version": version,
+                   "Implementation-Vendor": "Thierry Wasylczenko",
+                   "JavaFX-Preloader-Class": "com.twasyl.slideshowfx.app.SlideshowFXPreloader",
+                   "Main-Class": "com.twasyl.slideshowfx.app.SlideshowFX",
+                   "JavaFX-Version": "8.0+",
+                   "Class-Path": configurations.compile.collect { it.getName() }.join(' '))
+    }
+}

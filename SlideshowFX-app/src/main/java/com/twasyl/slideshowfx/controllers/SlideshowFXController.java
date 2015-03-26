@@ -19,6 +19,7 @@ package com.twasyl.slideshowfx.controllers;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.beans.properties.PresentationModifiedBinding;
 import com.twasyl.slideshowfx.concurrent.*;
+import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.TaskProgressIndicator;
 import com.twasyl.slideshowfx.controls.TextFieldCheckMenuItem;
@@ -32,6 +33,7 @@ import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfigu
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
+import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.*;
@@ -87,6 +89,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  *  This class is the controller of the <code>Slideshow.fxml</code> file. It defines all actions possible inside the view
@@ -644,16 +647,20 @@ public class SlideshowFXController implements Initializable {
             }
 
             if(service != null) {
-                this.openedPresentationsTabPane.getTabs()
+                final Stream<Tab> stream = this.openedPresentationsTabPane.getTabs()
                         .stream()
-                        .filter(tab -> tab.getUserData() != null && tab.getUserData() instanceof PresentationViewController)
-                        .forEach(tab -> ((PresentationViewController) tab.getUserData()).refreshMarkupSyntax());
+                        .filter(tab -> tab.getUserData() != null && tab.getUserData() instanceof PresentationViewController);
+                if(service instanceof IMarkup) {
+                    stream.forEach(tab -> ((PresentationViewController) tab.getUserData()).refreshMarkupSyntax());
+                } else if(service instanceof IContentExtension) {
+                    stream.forEach(tab -> ((PresentationViewController) tab.getUserData()).refreshContentExtensions());
+                }
             }
         }
     }
 
     /**
-     * This method
+     * This method shows a dialog for options of SlideshowFX.
      * @param event
      */
     @FXML private void showOptionsDialog(ActionEvent event) {

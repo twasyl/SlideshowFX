@@ -360,7 +360,7 @@ public class PresentationViewController implements Initializable {
 
             final ButtonType response = DialogHelper.showCancellableDialog(contentExtension.getTitle(), contentExtension.getUI());
 
-            if(response != null && response == ButtonType.OK) {
+            if (response != null && response == ButtonType.OK) {
                 final String content = contentExtension.buildContentString(this.markupContentType.getSelectedToggle() != null ?
                         (IMarkup) this.markupContentType.getSelectedToggle().getUserData() :
                         null);
@@ -423,6 +423,26 @@ public class PresentationViewController implements Initializable {
         MarkupManager.getInstalledMarkupSyntax().stream()
                 .sorted((markup1, markup2) -> markup1.getName().compareToIgnoreCase(markup2.getName()))
                 .forEach(markup -> createRadioButtonForMakup(markup));
+    }
+
+    /**
+     * Refresh the UI in order to display all content extensions that are installed on the system.
+     */
+    public void refreshContentExtensions() {
+        final Iterator<Node> iterator = this.contentExtensionToolBar.getItems().iterator();
+        Node child;
+
+        while(iterator.hasNext()) {
+            child = iterator.next();
+
+            if(child instanceof Button && child.getUserData() instanceof IContentExtension) iterator.remove();
+        }
+
+        // Creating Buttons for each extension bundle installed
+        OSGiManager.getInstalledServices(IContentExtension.class)
+                .stream()
+                .sorted((extension1, extension2) -> extension1.getCode().compareTo(extension2.getCode()))
+                .forEach(extension -> createButtonForContentExtension(extension));
     }
 
     /**

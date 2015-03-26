@@ -22,6 +22,7 @@ buildscript {
 
     dependencies {
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.2'
+        classpath 'org.jruby:jruby-complete:1.7.18'
         classpath 'org.asciidoctor:asciidoctorj:1.5.2'
         classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.6'
     }
@@ -59,7 +60,7 @@ ext {
 }
 
 ext.libraries = [
-    asciidoctorj: ['org.asciidoctor:asciidoctorj:1.5.2', 'org.slf4j:slf4j-simple:1.7.7'],
+    asciidoctorj: ['org.jruby:jruby-complete:1.7.18', 'org.asciidoctor:asciidoctorj:1.5.2', 'org.slf4j:slf4j-simple:1.7.7'],
     drive: 'com.google.apis:google-api-services-drive:v2-rev155-1.19.1',
     dropbox:  ['com.dropbox.core:dropbox-core-sdk:1.7.7', 'com.fasterxml.jackson.core:jackson-core:2.2.2'],
     felix: 'org.apache.felix:org.apache.felix.framework:4.4.1@jar',
@@ -83,7 +84,6 @@ asciidoctorj {
 }
 
 asciidoctor {
-    outputDir = new File("$buildDir/docs/asciidoctor")
     backends = ['html5','pdf']
     attributes = [
             'source-highlighter': 'coderay',
@@ -197,12 +197,12 @@ task packageSlideshowFX(dependsOn : [ ':SlideshowFX-asciidoctor:jar', ':Slidesho
         }
 
         copy {
-            from project(':SlideshowFX-alert-extension').tasks['jar'].archivePath
-            from project(':SlideshowFX-code-extension').tasks['jar'].archivePath
-            from project(':SlideshowFX-image-extension').tasks['jar'].archivePath
-            from project(':SlideshowFX-link-extension').tasks['jar'].archivePath
-            from project(':SlideshowFX-quote-extension').tasks['jar'].archivePath
-            from project(':SlideshowFX-snippet-extension').tasks['jar'].archivePath
+            from project(':SlideshowFX-alert-extension').jar.archivePath
+            from project(':SlideshowFX-code-extension').jar.archivePath
+            from project(':SlideshowFX-image-extension').jar.archivePath
+            from project(':SlideshowFX-link-extension').jar.archivePath
+            from project(':SlideshowFX-quote-extension').jar.archivePath
+            from project(':SlideshowFX-snippet-extension').jar.archivePath
 
             into new File(pluginsFolder, "extensions")
         }
@@ -242,8 +242,7 @@ task packageSlideshowFX(dependsOn : [ ':SlideshowFX-asciidoctor:jar', ':Slidesho
     doLast {
         delete { ant.deployOutDir }
         delete { tmpFolder }
-
-        asciidoctor.outputDir
+        delete {asciidoctor.outputDir }
     }
 }
 

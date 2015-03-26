@@ -25,7 +25,7 @@ dependencies {
 }
 
 jar {
-    def dependenciesFiles = configurations.compile.files { dep -> dep.name == 'asciidoctorj' || dep.name == 'slf4j-simple' }
+    def dependenciesFiles = configurations.compile.files { dep -> dep.name == 'asciidoctorj' || dep.name == 'slf4j-simple' || dep.name == 'jruby-complete' }
     from(dependenciesFiles) {
         include '*'
     }
@@ -39,7 +39,7 @@ jar {
                 'Bundle-ManifestVersion': '2',
                 'Bundle-Name': 'SlideshowFX asciidoctor support',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.asciidoctor',
-                'Bundle-Description': 'Support asscidoctor for defining slide\'s content',
+                'Bundle-Description': 'Support asciidoctor for defining slide\'s content',
                 'Bundle-Version': '1.0.0',
                 'Bundle-Activator': 'com.twasyl.slideshowfx.markup.asciidoctor.activator.AsciidoctorActivator',
                 'Bundle-ClassPath': bundleClasspath,
@@ -47,4 +47,11 @@ jar {
                 'Export-Package': 'com.twasyl.slideshowfx.markup.asciidoctor,com.twasyl.slideshowfx.markup.asciidoctor.activator',
                 'Import-Package': 'org.osgi.framework')
     }
+}
+
+task coucou << {
+    // configurations.compile.dependencies.asciidoctorj {ar -> println "huhu" + ar.name}
+
+    configurations.compile.dependencies.filescollect {dep -> println dep.name}
+
 }

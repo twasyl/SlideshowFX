@@ -105,15 +105,16 @@ public class PresentationConfiguration implements IConfiguration {
 
     /**
      * Update the given {@code slide} in the HTML file. Each {@link com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration}
-     * of the {@code slide} in the HTML document.
+     * of the {@code slide} in the HTML document is updated.
      * If {@link com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration#elements elements}
      * in the given {@code slide} contain variables, their values are inserted in the final HTML document. But the slide
      * will not be updated.
+     * If the slide contains variables outside the {@link com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration#elements elements}
+     * they will also be replaced in the HTML document.
      * @param slide The slide to update in the HTML document.
      */
     public void updateSlideInDocument(final SlidePresentationConfiguration slide) {
         if(slide == null) throw new IllegalArgumentException("The slide can not be null");
-
         slide.getElements().values()
                 .stream()
                 .forEach(element -> this.document.getElementById(element.getId())

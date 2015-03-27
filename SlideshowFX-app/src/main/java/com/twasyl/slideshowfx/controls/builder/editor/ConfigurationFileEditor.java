@@ -194,7 +194,7 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
      * @return {@code true} if the field is identified as a Base64 one, {@code false} otherwise.
      */
     private boolean isBase64Field(final String fieldName, final String fieldValue) {
-        boolean result = Arrays.binarySearch(BASE64_ATTRIBUTES, fieldName) >= 0;
+        boolean result = fieldName == null ? true : Arrays.binarySearch(BASE64_ATTRIBUTES, fieldName) >= 0;
 
         if(result) {
             try {

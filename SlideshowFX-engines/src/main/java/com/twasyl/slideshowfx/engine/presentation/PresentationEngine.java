@@ -267,6 +267,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         tokens.clear();
         tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_CALL);
         tokens.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
+        tokens.putAll(this.configuration.getVariables().stream().collect(Collectors.toMap(Pair::getKey, Pair::getValue)));
 
         for(SlidePresentationConfiguration s : this.configuration.getSlides()) {
             templateConfiguration.setDirectoryForTemplateLoading(s.getTemplate().getFile().getParentFile());
@@ -413,6 +414,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         tokens.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
         tokens.put(TEMPLATE_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
         tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_CALL);
+        tokens.putAll(this.configuration.getVariables().stream().collect(Collectors.toMap(Pair::getKey, Pair::getValue)));
 
         if(template.getDynamicAttributes() != null && template.getDynamicAttributes().length > 0) {
             Scanner scanner = new Scanner(System.in);

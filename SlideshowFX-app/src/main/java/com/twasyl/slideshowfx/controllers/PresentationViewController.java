@@ -20,9 +20,9 @@ import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.*;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
-import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
-import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
-import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
+import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
+import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElement;
+import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
@@ -179,7 +179,7 @@ public class PresentationViewController implements Initializable {
         String htmlContent = markup.convertAsHtml(originalContent);
 
         // Update the SlideElement
-        final SlidePresentationConfiguration slideToUpdate = this.presentationEngine.getConfiguration().getSlideByNumber(this.slideNumber.getText());
+        final Slide slideToUpdate = this.presentationEngine.getConfiguration().getSlideByNumber(this.slideNumber.getText());
         slideToUpdate.updateElement(elementId, markup.getCode(), originalContent, htmlContent);
 
         this.presentationEngine.getConfiguration().updateSlideInDocument(slideToUpdate);
@@ -187,7 +187,7 @@ public class PresentationViewController implements Initializable {
         this.presentationEngine.savePresentationFile();
 
         // Clear the HTML of any variables
-        htmlContent = slideToUpdate.getElements().get(elementId).getClearedHtmlContent(this.presentationEngine.getConfiguration().getVariables());
+        htmlContent = slideToUpdate.getElement(elementId).getClearedHtmlContent(this.presentationEngine.getConfiguration().getVariables());
 
         String clearedContent = Base64.getEncoder().encodeToString(htmlContent.getBytes("UTF8"));
         String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",
@@ -219,10 +219,10 @@ public class PresentationViewController implements Initializable {
         this.slideNumber.setText(slideNumber);
         this.fieldName.setText(field);
 
-        final SlidePresentationConfiguration slide = this.presentationEngine.getConfiguration().getSlideByNumber(slideNumber);
+        final Slide slide = this.presentationEngine.getConfiguration().getSlideByNumber(slideNumber);
 
         if (slide != null) {
-            final SlideElementConfiguration element = slide.getElements().get(slideNumber + "-" + field);
+            final SlideElement element = slide.getElement(slideNumber + "-" + field);
 
             /**
              * Prefill the content either with the element's content if it is not null, either with the given
@@ -579,13 +579,13 @@ public class PresentationViewController implements Initializable {
     }
 
     /**
-     * Get the {@link com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration}
+     * Get the {@link Slide}
      * of the current displayed slide.
-     * @return The {@link com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration} of the
+     * @return The {@link Slide} of the
      * current displayed slide or {@code null} if no slide is displayed.
      */
-    public SlidePresentationConfiguration getCurrentSlidePresentationConfiguration() {
-        SlidePresentationConfiguration configuration = null;
+    public Slide getCurrentSlidePresentationConfiguration() {
+        Slide configuration = null;
         final String slideId = this.getCurrentSlideId();
 
         if(slideId != null && !slideId.isEmpty()) {
@@ -601,7 +601,7 @@ public class PresentationViewController implements Initializable {
      * @throws java.lang.NullPointerException If the {@code template} is null.
      * @throws java.io.IOException If an error occured when adding a slide.
      */
-    public void addSlide(SlideTemplateConfiguration template) throws IOException {
+    public void addSlide(SlideTemplate template) throws IOException {
         if(template == null) throw new NullPointerException("The template can not be null");
 
         this.presentationEngine.addSlide(template, this.getCurrentSlideNumber());
@@ -613,7 +613,7 @@ public class PresentationViewController implements Initializable {
      * @param beforeSlide The slide where {@code slideToMove} will be placed before.
      * @throws java.lang.NullPointerException If {@code slideToMove} is {@code null}
      */
-    public void moveSlide(SlidePresentationConfiguration slideToMove, SlidePresentationConfiguration beforeSlide) {
+    public void moveSlide(Slide slideToMove, Slide beforeSlide) {
         if(slideToMove == null) throw new NullPointerException("The slide to move can not be null");
 
         this.presentationEngine.moveSlide(slideToMove, beforeSlide);
@@ -626,9 +626,15 @@ public class PresentationViewController implements Initializable {
         final String slideId = this.getCurrentSlideId();
 
         if(slideId != null && !slideId.isEmpty()) {
-            final SlidePresentationConfiguration slideToCopy = this.presentationEngine.getConfiguration().getSlideById(slideId);
+            final Slide slideToCopy = this.presentationEngine.getConfiguration().getSlideById(slideId);
 
-            if(slideToCopy != null) this.presentationEngine.duplicateSlide(slideToCopy);
+            if(slideToCopy != null) {
+                try {
+                    this.presentationEngine.duplicateSlide(slideToCopy);
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Can not duplicate the slide", e);
+                }
+            }
         }
     }
 
@@ -659,14 +665,14 @@ public class PresentationViewController implements Initializable {
      * Get the slide for this presentation.
      * @return An array containing all slides, {@code null} if no slides are found.
      */
-    public SlidePresentationConfiguration[] getSlides() {
-        SlidePresentationConfiguration[] slides = null;
+    public Slide[] getSlides() {
+        Slide[] slides = null;
 
         if(this.presentationEngine != null
             && this.presentationEngine.getConfiguration() != null
             && this.presentationEngine.getConfiguration().getSlides() != null
             && !this.presentationEngine.getConfiguration().getSlides().isEmpty()) {
-            slides = this.presentationEngine.getConfiguration().getSlides().toArray(new SlidePresentationConfiguration[0]);
+            slides = this.presentationEngine.getConfiguration().getSlides().toArray(new Slide[0]);
         }
 
         return slides;
@@ -676,14 +682,14 @@ public class PresentationViewController implements Initializable {
      * Get the slide templates for this presentation.
      * @return An array containing all templates, {@code null} if no templates are found.
      */
-    public SlideTemplateConfiguration[] getSlideTemplates() {
-        SlideTemplateConfiguration[] templates = null;
+    public SlideTemplate[] getSlideTemplates() {
+        SlideTemplate[] templates = null;
 
         if(this.presentationEngine != null
                 && this.presentationEngine.getTemplateConfiguration() != null
-                && this.presentationEngine.getTemplateConfiguration().getSlideTemplateConfigurations() != null
-                && !this.presentationEngine.getTemplateConfiguration().getSlideTemplateConfigurations().isEmpty()) {
-            templates = this.presentationEngine.getTemplateConfiguration().getSlideTemplateConfigurations().toArray(new SlideTemplateConfiguration[0]);
+                && this.presentationEngine.getTemplateConfiguration().getSlideTemplates() != null
+                && !this.presentationEngine.getTemplateConfiguration().getSlideTemplates().isEmpty()) {
+            templates = this.presentationEngine.getTemplateConfiguration().getSlideTemplates().toArray(new SlideTemplate[0]);
         }
 
         return templates;

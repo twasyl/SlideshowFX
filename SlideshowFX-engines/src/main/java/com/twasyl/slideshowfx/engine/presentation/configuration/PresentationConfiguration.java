@@ -37,13 +37,13 @@ public class PresentationConfiguration implements IConfiguration {
     private File presentationFile;
     private Set<Resource> customResources = new LinkedHashSet<>();
     private Set<Pair<String, String>> variables = new LinkedHashSet<>();
-    private List<SlidePresentationConfiguration> slides = new ArrayList<>();
+    private List<Slide> slides = new ArrayList<>();
 
     public File getPresentationFile() { return presentationFile; }
     public void setPresentationFile(File presentationFile) { this.presentationFile = presentationFile; }
 
-    public List<SlidePresentationConfiguration> getSlides() { return slides; }
-    public void setSlides(List<SlidePresentationConfiguration> slides) { this.slides = slides; }
+    public List<Slide> getSlides() { return slides; }
+    public void setSlides(List<Slide> slides) { this.slides = slides; }
 
     public Document getDocument() { return document; }
     public void setDocument(Document document) { this.document = document; }
@@ -59,8 +59,8 @@ public class PresentationConfiguration implements IConfiguration {
     public void updateSlideThumbnail(String slideNumber, Image image) {
         if(slideNumber == null) throw new IllegalArgumentException("The slide number can not be null");
 
-        SlidePresentationConfiguration slideToUpdate = null;
-        for (SlidePresentationConfiguration s : getSlides()) {
+        Slide slideToUpdate = null;
+        for (Slide s : getSlides()) {
             if (slideNumber.equals(s.getSlideNumber())) {
                 s.setThumbnail(image);
                 LOGGER.finest("Slide's thumbnail updated");
@@ -74,10 +74,10 @@ public class PresentationConfiguration implements IConfiguration {
      * @param slideNumber The slide number og the slide to get.
      * @return The slide or null if not found.
      */
-    public SlidePresentationConfiguration getSlideByNumber(String slideNumber) {
-        SlidePresentationConfiguration slide = null;
+    public Slide getSlideByNumber(String slideNumber) {
+        Slide slide = null;
 
-        Optional<SlidePresentationConfiguration> slideOpt = slides.stream()
+        Optional<Slide> slideOpt = slides.stream()
                 .filter(s -> slideNumber.equals(s.getSlideNumber()))
                 .findFirst();
 
@@ -91,10 +91,10 @@ public class PresentationConfiguration implements IConfiguration {
      * @param id The ID of the slide to get.
      * @return The slide or null if not found.
      */
-    public SlidePresentationConfiguration getSlideById(String id) {
-        SlidePresentationConfiguration slide = null;
+    public Slide getSlideById(String id) {
+        Slide slide = null;
 
-        Optional<SlidePresentationConfiguration> slideOpt = slides.stream()
+        Optional<Slide> slideOpt = slides.stream()
                 .filter(s -> id.equals(s.getId()))
                 .findFirst();
 
@@ -104,18 +104,19 @@ public class PresentationConfiguration implements IConfiguration {
     }
 
     /**
-     * Update the given {@code slide} in the HTML file. Each {@link com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration}
+     * Update the given {@code slide} in the HTML file. Each {@link SlideElement}
      * of the {@code slide} in the HTML document is updated.
-     * If {@link com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration#elements elements}
+     * If {@link Slide#elements elements}
      * in the given {@code slide} contain variables, their values are inserted in the final HTML document. But the slide
      * will not be updated.
-     * If the slide contains variables outside the {@link com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration#elements elements}
+     * If the slide contains variables outside the {@link Slide#elements elements}
      * they will also be replaced in the HTML document.
      * @param slide The slide to update in the HTML document.
      */
-    public void updateSlideInDocument(final SlidePresentationConfiguration slide) {
+    public void updateSlideInDocument(final Slide slide) {
         if(slide == null) throw new IllegalArgumentException("The slide can not be null");
-        slide.getElements().values()
+
+        slide.getElements()
                 .stream()
                 .forEach(element -> this.document.getElementById(element.getId())
                                                  .html(element.getClearedHtmlContent(this.variables)));

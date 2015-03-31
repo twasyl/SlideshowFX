@@ -18,7 +18,8 @@ package com.twasyl.slideshowfx.engine.template;
 
 import com.twasyl.slideshowfx.engine.AbstractEngine;
 import com.twasyl.slideshowfx.engine.EngineException;
-import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
+import com.twasyl.slideshowfx.engine.template.configuration.SlideElementTemplate;
+import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
 import com.twasyl.slideshowfx.utils.JSONHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
@@ -29,17 +30,9 @@ import org.vertx.java.core.json.JsonObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 /**
  * This class is used to managed the templates provided by SlideshowFX.
@@ -106,7 +99,7 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
         }
 
         // Setting the slides
-        templateConfiguration.setSlideTemplateConfigurations(new ArrayList<SlideTemplateConfiguration>());
+        templateConfiguration.setSlideTemplates(new ArrayList<SlideTemplate>());
         JsonObject slidesJson = templateJson.getObject("slides");
 
         if (slidesJson != null) {
@@ -132,28 +125,28 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                     .forEach(slideJson -> {
                         Number number;
 
-                        final SlideTemplateConfiguration slideTemplateConfiguration = new SlideTemplateConfiguration();
-                        slideTemplateConfiguration.setId((number = ((JsonObject) slideJson).getNumber("id")) != null ? number.intValue() : -1);
-                        LOGGER.fine("[Slide definition] id = " + slideTemplateConfiguration.getId());
+                        final SlideTemplate slideTemplate = new SlideTemplate();
+                        slideTemplate.setId((number = ((JsonObject) slideJson).getNumber("id")) != null ? number.intValue() : -1);
+                        LOGGER.fine("[Slide definition] id = " + slideTemplate.getId());
 
-                        slideTemplateConfiguration.setName(((JsonObject) slideJson).getString("name"));
-                        LOGGER.fine("[Slide definition] name = " + slideTemplateConfiguration.getName());
+                        slideTemplate.setName(((JsonObject) slideJson).getString("name"));
+                        LOGGER.fine("[Slide definition] name = " + slideTemplate.getName());
 
-                        slideTemplateConfiguration.setFile(new File(templateConfiguration.getSlidesTemplateDirectory(), ((JsonObject) slideJson).getString("file")));
-                        LOGGER.fine("[Slide definition] file = " + slideTemplateConfiguration.getFile().getAbsolutePath());
+                        slideTemplate.setFile(new File(templateConfiguration.getSlidesTemplateDirectory(), ((JsonObject) slideJson).getString("file")));
+                        LOGGER.fine("[Slide definition] file = " + slideTemplate.getFile().getAbsolutePath());
 
-                        final JsonArray dynamicIdsJson = ((JsonObject) slideJson).getArray("dynamic-ids");
+                        /* final JsonArray dynamicIdsJson = ((JsonObject) slideJson).getArray("dynamic-ids");
                         if (dynamicIdsJson != null && dynamicIdsJson.size() > 0) {
-                            slideTemplateConfiguration.setDynamicIds(new String[dynamicIdsJson.size()]);
+                            slideTemplate.setDynamicIds(new String[dynamicIdsJson.size()]);
 
                             for (int index = 0; index < dynamicIdsJson.size(); index++) {
-                                slideTemplateConfiguration.getDynamicIds()[index] = dynamicIdsJson.get(index);
+                                slideTemplate.getDynamicIds()[index] = dynamicIdsJson.get(index);
                             }
-                        }
+                        }*/
 
                         final JsonArray dynamicAttributesJson = ((JsonObject) slideJson).getArray("dynamic-attributes");
                         if (dynamicAttributesJson != null && dynamicAttributesJson.size() > 0) {
-                            slideTemplateConfiguration.setDynamicAttributes(new DynamicAttribute[dynamicAttributesJson.size()]);
+                            slideTemplate.setDynamicAttributes(new DynamicAttribute[dynamicAttributesJson.size()]);
                             DynamicAttribute dynamicAttribute;
                             JsonObject dynamicAttributeJson;
 
@@ -165,11 +158,29 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                                 dynamicAttribute.setPromptMessage(dynamicAttributeJson.getString("prompt-message"));
                                 dynamicAttribute.setTemplateExpression(dynamicAttributeJson.getString("templateConfiguration-expression"));
 
-                                slideTemplateConfiguration.getDynamicAttributes()[index] = dynamicAttribute;
+                                slideTemplate.getDynamicAttributes()[index] = dynamicAttribute;
                             }
                         }
 
-                        templateConfiguration.getSlideTemplateConfigurations().add(slideTemplateConfiguration);
+                        final JsonArray elementsJson = ((JsonObject) slideJson).getArray("elements");
+                        if(elementsJson != null && elementsJson.size() > 0) {
+                            slideTemplate.setElements(new SlideElementTemplate[elementsJson.size()]);
+                            SlideElementTemplate element;
+                            JsonObject elementJson;
+
+                            for (int index = 0; index < elementsJson.size(); index++) {
+                                element = new SlideElementTemplate();
+                                elementJson = elementsJson.get(index);
+
+                                element.setId(elementJson.getNumber("id").intValue());
+                                element.setHtmlId(elementJson.getString("html-id"));
+                                element.setDefaultContent(elementJson.getString("default-content"));
+
+                                slideTemplate.getElements()[index] = element;
+                            }
+                        }
+
+                        templateConfiguration.getSlideTemplates().add(slideTemplate);
                     });
         } else {
             LOGGER.fine("No slide's configuration found");
@@ -214,20 +225,21 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
             final JsonArray slidesDefinitionJson = configurationJson.getObject("template")
                                                                 .getObject("slides")
                                                                 .getArray("slides-definition");
-            this.configuration.getSlideTemplateConfigurations()
+            this.configuration.getSlideTemplates()
                     .forEach(slideTemplate -> {
                         final JsonObject jsonObject = new JsonObject()
                                 .putNumber("id", slideTemplate.getId())
                                 .putString("name", slideTemplate.getName() == null ? "" : slideTemplate.getName())
                                 .putString("file", slideTemplate.getFile() == null ? "" : slideTemplate.getFile().getName())
                                 .putArray("dynamic-ids", new JsonArray())
-                                .putArray("dynamic-attributes", new JsonArray());
+                                .putArray("dynamic-attributes", new JsonArray())
+                                .putArray("elements", new JsonArray());
 
-                        if(slideTemplate.getDynamicIds() != null && slideTemplate.getDynamicIds().length > 0) {
+                       /* if(slideTemplate.getDynamicIds() != null && slideTemplate.getDynamicIds().length > 0) {
                             final JsonArray array = jsonObject.getArray("dynamic-ids");
                             Arrays.stream(slideTemplate.getDynamicIds())
                                     .forEach(id -> array.addString(id));
-                        }
+                        } */
 
                         if(slideTemplate.getDynamicAttributes() != null && slideTemplate.getDynamicAttributes().length > 0) {
                             final JsonArray array = jsonObject.getArray("dynamic-attributes");
@@ -237,6 +249,17 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                                                             .putString("attribute", attribute.getAttribute())
                                                             .putString("template-expression", attribute.getTemplateExpression())
                                                             .putString("prompt-message", attribute.getPromptMessage()));
+                                    });
+                        }
+
+                        if(slideTemplate.getElements() != null && slideTemplate.getElements().length > 0) {
+                            final JsonArray array = jsonObject.getArray("elements");
+                            Arrays.stream(slideTemplate.getElements())
+                                    .forEach(element -> {
+                                        array.addObject(new JsonObject()
+                                                            .putNumber("template-id", element.getId())
+                                                            .putString("html-id", element.getHtmlId())
+                                                            .putString("default-content", element.getDefaultContent()));
                                     });
                         }
 

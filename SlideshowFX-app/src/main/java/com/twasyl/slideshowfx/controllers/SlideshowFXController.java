@@ -27,9 +27,9 @@ import com.twasyl.slideshowfx.controls.Tour;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
-import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
+import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
-import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
+import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
@@ -110,8 +110,8 @@ public class SlideshowFXController implements Initializable {
                 final PresentationViewController view = SlideshowFXController.this.getCurrentPresentationView();
                 final Object userData = ((MenuItem) actionEvent.getSource()).getUserData();
 
-                if (userData instanceof SlideTemplateConfiguration && view != null) {
-                    view.addSlide((SlideTemplateConfiguration) userData);
+                if (userData instanceof SlideTemplate && view != null) {
+                    view.addSlide((SlideTemplate) userData);
 
                     final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
                     SlideshowFXController.this.taskInProgress.setCurrentTask(task);
@@ -132,8 +132,8 @@ public class SlideshowFXController implements Initializable {
 
             if(view != null) {
                 final SlideMenuItem menunItem = (SlideMenuItem) actionEvent.getSource();
-                final SlidePresentationConfiguration slideToMove = view.getCurrentSlidePresentationConfiguration();
-                final SlidePresentationConfiguration beforeSlide = menunItem.getSlide();
+                final Slide slideToMove = view.getCurrentSlidePresentationConfiguration();
+                final Slide beforeSlide = menunItem.getSlide();
 
                 view.moveSlide(slideToMove, beforeSlide);
 
@@ -428,7 +428,7 @@ public class SlideshowFXController implements Initializable {
 
     /**
      * Copy the slide, update the menu of available slides and reload the presentation.
-     * The copy is delegated to {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#duplicateSlide(com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration)}.
+     * The copy is delegated to {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#duplicateSlide(Slide)}.
      *
      * @param event
      */
@@ -787,12 +787,12 @@ public class SlideshowFXController implements Initializable {
 
         final PresentationViewController view = this.getCurrentPresentationView();
         if (view != null) {
-            SlideTemplateConfiguration[] templates = view.getSlideTemplates();
+            SlideTemplate[] templates = view.getSlideTemplates();
 
             if(templates != null) {
                 MenuItem item;
 
-                for (SlideTemplateConfiguration template : templates) {
+                for (SlideTemplate template : templates) {
                     item = new MenuItem();
                     item.setText(template.getName());
                     item.setUserData(template);
@@ -812,12 +812,12 @@ public class SlideshowFXController implements Initializable {
 
         final PresentationViewController view = this.getCurrentPresentationView();
         if (view != null) {
-            SlidePresentationConfiguration[] slides = view.getSlides();
+            Slide[] slides = view.getSlides();
 
             if(slides != null) {
                 SlideMenuItem menuItem;
 
-                for (SlidePresentationConfiguration slide : slides) {
+                for (Slide slide : slides) {
                     menuItem = new SlideMenuItem(slide);
                     menuItem.setOnAction(SlideshowFXController.this.moveSlideActionEvent);
                     this.moveSlideButton.getItems().add(menuItem);

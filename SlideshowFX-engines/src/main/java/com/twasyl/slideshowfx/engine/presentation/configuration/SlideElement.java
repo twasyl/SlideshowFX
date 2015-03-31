@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.engine.presentation.configuration;
 
 
+import com.twasyl.slideshowfx.engine.template.configuration.SlideElementTemplate;
 import com.twasyl.slideshowfx.utils.TemplateProcessor;
 import com.twasyl.slideshowfx.utils.beans.Pair;
 import freemarker.template.Template;
@@ -33,14 +34,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class SlideElementConfiguration {
-    private static final Logger LOGGER = Logger.getLogger(SlideElementConfiguration.class.getName());
+public class SlideElement {
+    private static final Logger LOGGER = Logger.getLogger(SlideElement.class.getName());
 
     private String id;
+    private SlideElementTemplate template;
     private String htmlContent;
     private String originalContent;
     private String originalContentCode;
-    private String defaultContent;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -115,6 +116,6 @@ public class SlideElementConfiguration {
     public String getOriginalContentCode() { return originalContentCode; }
     public void setOriginalContentCode(String originalContentCode) { this.originalContentCode = originalContentCode; }
 
-    public String getDefaultContent() { return defaultContent; }
-    public void setDefaultContent(String defaultContent) { this.defaultContent = defaultContent; }
+    public SlideElementTemplate getTemplate() { return template; }
+    public void setTemplate(SlideElementTemplate template) { this.template = template; }
 }

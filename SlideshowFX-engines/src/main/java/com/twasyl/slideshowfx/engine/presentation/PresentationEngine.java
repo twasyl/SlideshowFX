@@ -21,11 +21,12 @@ import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.engine.AbstractEngine;
 import com.twasyl.slideshowfx.engine.EngineException;
 import com.twasyl.slideshowfx.engine.presentation.configuration.PresentationConfiguration;
-import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElementConfiguration;
-import com.twasyl.slideshowfx.engine.presentation.configuration.SlidePresentationConfiguration;
+import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
+import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElement;
 import com.twasyl.slideshowfx.engine.template.DynamicAttribute;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
-import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplateConfiguration;
+import com.twasyl.slideshowfx.engine.template.configuration.SlideElementTemplate;
+import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
 import com.twasyl.slideshowfx.utils.*;
 import com.twasyl.slideshowfx.utils.beans.Pair;
@@ -117,7 +118,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
         presentationJson.getArray("slides")
                 .forEach(slideJson -> {
-                    final SlidePresentationConfiguration slide = new SlidePresentationConfiguration();
+                    final Slide slide = new Slide();
 
                     slide.setId(((JsonObject) slideJson).getString("id"));
                     slide.setSlideNumber(((JsonObject) slideJson).getString("number"));
@@ -131,13 +132,14 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
                     ((JsonObject) slideJson).getArray("elements")
                             .forEach(slideElementJson -> {
-                                final SlideElementConfiguration slideElement = new SlideElementConfiguration();
+                                final SlideElement slideElement = new SlideElement();
+                                slideElement.setTemplate(slide.getTemplate().getSlideElementTemplate(((JsonObject) slideElementJson).getNumber("template-id").intValue()));
                                 slideElement.setId(((JsonObject) slideElementJson).getString("element-id"));
                                 slideElement.setOriginalContentCode(((JsonObject) slideElementJson).getString("original-content-code"));
                                 slideElement.setOriginalContentAsBase64(((JsonObject) slideElementJson).getString("original-content"));
                                 slideElement.setHtmlContentAsBase64(((JsonObject) slideElementJson).getString("html-content"));
 
-                                slide.getElements().put(slideElement.getId(), slideElement);
+                                slide.getElements().add(slideElement);
                             });
 
                     presentationConfiguration.getSlides().add(slide);
@@ -185,11 +187,12 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                                 .putString("id", slide.getId())
                                 .putString("number", slide.getSlideNumber());
 
-                        slide.getElements().values()
+                        slide.getElements()
                                 .stream()
                                 .forEach(slideElement -> {
                                     final JsonObject elementJson = new JsonObject();
-                                    elementJson.putString("element-id", slideElement.getId())
+                                    elementJson.putNumber("template-id", slideElement.getTemplate().getId())
+                                            .putString("element-id", slideElement.getId())
                                             .putString("original-content-code", slideElement.getOriginalContentCode())
                                             .putString("original-content", slideElement.getOriginalContentAsBase64())
                                             .putString("html-content", slideElement.getHtmlContentAsBase64());
@@ -269,7 +272,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         tokens.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
         tokens.putAll(this.configuration.getVariables().stream().collect(Collectors.toMap(Pair::getKey, Pair::getValue)));
 
-        for(SlidePresentationConfiguration s : this.configuration.getSlides()) {
+        for(Slide s : this.configuration.getSlides()) {
             templateConfiguration.setDirectoryForTemplateLoading(s.getTemplate().getFile().getParentFile());
 
             try (final StringWriter writer = new StringWriter()) {
@@ -283,7 +286,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                         .getElementById(this.templateEngine.getConfiguration().getSlidesContainer())
                         .append(writer.toString());
 
-                s.getElements().values()
+                s.getElements()
                         .stream()
                         .forEach(element -> this.configuration.getDocument()
                                 .getElementById(element.getId())
@@ -345,6 +348,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
         this.configuration = new PresentationConfiguration();
         this.configuration.setPresentationFile(new File(this.getWorkingDirectory(), PresentationConfiguration.DEFAULT_PRESENTATION_FILENAME));
+        this.configuration.getVariables().addAll(this.templateEngine.getConfiguration().getDefaultVariables());
 
         final Configuration templateConfiguration = TemplateProcessor.getDefaultConfiguration();
         templateConfiguration.setDirectoryForTemplateLoading(this.templateEngine.getConfiguration().getFile().getParentFile());
@@ -381,15 +385,15 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
      * @return The new added slide.
      * @throws IOException If an error occurred when saving the presentation.
      */
-    public SlidePresentationConfiguration addSlide(SlideTemplateConfiguration template, String afterSlideNumber) throws IOException {
+    public Slide addSlide(SlideTemplate template, String afterSlideNumber) throws IOException {
         if(template == null) throw new IllegalArgumentException("The templateConfiguration for creating a slide can not be null");
 
-        final SlidePresentationConfiguration slide = new SlidePresentationConfiguration(template, System.currentTimeMillis() + "");
+        final Pair<Slide, Element> createdSlide = this.createSlide(template);
 
         if(afterSlideNumber == null) {
-            this.configuration.getSlides().add(slide);
+            this.configuration.getSlides().add(createdSlide.getKey());
         } else {
-            ListIterator<SlidePresentationConfiguration> slidesIterator = this.configuration.getSlides().listIterator();
+            ListIterator<Slide> slidesIterator = this.configuration.getSlides().listIterator();
 
             this.configuration.getSlideByNumber(afterSlideNumber);
             int index = -1;
@@ -401,61 +405,25 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             }
 
             if(index > -1) {
-                this.configuration.getSlides().add(index, slide);
+                this.configuration.getSlides().add(index, createdSlide.getKey());
             } else {
-                this.configuration.getSlides().add(slide);
+                this.configuration.getSlides().add(createdSlide.getKey());
             }
         }
 
-        final Configuration templateConfiguration = TemplateProcessor.getDefaultConfiguration();
-        templateConfiguration.setDirectoryForTemplateLoading(template.getFile().getParentFile());
-
-        final Map tokens = new HashMap<>();
-        tokens.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
-        tokens.put(TEMPLATE_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
-        tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_CALL);
-        tokens.putAll(this.configuration.getVariables().stream().collect(Collectors.toMap(Pair::getKey, Pair::getValue)));
-
-        if(template.getDynamicAttributes() != null && template.getDynamicAttributes().length > 0) {
-            Scanner scanner = new Scanner(System.in);
-            String value;
-
-            for(DynamicAttribute attribute : template.getDynamicAttributes()) {
-                System.out.print(attribute.getPromptMessage() + " ");
-                value = scanner.nextLine();
-
-                if(value == null || value.trim().isEmpty()) {
-                    tokens.put(attribute.getTemplateExpression(), "");
-                } else {
-                    tokens.put(attribute.getTemplateExpression(), String.format("%1$s=\"%2$s\"", attribute.getAttribute(), value.trim()));
-                }
-            }
+        if(afterSlideNumber == null || afterSlideNumber.isEmpty()) {
+            this.configuration.getDocument()
+                    .getElementById(this.templateEngine.getConfiguration().getSlidesContainer())
+                    .append(createdSlide.getValue().outerHtml());
+        } else {
+            this.configuration.getDocument()
+                    .getElementById(this.configuration.getSlideByNumber(afterSlideNumber).getId())
+                    .after(createdSlide.getValue().outerHtml());
         }
 
-        try(final StringWriter writer = new StringWriter()) {
-            final Template slideTemplate = templateConfiguration.getTemplate(template.getFile().getName());
-            slideTemplate.process(tokens, writer);
-            writer.flush();
+        this.savePresentationFile();
 
-            Element htmlSlide = DOMUtils.convertToNode(writer.toString());
-            slide.setId(htmlSlide.id());
-
-            if(afterSlideNumber == null || afterSlideNumber.isEmpty()) {
-                this.configuration.getDocument()
-                        .getElementById(this.templateEngine.getConfiguration().getSlidesContainer())
-                        .append(htmlSlide.outerHtml());
-            } else {
-                this.configuration.getDocument()
-                        .getElementById(this.configuration.getSlideByNumber(afterSlideNumber).getId())
-                        .after(htmlSlide.outerHtml());
-            }
-
-            this.savePresentationFile();
-        } catch (TemplateException e) {
-            LOGGER.log(Level.WARNING, "Error when parsing the slide's template", e);
-        }
-
-        return slide;
+        return createdSlide.getKey();
     }
 
     /**
@@ -465,7 +433,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     public void deleteSlide(String slideNumber) {
         if(slideNumber == null) throw new IllegalArgumentException("Slide number can not be null");
 
-        SlidePresentationConfiguration slideToRemove = this.configuration.getSlideByNumber(slideNumber);
+        Slide slideToRemove = this.configuration.getSlideByNumber(slideNumber);
         if(slideToRemove != null) {
             this.configuration.getSlides().remove(slideToRemove);
             this.configuration.getDocument()
@@ -480,139 +448,42 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
      * @param slide The slide to duplicate.
      * @return The duplicated slide.
      */
-    public SlidePresentationConfiguration duplicateSlide(SlidePresentationConfiguration slide) {
+    public Slide duplicateSlide(Slide slide) throws IOException {
         if(slide == null) throw new IllegalArgumentException("The slide to duplicate can not be null");
 
-        final SlidePresentationConfiguration copy = new SlidePresentationConfiguration(slide.getTemplate(), System.currentTimeMillis() + "");
-        copy.setThumbnail(slide.getThumbnail());
-        copy.setId(slide.getId());
+        final Pair<Slide, Element> duplicatedSlide = this.createSlide(slide.getTemplate());
 
-        // Copy the elements. Keep original IDs for now
-        SlideElementConfiguration copySlideElement;
-        for(SlideElementConfiguration slideElement : slide.getElements().values()) {
-            copySlideElement = new SlideElementConfiguration();
-            copySlideElement.setId(slideElement.getId());
-            copySlideElement.setOriginalContentCode(slideElement.getOriginalContentCode());
-            copySlideElement.setOriginalContent(slideElement.getOriginalContent());
-            copySlideElement.setHtmlContent(slideElement.getHtmlContent());
-
-            copy.getElements().put(copySlideElement.getId(), copySlideElement);
-        }
-
-        // Apply the templateConfiguration engine for replacing dynamic elements
-        final Configuration templateConfiguration = TemplateProcessor.getDefaultConfiguration();
-        final Map originalContext = new HashMap<>();
-        originalContext.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
-        originalContext.put(TEMPLATE_SLIDE_NUMBER_TOKEN, slide.getSlideNumber());
-
-        final Map copyContext = new HashMap<>();
-        copyContext.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
-        copyContext.put(TEMPLATE_SLIDE_NUMBER_TOKEN, copy.getSlideNumber());
-
-        try (final StringWriter writer = new StringWriter()) {
-
-            String oldId, newId;
-
-            /**
-             * For each ID:
-             * 1- Look for the original ID ; ie with the original slide number
-             * 2- Replace each original ID by the ID of the new slide
-             * 3- Store the new elements in a list
-             * 4- Clear the current elements
-             * 5- Create the new map of elements
-             */
-            List<SlideElementConfiguration> copySlideElements = new ArrayList<>();
-            for(String dynamicId : slide.getTemplate().getDynamicIds()) {
-                final Template idTemplate = new Template("dynamicIds", new StringReader(dynamicId), templateConfiguration);
-                idTemplate.process(originalContext, writer);
-                writer.flush();
-
-                oldId = writer.toString();
-                writer.getBuffer().setLength(0);
-
-                /**
-                 * Manage slide elements IDs
-                 */
-                if(copy.getElements().containsKey(oldId)) {
-                    idTemplate.process(copyContext, writer);
-                    writer.flush();
-
-                    newId = writer.toString();
-                    writer.getBuffer().setLength(0);
-
-                    // Change IDs
-                    copySlideElement = copy.getElements().get(oldId);
-                    copySlideElement.setId(newId);
-
-                    copySlideElements.add(copySlideElement);
-                }
-
-                /**
-                 * Manage slide ID
-                 */
-                if(copy.getId().equals(oldId)) {
-                    idTemplate.process(copyContext, writer);
-                    writer.flush();
-
-                    newId = writer.toString();
-                    writer.getBuffer().setLength(0);
-                    copy.setId(newId);
-                }
-            }
-
-            copy.getElements().clear();
-            for(SlideElementConfiguration copySE : copySlideElements) {
-                copy.getElements().put(copySE.getId(), copySE);
-            }
-
-            copySlideElements = null;
-        } catch (IOException | TemplateException e) {
-            LOGGER.log(Level.SEVERE, "Can not duplicate slide", e);
-        }
-
-        /**
-         * Add the slide to the document
-         */
-        try(final Writer writer = new StringWriter()) {
-
-            templateConfiguration.setDirectoryForTemplateLoading(copy.getTemplate().getFile().getParentFile());
-            copyContext.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_CALL);
-
-            final Template slideTemplate = templateConfiguration.getTemplate(copy.getTemplate().getFile().getName());
-            slideTemplate.process(copyContext, writer);
-            writer.flush();
-
-            this.configuration.getDocument()
-                    .getElementById(slide.getId())
-                    .after(writer.toString());
-
-            /**
-             * Insert the content
-             */
-            copy.getElements().values()
-                    .stream()
-                    .forEach(element -> this.configuration.getDocument()
-                                                            .getElementById(element.getId())
-                                                            .html(element.getHtmlContent()));
-        } catch (IOException | TemplateException e) {
-            LOGGER.log(Level.SEVERE, "Error when duplicating the slide", e);
-        }
-
-        /**
-         * Add the slide to the presentation's slides
-         */
+        // Add the slide to the presentation's slides
         int index = this.configuration.getSlides().indexOf(slide);
         if(index != -1) {
             if(index == this.configuration.getSlides().size() - 1) {
-                this.configuration.getSlides().add(copy);
+                this.configuration.getSlides().add(duplicatedSlide.getKey());
             } else {
-                this.configuration.getSlides().add(index + 1, copy);
+                this.configuration.getSlides().add(index + 1, duplicatedSlide.getKey());
             }
         }
 
+        // Update the slide elements
+        duplicatedSlide.getKey().getElements().forEach(copiedElement -> {
+            Optional<SlideElement> optional = slide.getElements().stream()
+                    .filter(originalElement -> copiedElement.getTemplate().getId() == originalElement.getTemplate().getId())
+                    .findFirst();
+
+            // Update the copy
+            if (optional.isPresent()) {
+                copiedElement.setOriginalContentCode(optional.get().getOriginalContentCode());
+                copiedElement.setOriginalContent(optional.get().getOriginalContent());
+                copiedElement.setHtmlContent(optional.get().getHtmlContent());
+            }
+        });
+
+        // Update the document
+        this.getConfiguration().getDocument().getElementById(slide.getId()).after(duplicatedSlide.getValue().outerHtml());
+        this.getConfiguration().updateSlideInDocument(duplicatedSlide.getKey());
+
         this.savePresentationFile();
 
-        return copy;
+        return duplicatedSlide.getKey();
     }
 
     /**
@@ -624,7 +495,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
      * @param beforeSlide The slide before <code>slideToMove</code> is moved
      * @throws java.lang.IllegalArgumentException if the slideToMove is null
      */
-    public void moveSlide(SlidePresentationConfiguration slideToMove, SlidePresentationConfiguration beforeSlide) {
+    public void moveSlide(Slide slideToMove, Slide beforeSlide) {
         if(slideToMove == null) throw new IllegalArgumentException("The slideToMove to move can not be null");
 
         if(!slideToMove.equals(beforeSlide)) {
@@ -702,5 +573,82 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                 .append(ResourceHelper.readResource(TEMPLATE_SFX_QUIZZ_CALLER_SCRIPT)).append("\n\n");
 
         return builder.toString();
+    }
+
+    /**
+     * Create a {@link Slide slide} from the given {@link SlideTemplate template}.
+     * @param template The template to create the slide from.
+     * @return A {@link Pair} where the key is the created {@link Slide} object and the value the HTML code get from the
+     * parsed template.
+     * @throws IOException If an error occurs when parsing the template.
+     * @throws NullPointerException If the given {@code template} is {@code null}.
+     */
+    private Pair<Slide, Element> createSlide(final SlideTemplate template) throws NullPointerException, IOException {
+        if(template == null) throw new NullPointerException("The template can not be null");
+
+        final Pair<Slide, Element> result = new Pair<>();
+        result.setKey(new Slide(template, System.currentTimeMillis() + ""));
+
+        final Map tokens = new HashMap<>();
+        tokens.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
+        tokens.put(TEMPLATE_SLIDE_NUMBER_TOKEN, result.getKey().getSlideNumber());
+
+        // Process the SlideElements by replacing their ID and setting their content
+        final Configuration defaultConfiguration = TemplateProcessor.getDefaultConfiguration();
+        Arrays.stream(template.getElements())
+            .forEach(element -> {
+                try (final StringWriter writer = new StringWriter();
+                     final StringReader reader = new StringReader(element.getHtmlId())) {
+
+                    final Template elementTemplate = new Template("element template", reader, defaultConfiguration);
+                    elementTemplate.process(tokens, writer);
+                    writer.flush();
+
+                    result.getKey().updateElement(writer.toString(), "HTML", element.getDefaultContent(), element.getDefaultContent())
+                            .setTemplate(element);
+                } catch (IOException | TemplateException e) {
+                    LOGGER.log(Level.WARNING, "Can not parse element", e);
+                }
+            });
+
+
+        // Add dynamic attributes to the tokens by asking their values to the user
+        // INCUBATING
+        tokens.clear();
+        if(result.getKey().getTemplate().getDynamicAttributes() != null && result.getKey().getTemplate().getDynamicAttributes().length > 0) {
+            Scanner scanner = new Scanner(System.in);
+            String value;
+
+            for(DynamicAttribute attribute : result.getKey().getTemplate().getDynamicAttributes()) {
+                System.out.print(attribute.getPromptMessage() + " ");
+                value = scanner.nextLine();
+
+                if(value == null || value.trim().isEmpty()) {
+                    tokens.put(attribute.getTemplateExpression(), "");
+                } else {
+                    tokens.put(attribute.getTemplateExpression(), String.format("%1$s=\"%2$s\"", attribute.getAttribute(), value.trim()));
+                }
+            }
+        }
+
+        // Parsing the slide's template file
+        defaultConfiguration.setDirectoryForTemplateLoading(result.getKey().getTemplate().getFile().getParentFile());
+        tokens.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
+        tokens.put(TEMPLATE_SLIDE_NUMBER_TOKEN, result.getKey().getSlideNumber());
+        tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_CALL);
+        tokens.putAll(this.configuration.getVariables().stream().collect(Collectors.toMap(Pair::getKey, Pair::getValue)));
+
+        try(final StringWriter writer = new StringWriter()) {
+            final Template slideTemplate = defaultConfiguration.getTemplate(template.getFile().getName());
+            slideTemplate.process(tokens, writer);
+            writer.flush();
+
+            result.setValue(DOMUtils.convertToNode(writer.toString()));
+            result.getKey().setId(result.getValue().id());
+        } catch (TemplateException e) {
+            LOGGER.log(Level.WARNING, "Error when parsing the slide's template", e);
+        }
+
+        return result;
     }
 }

@@ -37,7 +37,7 @@ public class TemplateConfiguration implements IConfiguration {
     private String name;
     private File file;
     private Set<Pair<String, String>> defaultVariables;
-    private List<SlideTemplateConfiguration> slideTemplateConfigurations;
+    private List<SlideTemplate> slideTemplates;
     private String contentDefinerMethod;
     private String getCurrentSlideMethod;
     private String jsObject;
@@ -60,8 +60,8 @@ public class TemplateConfiguration implements IConfiguration {
     public Set<Pair<String, String>> getDefaultVariables() { return defaultVariables; }
     public void setDefaultVariables(Set<Pair<String, String>> defaultVariables) { this.defaultVariables = defaultVariables; }
 
-    public List<SlideTemplateConfiguration> getSlideTemplateConfigurations() { return slideTemplateConfigurations; }
-    public void setSlideTemplateConfigurations(List<SlideTemplateConfiguration> slideTemplateConfigurations) { this.slideTemplateConfigurations = slideTemplateConfigurations; }
+    public List<SlideTemplate> getSlideTemplates() { return slideTemplates; }
+    public void setSlideTemplates(List<SlideTemplate> slideTemplates) { this.slideTemplates = slideTemplates; }
 
     public String getContentDefinerMethod() { return contentDefinerMethod; }
     public void setContentDefinerMethod(String contentDefinerMethod) { this.contentDefinerMethod = contentDefinerMethod; }
@@ -90,12 +90,12 @@ public class TemplateConfiguration implements IConfiguration {
     public String getSlidesContainer() { return slidesContainer; }
     public void setSlidesContainer(String slidesContainer) { this.slidesContainer = slidesContainer; }
 
-    public SlideTemplateConfiguration getSlideTemplate(int slideId) {
-        SlideTemplateConfiguration searchedTemplate = null;
+    public SlideTemplate getSlideTemplate(int slideId) {
+        SlideTemplate searchedTemplate = null;
 
-        for(SlideTemplateConfiguration slideTemplateConfiguration : getSlideTemplateConfigurations()) {
-            if(slideId == slideTemplateConfiguration.getId()) {
-                searchedTemplate = slideTemplateConfiguration;
+        for(SlideTemplate slideTemplate : getSlideTemplates()) {
+            if(slideId == slideTemplate.getId()) {
+                searchedTemplate = slideTemplate;
                 break;
             }
         }

@@ -209,31 +209,52 @@ The template configuration must be at the root of the archive and will contain a
           "id" : 1,
           "name" : "Title",
           "file" : "title.html",
-          "dynamic-ids" : [
-            "${slideIdPrefix}${slideNumber}",
-            "${slideNumber}-title",
-            "${slideNumber}-subtitle",
-            "${slideNumber}-author",
-            "${slideNumber}-twitter",
+          "elements" : [
+            {
+              "id" : 1,
+              "html-id" : "${slideNumber}-title",
+              "default-content" : "Title"
+            }, {
+              "id" : 2,
+              "html-id" : "${slideNumber}-subtitle",
+              "default-content" : "Subtitle"
+            }, {
+               "id" : 3,
+               "html-id" : "${slideNumber}-author",
+               "default-content" : "Author"
+            }, {
+               "id" : 4,
+               "html-id" : "${slideNumber}-twitter",
+               "default-content" : "@Twitter"
+             }
           ]
         },
         {
           "id" : 2,
           "name" : "Title and content",
           "file" : "title_content.html",
-          "dynamic-ids" : [
-            "${slideIdPrefix}${slideNumber}",
-            "${slideNumber}-title",
-            "${slideNumber}-text"
+          "elements" : [
+            {
+              "id" : 1,
+              "html-id" : "${slideNumber}-title",
+              "default-content" : "Title"
+            }, {
+              "id" : 2,
+              "html-id" : "${slideNumber}-content",
+              "default-content" : "Content"
+            }
           ]
         },
         {
           "id" : 3,
           "name" : "Empty",
           "file" : "empty.html",
-          "dynamic-ids" : [
-            "${slideIdPrefix}${slideNumber}",
-            "${dslideNumber}-content"
+          "elements" : [
+            {
+              "id" : 1,
+              "html-id" : "${slideNumber}-content",
+              "default-content" : "Content"
+            }
           ],
           "dynamic-attributes" : [
             {
@@ -274,7 +295,10 @@ The complete configuration is wrapped into a *template* JSON object. This object
 *** *id* : the ID of the slide ;
 *** *name* : the name of the slide that will be displayed in SlideshowFX in the lst of available slide’s type ;
 *** *file* : the template file of the slide ;
-*** *dynamic-ids* : a JSON array composed of JSON string that lists all the HTML IDs that can be generated when a slide is created in the presentation. It is mainly used for copying a slide inside the application ;
+*** *elements* : a JSON array composed of JSON documents that describe all elements that can be dynamic modified (by the user or by SlideshowFX):
+**** *id* : the ID for the element ;
+**** *html-id* : the HTML ID of the element within the presentation. It can contain variable ;
+**** *default-content* : the default content for the element ;
 *** *dynamic-attributes* : a JSON array composed of JSON object describing the attributes that can be dynamically created when creating a slide by prompting its value to the user. Each object is structured as follow:
 **** *attribute* : the name of the attribute ;
 **** *template-expression* : the name of the template token. It is the Velocity token without the dollar sign ;
@@ -368,24 +392,28 @@ The configuration of the presentation is wrapped into an JSON configuration file
         "number": "1400836547234",
         "elements": [
           {
+            "template-id": 3,
             "element-id": "1400836547234-author",
             "original-content-code": "HTML",
             "original-content": "<content encoded in Base64>",
             "html-content": "<content encoded in Base64>"
           },
           {
+            "template-id": 4,
             "element-id": "1400836547234-twitter",
             "original-content-code": "HTML",
             "original-content": "<content encoded in Base64>",
             "html-content": "<content encoded in Base64>"
           },
           {
+            "template-id": 1,
             "element-id": "1400836547234-title",
             "original-content-code": "HTML",
             "original-content": "<content encoded in Base64>",
             "html-content": "<content encoded in Base64>"
           },
           {
+            "template-id": 2,
             "element-id": "1400836547234-subtitle",
             "original-content-code": "HTML",
             "original-content": "<content encoded in Base64>",
@@ -399,13 +427,15 @@ The configuration of the presentation is wrapped into an JSON configuration file
         "number": "1400836587307",
         "elements": [
           {
+            "template-id": 1,
             "element-id": "1400836587307-title",
             "original-content-code": "HTML",
             "original-content": "<content encoded in Base64>",
             "html-content": "<content encoded in Base64>"
           },
           {
-            "element-id": "1400836587307-text",
+            "template-id": 2,
+            "element-id": "1400836587307-content",
             "original-content-code": "TEXTILE",
             "original-content": "<content encoded in Base64>",
             "html-content": "<content encoded in Base64>"
@@ -430,6 +460,7 @@ The *presentation* JSON object is described below:
 ** *id* : the ID of the slide ;
 ** *number* : the slide number ;
 ** *elements* : the array containing a JSON object for each element defined in the slide ;
+*** *template-id* : the ID of the slide element in the template ;
 *** *element-id* : the ID of the slide element ;
 *** *original-content-code* : the code of the markup syntax used ;
 *** *original-content* : the original content of the element encoded in Base64. This syntax of the content must correspond to the content code ;

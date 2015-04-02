@@ -87,7 +87,11 @@ asciidoctor {
     backends = ['html5','pdf']
     attributes = [
             'source-highlighter': 'coderay',
-            toc: '',
+            toc: 'left',
+            icons: 'font',
+            setanchors: '',
+            sectlinks: '',
+            linkcss: false,
             'javafx-version': '8 update 40',
             'jdk-version': '8 update 40',
             'gradle-version': '2.3',
@@ -246,6 +250,6 @@ task packageSlideshowFX(dependsOn : [ ':SlideshowFX-asciidoctor:jar', ':Slidesho
     }
 }
 
-task buildGradleWrapper(type: Wrapper) {
+wrapper {
     gradleVersion = '2.3'
 }

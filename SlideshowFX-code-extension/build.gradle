@@ -31,7 +31,7 @@ jar {
                 'Bundle-Version': '1.0.0',
                 'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.code.activator.CodeContentExtensionActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
-                'Export-Package': 'com.twasyl.slideshowfx.content.extension.code.controllers,com.twasyl.slideshowfx.content.extension.code,com.twasyl.slideshowfx.content.extension.code.activator',
+                'Export-Package': 'com.twasyl.slideshowfx.content.extension.code,com.twasyl.slideshowfx.content.extension.code.controllers,com.twasyl.slideshowfx.content.extension.code.activator',
                 'Import-Package': 'org.osgi.framework')
     }
 }

@@ -68,26 +68,16 @@ public interface IContentExtension {
     Set<Resource> getResources();
 
     /**
-     * Get the resources location prefix. The resources location prefix is typically the beginning of the path where all
-     * resources are located inside the architecture of the content extension. For exemple, imagine all resources are
-     * located in <code>/com/twasyl/slideshowfx/content/extension/custom/mylibjs/</code>. During the extraction in order to
-     * not extract all resources in this whole path but only in <code>mylibjs</code>, the prefix should be
-     * <code>/com/twasyl/slideshowfx/content/extension/custom/</code>
-     * @return The resource location prefix.
+     * Get the URL of the resources archive. Typically the archive is a ZIP file that contains a complete JavaScript
+     * library for example. The archive is usually present within the content extension project.
+     * @return The URL of the archive containing all resources for this content extension.
      */
-    String getResourcesLocationPrefix();
-
-    /**
-     * Get the resources location inside this content extension. Typically it is each file considered as resource that is
-     * contained inside the architecture of the content extension. These resources locations will be extracted by
-     * {@link #extractResources(java.io.File)}
-     * @return The locations of resources inside the content extension.
-     */
-    Set<String> getResourcesLocation();
+    URL getResourcesArchive();
 
     /**
      * Extract the resources needed for this content extension to be working in a presentation in the given <code>directory</code>.
      * The default behavior will extract the resources in the in {@code directory/#getExtractBaseDirectory()}.
+     * Resources to extract are the ones contained within the archive located by the {@link #getResourcesArchive()}.
      * @param directory The directory where the resources will be extracted.
      * @throws java.lang.NullPointerException If the given directory is null.
      */

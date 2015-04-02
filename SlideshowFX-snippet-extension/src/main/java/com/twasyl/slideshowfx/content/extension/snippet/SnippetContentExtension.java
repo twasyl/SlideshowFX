@@ -20,6 +20,7 @@ import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.snippet.controllers.SnippetContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 
@@ -44,7 +45,7 @@ public class SnippetContentExtension extends AbstractContentExtension {
 
     public SnippetContentExtension() {
         super("SNIPPET",
-                "/com/twasyl/slideshowfx/content/extension/snippet/",
+                SnippetContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/snippet/resources/highlightjs.zip"),
                 SnippetContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/snippet/images/icon.png"),
                 "Insert an executable code snippet",
                 "Insert an executable code snippet");
@@ -55,62 +56,8 @@ public class SnippetContentExtension extends AbstractContentExtension {
         this.putResource(ResourceType.CSS_FILE, baseURL.concat("styles/github.css"));
         this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("highlight.pack.js"));
         this.putResource(ResourceType.SCRIPT, "hljs.initHighlightingOnLoad();");
-
-        // Add locations
-        this.putResourceLocation(baseURL.concat("highlight.pack.js"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("arta.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("ascetic.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("atelier-dune.dark.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("atelier-dune.light.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("atelier-forest.dark.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("atelier-forest.light.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("atelier-heath.dark.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("atelier-heath.light.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("atelier-lakeside.dark.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("atelier-lakeside.light.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("atelier-seaside.dark.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("atelier-seaside.light.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("brown_paper.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("brown_papersq.png"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("codepen-embed.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("color-brewer.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("dark.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("default.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("docco.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("far.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("foundation.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("github.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("googlecode.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("hybrid.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("idea.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("ir_black.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("kimbie.dark.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("kimbie.light.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("magula.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("mono-blue.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("monokai.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("monokai_sublime.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("obsidian.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("paraiso.dark.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("paraiso.light.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("pojoaque.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("pojoaque.jpg"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("railscasts.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("rainbow.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("school_book.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("school_book.png"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("solarized_dark.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("solarized_light.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("sunburst.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("tomorrow-night-blue.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("tomorrow-night-bright.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("tomorrow-night-eighties.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("tomorrow-night.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("tomorrow.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("vs.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("xcode.css"));
-        this.putResourceLocation(baseURL.concat("styles/").concat("zenburn.css"));
     }
+
     @Override
     public Pane getUI() {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/snippet/fxml/SnippetContentExtension.fxml"));

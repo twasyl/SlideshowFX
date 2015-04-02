@@ -20,6 +20,7 @@ import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.alert.controllers.AlertContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 
@@ -44,7 +45,7 @@ public class AlertContentExtension extends AbstractContentExtension {
 
     public AlertContentExtension() {
         super("ALERT",
-                "/com/twasyl/slideshowfx/content/extension/alert/",
+                AlertContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/alert/resources/sweetalert.zip"),
                 AlertContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/alert/images/icon.png"),
                 "Insert an alert",
                 "Insert an alert");
@@ -54,21 +55,6 @@ public class AlertContentExtension extends AbstractContentExtension {
         // Add URL
         this.putResource(ResourceType.CSS_FILE, baseURL.concat("sweet-alert.css"));
         this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("sweet-alert.min.js"));
-        this.putResource(ResourceType.SCRIPT, "hljs.initHighlightingOnLoad();");
-
-        // Add locations
-        this.putResourceLocation(baseURL.concat("sweet-alert.css"));
-        this.putResourceLocation(baseURL.concat("sweet-alert.min.js"));
-        this.putResourceLocation(baseURL.concat("font/OpenSans-Bold.ttf"));
-        this.putResourceLocation(baseURL.concat("font/OpenSans-BoldItalic.ttf"));
-        this.putResourceLocation(baseURL.concat("font/OpenSans-ExtraBold.ttf"));
-        this.putResourceLocation(baseURL.concat("font/OpenSans-ExtraBoldItalic.ttf"));
-        this.putResourceLocation(baseURL.concat("font/OpenSans-Italic.ttf"));
-        this.putResourceLocation(baseURL.concat("font/OpenSans-Light.ttf"));
-        this.putResourceLocation(baseURL.concat("font/OpenSans-LightItalic.ttf"));
-        this.putResourceLocation(baseURL.concat("font/OpenSans-regular.ttf"));
-        this.putResourceLocation(baseURL.concat("font/OpenSans-Semibold.ttf"));
-        this.putResourceLocation(baseURL.concat("font/OpenSans-SemiboldItalic.ttf"));
     }
 
     @Override

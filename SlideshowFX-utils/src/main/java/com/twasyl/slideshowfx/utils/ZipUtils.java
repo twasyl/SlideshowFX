@@ -43,17 +43,31 @@ public class ZipUtils {
     public static void unzip(File archive, File destination) throws IOException, IllegalArgumentException {
         if(archive == null) throw new NullPointerException("The ZIP file can not be null");
         if(!archive.exists()) throw new FileNotFoundException("The ZIP file does not exist");
+
+        // Unzip
+        LOGGER.fine("Extracting file " + archive.toURI().toASCIIString());
+
+        final FileInputStream inputStream = new FileInputStream(archive);
+        unzip(inputStream, destination);
+    }
+
+    /**
+     * Unzpi the given archive into the provided destination. If the destination does not exist it is created.
+     * @param archive The archive file to unzip.
+     * @param destination The destination directory where the archive will be unzipped.
+     * @throws IOException If the archive file does not exist.
+     * @throws java.lang.NullPointerException If the archive file or the destination is null.
+     */
+    public static void unzip(InputStream archive, File destination) throws IOException, IllegalArgumentException {
+        if(archive == null) throw new NullPointerException("The ZIP file can not be null");
         if(destination == null) throw new NullPointerException("The destination can not be null");
 
         if(!destination.exists()) destination.mkdirs();
 
-        ZipInputStream zipReader = new ZipInputStream(new FileInputStream(archive));
+        ZipInputStream zipReader = new ZipInputStream(archive);
         ZipEntry zipEntry;
         File extractedFile;
         FileOutputStream extractedFileOutputStream;
-
-        // Unzip
-        LOGGER.fine("Extracting file " + archive.toURI().toASCIIString());
 
         while((zipEntry = zipReader.getNextEntry()) != null) {
             extractedFile = new File(destination, zipEntry.getName());

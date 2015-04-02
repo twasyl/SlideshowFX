@@ -32,7 +32,6 @@ public class SlideTemplate {
     private int id;
     private String name;
     private File file;
-    // private String[] dynamicIds;
     private DynamicAttribute[] dynamicAttributes;
     private SlideElementTemplate[] elements;
 

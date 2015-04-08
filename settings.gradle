@@ -32,6 +32,7 @@ include 'SlideshowFX-code-extension'
 include 'SlideshowFX-image-extension'
 include 'SlideshowFX-link-extension'
 include 'SlideshowFX-quote-extension'
+include 'SlideshowFX-sequence-diagram-extension'
 include 'SlideshowFX-snippet-extension'
 
 include 'SlideshowFX-hosting-connector'

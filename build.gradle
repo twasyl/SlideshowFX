@@ -139,6 +139,7 @@ task installContentExtensionPlugins(dependsOn: [':SlideshowFX-alert-extension:ja
                                                ':SlideshowFX-image-extension:jar',
                                                ':SlideshowFX-link-extension:jar',
                                                ':SlideshowFX-quote-extension:jar',
+                                               ':SlideshowFX-sequence-diagram-extension:jar',
                                                ':SlideshowFX-snippet-extension:jar']) << {
 
     copy {
@@ -147,6 +148,7 @@ task installContentExtensionPlugins(dependsOn: [':SlideshowFX-alert-extension:ja
         from project(':SlideshowFX-image-extension').jar.archivePath
         from project(':SlideshowFX-link-extension').jar.archivePath
         from project(':SlideshowFX-quote-extension').jar.archivePath
+        from project(':SlideshowFX-sequence-diagram-extension').jar.archivePath
         from project(':SlideshowFX-snippet-extension').jar.archivePath
 
         into pluginsFolder
@@ -174,7 +176,7 @@ task installSnippetExecutorPlugins(dependsOn : [':SlideshowFX-golo-executor:jar'
 }
 
 task packageSlideshowFX(dependsOn : [ ':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar', ':SlideshowFX-textile:jar',
-                                      ':SlideshowFX-code-extension:jar', ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar', ':SlideshowFX-quote-extension:jar', ':SlideshowFX-snippet-extension:jar',
+                                      ':SlideshowFX-code-extension:jar', ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar', ':SlideshowFX-quote-extension:jar', ':SlideshowFX-sequence-diagram-extension:jar', ':SlideshowFX-snippet-extension:jar',
                                       ':SlideshowFX-app:jar',
                                       'asciidoctor']) {
 
@@ -206,6 +208,7 @@ task packageSlideshowFX(dependsOn : [ ':SlideshowFX-asciidoctor:jar', ':Slidesho
             from project(':SlideshowFX-image-extension').jar.archivePath
             from project(':SlideshowFX-link-extension').jar.archivePath
             from project(':SlideshowFX-quote-extension').jar.archivePath
+            from project(':SlideshowFX-sequence-diagram-extension').jar.archivePath
             from project(':SlideshowFX-snippet-extension').jar.archivePath
 
             into new File(pluginsFolder, "extensions")

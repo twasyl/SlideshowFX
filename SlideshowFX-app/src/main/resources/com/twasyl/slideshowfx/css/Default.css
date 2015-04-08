@@ -430,3 +430,15 @@
 .dialog-pane .header-panel {
     -fx-background-color: transparent;
 }
+
+.messages-box {
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-border-color: app-color-orange;
+    -fx-background-color: derive(app-color-orange, 90%);
+    -fx-padding: 2px;
+}
+
+.messages-box .label, .messages-box .text, .messages-box .hyperlink {
+    -fx-text-fill: app-color-orange;
+}

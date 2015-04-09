@@ -47,9 +47,9 @@ import java.util.logging.Logger;
  */
 public class ImageContentExtensionController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(ImageContentExtensionController.class.getName());
-    public static FileChooser.ExtensionFilter IMAGES_FILES = new FileChooser.ExtensionFilter("Image files", "*.png", "*.bmp", "*.jpg", "*.jpeg", "*.gif");
+    public static FileChooser.ExtensionFilter IMAGES_FILES = new FileChooser.ExtensionFilter("Image files", "*.png", "*.bmp", "*.jpg", "*.jpeg", "*.gif", "*.svg");
     public static final FileFilter IMAGE_FILTER = new FileFilter() {
-        private final String[] extensions = new String[] { ".png", ".bmp", ".gif", ".jpg", ".jpeg" };
+        private final String[] extensions = new String[] { ".png", ".bmp", ".gif", ".jpg", ".jpeg", ".svg" };
 
         @Override
         public boolean accept(File pathname) {

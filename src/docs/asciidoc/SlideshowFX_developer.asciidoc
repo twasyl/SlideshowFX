@@ -37,6 +37,8 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 | freemarker | {freemarker-version} |
 
+| Google Guava | {google-guava} |
+
 | hamcrest-core | {hamcrest-core-version} |
 
 | jackson-annotations | {jackson-annotations-version} |

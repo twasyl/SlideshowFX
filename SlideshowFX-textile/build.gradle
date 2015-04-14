@@ -18,21 +18,17 @@ version = '1.0.0'
 
 dependencies {
     compile project(':SlideshowFX-markup')
-    compile libraries.felix
-    compile libraries.wikitext
+    compile configurations.felix
+    compile configurations.wikitext
 
-    testCompile libraries.testng
-    testCompile libraries.jsoup
+    testCompile configurations.testng
+    testCompile configurations.jsoup
 }
 
 jar {
-    from(libraries.wikitext) {
+    from(configurations.wikitext.resolve().collect()) {
         include '**/*.jar'
     }
-
-    def bundleClasspath = ""
-    libraries.wikitext.each {file -> bundleClasspath += file.name + ","}
-    bundleClasspath += "."
 
     manifest {
         attributes('Manifest-Version': '1.0',
@@ -42,7 +38,7 @@ jar {
                 'Bundle-Description': 'Support Textile for defining slide\'s content',
                 'Bundle-Version': '1.0.0',
                 'Bundle-Activator': 'com.twasyl.slideshowfx.markup.textile.activator.TextileActivator',
-                'Bundle-ClassPath': bundleClasspath,
+                'Bundle-ClassPath': configurations.wikitext.resolve().collect { artifact -> artifact.name }.join(',').concat(',.'),
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.markup.textile,com.twasyl.slideshowfx.markup.textile.activator',
                 'Import-Package': 'org.osgi.framework')

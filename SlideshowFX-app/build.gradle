@@ -27,16 +27,16 @@ dependencies {
     compile project(':SlideshowFX-markup')
     compile project(':SlideshowFX-snippet-executor')
 
-    compile libraries.felix
-    compile libraries.freemarker
-    compile libraries.jsoup
-    compile libraries.leapmotion
-    compile libraries.twitter4j
-    compile libraries.vertx
-    compile libraries.zxing
+    compile configurations.felix
+    compile configurations.freemarker
+    compile configurations.jsoup
+    compile configurations.leapmotion
+    compile configurations.twitter4j
+    compile configurations.vertx
+    compile configurations.zxing
 
-    testCompile libraries.testng
-    testCompile libraries.automaton
+    testCompile configurations.testng
+    testCompile configurations.automaton
 }
 
 jar {

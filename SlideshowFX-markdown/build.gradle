@@ -19,19 +19,14 @@ version = '1.0.0'
 dependencies {
     compile project(':SlideshowFX-markup')
 
-    compile libraries.felix
-    compile libraries.markdown
+    compile configurations.felix
+    compile configurations.markdown
 }
 
 jar {
-    def dependenciesFiles = configurations.compile.files { dep -> dep.name == 'txtmark' }
-    from(dependenciesFiles) {
+    from(configurations.markdown.resolve().collect()) {
         include '*'
     }
-
-    def bundleClasspath = ""
-    dependenciesFiles.each {file -> bundleClasspath += file.name + ","}
-    bundleClasspath += "."
 
     manifest {
         attributes('Manifest-Version': '1.0',
@@ -41,7 +36,7 @@ jar {
                 'Bundle-Description': 'Support markdown for defining slide\'s content',
                 'Bundle-Version': '1.0.0',
                 'Bundle-Activator': 'com.twasyl.slideshowfx.markup.markdown.activator.MarkdownActivator',
-                'Bundle-ClassPath': bundleClasspath,
+                'Bundle-ClassPath': configurations.markdown.resolve().collect { artifact -> artifact.name }.join(',').concat(',.'),
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.markup.markdown,com.twasyl.slideshowfx.markup.markdown.activator',
                 'Import-Package': 'org.osgi.framework')

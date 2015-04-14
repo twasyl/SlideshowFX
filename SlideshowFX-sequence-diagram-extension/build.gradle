@@ -19,7 +19,7 @@ version = '1.0.0'
 dependencies {
     compile project(':SlideshowFX-content-extension')
     compile project(':SlideshowFX-osgi')
-    compile libraries.felix
+    compile configurations.felix
 }
 
 jar {

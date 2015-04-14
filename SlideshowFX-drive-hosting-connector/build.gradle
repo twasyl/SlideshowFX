@@ -20,19 +20,14 @@ dependencies {
     compile project(':SlideshowFX-global-configuration')
     compile project(':SlideshowFX-hosting-connector')
 
-    compile libraries.felix
-    compile libraries.drive
+    compile configurations.felix
+    compile configurations.drive
 }
 
 jar {
-    def dependenciesFiles = configurations.compile.files { dep -> dep.name == 'google-api-services-drive' }
-    from(dependenciesFiles) {
+    from(configurations.drive.resolve().collect()) {
         include '*'
     }
-
-    def bundleClasspath = ""
-    dependenciesFiles.each {file -> bundleClasspath += file.name + ","}
-    bundleClasspath += "."
 
     manifest {
         attributes('Manifest-Version': '1.0',
@@ -42,7 +37,7 @@ jar {
                 'Bundle-Description': 'Support for connecting to Google Drive',
                 'Bundle-Version': version,
                 'Bundle-Activator': 'com.twasyl.slideshowfx.hosting.connector.drive.activator.DriveHostingConnectorActivator',
-                'Bundle-ClassPath': bundleClasspath,
+                'Bundle-ClassPath': configurations.drive.resolve().collect { artifact -> artifact.name }.join(',').concat(',.'),
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.hosting.connector.drive,com.twasyl.slideshowfx.hosting.connector.drive.activator',
                 'Import-Package': 'org.osgi.framework')

@@ -20,7 +20,7 @@ dependencies {
     compile project(':SlideshowFX-content-extension')
     compile project(':SlideshowFX-osgi')
     compile project(':SlideshowFX-snippet-executor')
-    compile libraries.felix
+    compile configurations.felix
 }
 
 jar {

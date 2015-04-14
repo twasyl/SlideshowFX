@@ -16,13 +16,9 @@
 
 version = '1.0.0'
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     compile project(':SlideshowFX-engines')
     compile project(':SlideshowFX-global-configuration')
 
-    testCompile libraries.testng
+    testCompile configurations.testng
 }

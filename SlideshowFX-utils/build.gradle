@@ -17,9 +17,9 @@
 version = '1.0.0'
 
 dependencies {
-    compile libraries.freemarker
-    compile libraries.jsoup
-    compile libraries.vertx
+    compile configurations.freemarker
+    compile configurations.jsoup
+    compile configurations.vertx
 
-    testCompile libraries.testng
+    testCompile configurations.testng
 }

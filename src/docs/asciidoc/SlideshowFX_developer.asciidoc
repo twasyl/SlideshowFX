@@ -31,29 +31,11 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 | Apache Felix | {apache-felix-version} |
 
-| commons-collections | {commons-collections-version} |
-
-| commons-lang | {commons-lang-version} |
-
 | freemarker | {freemarker-version} |
-
-| Google Guava | {google-guava} |
-
-| hamcrest-core | {hamcrest-core-version} |
-
-| jackson-annotations | {jackson-annotations-version} |
-
-| jackson-core | {jackson-core-version} |
-
-| jackson-databind | {jackson-databind-version} |
-
-| JRuby Complete | {jrubycomplete-version} |
 
 | jsoup | {jsoup-version} |
 
 | LeapMotion SDK | {leapmotion-sdk-version} |
-
-| netty-all | {netty-all-version} |
 
 | org.eclipse.mylyn.wikitext.core | {wikitext-core-version} | Library used for textile support
 
@@ -94,6 +76,7 @@ SlideshowFX contains the following modules:
 - *SlideshowFX-image-extension* which defines the implementation of SlideshowFX-content-extension to insert images in slides ;
 - *SlideshowFX-link-extension* which defines the implementation of SlideshowFX-content-extension to insert HTML links in slides ;
 - *SlideshowFX-quote-extension* which defines the implementation of SlideshowFX-content-extension to insert quotes in slides ;
+- *SlideshowFX-sequence-diagram-extension* which defines the implementation of SlideshowFX-content-extension to insert sequence diagrams in slides ;
 - *SlideshowFX-snippet-extension* which defines the implementation of SlideshowFX-content-extension to insert executable code snippet in slides ;
 - *SlideshowFX-hosting-connector* which defines the base classes for creating an OSGi module for connecting to a file hosting service ;
 - *SlideshowFX-dropbox-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Dropbox ;

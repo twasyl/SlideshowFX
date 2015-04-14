@@ -15,6 +15,7 @@
  */
 
 buildscript {
+
     repositories {
         jcenter()
         mavenCentral()
@@ -28,6 +29,64 @@ buildscript {
     }
 }
 
+ext {
+    applicationName = 'SlideshowFX'
+    applicationVersion = '1.0.0'
+
+    allLibs = new File(rootDir, '/lib')
+    jdk = System.env.'JAVA_HOME'
+
+    pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
+    felixCacheFolder = new File(System.getProperty("user.home"), '.SlideshowFX/felix-cache')
+}
+
+allprojects {
+
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+    configurations {
+        asciidoctorj {}
+        drive
+        dropbox
+        felix
+        freemarker
+        jsoup
+        leapmotion
+        markdown
+        twitter4j
+        vertx
+        wikitext
+        zxing
+
+        testng
+        cucumber
+        automaton
+    }
+
+    dependencies {
+        asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.2'
+        drive 'com.google.apis:google-api-services-drive:v2-rev155-1.19.1'
+        dropbox 'com.dropbox.core:dropbox-core-sdk:1.7.7'
+        felix 'org.apache.felix:org.apache.felix.framework:4.6.1'
+        freemarker 'org.freemarker:freemarker:2.3.22'
+        jsoup 'org.jsoup:jsoup:1.8.2'
+        leapmotion fileTree(dir: allLibs, include: 'Leap/*')
+        markdown 'com.github.rjeschke:txtmark:0.13'
+        twitter4j 'org.twitter4j:twitter4j-core:4.0.3', 'org.twitter4j:twitter4j-stream:4.0.3'
+        vertx 'io.vertx:vertx-core:2.1.5', 'io.vertx:vertx-platform:2.1.5'
+        wikitext fileTree(dir: new File(allLibs, 'WikiText'), include: '*.jar')
+        zxing 'com.google.zxing:core:3.2.0', 'com.google.zxing:javase:3.2.0'
+
+        testng 'org.testng:testng:6.8.13', 'com.beust:jcommander:1.47'
+        cucumber 'info.cukes:cucumber-core:1.2.2', 'info.cukes:cucumber-java:1.2.2', 'info.cukes:cucumber-testng:1.2.2'
+        automaton 'com.athaydes.automaton:Automaton:1.1.0'
+    }
+
+}
+
 subprojects {
     apply plugin: 'java'
     group = "com.twasyl.slideshowfx"
@@ -35,49 +94,14 @@ subprojects {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
-    repositories {
-        jcenter()
-        mavenCentral()
-    }
-
     test {
         useTestNG()
         reports.html.enabled = true
     }
 }
 
+
 apply plugin: 'org.asciidoctor.convert'
-
-ext {
-    applicationName = 'SlideshowFX'
-    applicationVersion = '1.0.0'
-
-	allLibs = new File(rootDir, '/lib')
-	jdk = System.env.'JAVA_HOME'
-
-    pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
-    felixCacheFolder = new File(System.getProperty("user.home"), '.SlideshowFX/felix-cache')
-}
-
-ext.libraries = [
-    asciidoctorj: ['org.jruby:jruby-complete:1.7.18', 'org.asciidoctor:asciidoctorj:1.5.2', 'org.slf4j:slf4j-simple:1.7.7'],
-    drive: 'com.google.apis:google-api-services-drive:v2-rev155-1.19.1',
-    dropbox:  ['com.dropbox.core:dropbox-core-sdk:1.7.7', 'com.fasterxml.jackson.core:jackson-core:2.2.2'],
-    felix: 'org.apache.felix:org.apache.felix.framework:4.6.1@jar',
-    freemarker: 'org.freemarker:freemarker:2.3.22@jar',
-    jsoup: 'org.jsoup:jsoup:1.8.2@jar',
-    leapmotion: fileTree(dir: allLibs, include: 'Leap/*'),
-    markdown: 'com.github.rjeschke:txtmark:0.13',
-    wikitext: fileTree(dir: new File(allLibs, 'WikiText'), include: '*.jar'),
-    twitter4j: ['org.twitter4j:twitter4j-core:4.0.3@jar', 'org.twitter4j:twitter4j-stream:4.0.3@jar'],
-    vertx: ['io.vertx:vertx-core:2.1.5@jar', 'io.vertx:vertx-platform:2.1.5@jar', 'io.netty:netty-all:4.0.21.Final', 'com.fasterxml.jackson.core:jackson-core:2.2.2', 'com.fasterxml.jackson.core:jackson-databind:2.2.2', 'com.fasterxml.jackson.core:jackson-annotations:2.2.2'],
-    zxing: ['com.google.zxing:core:3.2.0@jar', 'com.google.zxing:javase:3.2.0@jar'],
-
-    testng: ['org.testng:testng:6.8.13@jar', 'com.beust:jcommander:1.47'],
-    cucumber: ['info.cukes:cucumber-core:1.2.2', 'info.cukes:cucumber-java:1.2.2', 'info.cukes:cucumber-testng:1.2.2'],
-    automaton: 'com.athaydes.automaton:Automaton:1.1.0'
-
-]
 
 asciidoctorj {
     version = '1.5.2'
@@ -94,28 +118,19 @@ asciidoctor {
             linkcss: false,
             'javafx-version': '8 update 40',
             'jdk-version': '8 update 40',
-            'google-guava': '15.0.0.v201403281430',
             'gradle-version': '2.3',
-            'asciidoctorj-version': '1.5.2',
-            'apache-felix-version': '4.6.1',
-            'commons-collections-version': '3.2.1',
-            'commons-lang-version': '2.4',
-            'freemarker-version': '2.3.21',
-            'hamcrest-core-version': '1.3',
-            'jackson-annotations-version': '2.2.2',
-            'jackson-core-version': '2.2.2',
-            'jackson-databind-version': '2.2.2',
-            'jrubycomplete-version': '1.7.18',
-            'jsoup-version': '1.8.2',
+            'asciidoctorj-version': "${configurations.asciidoctorj.dependencies[0].version}",
+            'apache-felix-version': "${configurations.felix.dependencies[0].version}",
+            'freemarker-version': "${configurations.freemarker.dependencies[0].version}",
+            'jsoup-version': "${configurations.jsoup.dependencies[0].version}",
             'leapmotion-sdk-version': '2.2.5.26752',
-            'netty-all-version': '4.0.21.Final',
             'wikitext-core-version': '2.4.0.N20150409-1542',
             'wikitext-textile-core-version': '2.4.0.N20150312-2106',
-            'twitter4j-version': '4.0.3',
-            'txtmark-version': '0.13',
-            'vertx-version': '2.1.5',
-            'zxing-core-version': '3.2.0',
-            'zxing-jse-version': '3.2.0',
+            'twitter4j-version': "${configurations.twitter4j.dependencies[0].version}",
+            'txtmark-version': "${configurations.markdown.dependencies[0].version}",
+            'vertx-version': "${configurations.vertx.dependencies[0].version}",
+            'zxing-core-version': "${configurations.zxing.dependencies[0].version}",
+            'zxing-jse-version': "${configurations.zxing.dependencies[1].version}",
             'ace-version': '1.1.8'
     ]
 }
@@ -176,7 +191,8 @@ task installSnippetExecutorPlugins(dependsOn : [':SlideshowFX-golo-executor:jar'
     }
 }
 
-task packageSlideshowFX(dependsOn : [ ':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar', ':SlideshowFX-textile:jar',
+task packageSlideshowFX(dependsOn : [ 'clean',
+                                      ':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar', ':SlideshowFX-textile:jar',
                                       ':SlideshowFX-code-extension:jar', ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar', ':SlideshowFX-quote-extension:jar', ':SlideshowFX-sequence-diagram-extension:jar', ':SlideshowFX-snippet-extension:jar',
                                       ':SlideshowFX-app:jar',
                                       'asciidoctor']) {
@@ -256,4 +272,8 @@ task packageSlideshowFX(dependsOn : [ ':SlideshowFX-asciidoctor:jar', ':Slidesho
 
 wrapper {
     gradleVersion = '2.3'
+}
+
+task coucou << {
+    println configurations.dropbox.dependencies[0].version
 }

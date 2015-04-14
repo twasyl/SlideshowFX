@@ -18,7 +18,7 @@ version = '1.0.0'
 
 dependencies {
     compile project(':SlideshowFX-snippet-executor')
-    compile libraries.felix
+    compile configurations.felix
 }
 
 jar {

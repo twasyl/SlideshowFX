@@ -110,11 +110,10 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor {
                     new File(this.getSdkHome(), "bin/golo");
 
             final String[] command = {executable.getAbsolutePath(), "golo", "--files", codeFile.getAbsolutePath()};
-            final Runtime runtime = Runtime.getRuntime();
 
             Process process = null;
             try {
-                process = runtime.exec(command);
+                process = new ProcessBuilder().redirectErrorStream(true).command(command).start();
 
                 try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                     inputStream.lines().forEach(line -> consoleOutput.add(line));

@@ -127,11 +127,14 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor {
             final File javacExecutable = new File(this.getSdkHome(), "bin/javac");
 
             final String[] compilationCommand = {javacExecutable.getAbsolutePath(), codeFile.getName()};
-            final Runtime runtime = Runtime.getRuntime();
 
             Process process = null;
             try {
-                process = runtime.exec(compilationCommand, null, this.getTemporaryDirectory());
+                process = new ProcessBuilder()
+                            .redirectErrorStream(true)
+                            .command(compilationCommand)
+                            .directory(this.getTemporaryDirectory())
+                            .start();
 
                 try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
                     errorStream.lines().forEach(line -> consoleOutput.add(line));
@@ -158,7 +161,11 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor {
                 final String[] executionCommand = {javaExecutable.getAbsolutePath(), className};
 
                 try {
-                    process = runtime.exec(executionCommand, null, this.getTemporaryDirectory());
+                    process = new ProcessBuilder()
+                                .redirectErrorStream(true)
+                                .command(executionCommand)
+                                .directory(this.getTemporaryDirectory())
+                                .start();
 
                     try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                         inputStream.lines().forEach(line -> consoleOutput.add(line));

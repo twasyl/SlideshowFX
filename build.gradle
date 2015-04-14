@@ -71,7 +71,7 @@ ext.libraries = [
     wikitext: fileTree(dir: new File(allLibs, 'WikiText'), include: '*.jar'),
     twitter4j: ['org.twitter4j:twitter4j-core:4.0.3@jar', 'org.twitter4j:twitter4j-stream:4.0.3@jar'],
     vertx: ['io.vertx:vertx-core:2.1.5@jar', 'io.vertx:vertx-platform:2.1.5@jar', 'io.netty:netty-all:4.0.21.Final', 'com.fasterxml.jackson.core:jackson-core:2.2.2', 'com.fasterxml.jackson.core:jackson-databind:2.2.2', 'com.fasterxml.jackson.core:jackson-annotations:2.2.2'],
-    zxing: ['com.google.zxing:core:3.1.0@jar', 'com.google.zxing:javase:3.1.0@jar'],
+    zxing: ['com.google.zxing:core:3.2.0@jar', 'com.google.zxing:javase:3.2.0@jar'],
 
     testng: ['org.testng:testng:6.8.13@jar', 'com.beust:jcommander:1.47'],
     cucumber: ['info.cukes:cucumber-core:1.2.2', 'info.cukes:cucumber-java:1.2.2', 'info.cukes:cucumber-testng:1.2.2'],
@@ -113,8 +113,8 @@ asciidoctor {
             'twitter4j-version': '4.0.3',
             'txtmark-version': '0.13',
             'vertx-version': '2.1.5',
-            'zxing-core-version': '3.1.0',
-            'zxing-jse-version': '3.1.0',
+            'zxing-core-version': '3.2.0',
+            'zxing-jse-version': '3.2.0',
             'ace-version': '1.1.8'
     ]
 }

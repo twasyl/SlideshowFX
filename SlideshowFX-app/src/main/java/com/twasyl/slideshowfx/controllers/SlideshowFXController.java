@@ -427,6 +427,22 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
+     * Displays an internal browser in a specific tab.
+     * @param event The source event.
+     */
+    @FXML private void displayInternalBrowser(ActionEvent event) {
+        try {
+            final Parent root = FXMLLoader.load(ResourceHelper.getURL("/com/twasyl/slideshowfx/fxml/InternalBrowser.fxml"));
+            final Tab tab = new Tab("Internal browser", root);
+
+            this.openedPresentationsTabPane.getTabs().addAll(tab);
+            this.openedPresentationsTabPane.getSelectionModel().select(tab);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Can not open internal browser");
+        }
+    }
+
+    /**
      * Copy the slide, update the menu of available slides and reload the presentation.
      * The copy is delegated to {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#duplicateSlide(Slide)}.
      *

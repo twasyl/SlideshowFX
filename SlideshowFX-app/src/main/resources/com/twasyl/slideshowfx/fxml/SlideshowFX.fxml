@@ -228,6 +228,9 @@
                     <SeparatorMenuItem />
                     <MenuItem text="Quit" fx:id="quitMenuItem" onAction="#exitApplication" />
                 </Menu>
+                <Menu text="View">
+                    <MenuItem text="Internal browser" onAction="#displayInternalBrowser" />
+                </Menu>
                 <Menu text="Options">
                     <MenuItem text="Install plugin" onAction="#installPlugin" />
                     <TextFieldCheckMenuItem fx:id="autoSaveItem" text="Auto save interval (min):" value="5" />

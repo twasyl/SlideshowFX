@@ -29,7 +29,7 @@ import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 public class PresentationDAO {
 
     private static PresentationDAO singleton = new PresentationDAO();
-    private static PresentationEngine currentPresentation;
+    private PresentationEngine currentPresentation;
 
     private PresentationDAO() {}
 
@@ -40,7 +40,7 @@ public class PresentationDAO {
      * @return The current presentation used by SlideshowFX.
      */
     public PresentationEngine getCurrentPresentation() {
-        synchronized (currentPresentation) {
+        synchronized (this) {
             return currentPresentation;
         }
     }
@@ -50,8 +50,8 @@ public class PresentationDAO {
      * @param currentPresentation The new current presentation.
      */
     public void setCurrentPresentation(PresentationEngine currentPresentation) {
-        synchronized (currentPresentation) {
-            PresentationDAO.currentPresentation = currentPresentation;
+        synchronized (this) {
+            this.currentPresentation = currentPresentation;
         }
     }
 }

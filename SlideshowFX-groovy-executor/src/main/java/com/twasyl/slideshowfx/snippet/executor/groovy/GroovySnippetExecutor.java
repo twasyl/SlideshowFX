@@ -73,7 +73,7 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor {
         final StringProperty codeEncapsulationType = new SimpleStringProperty("main");
 
         final Tooltip wrapInTooltip = new Tooltip();
-        wrapInTooltip.textProperty().bind(new SimpleStringProperty("Wrap the provided code snippet in a Groovy").concat(codeEncapsulationType).concat(" method"));
+        wrapInTooltip.textProperty().bind(new SimpleStringProperty("Wrap the provided code snippet in a Groovy ").concat(codeEncapsulationType).concat(" method"));
 
         final CheckBox wrapInMethodRunner = new CheckBox();
         wrapInMethodRunner.textProperty().bind(new SimpleStringProperty("Wrap code snippet in ").concat(codeEncapsulationType));

@@ -118,7 +118,7 @@ asciidoctor {
             linkcss: false,
             'javafx-version': '8 update 40',
             'jdk-version': '8 update 40',
-            'gradle-version': '2.3',
+            'gradle-version': "${wrapper.gradleVersion}",
             'asciidoctorj-version': "${configurations.asciidoctorj.dependencies[0].version}",
             'apache-felix-version': "${configurations.felix.dependencies[0].version}",
             'freemarker-version': "${configurations.freemarker.dependencies[0].version}",
@@ -182,9 +182,11 @@ task installHostingConnectorPlugins(dependsOn : [':SlideshowFX-dropbox-hosting-c
 }
 
 task installSnippetExecutorPlugins(dependsOn : [':SlideshowFX-golo-executor:jar',
+                                                ':SlideshowFX-groovy-executor:jar',
                                                 ':SlideshowFX-java-executor:jar']) << {
     copy {
         from project(':SlideshowFX-golo-executor').jar.archivePath
+        from project(':SlideshowFX-groovy-executor').jar.archivePath
         from project(':SlideshowFX-java-executor').jar.archivePath
 
         into pluginsFolder
@@ -194,6 +196,7 @@ task installSnippetExecutorPlugins(dependsOn : [':SlideshowFX-golo-executor:jar'
 task packageSlideshowFX(dependsOn : [ 'clean',
                                       ':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar', ':SlideshowFX-textile:jar',
                                       ':SlideshowFX-code-extension:jar', ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar', ':SlideshowFX-quote-extension:jar', ':SlideshowFX-sequence-diagram-extension:jar', ':SlideshowFX-snippet-extension:jar',
+                                      ':SlideshowFX-golo-executor:jar', ':SlideshowFX-groovy-executor:jar', ':SlideshowFX-java-executor:jar',
                                       ':SlideshowFX-app:jar',
                                       'asciidoctor']) {
 
@@ -229,6 +232,14 @@ task packageSlideshowFX(dependsOn : [ 'clean',
             from project(':SlideshowFX-snippet-extension').jar.archivePath
 
             into new File(pluginsFolder, "extensions")
+        }
+
+        copy {
+            from project(':SlideshowFX-java-executor').jar.archivePath
+            from project(':SlideshowFX-golo-executor').jar.archivePath
+            from project(':SlideshowFX-groovy-executor').jar.archivePath
+
+            into new File(pluginsFolder, "executors")
         }
 
         copy {
@@ -272,8 +283,4 @@ task packageSlideshowFX(dependsOn : [ 'clean',
 
 wrapper {
     gradleVersion = '2.3'
-}
-
-task coucou << {
-    println configurations.dropbox.dependencies[0].version
 }

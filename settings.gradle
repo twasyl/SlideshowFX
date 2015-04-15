@@ -40,6 +40,6 @@ include 'SlideshowFX-dropbox-hosting-connector'
 include 'SlideshowFX-drive-hosting-connector'
 
 include 'SlideshowFX-golo-executor'
+include 'SlideshowFX-groovy-executor'
 include 'SlideshowFX-java-executor'
 include 'SlideshowFX-snippet-executor'
-

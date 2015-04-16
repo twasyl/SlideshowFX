@@ -52,6 +52,7 @@ allprojects {
         drive
         dropbox
         felix
+        fontawesomefx
         freemarker
         jsoup
         leapmotion
@@ -71,6 +72,7 @@ allprojects {
         drive 'com.google.apis:google-api-services-drive:v2-rev155-1.19.1'
         dropbox 'com.dropbox.core:dropbox-core-sdk:1.7.7'
         felix 'org.apache.felix:org.apache.felix.framework:4.6.1'
+        fontawesomefx 'de.jensd:fontawesomefx:8.3'
         freemarker 'org.freemarker:freemarker:2.3.22'
         jsoup 'org.jsoup:jsoup:1.8.2'
         leapmotion fileTree(dir: allLibs, include: 'Leap/*')
@@ -122,6 +124,7 @@ asciidoctor {
             'asciidoctorj-version': "${configurations.asciidoctorj.dependencies[0].version}",
             'apache-felix-version': "${configurations.felix.dependencies[0].version}",
             'freemarker-version': "${configurations.freemarker.dependencies[0].version}",
+            'fontawesomefx-version' : "${configurations.fontawesomefx.dependencies[0].version}",
             'jsoup-version': "${configurations.jsoup.dependencies[0].version}",
             'leapmotion-sdk-version': '2.2.5.26752',
             'wikitext-core-version': '2.4.0.N20150409-1542',

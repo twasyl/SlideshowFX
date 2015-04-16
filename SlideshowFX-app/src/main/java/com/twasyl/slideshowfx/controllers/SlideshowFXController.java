@@ -40,6 +40,8 @@ import com.twasyl.slideshowfx.utils.*;
 import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.DisableAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.EnableAction;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
 import javafx.application.Platform;
 import javafx.beans.binding.StringExpression;
 import javafx.beans.property.SimpleStringProperty;
@@ -680,7 +682,7 @@ public class SlideshowFXController implements Initializable {
      * @param event
      */
     @FXML private void showOptionsDialog(ActionEvent event) {
-        FXMLLoader loader = new FXMLLoader(ResourceHelper.getURL("/com/twasyl/slideshowfx/fxml/OptionsVIew.fxml"));
+        FXMLLoader loader = new FXMLLoader(ResourceHelper.getURL("/com/twasyl/slideshowfx/fxml/OptionsView.fxml"));
         try {
             final Parent root = loader.load();
             final OptionsViewController controller = loader.getController();
@@ -870,12 +872,15 @@ public class SlideshowFXController implements Initializable {
      * If no text is entered for the IP address and the port number, the IP address of the computer is used and the port 80 is chosen.
      */
     private void startChat() {
-        Image icon;
+        FontAwesomeIcon icon;
 
         if (SlideshowFXServer.getSingleton() != null) {
             SlideshowFXServer.getSingleton().stop();
 
-            icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/start.png"));
+            icon = new FontAwesomeIcon();
+            icon.setGlyphName(FontAwesomeIcons.PLAY.name());
+            icon.setGlyphSize(20);
+            icon.setGlyphStyle("-fx-fill: green");
         } else {
             String ip = this.chatIpAddress.getValue();
             if (ip == null || ip.isEmpty()) {
@@ -896,10 +901,13 @@ public class SlideshowFXController implements Initializable {
 
             new SlideshowFXServer(ip, port, this.twitterHashtag.getText());
 
-            icon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/shutdown.png"));
+            icon = new FontAwesomeIcon();
+            icon.setGlyphName(FontAwesomeIcons.POWER_OFF.name());
+            icon.setGlyphSize(20);
+            icon.setGlyphStyle("-fx-fill: app-color-orange");
         }
 
-        ((ImageView) this.startChatButton.getGraphic()).setImage(icon);
+        this.startChatButton.setGraphic(icon);
         this.chatIpAddress.setDisable(!this.chatIpAddress.isDisable());
         this.chatPort.setDisable(!this.chatPort.isDisable());
     }

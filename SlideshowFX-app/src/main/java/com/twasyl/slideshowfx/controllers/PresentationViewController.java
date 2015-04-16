@@ -33,6 +33,8 @@ import com.twasyl.slideshowfx.utils.DialogHelper;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.beans.Pair;
 import com.twasyl.slideshowfx.utils.beans.binding.FilenameBinding;
+import de.jensd.fx.glyphs.GlyphIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -349,12 +351,12 @@ public class PresentationViewController implements Initializable {
         button.setTooltip(new Tooltip(contentExtension.getToolTip()));
         button.getStyleClass().add("image");
 
-        final Image icon = new Image(contentExtension.getIcon().toExternalForm(), true);
-        final ImageView view = new ImageView(icon);
-        view.setFitHeight(20);
-        view.setFitWidth(20);
+        final GlyphIcon icon = new FontAwesomeIcon();
+        icon.setGlyphName(contentExtension.getIcon().name());
+        icon.setGlyphSize(20);
+        icon.setGlyphStyle("-fx-fill: app-color-orange;");
 
-        button.setGraphic(view);
+        button.setGraphic(icon);
 
         button.setOnAction(event -> {
 

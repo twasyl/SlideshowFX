@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.content.extension;
 
 import com.twasyl.slideshowfx.markup.IMarkup;
+import de.jensd.fx.glyphs.GlyphIcons;
 import javafx.scene.layout.Pane;
 
 import java.io.File;
@@ -43,9 +44,9 @@ public interface IContentExtension {
 
     /**
      * Get the icon that will be used in the SlideshowFX UI to make the content extension available.
-     * @return The InputStream corresponding of the icon of the content extension.
+     * @return The icon of the content extension.
      */
-    URL getIcon();
+    GlyphIcons getIcon();
 
     /**
      * Get the tooltip that will be used in the SlideshowFX UI to make the content extension available.

@@ -19,6 +19,7 @@ package com.twasyl.slideshowfx.content.extension.link;
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.link.controllers.LinkContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 
@@ -43,7 +44,7 @@ public class LinkContentExtension extends AbstractContentExtension {
 
     public LinkContentExtension() {
         super("LINK", null,
-                LinkContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/link/images/icon.png"),
+                FontAwesomeIcons.LINK,
                 "Insert a link",
                 "Insert a link");
     }

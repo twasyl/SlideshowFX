@@ -21,6 +21,7 @@ import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.snippet.controllers.SnippetContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 
@@ -46,7 +47,7 @@ public class SnippetContentExtension extends AbstractContentExtension {
     public SnippetContentExtension() {
         super("SNIPPET",
                 SnippetContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/snippet/resources/highlightjs.zip"),
-                SnippetContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/snippet/images/icon.png"),
+                FontAwesomeIcons.TERMINAL,
                 "Insert an executable code snippet",
                 "Insert an executable code snippet");
 

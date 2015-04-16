@@ -2,11 +2,16 @@ package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.engine.presentation.configuration.PresentationConfiguration;
 import com.twasyl.slideshowfx.utils.beans.Pair;
+import de.jensd.fx.glyphs.GlyphIcon;
+import de.jensd.fx.glyphs.GlyphsStack;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
@@ -32,11 +37,22 @@ public class PresentationVariablesPanel extends BorderPane {
 
         this.variablesScrollPane.setPrefSize(500, 500);
 
-        final Image addVariableImage = new Image("/com/twasyl/slideshowfx/images/add_button.png", 20, 20, true, true);
-        final ImageView addVariableImageView = new ImageView(addVariableImage);
+        final GlyphIcon<FontAwesomeIcons> backgroundIcon = new FontAwesomeIcon();
+        backgroundIcon.setGlyphName(FontAwesomeIcons.PLUS_SQUARE.name());
+        backgroundIcon.setGlyphSize(20);
+        backgroundIcon.setGlyphStyle("-fx-fill: white");
+
+        final GlyphIcon<FontAwesomeIcons> plusIcon = new FontAwesomeIcon();
+        plusIcon.setGlyphName(FontAwesomeIcons.PLUS.name());
+        plusIcon.setGlyphSize(15);
+        plusIcon.setGlyphStyle("-fx-fill: app-color-orange");
+
+        final GlyphsStack stack = new GlyphsStack();
+        stack.add(backgroundIcon).add(plusIcon);
+
         final Button addButton = new Button();
         addButton.getStyleClass().add("image");
-        addButton.setGraphic(addVariableImageView);
+        addButton.setGraphic(stack);
         addButton.setTooltip(new Tooltip("Add a variable"));
         addButton.setOnAction(event -> this.addVariable(null, null));
 
@@ -72,9 +88,13 @@ public class PresentationVariablesPanel extends BorderPane {
         variableValue.setPrefColumnCount(15);
         variableValue.textProperty().bindBidirectional(variable.valueProperty());
 
-        final ImageView view = new ImageView("/com/twasyl/slideshowfx/images/round_delete.png");
+        final GlyphIcon<FontAwesomeIcons> icon = new FontAwesomeIcon();
+        icon.setGlyphName(FontAwesomeIcons.TIMES_CIRCLE.name());
+        icon.setGlyphSize(20);
+        icon.setGlyphStyle("-fx-fill: app-color-orange");
+
         final Button delete = new Button();
-        delete.setGraphic(view);
+        delete.setGraphic(icon);
         delete.setTooltip(new Tooltip("Delete this variable"));
 
         final HBox box = new HBox(5);

@@ -21,12 +21,14 @@
 <?import com.twasyl.slideshowfx.utils.NetworkUtils?>
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
+<?import javafx.scene.layout.StackPane?>
+<?import de.jensd.fx.glyphs.GlyphsStack?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
@@ -55,9 +57,8 @@
                 <Tooltip text="Open presentation" />
             </tooltip>
             <graphic>
-                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                    <Image url="@/com/twasyl/slideshowfx/images/open.png" />
-                </ImageView>
+                <FontAwesomeIcon glyphName="FOLDER_OPEN" glyphSize="$TOOLBAR_ICON_WIDTH"
+                                 glyphStyle="-fx-fill: #FF8000"/>
             </graphic>
         </Button>
 
@@ -66,12 +67,7 @@
                 <Tooltip text="Save" />
             </tooltip>
             <graphic>
-                <ImageView>
-                    <image>
-                        <Image url="@/com/twasyl/slideshowfx/images/save.png" requestedWidth="$TOOLBAR_ICON_WIDTH"
-                               requestedHeight="$TOOLBAR_ICON_HEIGHT" preserveRatio="true" smooth="true" />
-                    </image>
-                </ImageView>
+                <FontAwesomeIcon glyphName="FLOPPY_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
             </graphic>
             <items>
                 <MenuItem text="Save as ..." onAction="#saveAs" />
@@ -83,9 +79,7 @@
                 <Tooltip text="Print" />
             </tooltip>
             <graphic>
-                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                    <Image url="@/com/twasyl/slideshowfx/images/print.png" />
-                </ImageView>
+                <FontAwesomeIcon glyphName="PRINT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
             </graphic>
         </Button>
 
@@ -94,12 +88,10 @@
                 <Tooltip text="Add slide" />
             </tooltip>
             <graphic>
-                <ImageView>
-                    <image>
-                        <Image url="@/com/twasyl/slideshowfx/images/add.png" requestedWidth="$TOOLBAR_ICON_WIDTH"
-                               requestedHeight="$TOOLBAR_ICON_HEIGHT" preserveRatio="true" smooth="true" />
-                    </image>
-                </ImageView>
+                <GlyphsStack>
+                    <FontAwesomeIcon glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white;" />
+                    <FontAwesomeIcon glyphName="PLUS" glyphSize="15" glyphStyle="-fx-fill: app-color-orange;" StackPane.alignment="BOTTOM_CENTER" />
+                </GlyphsStack>
             </graphic>
         </SplitMenuButton>
 
@@ -108,9 +100,7 @@
                 <Tooltip text="Copy slide" />
             </tooltip>
             <graphic>
-                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                    <Image url="@/com/twasyl/slideshowfx/images/copy.png" />
-                </ImageView>
+                <FontAwesomeIcon glyphName="FILES_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange;" />
             </graphic>
         </Button>
 
@@ -119,12 +109,10 @@
                 <Tooltip  text="Move slide" />
             </tooltip>
             <graphic>
-                <ImageView>
-                    <image>
-                        <Image url="@/com/twasyl/slideshowfx/images/move.png" requestedWidth="$TOOLBAR_ICON_WIDTH"
-                               requestedHeight="$TOOLBAR_ICON_HEIGHT" preserveRatio="true" smooth="true" />
-                    </image>
-                </ImageView>
+                <GlyphsStack>
+                    <FontAwesomeIcon glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white" />
+                    <FontAwesomeIcon glyphName="ARROW_RIGHT" glyphSize="15" glyphStyle="-fx-fill: app-color-orange" StackPane.alignment="BOTTOM_CENTER" />
+                </GlyphsStack>
             </graphic>
         </SplitMenuButton>
 
@@ -133,9 +121,10 @@
                 <Tooltip text="Delete slide" />
             </tooltip>
             <graphic>
-                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                    <Image url="@/com/twasyl/slideshowfx/images/delete.png" />
-                </ImageView>
+                <GlyphsStack>
+                    <FontAwesomeIcon glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white" />
+                    <FontAwesomeIcon glyphName="TIMES" glyphSize="15" glyphStyle="-fx-fill: app-color-orange" StackPane.alignment="BOTTOM_CENTER" />
+                </GlyphsStack>
             </graphic>
         </Button>
 
@@ -144,9 +133,7 @@
                 <Tooltip text="Reload" />
             </tooltip>
             <graphic>
-                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                    <Image url="@/com/twasyl/slideshowfx/images/reload.png" />
-                </ImageView>
+                <FontAwesomeIcon glyphName="REFRESH" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
             </graphic>
         </Button>
 
@@ -155,12 +142,7 @@
                 <Tooltip text="Slideshow" />
             </tooltip>
             <graphic>
-                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                    <image>
-                        <Image url="@/com/twasyl/slideshowfx/images/slideshow.png" requestedWidth="$TOOLBAR_ICON_WIDTH"
-                               requestedHeight="$TOOLBAR_ICON_HEIGHT" preserveRatio="true" smooth="true" />
-                    </image>
-                </ImageView>
+                <FontAwesomeIcon glyphName="DESKTOP" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
             </graphic>
             <items>
                 <MenuItem text="Slideshow from current slide" onAction="#slideshowFromCurrentSlide" />
@@ -255,9 +237,10 @@
                         <Tooltip text="New presentation" />
                     </tooltip>
                     <graphic>
-                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                            <Image url="@/com/twasyl/slideshowfx/images/new.png" />
-                        </ImageView>
+                        <GlyphsStack>
+                            <FontAwesomeIcon glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white" />
+                            <FontAwesomeIcon glyphName="COG" glyphSize="10" glyphStyle="-fx-fill: app-color-orange" StackPane.alignment="TOP_RIGHT" />
+                        </GlyphsStack>
                     </graphic>
                 </Button>
 
@@ -288,17 +271,13 @@
                         <Tooltip text="LeapMotion controller" />
                     </tooltip>
                     <graphic>
-                        <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                            <Image url="@/com/twasyl/slideshowfx/images/leap.png" />
-                        </ImageView>
+                        <FontAwesomeIcon glyphName="HAND_ALT_UP" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
                     </graphic>
                 </CheckBox>
 
                 <Separator />
 
-                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                    <Image url="@/com/twasyl/slideshowfx/images/chat.png"  smooth="true" />
-                </ImageView>
+                <FontAwesomeIcon glyphName="COMMENTS_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
 
                 <ComboBox  promptText="IP address" fx:id="chatIpAddress">
                     <items>
@@ -308,17 +287,13 @@
 
                 <TextField prefColumnCount="3" promptText="Port" fx:id="chatPort" onKeyPressed="#startChatByKeyPressed" />
 
-                <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                    <Image url="@/com/twasyl/slideshowfx/images/twitter.png"  smooth="true" />
-                </ImageView>
+                <FontAwesomeIcon glyphName="TWITTER" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
 
                 <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" onKeyPressed="#startChatByKeyPressed" />
 
                 <Button onAction="#startChatByButton" fx:id="startChatButton" styleClass="image">
                     <graphic>
-                        <ImageView fitWidth="$TOOLBAR_ICON_WIDTH" fitHeight="$TOOLBAR_ICON_HEIGHT">
-                            <Image url="@/com/twasyl/slideshowfx/images/start.png" preserveRatio="true" smooth="true" />
-                        </ImageView>
+                        <FontAwesomeIcon glyphName="PLAY" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: green" />
                     </graphic>
                 </Button>
             </ToolBar>

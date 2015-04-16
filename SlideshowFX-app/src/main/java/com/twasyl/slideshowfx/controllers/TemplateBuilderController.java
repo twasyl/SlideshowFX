@@ -27,8 +27,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -53,10 +51,6 @@ import java.util.logging.Logger;
 public class TemplateBuilderController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(TemplateBuilderController.class.getName());
 
-    @FXML private SplitMenuButton saveButton;
-    @FXML private SplitMenuButton buildButton;
-    @FXML private SplitMenuButton addFolderButton;
-    @FXML private SplitMenuButton addFileButton;
     @FXML private TemplateTreeView templateContentTreeView;
     @FXML private TabPane openedFiles;
 
@@ -339,30 +333,6 @@ public class TemplateBuilderController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.buildButton.setGraphic(
-                new ImageView(
-                        new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/package.png"), 20d, 20d, true, true)
-                )
-        );
-
-        this.saveButton.setGraphic(
-                new ImageView(
-                        new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/save.png"), 20d, 20d, true, true)
-                )
-        );
-
-        this.addFolderButton.setGraphic(
-                new ImageView(
-                        new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/add_folder.png"), 20d, 20d, true, true)
-                )
-        );
-
-        this.addFileButton.setGraphic(
-                new ImageView(
-                        new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/add.png"), 20d, 20d, true, true)
-                )
-        );
-
         // Initialize the tree view
         this.templateContentTreeView.setOnItemClick(event -> {
             if(event.getClickCount() == 2 && event.getButton().equals(MouseButton.PRIMARY)) {

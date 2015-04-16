@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.utils.ResourceHelper;
+import de.jensd.fx.glyphs.GlyphIcon;
 import javafx.animation.TranslateTransition;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -99,7 +100,7 @@ public class CollapsibleToolPane extends Region {
      * @param content The content that will be displayed when the icon is triggered.
      * @return Return this panel.
      */
-    public CollapsibleToolPane addContent(final ImageView icon, final Region content) {
+    public CollapsibleToolPane addContent(final GlyphIcon icon, final Region content) {
         final ToggleButton button = new ToggleButton();
         button.setToggleGroup(this.iconsGroup);
         button.setGraphic(icon);

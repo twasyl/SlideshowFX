@@ -31,6 +31,8 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 | Apache Felix | {apache-felix-version} |
 
+| FontAwesomeFX | {fontawesomefx-version} |
+
 | freemarker | {freemarker-version} |
 
 | jsoup | {jsoup-version} |

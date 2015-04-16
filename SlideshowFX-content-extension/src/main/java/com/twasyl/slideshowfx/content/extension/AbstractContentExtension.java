@@ -17,8 +17,10 @@
 package com.twasyl.slideshowfx.content.extension;
 
 import com.twasyl.slideshowfx.utils.ZipUtils;
+import de.jensd.fx.glyphs.GlyphIcons;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -36,7 +38,7 @@ public abstract class AbstractContentExtension implements IContentExtension {
     private static final Logger LOGGER = Logger.getLogger(AbstractContentExtension.class.getName());
 
     protected final String code;
-    protected final URL icon;
+    protected final GlyphIcons icon;
     protected final String toolTip;
     protected final String title;
     protected final URL resourcesArchive;
@@ -52,7 +54,7 @@ public abstract class AbstractContentExtension implements IContentExtension {
      * @throws java.lang.NullPointerException If the code is null.
      * @throws java.lang.IllegalArgumentException If the code is empty.
      */
-    protected AbstractContentExtension(String code, URL resourcesArchive, URL icon, String toolTip, String title) {
+    protected AbstractContentExtension(String code, URL resourcesArchive, GlyphIcons icon, String toolTip, String title) {
         if(code == null) throw new NullPointerException("The code of the content extension is null");
         if(code.trim().isEmpty()) throw new IllegalArgumentException("The code of the content extension can not be empty");
 
@@ -99,7 +101,7 @@ public abstract class AbstractContentExtension implements IContentExtension {
     }
 
     @Override
-    public URL getIcon() { return this.icon; }
+    public GlyphIcons getIcon() { return this.icon; }
 
     @Override
     public String getToolTip() { return this.toolTip; }

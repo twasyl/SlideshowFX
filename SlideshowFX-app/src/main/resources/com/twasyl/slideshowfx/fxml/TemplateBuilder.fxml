@@ -24,6 +24,8 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
+<?import de.jensd.fx.glyphs.GlyphsStack?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.TemplateBuilderController"
         prefHeight="700" prefWidth="1024">
     <stylesheets>
@@ -39,6 +41,9 @@
     <top>
         <ToolBar>
             <SplitMenuButton fx:id="buildButton" onAction="#buildTemplateArchive">
+                <graphic>
+                    <FontAwesomeIcon glyphName="ARCHIVE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange;" />
+                </graphic>
                 <tooltip>
                     <Tooltip text="Build template archive" />
                 </tooltip>
@@ -48,6 +53,9 @@
             </SplitMenuButton>
 
             <SplitMenuButton fx:id="saveButton" onAction="#saveCurrentFile">
+                <graphic>
+                    <FontAwesomeIcon glyphName="FLOPPY_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                </graphic>
                 <tooltip>
                     <Tooltip text="Save" />
                 </tooltip>
@@ -59,6 +67,12 @@
             <Separator />
 
             <SplitMenuButton fx:id="addFileButton" onAction="#addFileToTreeView">
+                <graphic>
+                    <GlyphsStack>
+                        <FontAwesomeIcon glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white;" />
+                        <FontAwesomeIcon glyphName="PLUS" glyphSize="15" glyphStyle="-fx-fill: app-color-orange;" StackPane.alignment="BOTTOM_CENTER" />
+                    </GlyphsStack>
+                </graphic>
                 <tooltip>
                     <Tooltip text="Add file" />
                 </tooltip>
@@ -68,6 +82,12 @@
             </SplitMenuButton>
 
             <SplitMenuButton fx:id="addFolderButton" onAction="#addFolderToTreeView">
+                <graphic>
+                    <GlyphsStack>
+                        <FontAwesomeIcon glyphName="FOLDER" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white;" />
+                        <FontAwesomeIcon glyphName="PLUS" glyphSize="13" glyphStyle="-fx-fill: app-color-orange;" StackPane.alignment="CENTER" />
+                    </GlyphsStack>
+                </graphic>
                 <tooltip>
                     <Tooltip text="Add folder" />
                 </tooltip>
@@ -81,9 +101,7 @@
                     <Tooltip text="Delete selection" />
                 </tooltip>
                 <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/delete.png" />
-                    </ImageView>
+                    <FontAwesomeIcon glyphName="TIMES_CIRCLE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
                 </graphic>
             </Button>
         </ToolBar>

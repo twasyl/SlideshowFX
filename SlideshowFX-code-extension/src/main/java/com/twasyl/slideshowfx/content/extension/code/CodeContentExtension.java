@@ -21,6 +21,7 @@ import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.code.controllers.CodeContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 
@@ -46,7 +47,7 @@ public class CodeContentExtension extends AbstractContentExtension {
     public CodeContentExtension() {
         super("CODE",
                 CodeContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/code/resources/highlightjs.zip"),
-                CodeContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/code/images/icon.png"),
+                FontAwesomeIcons.CODE,
                 "Insert code",
                 "Insert code");
 

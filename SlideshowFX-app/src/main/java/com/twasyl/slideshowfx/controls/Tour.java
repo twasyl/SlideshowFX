@@ -18,6 +18,9 @@ package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
+import de.jensd.fx.glyphs.GlyphIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
@@ -37,6 +40,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -290,9 +294,13 @@ public class Tour extends StackPane {
      * @return The Node for displaying the reload screen.
      */
     private Node getReloadNode() {
-        final ImageView reloadIcon = new ImageView(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/images/reload_white.png"));
+        final GlyphIcon<FontAwesomeIcons> reloadIcon = new FontAwesomeIcon();
+        reloadIcon.setGlyphName(FontAwesomeIcons.REFRESH.name());
+        reloadIcon.setGlyphSize(48);
+        reloadIcon.setGlyphStyle("-fx-fill: white");
 
-        final Button  reloadButton = new Button();
+        final Button reloadButton = new Button();
+        reloadButton.setBackground(Background.EMPTY);
         reloadButton.setGraphic(reloadIcon);
         reloadButton.setOnAction(event -> reload());
 

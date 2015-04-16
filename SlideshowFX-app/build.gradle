@@ -28,6 +28,7 @@ dependencies {
     compile project(':SlideshowFX-snippet-executor')
 
     compile configurations.felix
+    compile configurations.fontawesomefx
     compile configurations.freemarker
     compile configurations.jsoup
     compile configurations.leapmotion

@@ -25,6 +25,7 @@
 <?import javafx.scene.web.WebView?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
 <SplitPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.PresentationViewController">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
@@ -42,9 +43,7 @@
                     <Tooltip text="Insert a quizz" />
                 </tooltip>
                 <graphic>
-                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
-                        <Image url="@/com/twasyl/slideshowfx/images/quizz.png" />
-                    </ImageView>
+                    <FontAwesomeIcon glyphName="QUESTION" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
                 </graphic>
             </Button>
             <Button onAction="#definePresentationVariables" styleClass="image">

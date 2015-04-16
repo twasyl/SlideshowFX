@@ -21,6 +21,7 @@ import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.alert.controllers.AlertContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 
@@ -46,7 +47,7 @@ public class AlertContentExtension extends AbstractContentExtension {
     public AlertContentExtension() {
         super("ALERT",
                 AlertContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/alert/resources/sweetalert.zip"),
-                AlertContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/alert/images/icon.png"),
+                FontAwesomeIcons.EXCLAMATION_TRIANGLE,
                 "Insert an alert",
                 "Insert an alert");
 

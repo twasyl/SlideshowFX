@@ -64,6 +64,8 @@ public class OSGiManager {
                 "com.twasyl.slideshowfx.engine.*," +
                 "com.twasyl.slideshowfx.global.configuration," +
                 "com.twasyl.slideshowfx.utils," +
+                "de.jensd.fx.glyphs," +
+                "de.jensd.fx.glyphs.fontawesome," +
                 "sun.misc," +
                 "org.w3c.*," +
                 "javax.*," +

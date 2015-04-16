@@ -19,11 +19,47 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.web.WebView?>
+<?import javafx.scene.layout.HBox?>
+<?import java.lang.Double?>
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.InternalBrowserController">
+    <stylesheets>
+        <URL value="@/com/twasyl/slideshowfx/css/InternalBrowser.css" />
+    </stylesheets>
+
+    <fx:define>
+        <Double fx:id="TOOLBAR_ICON_WIDTH" fx:value="20" />
+        <Double fx:id="TOOLBAR_ICON_HEIGHT" fx:value="20" />
+    </fx:define>
 
     <top>
-        <TextField fx:id="addressBar" style="-fx-border-color: white; -fx-border-width: 0.5px 0px" promptText="Address"
-                   prefColumnCount="50" onKeyPressed="#manageKeyPressed" />
+        <HBox fx:id="addressPanel" alignment="BASELINE_CENTER">
+            <Button fx:id="previousPage" onAction="#navigateToPreviousPage">
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <image>
+                            <Image url="@/com/twasyl/slideshowfx/images/backward.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <TextField fx:id="addressBar" promptText="Address"
+                       prefColumnCount="50" onKeyPressed="#manageKeyPressed" />
+
+            <Button fx:id="nextPage" onAction="#navigateToNextPage">
+                <graphic>
+                    <ImageView fitHeight="$TOOLBAR_ICON_HEIGHT" fitWidth="$TOOLBAR_ICON_WIDTH">
+                        <image>
+                            <Image url="@/com/twasyl/slideshowfx/images/forward.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
     </top>
 
     <center>

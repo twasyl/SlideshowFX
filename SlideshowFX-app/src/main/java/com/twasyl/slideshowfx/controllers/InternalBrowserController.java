@@ -17,16 +17,18 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.utils.ResourceHelper;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.ListBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Side;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 
 import java.net.MalformedURLException;
@@ -43,6 +45,9 @@ public class InternalBrowserController implements Initializable {
 
     @FXML private TextField addressBar;
     @FXML private WebView browser;
+    @FXML private HBox addressPanel;
+    @FXML private Button previousPage;
+    @FXML private Button nextPage;
 
     private final ContextMenu browsingHistoryContextMenu = new ContextMenu();
 
@@ -58,6 +63,13 @@ public class InternalBrowserController implements Initializable {
         }
     }
 
+    @FXML private void navigateToPreviousPage(ActionEvent event) {
+        this.goToPage(-1);
+    }
+
+    @FXML private void navigateToNextPage(ActionEvent event) {
+        this.goToPage(1);
+    }
 
     /**
      * Loads the given {@code address} in the browser. If the address to load doesn't start with {@code http://} or
@@ -78,6 +90,16 @@ public class InternalBrowserController implements Initializable {
         }
     }
 
+    /**
+     * Navigate to the browsing history. This method calls {@link WebHistory#go(int)} with the {@code offset} passed in
+     * parameter.
+     * @param offset The offset to navigate to the page.
+     */
+    private void goToPage(int offset) {
+        this.browser.getEngine().getHistory().go(offset);
+        this.addressBar.setText(this.browser.getEngine().getLocation());
+        this.browsingHistoryContextMenu.hide();
+    }
     /**
      * Displays the context menu for the address bar which contains the URL starting with {@code partialAddress} in the
      * browsing history.
@@ -131,5 +153,13 @@ public class InternalBrowserController implements Initializable {
         });
 
         this.browser.getEngine().load(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/html/empty-webview.html"));
+
+        final WebHistory webHistory = this.browser.getEngine().getHistory();
+        BooleanBinding isHistoryEmpty = Bindings.isEmpty(webHistory.getEntries());
+        BooleanBinding isFirstPageDisplayed = isHistoryEmpty.or(webHistory.currentIndexProperty().isEqualTo(0));
+        BooleanBinding isLastPageDisplayed = isHistoryEmpty.or(webHistory.currentIndexProperty().isEqualTo(Bindings.size(webHistory.getEntries()).subtract(1)));
+
+        this.previousPage.disableProperty().bind(isFirstPageDisplayed);
+        this.nextPage.disableProperty().bind(isLastPageDisplayed);
     }
 }

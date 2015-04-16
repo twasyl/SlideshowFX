@@ -438,7 +438,7 @@ public class SlideshowFXController implements Initializable {
             this.openedPresentationsTabPane.getTabs().addAll(tab);
             this.openedPresentationsTabPane.getSelectionModel().select(tab);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not open internal browser");
+            LOGGER.log(Level.SEVERE, "Can not open internal browser", e);
         }
     }
 

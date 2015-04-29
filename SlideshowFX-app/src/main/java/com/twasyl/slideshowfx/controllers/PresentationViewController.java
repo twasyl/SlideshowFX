@@ -658,7 +658,15 @@ public class PresentationViewController implements Initializable {
      * @return The file representing the working directory of this presentation.
      */
     public File getWorkingDirectory() {
-        return this.presentationEngine.getWorkingDirectory();
+        return this.presentationEngine.getConfiguration().getPresentationFile();
+    }
+
+    /**
+     * Get the HTML presentation file of the current presentation.
+     * @return The file pointing to the HTML presentation file.
+     */
+    public File getPresentationFile() {
+        return this.presentationEngine.getConfiguration().getPresentationFile();
     }
 
     /**

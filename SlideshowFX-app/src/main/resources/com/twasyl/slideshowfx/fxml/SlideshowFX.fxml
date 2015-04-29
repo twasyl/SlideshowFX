@@ -46,6 +46,7 @@
         <Menu fx:id="downloadersMenu" text="Download from" />
         <Menu fx:id="uploadersMenu" text="Upload to" />
         <MenuItem fx:id="editCurrentTemplateMenuItem" text="Edit current template" onAction="#editTemplate" />
+        <MenuItem fx:id="openPresentationInBrowser" text="Open current presentation in good ol' browser" onAction="#openPresentationInBrowser"/>
         <MenuItem fx:id="openCurrentWorkingDirMenuItem" text="Open current working directory" onAction="#openWorkingDirectory" />
 
         <!-- Global ToolBar buttons -->
@@ -187,6 +188,7 @@
             <fx:reference source="markupContentTypeBox" />
             <fx:reference source="slideNumber" />
             <fx:reference source="fieldName" />
+            <fx:reference source="openPresentationInBrowser" />
             <fx:reference source="openCurrentWorkingDirMenuItem" />
         </FXCollections>
     </fx:define>
@@ -221,6 +223,7 @@
                         <MenuItem text="Open template" onAction="#openTemplate" />
                         <fx:reference source="editCurrentTemplateMenuItem" />
                     </Menu>
+                    <fx:reference source="openPresentationInBrowser" />
                     <fx:reference source="openCurrentWorkingDirMenuItem" />
                 </Menu>
                 <Menu text="?">

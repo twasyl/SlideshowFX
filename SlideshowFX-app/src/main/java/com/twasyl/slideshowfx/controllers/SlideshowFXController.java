@@ -332,8 +332,30 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
+     * Open the current presentation inside the default browser of the user.
+     * @param event The event associated to this request.
+     */
+    @FXML private void openPresentationInBrowser(ActionEvent event) {
+        if(Desktop.isDesktopSupported()) {
+            final PresentationViewController view = this.getCurrentPresentationView();
+
+            if(view != null) {
+                final File presentationFile = view.getPresentationFile();
+
+                if(presentationFile != null && presentationFile.exists()) {
+                    try {
+                        Desktop.getDesktop().browse(presentationFile.toURI());
+                    } catch (IOException e) {
+                        LOGGER.log(Level.SEVERE, "Can not open working directory", e);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Open the current working directory in the file explorer of the system.
-     * @param event The event associated to the request
+     * @param event The event associated to the request.
      */
     @FXML private void openWorkingDirectory(ActionEvent event) {
         final PresentationViewController view = this.getCurrentPresentationView();

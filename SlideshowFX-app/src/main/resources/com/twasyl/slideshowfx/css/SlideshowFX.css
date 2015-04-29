@@ -20,3 +20,16 @@
     -fx-background-position: center;
     -fx-background-repeat: no-repeat;
 }
+
+.button.notification, .button.notification:hover {
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+}
+
+.notification.title, .notification.title:hover {
+    -fx-font-size: 12px;
+}
+
+.notification.time, .notification.time:hover {
+    -fx-font-size: 10px;
+}

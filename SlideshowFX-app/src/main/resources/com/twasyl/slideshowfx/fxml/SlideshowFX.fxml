@@ -16,19 +16,16 @@
   ~ limitations under the License.
   -->
 
-<?import com.twasyl.slideshowfx.controls.TaskProgressIndicator?>
+<?import com.twasyl.slideshowfx.controls.notification.NotificationCenter?>
 <?import com.twasyl.slideshowfx.controls.TextFieldCheckMenuItem?>
 <?import com.twasyl.slideshowfx.utils.NetworkUtils?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import de.jensd.fx.glyphs.GlyphsStack?>
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
-<?import javafx.scene.layout.StackPane?>
-<?import de.jensd.fx.glyphs.GlyphsStack?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
@@ -308,7 +305,7 @@
     </center>
 
     <bottom>
-        <TaskProgressIndicator fx:id="taskInProgress" />
+        <NotificationCenter fx:id="taskInProgress" />
     </bottom>
 </BorderPane>
 

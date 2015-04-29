@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.concurrent;
 
 import com.twasyl.slideshowfx.controllers.PresentationViewController;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 
 import java.io.File;
@@ -42,6 +43,7 @@ public class SavePresentationTask extends Task<Void> {
     private final File archiveFile;
 
     public SavePresentationTask(final PresentationViewController presentation, final File archiveFile) {
+        ((SimpleStringProperty) this.titleProperty()).set(String.format("Saving presentation: %1$s", archiveFile.getName()));
         this.presentation = presentation;
         this.archiveFile = archiveFile;
     }

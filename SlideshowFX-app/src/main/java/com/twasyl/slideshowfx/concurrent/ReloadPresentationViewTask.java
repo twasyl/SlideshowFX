@@ -18,6 +18,7 @@ package com.twasyl.slideshowfx.concurrent;
 
 import com.twasyl.slideshowfx.controllers.PresentationViewController;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 
 import java.util.logging.Level;
@@ -37,6 +38,7 @@ public class ReloadPresentationViewTask extends Task<Void> {
     private final PresentationViewController presentationView;
 
     public ReloadPresentationViewTask(final PresentationViewController presentationView) {
+        ((SimpleStringProperty) this.titleProperty()).set("Reloading the presentation");
         this.presentationView = presentationView;
     }
 

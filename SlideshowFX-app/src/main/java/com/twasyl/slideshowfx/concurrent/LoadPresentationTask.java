@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.concurrent;
 
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 
 import java.io.File;
@@ -38,6 +39,7 @@ public class LoadPresentationTask extends Task<PresentationEngine> {
     private File dataFile;
 
     public LoadPresentationTask(File dataFile) {
+        ((SimpleStringProperty) this.titleProperty()).set(String.format("Loading presentation: %1$s", dataFile.getName()));
         this.dataFile = dataFile;
     }
 

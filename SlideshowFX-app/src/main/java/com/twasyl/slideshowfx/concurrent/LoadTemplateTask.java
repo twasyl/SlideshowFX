@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.concurrent;
 
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 
 import java.io.File;
@@ -39,6 +40,7 @@ public class LoadTemplateTask extends Task<PresentationEngine> {
     private File dataFile;
 
     public LoadTemplateTask(File dataFile) {
+        ((SimpleStringProperty) this.titleProperty()).set(String.format("Loading template: %1$s", dataFile.getName()));
         this.dataFile = dataFile;
     }
 

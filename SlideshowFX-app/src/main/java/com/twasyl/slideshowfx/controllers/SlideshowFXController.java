@@ -21,9 +21,9 @@ import com.twasyl.slideshowfx.beans.properties.PresentationModifiedBinding;
 import com.twasyl.slideshowfx.concurrent.*;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
-import com.twasyl.slideshowfx.controls.TaskProgressIndicator;
 import com.twasyl.slideshowfx.controls.TextFieldCheckMenuItem;
 import com.twasyl.slideshowfx.controls.Tour;
+import com.twasyl.slideshowfx.controls.notification.NotificationCenter;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
@@ -167,7 +167,7 @@ public class SlideshowFXController implements Initializable {
     @FXML private Menu downloadersMenu;
 
     /* Notification center */
-    @FXML private TaskProgressIndicator taskInProgress;
+    @FXML private NotificationCenter taskInProgress;
 
     /* List of controls */
     @FXML private ObservableList<Object> saveElementsGroup;

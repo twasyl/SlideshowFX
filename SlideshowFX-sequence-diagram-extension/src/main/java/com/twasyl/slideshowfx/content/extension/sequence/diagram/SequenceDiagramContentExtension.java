@@ -16,9 +16,9 @@
 
 package com.twasyl.slideshowfx.content.extension.sequence.diagram;
 
-import com.twasyl.slideshowfx.content.extension.sequence.diagram.controllers.SequenceDiagramContentExtensionController;
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.ResourceType;
+import com.twasyl.slideshowfx.content.extension.sequence.diagram.controllers.SequenceDiagramContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
 import javafx.fxml.FXMLLoader;

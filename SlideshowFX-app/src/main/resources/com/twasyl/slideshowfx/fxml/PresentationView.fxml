@@ -17,6 +17,7 @@
   -->
 
 <?import com.twasyl.slideshowfx.controls.SlideContentEditor?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -25,7 +26,6 @@
 <?import javafx.scene.web.WebView?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
 <SplitPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.PresentationViewController">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />

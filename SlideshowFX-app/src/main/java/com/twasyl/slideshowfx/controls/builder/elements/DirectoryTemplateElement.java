@@ -18,8 +18,6 @@ package com.twasyl.slideshowfx.controls.builder.elements;
 
 import javafx.stage.DirectoryChooser;
 
-import java.io.File;
-
 /**
  * The DirectoryTemplateElement allows to choose a directory as value.
  * It extends {@link com.twasyl.slideshowfx.controls.builder.elements.FileTemplateElement}.

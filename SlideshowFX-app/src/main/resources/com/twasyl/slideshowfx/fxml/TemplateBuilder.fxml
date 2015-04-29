@@ -18,14 +18,12 @@
 
 <?import com.twasyl.slideshowfx.controls.builder.labels.*?>
 <?import com.twasyl.slideshowfx.controls.tree.TemplateTreeView?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import de.jensd.fx.glyphs.GlyphsStack?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
-<?import de.jensd.fx.glyphs.GlyphsStack?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.TemplateBuilderController"
         prefHeight="700" prefWidth="1024">
     <stylesheets>

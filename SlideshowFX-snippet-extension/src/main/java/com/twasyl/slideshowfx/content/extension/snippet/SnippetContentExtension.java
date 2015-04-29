@@ -20,7 +20,6 @@ import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.snippet.controllers.SnippetContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
-import com.twasyl.slideshowfx.utils.ResourceHelper;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;

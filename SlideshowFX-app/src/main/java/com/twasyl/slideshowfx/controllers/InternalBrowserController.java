@@ -19,7 +19,6 @@ package com.twasyl.slideshowfx.controllers;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.ListBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

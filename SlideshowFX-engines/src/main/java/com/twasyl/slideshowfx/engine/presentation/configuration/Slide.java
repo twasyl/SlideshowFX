@@ -17,20 +17,12 @@
 package com.twasyl.slideshowfx.engine.presentation.configuration;
 
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
-import com.twasyl.slideshowfx.utils.TemplateProcessor;
-import com.twasyl.slideshowfx.utils.beans.Pair;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import javafx.scene.image.Image;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.*;
-import java.util.logging.Level;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * Represents a slide of the presentation. The slide is composed of:

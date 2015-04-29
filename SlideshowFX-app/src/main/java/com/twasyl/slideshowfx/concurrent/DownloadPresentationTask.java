@@ -18,6 +18,7 @@ package com.twasyl.slideshowfx.concurrent;
 
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 
 import java.io.File;
@@ -42,6 +43,7 @@ public class DownloadPresentationTask extends Task<File> {
     private File destination;
 
     public DownloadPresentationTask(IHostingConnector hostingConnector, File destination, RemoteFile file) {
+        ((SimpleStringProperty) this.titleProperty()).set(String.format("Downloading presentation from %1$s: %2$s", hostingConnector.getName(), file.getName()));
         this.hostingConnector = hostingConnector;
         this.destination = destination;
         this.file = file;

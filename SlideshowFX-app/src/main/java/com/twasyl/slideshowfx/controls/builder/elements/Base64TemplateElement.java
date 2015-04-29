@@ -18,10 +18,8 @@ package com.twasyl.slideshowfx.controls.builder.elements;
 
 import javafx.scene.control.TextField;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**

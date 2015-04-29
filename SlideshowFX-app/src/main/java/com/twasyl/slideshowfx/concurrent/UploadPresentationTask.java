@@ -21,6 +21,7 @@ import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.utils.DialogHelper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 import javafx.scene.control.ButtonType;
 
@@ -47,6 +48,7 @@ public class UploadPresentationTask extends Task<Void> {
     private RemoteFile destination;
 
     public UploadPresentationTask(PresentationEngine engine, IHostingConnector hostingConnector, RemoteFile destination) {
+        ((SimpleStringProperty) this.titleProperty()).set(String.format("uploading presentation to %1$s: %2$s", hostingConnector.getName(), engine.getArchive().getName()));
         this.engine = engine;
         this.hostingConnector = hostingConnector;
         this.destination = destination;

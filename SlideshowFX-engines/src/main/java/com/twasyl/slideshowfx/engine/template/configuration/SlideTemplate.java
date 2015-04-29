@@ -21,7 +21,6 @@ import com.twasyl.slideshowfx.engine.template.DynamicAttribute;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Represents a slide defined by the template.

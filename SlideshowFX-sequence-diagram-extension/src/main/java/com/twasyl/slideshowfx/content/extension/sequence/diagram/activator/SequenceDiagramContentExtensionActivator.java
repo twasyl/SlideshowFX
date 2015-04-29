@@ -16,8 +16,8 @@
 
 package com.twasyl.slideshowfx.content.extension.sequence.diagram.activator;
 
-import com.twasyl.slideshowfx.content.extension.sequence.diagram.SequenceDiagramContentExtension;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
+import com.twasyl.slideshowfx.content.extension.sequence.diagram.SequenceDiagramContentExtension;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 

@@ -25,7 +25,6 @@ import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElement;
 import com.twasyl.slideshowfx.engine.template.DynamicAttribute;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
-import com.twasyl.slideshowfx.engine.template.configuration.SlideElementTemplate;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
 import com.twasyl.slideshowfx.utils.*;

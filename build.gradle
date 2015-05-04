@@ -46,7 +46,11 @@ allprojects {
     }
 
     configurations {
-        asciidoctorj {}
+        asciidoctorj {
+            resolutionStrategy {
+                force 'org.jruby:jruby-complete:1.7.19'
+            }
+        }
         drive
         dropbox
         felix

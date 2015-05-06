@@ -104,7 +104,6 @@ subprojects {
     }
 }
 
-
 apply plugin: 'org.asciidoctor.convert'
 
 asciidoctorj {
@@ -287,5 +286,5 @@ task packageSlideshowFX(dependsOn : [ 'clean',
 }
 
 wrapper {
-    gradleVersion = '2.3'
+    gradleVersion = '2.4'
 }

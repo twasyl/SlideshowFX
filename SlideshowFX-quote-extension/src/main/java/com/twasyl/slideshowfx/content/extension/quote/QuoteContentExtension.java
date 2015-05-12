@@ -19,7 +19,7 @@ package com.twasyl.slideshowfx.content.extension.quote;
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.quote.controllers.QuoteContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 
@@ -44,7 +44,7 @@ public class QuoteContentExtension extends AbstractContentExtension {
 
     public QuoteContentExtension() {
         super("QUOTE", null,
-                FontAwesomeIcons.QUOTE_LEFT,
+                FontAwesomeIcon.QUOTE_LEFT,
                 "Insert a quote",
                 "Insert a quote");
     }

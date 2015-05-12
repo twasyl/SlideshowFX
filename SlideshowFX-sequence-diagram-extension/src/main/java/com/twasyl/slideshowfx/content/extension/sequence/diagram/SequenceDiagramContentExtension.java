@@ -20,7 +20,7 @@ import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.sequence.diagram.controllers.SequenceDiagramContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 
@@ -45,7 +45,7 @@ public class SequenceDiagramContentExtension extends AbstractContentExtension {
     public SequenceDiagramContentExtension() {
         super("SEQUENCE_DIAGRAM",
                 SequenceDiagramContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/sequence/diagram/resources/jumly.zip"),
-                FontAwesomeIcons.SHARE_ALT_SQUARE,
+                FontAwesomeIcon.SHARE_ALT_SQUARE,
                 "Insert a sequence diagram",
                 "Insert a sequence diagram");
 

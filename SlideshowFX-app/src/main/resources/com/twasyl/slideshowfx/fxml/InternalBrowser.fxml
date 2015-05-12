@@ -16,7 +16,7 @@
   ~ limitations under the License.
   -->
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
@@ -38,7 +38,7 @@
         <HBox fx:id="addressPanel" alignment="BASELINE_CENTER">
             <Button fx:id="previousPage" onAction="#navigateToPreviousPage">
                 <graphic>
-                    <FontAwesomeIcon glyphName="CHEVRON_LEFT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                    <FontAwesomeIconView glyphName="CHEVRON_LEFT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
                 </graphic>
             </Button>
 
@@ -47,7 +47,7 @@
 
             <Button fx:id="nextPage" onAction="#navigateToNextPage">
                 <graphic>
-                    <FontAwesomeIcon glyphName="CHEVRON_RIGHT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                    <FontAwesomeIconView glyphName="CHEVRON_RIGHT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
                 </graphic>
             </Button>
         </HBox>

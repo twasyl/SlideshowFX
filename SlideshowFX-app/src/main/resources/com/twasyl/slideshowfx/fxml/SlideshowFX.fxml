@@ -55,7 +55,7 @@
                 <Tooltip text="Open presentation" />
             </tooltip>
             <graphic>
-                <FontAwesomeIcon glyphName="FOLDER_OPEN" glyphSize="$TOOLBAR_ICON_WIDTH"
+                <FontAwesomeIconView glyphName="FOLDER_OPEN" glyphSize="$TOOLBAR_ICON_WIDTH"
                                  glyphStyle="-fx-fill: #FF8000"/>
             </graphic>
         </Button>
@@ -65,7 +65,7 @@
                 <Tooltip text="Save" />
             </tooltip>
             <graphic>
-                <FontAwesomeIcon glyphName="FLOPPY_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                <FontAwesomeIconView glyphName="FLOPPY_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
             </graphic>
             <items>
                 <MenuItem text="Save as ..." onAction="#saveAs" />
@@ -77,7 +77,7 @@
                 <Tooltip text="Print" />
             </tooltip>
             <graphic>
-                <FontAwesomeIcon glyphName="PRINT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                <FontAwesomeIconView glyphName="PRINT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
             </graphic>
         </Button>
 
@@ -87,8 +87,8 @@
             </tooltip>
             <graphic>
                 <GlyphsStack>
-                    <FontAwesomeIcon glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white;" />
-                    <FontAwesomeIcon glyphName="PLUS" glyphSize="15" glyphStyle="-fx-fill: app-color-orange;" StackPane.alignment="BOTTOM_CENTER" />
+                    <FontAwesomeIconView glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white;" />
+                    <FontAwesomeIconView glyphName="PLUS" glyphSize="15" glyphStyle="-fx-fill: app-color-orange;" StackPane.alignment="BOTTOM_CENTER" />
                 </GlyphsStack>
             </graphic>
         </SplitMenuButton>
@@ -98,7 +98,7 @@
                 <Tooltip text="Copy slide" />
             </tooltip>
             <graphic>
-                <FontAwesomeIcon glyphName="FILES_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange;" />
+                <FontAwesomeIconView glyphName="FILES_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange;" />
             </graphic>
         </Button>
 
@@ -108,8 +108,8 @@
             </tooltip>
             <graphic>
                 <GlyphsStack>
-                    <FontAwesomeIcon glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white" />
-                    <FontAwesomeIcon glyphName="ARROW_RIGHT" glyphSize="15" glyphStyle="-fx-fill: app-color-orange" StackPane.alignment="BOTTOM_CENTER" />
+                    <FontAwesomeIconView glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white" />
+                    <FontAwesomeIconView glyphName="ARROW_RIGHT" glyphSize="15" glyphStyle="-fx-fill: app-color-orange" StackPane.alignment="BOTTOM_CENTER" />
                 </GlyphsStack>
             </graphic>
         </SplitMenuButton>
@@ -120,8 +120,8 @@
             </tooltip>
             <graphic>
                 <GlyphsStack>
-                    <FontAwesomeIcon glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white" />
-                    <FontAwesomeIcon glyphName="TIMES" glyphSize="15" glyphStyle="-fx-fill: app-color-orange" StackPane.alignment="BOTTOM_CENTER" />
+                    <FontAwesomeIconView glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white" />
+                    <FontAwesomeIconView glyphName="TIMES" glyphSize="15" glyphStyle="-fx-fill: app-color-orange" StackPane.alignment="BOTTOM_CENTER" />
                 </GlyphsStack>
             </graphic>
         </Button>
@@ -131,7 +131,7 @@
                 <Tooltip text="Reload" />
             </tooltip>
             <graphic>
-                <FontAwesomeIcon glyphName="REFRESH" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                <FontAwesomeIconView glyphName="REFRESH" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
             </graphic>
         </Button>
 
@@ -140,7 +140,7 @@
                 <Tooltip text="Slideshow" />
             </tooltip>
             <graphic>
-                <FontAwesomeIcon glyphName="DESKTOP" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                <FontAwesomeIconView glyphName="DESKTOP" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
             </graphic>
             <items>
                 <MenuItem text="Slideshow from current slide" onAction="#slideshowFromCurrentSlide" />
@@ -238,8 +238,8 @@
                     </tooltip>
                     <graphic>
                         <GlyphsStack>
-                            <FontAwesomeIcon glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white" />
-                            <FontAwesomeIcon glyphName="COG" glyphSize="10" glyphStyle="-fx-fill: app-color-orange" StackPane.alignment="TOP_RIGHT" />
+                            <FontAwesomeIconView glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white" />
+                            <FontAwesomeIconView glyphName="COG" glyphSize="10" glyphStyle="-fx-fill: app-color-orange" StackPane.alignment="TOP_RIGHT" />
                         </GlyphsStack>
                     </graphic>
                 </Button>
@@ -271,13 +271,13 @@
                         <Tooltip text="LeapMotion controller" />
                     </tooltip>
                     <graphic>
-                        <FontAwesomeIcon glyphName="HAND_ALT_UP" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                        <FontAwesomeIconView glyphName="HAND_ALT_UP" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
                     </graphic>
                 </CheckBox>
 
                 <Separator />
 
-                <FontAwesomeIcon glyphName="COMMENTS_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                <FontAwesomeIconView glyphName="COMMENTS_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
 
                 <ComboBox  promptText="IP address" fx:id="chatIpAddress">
                     <items>
@@ -287,13 +287,13 @@
 
                 <TextField prefColumnCount="3" promptText="Port" fx:id="chatPort" onKeyPressed="#startChatByKeyPressed" />
 
-                <FontAwesomeIcon glyphName="TWITTER" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                <FontAwesomeIconView glyphName="TWITTER" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
 
                 <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" onKeyPressed="#startChatByKeyPressed" />
 
                 <Button onAction="#startChatByButton" fx:id="startChatButton" styleClass="image">
                     <graphic>
-                        <FontAwesomeIcon glyphName="PLAY" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: green" />
+                        <FontAwesomeIconView glyphName="PLAY" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: green" />
                     </graphic>
                 </Button>
             </ToolBar>

@@ -19,9 +19,8 @@ package com.twasyl.slideshowfx.controls.notification;
 import com.twasyl.slideshowfx.beans.properties.TaskStatusGlyphNameBinding;
 import com.twasyl.slideshowfx.beans.properties.TaskStatusGlyphStyleBinding;
 import com.twasyl.slideshowfx.beans.properties.TaskStatusTimeBinding;
-import de.jensd.fx.glyphs.GlyphIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
@@ -58,13 +57,12 @@ public class Notification extends MenuItem {
         final TextFlow statusFlow = new TextFlow(taskTitle, new Text("\n"), statusChangeTime);
         statusFlow.setMaxWidth(250);
 
-        final GlyphIcon<FontAwesomeIcons> statusButton = new FontAwesomeIcon();
+        final FontAwesomeIconView statusButton = new FontAwesomeIconView();
         statusButton.glyphNameProperty().bind(new TaskStatusGlyphNameBinding(task));
         statusButton.glyphStyleProperty().bind(new TaskStatusGlyphStyleBinding(task));
         statusButton.setGlyphSize(20);
 
-        final GlyphIcon<FontAwesomeIcons> deleteIcon = new FontAwesomeIcon();
-        deleteIcon.setGlyphName(FontAwesomeIcons.TIMES.name());
+        final FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TIMES);
         deleteIcon.setGlyphSize(10);
 
         final Button deleteButton = new Button();

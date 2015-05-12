@@ -19,7 +19,7 @@ package com.twasyl.slideshowfx.content.extension.image;
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.image.controllers.ImageContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 
@@ -43,7 +43,7 @@ public class ImageContentExtension extends AbstractContentExtension {
 
     public ImageContentExtension() {
         super("IMAGE", null,
-                FontAwesomeIcons.PICTURE_ALT,
+                FontAwesomeIcon.PICTURE_ALT,
                 "Insert an image",
                 "Insert an image");
     }

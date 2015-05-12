@@ -16,7 +16,7 @@
 
 package com.twasyl.slideshowfx.beans.properties;
 
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -24,7 +24,7 @@ import javafx.concurrent.Task;
 
 /**
  * This bindings converts the status of a given {@link Task} to the name of a glyph used by FontAwesomeFX. The name
- * returned belongs to the {@link FontAwesomeIcons} enum.
+ * returned belongs to the {@link FontAwesomeIcon} enum.
  *
  * @author Thierry Wasylczenko
  * @version 1.0
@@ -49,12 +49,12 @@ public class TaskStatusGlyphNameBinding extends StringBinding {
             case SCHEDULED:
             case READY:
             case RUNNING:
-                return FontAwesomeIcons.SPINNER.name();
+                return FontAwesomeIcon.SPINNER.name();
             case CANCELLED:
             case FAILED:
-                return FontAwesomeIcons.EXCLAMATION_CIRCLE.name();
+                return FontAwesomeIcon.EXCLAMATION_CIRCLE.name();
             case SUCCEEDED:
-                return FontAwesomeIcons.CHECK_CIRCLE.name();
+                return FontAwesomeIcon.CHECK_CIRCLE.name();
         }
 
         return null;

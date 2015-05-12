@@ -20,14 +20,13 @@ import com.twasyl.slideshowfx.beans.quizz.Answer;
 import com.twasyl.slideshowfx.beans.quizz.Question;
 import com.twasyl.slideshowfx.beans.quizz.Quizz;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
-import com.twasyl.slideshowfx.utils.ResourceHelper;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -62,7 +61,9 @@ public class QuizzCreatorPanel extends BorderPane {
         // Initialize the UI
         this.addAnswer();
 
-        final ImageView icon = new ImageView(new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/quizz.png")));
+        final FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.QUESTION);
+        icon.setGlyphSize(25);
+        icon.setGlyphStyle("-fx-fill: app-color-orange");
 
         final TextArea questionText = new TextArea();
         questionText.setPromptText("Question ?");
@@ -72,7 +73,11 @@ public class QuizzCreatorPanel extends BorderPane {
         questionText.setTooltip(new Tooltip("Enter the text of the question"));
         questionText.textProperty().bindBidirectional(this.quizz.get().getQuestion().textProperty());
 
-        this.addAnswer.setGraphic(new ImageView(new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/add_button.png"), 15, 15, true, true)));
+        final FontAwesomeIconView addAnswerIcon = new FontAwesomeIconView(FontAwesomeIcon.PLUS_SQUARE);
+        addAnswerIcon.setGlyphSize(20);
+        addAnswerIcon.setGlyphStyle("-fx-fill: white");
+
+        this.addAnswer.setGraphic(addAnswerIcon);
         this.addAnswer.getStyleClass().add("image");
         this.addAnswer.setTooltip(new Tooltip("Add an answer to this quizz"));
         this.addAnswer.setOnAction(event -> this.addAnswer());

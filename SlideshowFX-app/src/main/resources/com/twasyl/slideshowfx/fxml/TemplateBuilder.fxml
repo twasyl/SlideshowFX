@@ -40,7 +40,7 @@
         <ToolBar>
             <SplitMenuButton fx:id="buildButton" onAction="#buildTemplateArchive">
                 <graphic>
-                    <FontAwesomeIcon glyphName="ARCHIVE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange;" />
+                    <FontAwesomeIconView glyphName="ARCHIVE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange;" />
                 </graphic>
                 <tooltip>
                     <Tooltip text="Build template archive" />
@@ -52,7 +52,7 @@
 
             <SplitMenuButton fx:id="saveButton" onAction="#saveCurrentFile">
                 <graphic>
-                    <FontAwesomeIcon glyphName="FLOPPY_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                    <FontAwesomeIconView glyphName="FLOPPY_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
                 </graphic>
                 <tooltip>
                     <Tooltip text="Save" />
@@ -67,8 +67,8 @@
             <SplitMenuButton fx:id="addFileButton" onAction="#addFileToTreeView">
                 <graphic>
                     <GlyphsStack>
-                        <FontAwesomeIcon glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white;" />
-                        <FontAwesomeIcon glyphName="PLUS" glyphSize="15" glyphStyle="-fx-fill: app-color-orange;" StackPane.alignment="BOTTOM_CENTER" />
+                        <FontAwesomeIconView glyphName="FILE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white;" />
+                        <FontAwesomeIconView glyphName="PLUS" glyphSize="15" glyphStyle="-fx-fill: app-color-orange;" StackPane.alignment="BOTTOM_CENTER" />
                     </GlyphsStack>
                 </graphic>
                 <tooltip>
@@ -82,8 +82,8 @@
             <SplitMenuButton fx:id="addFolderButton" onAction="#addFolderToTreeView">
                 <graphic>
                     <GlyphsStack>
-                        <FontAwesomeIcon glyphName="FOLDER" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white;" />
-                        <FontAwesomeIcon glyphName="PLUS" glyphSize="13" glyphStyle="-fx-fill: app-color-orange;" StackPane.alignment="CENTER" />
+                        <FontAwesomeIconView glyphName="FOLDER" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: white;" />
+                        <FontAwesomeIconView glyphName="PLUS" glyphSize="13" glyphStyle="-fx-fill: app-color-orange;" StackPane.alignment="CENTER" />
                     </GlyphsStack>
                 </graphic>
                 <tooltip>
@@ -99,7 +99,7 @@
                     <Tooltip text="Delete selection" />
                 </tooltip>
                 <graphic>
-                    <FontAwesomeIcon glyphName="TIMES_CIRCLE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                    <FontAwesomeIconView glyphName="TIMES_CIRCLE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
                 </graphic>
             </Button>
         </ToolBar>

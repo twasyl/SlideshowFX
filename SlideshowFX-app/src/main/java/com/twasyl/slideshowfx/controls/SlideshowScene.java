@@ -25,9 +25,8 @@ import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
-import de.jensd.fx.glyphs.GlyphIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
@@ -125,18 +124,15 @@ public class SlideshowScene extends Scene {
        if(SlideshowFXServer.getSingleton() != null) {
            this.initializeChatPanel();
 
-           final GlyphIcon<FontAwesomeIcons> qrCodeIcon = new FontAwesomeIcon();
-           qrCodeIcon.setGlyphName(FontAwesomeIcons.QRCODE.name());
+           final FontAwesomeIconView qrCodeIcon = new FontAwesomeIconView(FontAwesomeIcon.QRCODE);
            qrCodeIcon.setGlyphSize(32);
            qrCodeIcon.setGlyphStyle("-fx-fill: app-color-orange");
 
-           final GlyphIcon<FontAwesomeIcons> chatIcon = new FontAwesomeIcon();
-           chatIcon.setGlyphName(FontAwesomeIcons.COMMENTS_ALT.name());
+           final FontAwesomeIconView chatIcon = new FontAwesomeIconView(FontAwesomeIcon.COMMENTS_ALT);
            chatIcon.setGlyphSize(32);
            chatIcon.setGlyphStyle("-fx-fill: app-color-orange");
 
-           final GlyphIcon<FontAwesomeIcons> quizzIcon = new FontAwesomeIcon();
-           quizzIcon.setGlyphName(FontAwesomeIcons.QUESTION.name());
+           final FontAwesomeIconView quizzIcon = new FontAwesomeIconView(FontAwesomeIcon.QUESTION);
            quizzIcon.setGlyphSize(32);
            quizzIcon.setGlyphStyle("-fx-fill: app-color-orange");
 

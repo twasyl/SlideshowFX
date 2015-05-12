@@ -18,9 +18,8 @@ package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
-import de.jensd.fx.glyphs.GlyphIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
@@ -294,8 +293,7 @@ public class Tour extends StackPane {
      * @return The Node for displaying the reload screen.
      */
     private Node getReloadNode() {
-        final GlyphIcon<FontAwesomeIcons> reloadIcon = new FontAwesomeIcon();
-        reloadIcon.setGlyphName(FontAwesomeIcons.REFRESH.name());
+        final FontAwesomeIconView reloadIcon = new FontAwesomeIconView(FontAwesomeIcon.REFRESH);
         reloadIcon.setGlyphSize(48);
         reloadIcon.setGlyphStyle("-fx-fill: white");
 

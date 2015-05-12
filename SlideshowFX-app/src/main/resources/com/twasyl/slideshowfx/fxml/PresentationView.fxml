@@ -17,7 +17,7 @@
   -->
 
 <?import com.twasyl.slideshowfx.controls.SlideContentEditor?>
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -43,7 +43,7 @@
                     <Tooltip text="Insert a quizz" />
                 </tooltip>
                 <graphic>
-                    <FontAwesomeIcon glyphName="QUESTION" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                    <FontAwesomeIconView glyphName="QUESTION" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
                 </graphic>
             </Button>
             <Button onAction="#definePresentationVariables" styleClass="image">

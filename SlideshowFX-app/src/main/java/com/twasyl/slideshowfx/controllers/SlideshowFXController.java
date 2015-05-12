@@ -41,7 +41,7 @@ import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.DisableAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.EnableAction;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.beans.binding.StringExpression;
 import javafx.beans.property.SimpleStringProperty;
@@ -894,13 +894,12 @@ public class SlideshowFXController implements Initializable {
      * If no text is entered for the IP address and the port number, the IP address of the computer is used and the port 80 is chosen.
      */
     private void startChat() {
-        FontAwesomeIcon icon;
+        FontAwesomeIconView icon;
 
         if (SlideshowFXServer.getSingleton() != null) {
             SlideshowFXServer.getSingleton().stop();
 
-            icon = new FontAwesomeIcon();
-            icon.setGlyphName(FontAwesomeIcons.PLAY.name());
+            icon = new FontAwesomeIconView(FontAwesomeIcon.PLAY);
             icon.setGlyphSize(20);
             icon.setGlyphStyle("-fx-fill: green");
         } else {
@@ -923,8 +922,7 @@ public class SlideshowFXController implements Initializable {
 
             new SlideshowFXServer(ip, port, this.twitterHashtag.getText());
 
-            icon = new FontAwesomeIcon();
-            icon.setGlyphName(FontAwesomeIcons.POWER_OFF.name());
+            icon = new FontAwesomeIconView(FontAwesomeIcon.POWER_OFF);
             icon.setGlyphSize(20);
             icon.setGlyphStyle("-fx-fill: app-color-orange");
         }

@@ -2,10 +2,9 @@ package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.engine.presentation.configuration.PresentationConfiguration;
 import com.twasyl.slideshowfx.utils.beans.Pair;
-import de.jensd.fx.glyphs.GlyphIcon;
 import de.jensd.fx.glyphs.GlyphsStack;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcons;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -34,13 +33,11 @@ public class PresentationVariablesPanel extends BorderPane {
 
         this.variablesScrollPane.setPrefSize(500, 500);
 
-        final GlyphIcon<FontAwesomeIcons> backgroundIcon = new FontAwesomeIcon();
-        backgroundIcon.setGlyphName(FontAwesomeIcons.PLUS_SQUARE.name());
+        final FontAwesomeIconView backgroundIcon = new FontAwesomeIconView(FontAwesomeIcon.PLUS_SQUARE);
         backgroundIcon.setGlyphSize(20);
         backgroundIcon.setGlyphStyle("-fx-fill: white");
 
-        final GlyphIcon<FontAwesomeIcons> plusIcon = new FontAwesomeIcon();
-        plusIcon.setGlyphName(FontAwesomeIcons.PLUS.name());
+        final FontAwesomeIconView plusIcon = new FontAwesomeIconView(FontAwesomeIcon.PLUS);
         plusIcon.setGlyphSize(15);
         plusIcon.setGlyphStyle("-fx-fill: app-color-orange");
 
@@ -85,8 +82,7 @@ public class PresentationVariablesPanel extends BorderPane {
         variableValue.setPrefColumnCount(15);
         variableValue.textProperty().bindBidirectional(variable.valueProperty());
 
-        final GlyphIcon<FontAwesomeIcons> icon = new FontAwesomeIcon();
-        icon.setGlyphName(FontAwesomeIcons.TIMES_CIRCLE.name());
+        final FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE);
         icon.setGlyphSize(20);
         icon.setGlyphStyle("-fx-fill: app-color-orange");
 

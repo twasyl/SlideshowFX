@@ -34,7 +34,7 @@ import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.beans.Pair;
 import com.twasyl.slideshowfx.utils.beans.binding.FilenameBinding;
 import de.jensd.fx.glyphs.GlyphIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -349,7 +349,7 @@ public class PresentationViewController implements Initializable {
         button.setTooltip(new Tooltip(contentExtension.getToolTip()));
         button.getStyleClass().add("image");
 
-        final GlyphIcon icon = new FontAwesomeIcon();
+        final GlyphIcon icon = new FontAwesomeIconView();
         icon.setGlyphName(contentExtension.getIcon().name());
         icon.setGlyphSize(20);
         icon.setGlyphStyle("-fx-fill: app-color-orange;");
@@ -658,7 +658,7 @@ public class PresentationViewController implements Initializable {
      * @return The file representing the working directory of this presentation.
      */
     public File getWorkingDirectory() {
-        return this.presentationEngine.getConfiguration().getPresentationFile();
+        return this.presentationEngine.getWorkingDirectory();
     }
 
     /**

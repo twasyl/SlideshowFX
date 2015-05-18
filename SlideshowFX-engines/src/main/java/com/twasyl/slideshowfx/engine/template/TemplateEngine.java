@@ -75,6 +75,9 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
         templateConfiguration.setJsObject(templateJson.getString("js-object"));
         LOGGER.fine("[Template configuration] jsObject = " + templateConfiguration.getJsObject());
 
+        templateConfiguration.setSfxServerObject("sfxServer");
+        LOGGER.fine("[Template configuration] server object = " + templateConfiguration.getSfxServerObject());
+
         templateConfiguration.setResourcesDirectory(new File(getWorkingDirectory(), templateJson.getString("resources-directory")));
         LOGGER.fine("[Template configuration] resources-directory = " + templateConfiguration.getResourcesDirectory().getAbsolutePath());
 
@@ -83,6 +86,15 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
 
         templateConfiguration.setGetCurrentSlideMethod("slideshowFXGetCurrentSlide");
         LOGGER.fine("[Template configuration] content definer method = " + templateConfiguration.getGetCurrentSlideMethod());
+
+        templateConfiguration.setGotoSlideMethod("slideshowFXGotoSlide");
+        LOGGER.fine("[Template configuration] goto slide method = " + templateConfiguration.getGotoSlideMethod());
+
+        templateConfiguration.setUpdateCodeSnippetConsoleMethod("updateCodeSnippetConsole");
+        LOGGER.fine("[Template configuration] update code snippet console method = " + templateConfiguration.getUpdateCodeSnippetConsoleMethod());
+
+        templateConfiguration.setLeapMotionMethod("slideshowFXLeap");
+        LOGGER.fine("[Template configuration] content definer method = " + templateConfiguration.getLeapMotionMethod());
 
         // Settings the default variables
         templateConfiguration.setDefaultVariables(new HashSet<>());

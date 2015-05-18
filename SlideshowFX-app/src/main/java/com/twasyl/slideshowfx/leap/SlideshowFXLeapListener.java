@@ -17,7 +17,7 @@
 package com.twasyl.slideshowfx.leap;
 
 import com.leapmotion.leap.*;
-import com.twasyl.slideshowfx.controls.SlideshowScene;
+import com.twasyl.slideshowfx.controls.slideshow.SlideshowPane;
 import javafx.scene.input.KeyCode;
 
 import java.util.Iterator;
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 /**
  * This class is used the LeapMotion listener for controlling the slideshow. It has to be created using a
- * {@link com.twasyl.slideshowfx.controls.SlideshowScene} instance with which LeapMotion will interact.
+ * {@link SlideshowPane} instance with which LeapMotion will interact.
  *
  * @author Thierry Wasylczenko
  * @version 1.0
@@ -35,7 +35,7 @@ public class SlideshowFXLeapListener extends Listener {
 
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXLeapListener.class.getName());
 
-    private final SlideshowScene scene;
+    private final SlideshowPane scene;
 
     /**
      * When performing a gesture, indicates the maximum angle from the X axis the gesture's direction could have.
@@ -50,13 +50,13 @@ public class SlideshowFXLeapListener extends Listener {
     private SwipeGesture lastSwipeGesture;
 
     /**
-     * Creates a LeapMotion listener that will apply on a SlideshowScene. It will be used to change slides, show a pointer
+     * Creates a LeapMotion listener that will apply on a {@link SlideshowPane}. It will be used to change slides, show a pointer
      * and click on the presentation using LeapMotion.
      *
-     * @param scene The scene the listener will work on.
+     * @param scene The âne the listener will work on.
      * @throws java.lang.NullPointerException If the given {@code scene} is null.
      */
-    public SlideshowFXLeapListener(final SlideshowScene scene) {
+    public SlideshowFXLeapListener(final SlideshowPane scene) {
         super();
         this.scene = scene;
     }

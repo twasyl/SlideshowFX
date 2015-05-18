@@ -16,6 +16,7 @@
   ~ limitations under the License.
   -->
 
+<?import com.twasyl.slideshowfx.controls.PresentationBrowser?>
 <?import com.twasyl.slideshowfx.controls.SlideContentEditor?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
@@ -23,7 +24,6 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.web.WebView?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
 <SplitPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.PresentationViewController">
@@ -68,7 +68,7 @@
         <TextField fx:id="fieldName" prefColumnCount="15" />
     </fx:define>
 
-    <WebView fx:id="browser" minWidth="500" />
+    <PresentationBrowser fx:id="browser" minWidth="500" />
 
     <VBox spacing="10" minWidth="400">
         <fx:reference source="contentExtensionToolBar" />

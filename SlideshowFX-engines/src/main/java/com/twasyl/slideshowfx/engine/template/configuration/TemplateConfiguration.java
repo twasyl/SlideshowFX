@@ -39,8 +39,12 @@ public class TemplateConfiguration implements IConfiguration {
     private Set<Pair<String, String>> defaultVariables;
     private List<SlideTemplate> slideTemplates;
     private String contentDefinerMethod;
+    private String updateCodeSnippetConsoleMethod;
+    private String gotoSlideMethod;
+    private String leapMotionMethod;
     private String getCurrentSlideMethod;
     private String jsObject;
+    private String sfxServerObject;
     private File slidesTemplateDirectory;
     private File slidesPresentationDirectory;
     private File slidesThumbnailDirectory;
@@ -72,6 +76,9 @@ public class TemplateConfiguration implements IConfiguration {
     public String getJsObject() { return jsObject; }
     public void setJsObject(String jsObject) { this.jsObject = jsObject; }
 
+    public String getSfxServerObject() { return sfxServerObject; }
+    public void setSfxServerObject(String sfxServerObject) { this.sfxServerObject = sfxServerObject; }
+
     public File getSlidesTemplateDirectory() { return slidesTemplateDirectory; }
     public void setSlidesTemplateDirectory(File slidesTemplateDirectory) { this.slidesTemplateDirectory = slidesTemplateDirectory; }
 
@@ -89,6 +96,15 @@ public class TemplateConfiguration implements IConfiguration {
 
     public String getSlidesContainer() { return slidesContainer; }
     public void setSlidesContainer(String slidesContainer) { this.slidesContainer = slidesContainer; }
+
+    public String getUpdateCodeSnippetConsoleMethod() { return updateCodeSnippetConsoleMethod; }
+    public void setUpdateCodeSnippetConsoleMethod(String updateCodeSnippetConsoleMethod) { this.updateCodeSnippetConsoleMethod = updateCodeSnippetConsoleMethod; }
+
+    public String getGotoSlideMethod() { return gotoSlideMethod; }
+    public void setGotoSlideMethod(String gotoSlideMethod) { this.gotoSlideMethod = gotoSlideMethod; }
+
+    public String getLeapMotionMethod() { return leapMotionMethod; }
+    public void setLeapMotionMethod(String leapMotionMethod) { this.leapMotionMethod = leapMotionMethod; }
 
     public SlideTemplate getSlideTemplate(int slideId) {
         SlideTemplate searchedTemplate = null;

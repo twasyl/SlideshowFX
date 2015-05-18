@@ -104,6 +104,30 @@ public class PresentationConfiguration implements IConfiguration {
     }
 
     /**
+     * Get the first slide of the presentation. If the presentation has no slides, {@code null} is returned.
+     * @return The first slide of the presentation.
+     */
+    public Slide getFirstSlide() {
+        Slide slide = null;
+
+        if(!this.slides.isEmpty()) slide = this.slides.get(0);
+
+        return slide;
+    }
+
+    /**
+     * Get the last slide of the presentation. If the presentation has no slides, {@code null} is returned.
+     * @return The last slide from the presentation.
+     */
+    public Slide getLastSlide() {
+        Slide slide = null;
+
+        if(!this.slides.isEmpty()) slide = this.slides.get(this.slides.size() - 1);
+
+        return slide;
+    }
+
+    /**
      * Update the given {@code slide} in the HTML file. Each {@link SlideElement}
      * of the {@code slide} in the HTML document is updated.
      * If {@link Slide#elements elements}

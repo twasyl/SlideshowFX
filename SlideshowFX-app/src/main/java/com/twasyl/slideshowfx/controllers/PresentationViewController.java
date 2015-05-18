@@ -17,7 +17,12 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
-import com.twasyl.slideshowfx.controls.*;
+import com.twasyl.slideshowfx.controls.PresentationBrowser;
+import com.twasyl.slideshowfx.controls.PresentationVariablesPanel;
+import com.twasyl.slideshowfx.controls.QuizzCreatorPanel;
+import com.twasyl.slideshowfx.controls.SlideContentEditor;
+import com.twasyl.slideshowfx.controls.slideshow.Context;
+import com.twasyl.slideshowfx.controls.slideshow.SlideshowStage;
 import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
@@ -26,7 +31,6 @@ import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
-import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.utils.DialogHelper;
@@ -43,20 +47,13 @@ import javafx.beans.property.adapter.JavaBeanObjectProperty;
 import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.print.PageOrientation;
-import javafx.print.Paper;
-import javafx.print.PrintQuality;
-import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
-import javafx.scene.web.WebView;
-import netscape.javascript.JSObject;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -88,7 +85,7 @@ public class PresentationViewController implements Initializable {
     private final ReadOnlyStringProperty presentationName = new SimpleStringProperty();
     private final ReadOnlyBooleanProperty presentationModified = new SimpleBooleanProperty(false);
 
-    @FXML private WebView browser;
+    @FXML private PresentationBrowser browser;
     @FXML private TextField slideNumber;
     @FXML private TextField fieldName;
     @FXML private HBox markupContentTypeBox;
@@ -189,14 +186,7 @@ public class PresentationViewController implements Initializable {
         // Clear the HTML of any variables
         htmlContent = slideToUpdate.getElement(elementId).getClearedHtmlContent(this.presentationEngine.getConfiguration().getVariables());
 
-        String clearedContent = Base64.getEncoder().encodeToString(htmlContent.getBytes("UTF8"));
-        String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",
-                this.presentationEngine.getTemplateConfiguration().getContentDefinerMethod(),
-                this.slideNumber.getText(),
-                this.fieldName.getText(),
-                clearedContent);
-
-        this.browser.getEngine().executeScript(jsCommand);
+        this.browser.defineContent(this.slideNumber.getText(), this.fieldName.getText(), htmlContent);
 
         // Take a thumbnail of the slide
         WritableImage thumbnail = this.browser.snapshot(null, null);
@@ -288,10 +278,7 @@ public class PresentationViewController implements Initializable {
                                 if (change.wasAdded()) {
                                     change.getAddedSubList()
                                             .stream()
-                                            .forEach(line ->
-                                                            this.browser.getEngine().executeScript(String.format("updateCodeSnippetConsole('%1$s', '%2$s');",
-                                                                    consoleOutputId, Base64.getEncoder().encodeToString(line.getBytes())))
-                                            );
+                                            .forEach(line -> this.browser.updateCodeSnippetConsole(consoleOutputId, line));
                                 }
                             }
                             change.reset();
@@ -484,7 +471,7 @@ public class PresentationViewController implements Initializable {
      * This method refreshed the browser displaying the presentation.
      */
     public void reloadPresentationBrowser() {
-        this.browser.getEngine().reload();
+        this.browser.reload();
     }
 
     /**
@@ -494,9 +481,7 @@ public class PresentationViewController implements Initializable {
     public void loadPresentationInBrowser() {
         if(this.presentationEngine.getConfiguration().getPresentationFile() != null
                 && this.presentationEngine.getConfiguration().getPresentationFile().exists()) {
-            this.browser.getEngine().load(
-                    this.presentationEngine.getConfiguration().getPresentationFile().toURI().toASCIIString()
-            );
+            this.browser.loadPresentation(this.presentationEngine);
         }
     }
 
@@ -574,8 +559,7 @@ public class PresentationViewController implements Initializable {
      * @return The ID of the slide currently displayed or {@code null} if no slide is displayed.
      */
     public String getCurrentSlideId() {
-        final String slideId = (String) this.browser.getEngine().executeScript(this.presentationEngine.getTemplateConfiguration().getGetCurrentSlideMethod() + "();");
-        return slideId;
+        return this.browser.getCurrentSlideId();
     }
 
     /**
@@ -707,27 +691,7 @@ public class PresentationViewController implements Initializable {
      * Print the current presentation.
      */
     public void printPresentation() {
-        PrinterJob job = PrinterJob.createPrinterJob();
-
-        if (job != null) {
-            if (job.showPrintDialog(null)) {
-
-                if(this.presentationEngine.getArchive() != null) {
-                    final String extension = ".".concat(this.presentationEngine.getArchiveExtension());
-                    final int indexOfExtension = this.presentationEngine.getArchive().getName().indexOf(extension);
-                    final String jobName = this.presentationEngine.getArchive().getName().substring(0, indexOfExtension);
-                    job.getJobSettings().setJobName(jobName);
-                }
-
-                job.getJobSettings().setPrintQuality(PrintQuality.HIGH);
-                job.getJobSettings().setPageLayout(job.getPrinter().createPageLayout(Paper.A4, PageOrientation.LANDSCAPE, 0, 0, 0, 0));
-
-                this.browser.getEngine().print(job);
-                job.endJob();
-            } else {
-                job.cancelJob();
-            }
-        }
+        this.browser.print();
     }
 
     /**
@@ -745,8 +709,12 @@ public class PresentationViewController implements Initializable {
                 && this.presentationEngine.getConfiguration().getPresentationFile() != null
                 && this.presentationEngine.getConfiguration().getPresentationFile().exists()) {
 
-            final SlideshowScene scene = new SlideshowScene(this.presentationEngine, fromSlideId);
-            final SlideshowStage stage = new SlideshowStage(scene, leapMotionEnabled);
+            final Context context = new Context();
+            context.setLeapMotionEnabled(leapMotionEnabled);
+            context.setStartAtSlideId(fromSlideId);
+            context.setPresentation(this.presentationEngine);
+
+            final SlideshowStage stage = new SlideshowStage(context);
 
             stage.show();
         }
@@ -767,19 +735,8 @@ public class PresentationViewController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         // Make this controller available to JavaScript
-        this.browser.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
-            if (newState == Worker.State.SUCCEEDED) {
-                if(PresentationViewController.this.presentationEngine != null
-                        && PresentationViewController.this.presentationEngine.getTemplateConfiguration() != null
-                        && PresentationViewController.this.presentationEngine.getTemplateConfiguration().getJsObject() != null) {
-                    JSObject window = (JSObject) browser.getEngine().executeScript("window");
-                    window.setMember(PresentationViewController.this.presentationEngine.getTemplateConfiguration().getJsObject(), PresentationViewController.this);
-                    window.setMember("sfxServer", SlideshowFXServer.getSingleton());
-                }
-            }
-        });
-
-        this.browser.getEngine().setJavaScriptEnabled(true);
+        this.browser.setPresentation(this.presentationEngine);
+        this.browser.setBackend(this);
 
         this.refreshMarkupSyntax();
 

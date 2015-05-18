@@ -16,7 +16,7 @@
 
 package com.twasyl.slideshowfx.server.service;
 
-import com.twasyl.slideshowfx.controls.SlideshowScene;
+import com.twasyl.slideshowfx.controls.slideshow.SlideshowPane;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
@@ -25,7 +25,7 @@ import org.vertx.java.platform.Verticle;
 import java.util.logging.Logger;
 
 /**
- * This class represents the presneter part of the internal SlideshowFX chat.
+ * This class represents the presenter part of the internal SlideshowFX chat.
  *
  * @author Thierry Wasylczenko
  * @version 1.0
@@ -34,22 +34,25 @@ import java.util.logging.Logger;
 public class PresenterChatService extends Verticle {
     private static final Logger LOGGER = Logger.getLogger(PresenterChatService.class.getName());
 
-    private final String httpUrl = "/slideshowfx/chat/presenter";
+    private final String handlerAddress = "slideshowfx.chat.presenter.message.add";
+    private Handler<Message<JsonObject>> messagehandler;
 
     @Override
     public void start() {
-        this.vertx.eventBus().registerHandler("slideshowfx.chat.presenter.message.add", buildMessageHandler());
+        this.messagehandler = buildMessageHandler();
+        this.vertx.eventBus().registerHandler(this.handlerAddress, this.messagehandler);
     }
 
     @Override
     public void stop() {
+        this.vertx.eventBus().unregisterHandler(this.handlerAddress, this.messagehandler);
     }
 
     private Handler<Message<JsonObject>> buildMessageHandler() {
         final Handler<Message<JsonObject>> handler = message -> {
             final JsonObject messageContent = message.body();
 
-            if(SlideshowScene.getSingleton() != null) SlideshowScene.getSingleton().publishMessage(messageContent);
+            if(SlideshowPane.getSingleton() != null) SlideshowPane.getSingleton().publishMessage(messageContent);
 
             message.reply();
         };

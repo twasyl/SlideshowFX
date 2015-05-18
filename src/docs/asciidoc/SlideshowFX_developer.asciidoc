@@ -316,6 +316,33 @@ function slideshowFXGetCurrentSlide() {
 }
 ----
 
+- insert the JavaScript function with the right implementation to go to a specified slide
+
+[source,javascript]
+----
+function slideshowFXGotoSlide(slideId) {
+  // Go to the slide identified by the given ID
+}
+----
+
+- insert the JavaScript function with the right implementation to go to the next slide
+
+[source,javascript]
+----
+function slideshowFXNextSlide() {
+  // Go to the next slide
+}
+----
+
+- insert the JavaScript function with the right implementation to go to the previous slide
+
+[source,javascript]
+----
+function slideshowFXPreviousSlide() {
+  // Go to the previous slide
+}
+----
+
 ==== Slide’s template file
 
 The template of a slide will define what HTML element a slide is. In some frameworks it will be a *section* markup, in others a *div* and so on. In order to create a template, you will have to respect some pre-requisites:

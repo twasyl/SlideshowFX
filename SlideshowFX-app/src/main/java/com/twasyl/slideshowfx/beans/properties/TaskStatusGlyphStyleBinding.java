@@ -51,8 +51,6 @@ public class TaskStatusGlyphStyleBinding extends StringBinding {
             case SCHEDULED:
             case READY:
             case RUNNING:
-                style.append("RGB(60, 63, 63)");
-                break;
             case CANCELLED:
             case FAILED:
                 style.append("app-color-orange");

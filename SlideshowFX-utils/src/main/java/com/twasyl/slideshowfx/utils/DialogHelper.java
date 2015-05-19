@@ -20,7 +20,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.stage.Stage;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -35,7 +34,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class DialogHelper extends Stage {
+public class DialogHelper {
     private static final Logger LOGGER = Logger.getLogger(DialogHelper.class.getName());
 
     /**
@@ -60,6 +59,18 @@ public class DialogHelper extends Stage {
      */
     public static ButtonType showError(final String title, final String text) {
         return displayDialog(buildAlert(Alert.AlertType.ERROR, title, text, ButtonType.OK));
+    }
+
+    /**
+     * Show an error alert with the given {@code title} and {@code content}. The method returns the answer of the user
+     * which can only be {@link javafx.scene.control.ButtonType#OK}.
+     *
+     * @param title The title of the error.
+     * @param content The content of the error.
+     * @return The answer of the user or {@code null} if no answer has been made.
+     */
+    public static ButtonType showError(final String title, final Node content) {
+        return displayDialog(buildAlert(Alert.AlertType.ERROR, title, content, ButtonType.OK));
     }
 
     /**
@@ -101,6 +112,38 @@ public class DialogHelper extends Stage {
             alert.setGraphic(null);
             alert.setHeaderText(null);
             alert.setTitle(title);
+            alert.getDialogPane().getStylesheets().add("/com/twasyl/slideshowfx/css/Default.css");
+            return alert;
+        });
+
+        PlatformHelper.run(future);
+
+        Alert alert = null;
+        try {
+            alert = future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.log(Level.SEVERE, "Can not build an alert", e);
+        }
+
+        return alert;
+    }
+
+    /**
+     * Build an {@link javafx.scene.control.Alert Alert} object. This method ensures the alert is created in a JavaFX
+     * application thread. If the alert can not be created then {@code null} is returned.
+     * @param type The type of alert to create.
+     * @param title The title of the alert.
+     * @param content The content of this alert.
+     * @param buttons The buttons the alert will contain.
+     * @return A well created Alert or {@code null} if an error occurred during the creation of the alert.
+     */
+    private static Alert buildAlert(final Alert.AlertType type, final String title, final Node content, final ButtonType ... buttons) {
+        final FutureTask<Alert> future = new FutureTask<>(() -> {
+            final Alert alert = new Alert(type, null, buttons);
+            alert.setGraphic(null);
+            alert.setHeaderText(null);
+            alert.setTitle(title);
+            alert.getDialogPane().setContent(content);
             alert.getDialogPane().getStylesheets().add("/com/twasyl/slideshowfx/css/Default.css");
             return alert;
         });
@@ -164,10 +207,8 @@ public class DialogHelper extends Stage {
             PlatformHelper.run(future);
             try {
                 response = future.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.log(Level.SEVERE, "Can not show dialog", e);
             }
         }
 

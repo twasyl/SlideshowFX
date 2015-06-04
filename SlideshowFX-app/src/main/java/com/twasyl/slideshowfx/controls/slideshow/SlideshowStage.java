@@ -167,7 +167,6 @@ public class SlideshowStage {
             if (this.context.isLeapMotionEnabled()) {
                 this.controller.removeListener(this.listener);
             }
-            this.slideshowPane.close();
         });
     }
 

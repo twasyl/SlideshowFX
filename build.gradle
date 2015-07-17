@@ -73,13 +73,13 @@ allprojects {
         asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.2'
         drive 'com.google.apis:google-api-services-drive:v2-rev155-1.19.1'
         dropbox 'com.dropbox.core:dropbox-core-sdk:1.7.7'
-        felix 'org.apache.felix:org.apache.felix.framework:4.6.1'
+        felix 'org.apache.felix:org.apache.felix.framework:5.0.1'
         fontawesomefx 'de.jensd:fontawesomefx:8.4'
-        freemarker 'org.freemarker:freemarker:2.3.22'
+        freemarker 'org.freemarker:freemarker:2.3.23'
         jsoup 'org.jsoup:jsoup:1.8.2'
         leapmotion fileTree(dir: allLibs, include: 'Leap/*')
         markdown 'com.github.rjeschke:txtmark:0.13'
-        twitter4j 'org.twitter4j:twitter4j-core:4.0.3', 'org.twitter4j:twitter4j-stream:4.0.3'
+        twitter4j 'org.twitter4j:twitter4j-core:4.0.4', 'org.twitter4j:twitter4j-stream:4.0.4'
         vertx 'io.vertx:vertx-core:2.1.5', 'io.vertx:vertx-platform:2.1.5'
         wikitext fileTree(dir: new File(allLibs, 'WikiText'), include: '*.jar')
         zxing 'com.google.zxing:core:3.2.0', 'com.google.zxing:javase:3.2.0'
@@ -119,8 +119,8 @@ asciidoctor {
             setanchors: '',
             sectlinks: '',
             linkcss: false,
-            'javafx-version': '8 update 40',
-            'jdk-version': '8 update 40',
+            'javafx-version': '8 update 51',
+            'jdk-version': '8 update 51',
             'gradle-version': "${wrapper.gradleVersion}",
             'asciidoctorj-version': "${configurations.asciidoctorj.dependencies[0].version}",
             'apache-felix-version': "${configurations.felix.dependencies[0].version}",
@@ -128,8 +128,8 @@ asciidoctor {
             'fontawesomefx-version' : "${configurations.fontawesomefx.dependencies[0].version}",
             'jsoup-version': "${configurations.jsoup.dependencies[0].version}",
             'leapmotion-sdk-version': '2.2.6.29154',
-            'wikitext-core-version': '2.4.0.N20150409-1542',
-            'wikitext-textile-core-version': '2.4.0.N20150312-2106',
+            'wikitext-core-version': '2.6.0.N20150709-0448',
+            'wikitext-textile-core-version': '2.6.0.N20150629-1933',
             'twitter4j-version': "${configurations.twitter4j.dependencies[0].version}",
             'txtmark-version': "${configurations.markdown.dependencies[0].version}",
             'vertx-version': "${configurations.vertx.dependencies[0].version}",
@@ -286,5 +286,5 @@ task packageSlideshowFX(dependsOn : [ 'clean',
 }
 
 wrapper {
-    gradleVersion = '2.4'
+    gradleVersion = '2.5'
 }

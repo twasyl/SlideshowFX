@@ -16,6 +16,8 @@
 
 package com.twasyl.slideshowfx.controls.builder.elements;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.animation.FadeTransition;
 import javafx.beans.property.*;
 import javafx.geometry.Pos;
@@ -23,8 +25,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
@@ -60,8 +60,10 @@ public abstract class AbstractTemplateElement<T extends Object> extends HBox imp
             else AbstractTemplateElement.this.text.setText(newName + ":");
         });
 
-        final Image deleteIcon = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/round_delete.png"));
-        this.delete.setGraphic(new ImageView(deleteIcon));
+        final FontAwesomeIconView deleteImage = new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE);
+        deleteImage.setGlyphStyle("-fx-fill: app-color-orange");
+
+        this.delete.setGraphic(deleteImage);
         this.delete.getStyleClass().add("template-element-delete-button");
         this.delete.setTooltip(new Tooltip("Delete this element"));
         this.delete.setOpacity(0);
@@ -152,7 +154,7 @@ public abstract class AbstractTemplateElement<T extends Object> extends HBox imp
 
         Arrays.stream(nodes).forEach(node -> {
             if (node == null) throw new NullPointerException("Can not add a null element to the template element");
-            this.getChildren().add(/*this.getChildren().size() - 1, */node);
+            this.getChildren().add(node);
         });
     }
 }

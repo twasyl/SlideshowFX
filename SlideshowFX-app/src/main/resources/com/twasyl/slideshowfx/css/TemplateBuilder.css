@@ -21,6 +21,6 @@
 }
 
 .template-element-delete-button, .template-element-delete-button:hover {
-    -fx-background: transparent;
+    -fx-background-color: transparent;
     -fx-border-width: 0px;
 }

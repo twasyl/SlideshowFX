@@ -19,6 +19,7 @@ package com.twasyl.slideshowfx.controls;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -37,7 +38,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.logging.Level;
@@ -152,6 +156,12 @@ public final class PresentationBrowser extends StackPane {
                 this.progressIndicator.setProgress(0);
                 this.getChildren().remove(this.progressIndicator);
             }
+        });
+        this.internalBrowser.getEngine().setOnError(errorEvent -> {
+            LOGGER.log(Level.SEVERE, "An error occurred in the internal browser", errorEvent.getException());
+        });
+        this.internalBrowser.getEngine().setOnAlert(event -> {
+            LOGGER.log(Level.SEVERE, String.format("An alert has been raised in the internal browser:\n%1$s", event.getData()));
         });
     }
 

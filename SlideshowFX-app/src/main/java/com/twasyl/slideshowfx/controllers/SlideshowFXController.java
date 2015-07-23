@@ -789,7 +789,7 @@ public class SlideshowFXController implements Initializable {
      */
     private void showTemplateBuilder(final TemplateEngine engine) {
         try {
-            final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/twasyl/slideshowfx/fxml/TemplateBuilder.fxml"));
+            final FXMLLoader loader = new FXMLLoader(ResourceHelper.getURL("/com/twasyl/slideshowfx/fxml/TemplateBuilder.fxml"));
             final Parent root = loader.load();
 
             final TemplateBuilderController controller = loader.getController();
@@ -803,12 +803,12 @@ public class SlideshowFXController implements Initializable {
             stage.setScene(scene);
             stage.setTitle("Template builder");
             stage.getIcons().addAll(
-                    new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/16.png")),
-                    new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/32.png")),
-                    new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/64.png")),
-                    new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/128.png")),
-                    new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/256.png")),
-                    new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/512.png")));
+                    new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/16.png")),
+                    new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/32.png")),
+                    new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/64.png")),
+                    new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/128.png")),
+                    new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/256.png")),
+                    new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/512.png")));
 
             stage.show();
 

@@ -50,6 +50,18 @@ public class DialogHelper {
     }
 
     /**
+     * Show an alert with the given {@code title} and {@code text}. The method returns the answer of the user which can
+     * only be {@link ButtonType#OK}.
+     *
+     * @param title The title of the alert.
+     * @param text The text of the alert.
+     * @return The answer of the user which can only be {@link ButtonType#OK}.
+     */
+    public static ButtonType showAlert(final String title, final String text) {
+        return displayDialog(buildAlert(Alert.AlertType.INFORMATION, title, text, ButtonType.OK));
+    }
+
+    /**
      * Show an error alert with the given {@code title} and {@code text}. The method returns the answer of the user
      * which can only be {@link javafx.scene.control.ButtonType#OK}.
      *

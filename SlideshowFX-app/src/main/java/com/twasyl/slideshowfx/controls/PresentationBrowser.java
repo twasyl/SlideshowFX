@@ -19,7 +19,7 @@ package com.twasyl.slideshowfx.controls;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
-import com.twasyl.slideshowfx.utils.ResourceHelper;
+import com.twasyl.slideshowfx.utils.DialogHelper;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -38,10 +38,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.logging.Level;
@@ -148,7 +145,6 @@ public final class PresentationBrowser extends StackPane {
         this.internalBrowser.disableProperty().bind(this.interactionAllowed.not());
         this.internalBrowser.getEngine().setJavaScriptEnabled(true);
         this.internalBrowser.getEngine().getLoadWorker().stateProperty().addListener((stateValue, oldState, newState) -> {
-
             if (newState == Worker.State.RUNNING) {
                 this.progressIndicator.setProgress(-1d);
                 this.getChildren().add(this.progressIndicator);
@@ -156,12 +152,14 @@ public final class PresentationBrowser extends StackPane {
                 this.progressIndicator.setProgress(0);
                 this.getChildren().remove(this.progressIndicator);
             }
+
+            PresentationBrowser.this.injectBackend(this.getBackend());
         });
         this.internalBrowser.getEngine().setOnError(errorEvent -> {
             LOGGER.log(Level.SEVERE, "An error occurred in the internal browser", errorEvent.getException());
         });
         this.internalBrowser.getEngine().setOnAlert(event -> {
-            LOGGER.log(Level.SEVERE, String.format("An alert has been raised in the internal browser:\n%1$s", event.getData()));
+            DialogHelper.showAlert("SlideshowFX", event.getData());
         });
     }
 

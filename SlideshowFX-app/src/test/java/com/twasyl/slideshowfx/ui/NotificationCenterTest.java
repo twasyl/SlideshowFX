@@ -19,14 +19,11 @@ package com.twasyl.slideshowfx.ui;
 import com.twasyl.slideshowfx.controls.notification.NotificationCenter;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
-import javafx.animation.Animation;
-import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 /**
  * @author Thierry Wasylczenko

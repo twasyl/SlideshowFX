@@ -27,7 +27,12 @@
                             name="SlideshowFX"
                             mainClass="com.twasyl.slideshowfx.app.SlideshowFX"
                             preloaderClass="com.twasyl.slideshowfx.app.SlideshowFXPreloader"
-                            fallbackClass="com.javafx.main.NoJavaFXFallback"/>
+                            fallbackClass="com.javafx.main.NoJavaFXFallback" />
+
+            <fx:info>
+                <fx:association extension="sfxt" description="SlideshowFX templates" />
+                <fx:association extension="sfx" description="SlideshowFX presentations" />
+            </fx:info>
 
             <fx:platform javafx="8.0+" j2se="8.0">
                 <fx:jvmarg value="-Xms512m" />

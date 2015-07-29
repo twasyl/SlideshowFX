@@ -26,7 +26,8 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController"
+        minWidth="1024" minHeight="768">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
         <URL value="@/com/twasyl/slideshowfx/css/SlideshowFX.css" />

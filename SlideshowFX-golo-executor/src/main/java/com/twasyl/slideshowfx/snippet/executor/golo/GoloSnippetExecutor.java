@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,15 +17,18 @@
 package com.twasyl.slideshowfx.snippet.executor.golo;
 
 import com.sun.javafx.PlatformUtil;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
+import com.twasyl.slideshowfx.utils.beans.converter.FileStringConverter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 
 import java.io.*;
 import java.util.logging.Level;
@@ -40,14 +43,25 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class GoloSnippetExecutor extends AbstractSnippetExecutor {
+public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExecutorOptions> {
     private static final Logger LOGGER = Logger.getLogger(GoloSnippetExecutor.class.getName());
 
+    private static final String GOLO_HOME_PROPERTY_SUFFIX = ".home";
     private static final String WRAP_IN_MAIN_PROPERTY = "wrapInMain";
     private static final String IMPORTS_PROPERTY = "imports";
 
     public GoloSnippetExecutor() {
         super("GOLO", "Golo", "");
+        this.setOptions(new GoloSnippetExecutorOptions());
+
+        final String goloHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(GOLO_HOME_PROPERTY_SUFFIX));
+        if(goloHome != null) {
+            try {
+                this.getOptions().setGoloHome(new File(goloHome));
+            } catch (FileNotFoundException e) {
+                LOGGER.log(Level.SEVERE, "Can not set the JAVA_HOME", e);
+            }
+        }
     }
 
     @Override
@@ -72,6 +86,49 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor {
         ui.getChildren().addAll(wrapInMain, imports);
 
         return ui;
+    }
+
+    @Override
+    public Node getConfigurationUI() {
+        this.newOptions = new GoloSnippetExecutorOptions();
+        try {
+            this.newOptions.setGoloHome(this.getOptions().getGoloHome());
+        } catch (FileNotFoundException | NullPointerException e) {
+            LOGGER.log(Level.FINE, "Can not duplicate GOLO_HOME", e);
+        }
+
+        final Label label = new Label(this.getLanguage().concat(":"));
+
+        final TextField javaHomeField = new TextField();
+        javaHomeField.textProperty().bindBidirectional(this.newOptions.goloHomeProperty(), new FileStringConverter());
+        javaHomeField.setPrefColumnCount(20);
+
+        final Button browse = new Button("...");
+        browse.setOnAction(event -> {
+            final DirectoryChooser chooser = new DirectoryChooser();
+            final File sdkHomeDir = chooser.showDialog(null);
+            if(sdkHomeDir != null) {
+                javaHomeField.setText(sdkHomeDir.getAbsolutePath());
+            }
+
+        });
+
+        final HBox box = new HBox(5);
+        box.getChildren().addAll(label, javaHomeField, browse);
+
+        return box;
+    }
+
+    @Override
+    public void saveNewOptions() {
+        if(this.getNewOptions() != null) {
+            this.setOptions(this.getNewOptions());
+
+            if(this.getOptions().getGoloHome() != null) {
+                GlobalConfiguration.setProperty(this.getConfigurationBaseName().concat(GOLO_HOME_PROPERTY_SUFFIX),
+                        this.getOptions().getGoloHome().getAbsolutePath().replaceAll("\\\\", "/"));
+            }
+        }
     }
 
     @Override
@@ -106,8 +163,8 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor {
             }
 
             final File executable = PlatformUtil.isWindows() ?
-                    new File(this.getSdkHome(), "bin/golo.bat") :
-                    new File(this.getSdkHome(), "bin/golo");
+                    new File(this.getOptions().getGoloHome(), "bin/golo.bat") :
+                    new File(this.getOptions().getGoloHome(), "bin/golo");
 
             final String[] command = {executable.getAbsolutePath(), "golo", "--files", codeFile.getAbsolutePath()};
 

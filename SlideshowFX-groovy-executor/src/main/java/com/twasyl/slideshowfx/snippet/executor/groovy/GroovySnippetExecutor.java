@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,18 +17,20 @@
 package com.twasyl.slideshowfx.snippet.executor.groovy;
 
 import com.sun.javafx.PlatformUtil;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
+import com.twasyl.slideshowfx.utils.beans.converter.FileStringConverter;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 
 import java.io.*;
 import java.util.logging.Level;
@@ -43,10 +45,11 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class GroovySnippetExecutor  extends AbstractSnippetExecutor {
+public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippetExecutorOptions> {
 
     private static final Logger LOGGER = Logger.getLogger(GroovySnippetExecutor.class.getName());
 
+    private static final String GROOVY_HOME_PROPERTY_SUFFIX = ".home";
     /**
      * Indicates if the code should be wrapped in a main or run method (depending it is a Groovy Script or Class)
      */
@@ -57,6 +60,16 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor {
 
     public GroovySnippetExecutor() {
         super("GROOVY", "Groovy", "groovy");
+        this.setOptions(new GroovySnippetExecutorOptions());
+
+        final String groovyHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(GROOVY_HOME_PROPERTY_SUFFIX));
+        if(groovyHome != null) {
+            try {
+                this.getOptions().setGroovyHome(new File(groovyHome));
+            } catch (FileNotFoundException e) {
+                LOGGER.log(Level.SEVERE, "Can not set the GROOVY_HOME", e);
+            }
+        }
     }
 
     @Override
@@ -105,6 +118,49 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor {
         ui.getChildren().addAll(classTextField, wrapInMethodRunner, makeScript, imports);
 
         return ui;
+    }
+
+    @Override
+    public Node getConfigurationUI() {
+        this.newOptions = new GroovySnippetExecutorOptions();
+        try {
+            this.newOptions.setGroovyHome(this.getOptions().getGroovyHome());
+        } catch (FileNotFoundException | NullPointerException e) {
+            LOGGER.log(Level.FINE, "Can not duplicate GROOVY_HOME", e);
+        }
+
+        final Label label = new Label(this.getLanguage().concat(":"));
+
+        final TextField javaHomeField = new TextField();
+        javaHomeField.textProperty().bindBidirectional(this.newOptions.groovyHomeProperty(), new FileStringConverter());
+        javaHomeField.setPrefColumnCount(20);
+
+        final Button browse = new Button("...");
+        browse.setOnAction(event -> {
+            final DirectoryChooser chooser = new DirectoryChooser();
+            final File sdkHomeDir = chooser.showDialog(null);
+            if(sdkHomeDir != null) {
+                javaHomeField.setText(sdkHomeDir.getAbsolutePath());
+            }
+
+        });
+
+        final HBox box = new HBox(5);
+        box.getChildren().addAll(label, javaHomeField, browse);
+
+        return box;
+    }
+
+    @Override
+    public void saveNewOptions() {
+        if(this.getNewOptions() != null) {
+            this.setOptions(this.getNewOptions());
+
+            if(this.getOptions().getGroovyHome() != null) {
+                GlobalConfiguration.setProperty(this.getConfigurationBaseName().concat(GROOVY_HOME_PROPERTY_SUFFIX),
+                        this.getOptions().getGroovyHome().getAbsolutePath().replaceAll("\\\\", "/"));
+            }
+        }
     }
 
     @Override
@@ -159,8 +215,8 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor {
 
             // Execute the class
             final File groovyExecutable = PlatformUtil.isWindows() ?
-                    new File(this.getSdkHome(), "bin/groovy.bat") :
-                    new File(this.getSdkHome(), "bin/groovy");
+                    new File(this.getOptions().getGroovyHome(), "bin/groovy.bat") :
+                    new File(this.getOptions().getGroovyHome(), "bin/groovy");
 
             final String[] executionCommand = {groovyExecutable.getAbsolutePath(), codeFile.getName()};
 

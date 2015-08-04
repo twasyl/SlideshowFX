@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,12 +31,14 @@ import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
+import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.*;
+import com.twasyl.slideshowfx.utils.beans.Pair;
 import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.DisableAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.EnableAction;
@@ -945,18 +947,29 @@ public class SlideshowFXController implements Initializable {
         uploaderMenuItem.setOnAction(event -> {
             PlatformHelper.run(() -> {
                 if (!hostingConnector.isAuthenticated()) {
-                    hostingConnector.authenticate();
+                    try {
+                        hostingConnector.authenticate();
+                    } catch (HostingConnectorException e) {
+                        final Pair<String, String> pair = e.getTitleAndMessage();
+                        DialogHelper.showError(pair.getKey(), pair.getValue());
+                    }
                 }
 
                 if (hostingConnector.isAuthenticated()) {
                     // Prompts the user where to upload the presentation
-                    final RemoteFile destination = hostingConnector.chooseFile(true, false);
+                    final RemoteFile destination;
+                    try {
+                        destination = hostingConnector.chooseFile(true, false);
 
-                    if(destination != null) {
-                        final UploadPresentationTask task = new UploadPresentationTask(PresentationDAO.getInstance().getCurrentPresentation(),
-                                hostingConnector, destination);
-                        SlideshowFXController.this.taskInProgress.setCurrentTask(task);
-                        TaskDAO.getInstance().startTask(task);
+                        if (destination != null) {
+                            final UploadPresentationTask task = new UploadPresentationTask(PresentationDAO.getInstance().getCurrentPresentation(),
+                                    hostingConnector, destination);
+                            SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+                            TaskDAO.getInstance().startTask(task);
+                        }
+                    } catch (HostingConnectorException e) {
+                        final Pair<String, String> pair = e.getTitleAndMessage();
+                        DialogHelper.showError(pair.getKey(), pair.getValue());
                     }
                 }
             });
@@ -980,40 +993,50 @@ public class SlideshowFXController implements Initializable {
         downloaderMenuItem.setOnAction(event -> {
             PlatformHelper.run(() -> {
                 if (!hostingConnector.isAuthenticated()) {
-                    hostingConnector.authenticate();
+                    try {
+                        hostingConnector.authenticate();
+                    } catch (HostingConnectorException e) {
+                        final Pair<String, String> pair = e.getTitleAndMessage();
+                        DialogHelper.showError(pair.getKey(), pair.getValue());
+                    }
                 }
 
                 if (hostingConnector.isAuthenticated()) {
                     // Prompts the user which file to download
-                    final RemoteFile presentationFile = hostingConnector.chooseFile(true, true);
+                    try {
+                        final RemoteFile presentationFile = hostingConnector.chooseFile(true, true);
 
-                    if (presentationFile != null) {
-                        // Prompts the user where the file should be downloaded
-                        final DirectoryChooser chooser = new DirectoryChooser();
-                        chooser.setTitle("Choose directory");
+                        if (presentationFile != null) {
+                            // Prompts the user where the file should be downloaded
+                            final DirectoryChooser chooser = new DirectoryChooser();
+                            chooser.setTitle("Choose directory");
 
-                        final File directory = chooser.showDialog(null);
+                            final File directory = chooser.showDialog(null);
 
-                        if (directory != null) {
-                            final DownloadPresentationTask task = new DownloadPresentationTask(
-                                    hostingConnector, directory, presentationFile);
-                            task.stateProperty().addListener((value, oldState, newState) -> {
-                                if (newState == Worker.State.SUCCEEDED && task.getValue() != null) {
-                                    ButtonType response = DialogHelper.showConfirmationAlert("Open file?", String.format("Do you want to open '%1$s' ?", task.getValue()));
+                            if (directory != null) {
+                                final DownloadPresentationTask task = new DownloadPresentationTask(
+                                        hostingConnector, directory, presentationFile);
+                                task.stateProperty().addListener((value, oldState, newState) -> {
+                                    if (newState == Worker.State.SUCCEEDED && task.getValue() != null) {
+                                        ButtonType response = DialogHelper.showConfirmationAlert("Open file?", String.format("Do you want to open '%1$s' ?", task.getValue()));
 
-                                    if(response != null && response == ButtonType.YES) {
-                                        try {
-                                            this.openTemplateOrPresentation(task.getValue());
-                                        } catch (IOException | IllegalAccessException e) {
-                                            LOGGER.log(Level.SEVERE, "Error when opening file", e);
+                                        if (response != null && response == ButtonType.YES) {
+                                            try {
+                                                this.openTemplateOrPresentation(task.getValue());
+                                            } catch (IOException | IllegalAccessException e) {
+                                                LOGGER.log(Level.SEVERE, "Error when opening file", e);
+                                            }
                                         }
                                     }
-                                }
-                            });
-                            SlideshowFXController.this.taskInProgress.setCurrentTask(task);
-                            TaskDAO.getInstance().startTask(task);
+                                });
+                                SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+                                TaskDAO.getInstance().startTask(task);
 
+                            }
                         }
+                    } catch (HostingConnectorException e) {
+                        final Pair<String, String> pair = e.getTitleAndMessage();
+                        DialogHelper.showError(pair.getKey(), pair.getValue());
                     }
                 }
             });

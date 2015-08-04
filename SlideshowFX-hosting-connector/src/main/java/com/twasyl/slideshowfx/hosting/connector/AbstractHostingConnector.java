@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,12 +17,18 @@
 package com.twasyl.slideshowfx.hosting.connector;
 
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
+import com.twasyl.slideshowfx.plugin.AbstractPlugin;
 import com.twasyl.slideshowfx.utils.DialogHelper;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
+import javax.naming.AuthenticationException;
 import java.io.FileNotFoundException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The base class for implementing an {@link IHostingConnector}.
@@ -31,41 +37,41 @@ import java.io.FileNotFoundException;
  *  @version 1.0
  *  @since SlideshowFX 1.0.0
  */
-public abstract class AbstractHostingConnector implements IHostingConnector {
+public abstract class AbstractHostingConnector<T extends IHostingConnectorOptions> extends AbstractPlugin<T> implements IHostingConnector<T> {
+    private static final Logger LOGGER = Logger.getLogger(AbstractHostingConnector.class.getName());
+
     /*
      * Constants for stored properties
      */
     private static final String PROPERTIES_PREFIX = "hosting.connector.";
+    protected static final String CONSUMER_KEY_PROPERTY_SUFFIX = ".consumer.key";
+    protected static final String CONSUMER_SECRET_PROPERTY_SUFFIX = ".consumer.secret";
+    protected static final String REDIRECT_URI_PROPERTY_SUFFIX = ".redirecturi";
+    protected static final String ACCESS_TOKEN_PROPERTY_SUFFIX = ".accesstoken";
 
-    /*
-     * Constants for stored properties
-     */
-    protected final String CONSUMER_KEY;
-    protected final String CONSUMER_SECRET;
-    protected final String ACCESS_TOKEN;
-    protected final String REDIRECT_URI;
+    private final String configurationBaseName;
 
+    protected T newOptions;
     protected final String code;
-    protected final String name;
     protected String accessToken;
     protected final RemoteFile rootFolder;
 
     protected AbstractHostingConnector(String code, String name, RemoteFile rootFolder) {
+        super(name);
         this.code = code;
-        this.name = name;
         this.rootFolder = rootFolder;
 
-        this.CONSUMER_KEY = PROPERTIES_PREFIX.concat(this.code).concat(".consumer.key");
-        this.CONSUMER_SECRET = PROPERTIES_PREFIX.concat(this.code).concat(".consumer.secret");
-        this.ACCESS_TOKEN = PROPERTIES_PREFIX.concat(this.code).concat(".accesstoken");
-        this.REDIRECT_URI = PROPERTIES_PREFIX.concat(this.code).concat(".redirecturi");
+        this.configurationBaseName = PROPERTIES_PREFIX.concat(this.code);
     }
 
     @Override
-    public String getCode() { return this.code; }
+    public String getConfigurationBaseName() { return this.configurationBaseName; }
 
     @Override
-    public String getName() { return this.name; }
+    public T getNewOptions() { return this.newOptions; }
+
+    @Override
+    public String getCode() { return this.code; }
 
     @Override
     public boolean isAuthenticated() {
@@ -85,20 +91,21 @@ public abstract class AbstractHostingConnector implements IHostingConnector {
     public RemoteFile getRootFolder() { return this.rootFolder; }
 
     @Override
-    public void upload(PresentationEngine engine) throws FileNotFoundException {
+    public void upload(PresentationEngine engine) throws HostingConnectorException, FileNotFoundException {
         this.upload(engine, this.getRootFolder(), false);
     }
 
     @Override
-    public RemoteFile chooseFile(boolean showFolders, boolean showFiles) {
+    public RemoteFile chooseFile(boolean showFolders, boolean showFiles) throws HostingConnectorException {
 
         final TreeItem<RemoteFile> rootItem = this.buildCustomTreeItem(this.getRootFolder(), showFolders, showFiles);
         /**
          * Get the subfolders of root and populate the root TreeItem
          */
-        this.list(this.getRootFolder(), showFolders, showFiles)
-                .stream()
-                .forEach(subfolder -> rootItem.getChildren().add(this.buildCustomTreeItem(subfolder, showFolders, showFiles)));
+        final List<RemoteFile> subfolders = this.list(this.getRootFolder(), showFolders, showFiles);
+        for(RemoteFile subfolder : subfolders) {
+            rootItem.getChildren().add(this.buildCustomTreeItem(subfolder, showFolders, showFiles));
+        }
 
         final TreeView<RemoteFile> treeView = this.buildCustomTreeView(rootItem);
 
@@ -157,7 +164,7 @@ public abstract class AbstractHostingConnector implements IHostingConnector {
      * @param value The value of the item.
      * @return The created TreeItem.
      */
-    private TreeItem<RemoteFile> buildCustomTreeItem(RemoteFile value, boolean showFolders, boolean showFiles) {
+    private TreeItem<RemoteFile> buildCustomTreeItem(RemoteFile value, boolean showFolders, boolean showFiles) throws HostingConnectorException{
         final TreeItem<RemoteFile> item = new TreeItem<RemoteFile>(value) {
             @Override
             public boolean isLeaf() {
@@ -168,8 +175,12 @@ public abstract class AbstractHostingConnector implements IHostingConnector {
 
         item.expandedProperty().addListener((expandedValue, oldExpanded, newExpanded) -> {
             if(newExpanded && item.getChildren().isEmpty()) {
-                for(RemoteFile child : this.list(value, showFolders, showFiles)) {
-                    item.getChildren().add(this.buildCustomTreeItem(child, showFolders, showFiles));
+                try {
+                    for(RemoteFile child : this.list(value, showFolders, showFiles)) {
+                        item.getChildren().add(this.buildCustomTreeItem(child, showFolders, showFiles));
+                    }
+                } catch (HostingConnectorException e) {
+                    LOGGER.log(Level.SEVERE, "Error while building the custom tree view", e);
                 }
             }
         });

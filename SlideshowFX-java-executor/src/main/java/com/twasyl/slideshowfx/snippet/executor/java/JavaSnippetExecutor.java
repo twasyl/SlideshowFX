@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,16 +16,18 @@
 
 package com.twasyl.slideshowfx.snippet.executor.java;
 
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
+import com.twasyl.slideshowfx.utils.beans.converter.FileStringConverter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 
 import java.io.*;
 import java.util.logging.Level;
@@ -40,15 +42,26 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class JavaSnippetExecutor extends AbstractSnippetExecutor {
+public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExecutorOptions> {
     private static final Logger LOGGER = Logger.getLogger(JavaSnippetExecutor.class.getName());
 
+    private static final String JAVA_HOME_PROPERTY_SUFFIX = ".home";
     private static final String WRAP_IN_MAIN_PROPERTY = "wrapInMain";
     private static final String IMPORTS_PROPERTY = "imports";
     private static final String CLASS_NAME_PROPERTY = "class";
 
     public JavaSnippetExecutor() {
         super("JAVA", "Java", "java");
+        this.setOptions(new JavaSnippetExecutorOptions());
+
+        final String javaHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(JAVA_HOME_PROPERTY_SUFFIX));
+        if(javaHome != null) {
+            try {
+                this.getOptions().setJavaHome(new File(javaHome));
+            } catch (FileNotFoundException e) {
+                LOGGER.log(Level.SEVERE, "Can not set the JAVA_HOME", e);
+            }
+        }
     }
 
     @Override
@@ -82,6 +95,49 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor {
         ui.getChildren().addAll(classTextField, wrapInMain, imports);
 
         return ui;
+    }
+
+    @Override
+    public Node getConfigurationUI() {
+        this.newOptions = new JavaSnippetExecutorOptions();
+        try {
+            this.newOptions.setJavaHome(this.getOptions().getJavaHome());
+        } catch (FileNotFoundException | NullPointerException e) {
+            LOGGER.log(Level.FINE, "Can not duplicate JAVA_HOME", e);
+        }
+
+        final Label label = new Label(this.getLanguage().concat(":"));
+
+        final TextField javaHomeField = new TextField();
+        javaHomeField.textProperty().bindBidirectional(this.newOptions.javaHomeProperty(), new FileStringConverter());
+        javaHomeField.setPrefColumnCount(20);
+
+        final Button browse = new Button("...");
+        browse.setOnAction(event -> {
+            final DirectoryChooser chooser = new DirectoryChooser();
+            final File sdkHomeDir = chooser.showDialog(null);
+            if (sdkHomeDir != null) {
+                javaHomeField.setText(sdkHomeDir.getAbsolutePath());
+            }
+
+        });
+
+        final HBox box = new HBox(5);
+        box.getChildren().addAll(label, javaHomeField, browse);
+
+        return box;
+    }
+
+    @Override
+    public void saveNewOptions() {
+        if(this.getNewOptions() != null) {
+            this.setOptions(this.getNewOptions());
+
+            if(this.getOptions().getJavaHome() != null) {
+                GlobalConfiguration.setProperty(this.getConfigurationBaseName().concat(JAVA_HOME_PROPERTY_SUFFIX),
+                        this.getOptions().getJavaHome().getAbsolutePath().replaceAll("\\\\", "/"));
+            }
+        }
     }
 
     @Override
@@ -124,7 +180,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor {
             }
 
             // Compile the Java class
-            final File javacExecutable = new File(this.getSdkHome(), "bin/javac");
+            final File javacExecutable = new File(this.getOptions().getJavaHome(), "bin/javac");
 
             final String[] compilationCommand = {javacExecutable.getAbsolutePath(), codeFile.getName()};
 
@@ -157,7 +213,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor {
             // Execute the class only if the compilation was successful
             if(process != null && process.exitValue() == 0) {
                 final File classFile = new File(this.getTemporaryDirectory(), className);
-                final File javaExecutable = new File(this.getSdkHome(), "bin/java");
+                final File javaExecutable = new File(this.getOptions().getJavaHome(), "bin/java");
                 final String[] executionCommand = {javaExecutable.getAbsolutePath(), className};
 
                 try {

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,10 @@
 package com.twasyl.slideshowfx.hosting.connector;
 
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
+import com.twasyl.slideshowfx.plugin.IConfigurable;
+import com.twasyl.slideshowfx.plugin.IPlugin;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,19 +33,13 @@ import java.util.List;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public interface IHostingConnector {
+public interface IHostingConnector<T extends IHostingConnectorOptions> extends IPlugin<T>, IConfigurable<T> {
 
     /**
      * Returns the code that uniquely identifies this connector. The code must not contain spaces.
      * @return The code of this connector.
      */
     String getCode();
-
-    /**
-     * The name of the connector that will be used to identify it in the UI.
-     * @return The name of the connector.
-     */
-    String getName();
 
     /**
      * Indicates if the user is authenticated to the cloud based platform.
@@ -52,9 +49,9 @@ public interface IHostingConnector {
 
     /**
      * Authenticate the user to the cloud based platform.
-     * @return {@code true} if the user has been authenticated, {@code false} otherwise.
+     * @throws HostingConnectorException If the authentication process fails.
      */
-    boolean authenticate();
+    void authenticate() throws HostingConnectorException;
 
     /**
      * Get the access token that is get when the user is successfully logged in the service.
@@ -80,8 +77,9 @@ public interface IHostingConnector {
      * @throws java.lang.NullPointerException If the {@code engine} is {@code null} or if {@code engine.getArchive()}
      *                                          is {@code null}.
      * @throws java.io.FileNotFoundException If the archive file does not already exist.
+     * @throws HostingConnectorException If something went wrong due to configuration, authentication or an unknown error.
      */
-    void upload(PresentationEngine engine) throws FileNotFoundException;
+    void upload(PresentationEngine engine) throws HostingConnectorException, FileNotFoundException;
 
     /**
      * Upload the given {@code engine} to the service. The presentation is uploaded in the given {@code folder}.
@@ -91,8 +89,9 @@ public interface IHostingConnector {
      * @throws java.lang.NullPointerException If the {@code engine} is {@code null} or if {@code engine.getArchive()}
      *                                          is {@code null}.
      * @throws java.io.FileNotFoundException If the archive file does not already exist.
+     * @throws HostingConnectorException If something went wrong due to configuration, authentication or an unknown error.
      */
-    void upload(PresentationEngine engine, RemoteFile folder, boolean overwrite) throws FileNotFoundException;
+    void upload(PresentationEngine engine, RemoteFile folder, boolean overwrite) throws HostingConnectorException, FileNotFoundException;
 
     /**
      * Download a presentation located by {@code file} in the {@code destination} folder.
@@ -101,14 +100,16 @@ public interface IHostingConnector {
      * @return The File object representing the downloaded presentation.
      * @throws java.lang.NullPointerException If either {@code destination} or {@code file} is null
      * @throws java.lang.IllegalArgumentException If {@code destination} is not a folder.
+     * @throws HostingConnectorException If something went wrong due to configuration, authentication or an unknown error.
      */
-    File download(File destination, RemoteFile file);
+    File download(File destination, RemoteFile file) throws HostingConnectorException;
 
     /**
      * Returns the root folder of the service.
      * @return The root folder of the service.
+     * @throws HostingConnectorException If something went wrong due to configuration, authentication or an unknown error.
      */
-    RemoteFile getRootFolder();
+    RemoteFile getRootFolder() throws HostingConnectorException;
 
     /**
      * List all content already present in the {@code parent} directory.
@@ -119,8 +120,9 @@ public interface IHostingConnector {
      * @param includePresentations {@code true} to list the presentations in {@code parent}
      * @return The list of all content present remotely in the parent.
      * @throws java.lang.NullPointerException If {@code parent} is null.
+     * @throws HostingConnectorException If something went wrong due to configuration, authentication or an unknown error.
      */
-    List<RemoteFile> list(RemoteFile parent, boolean includeFolders, boolean includePresentations);
+    List<RemoteFile> list(RemoteFile parent, boolean includeFolders, boolean includePresentations) throws HostingConnectorException;
 
     /**
      * Shows a dialog allowing the user to choose a file available on the hosting service.
@@ -133,8 +135,9 @@ public interface IHostingConnector {
      * @param showFolders {@code true} for showing the folders.
      * @param showFiles {@code true} for showing the files.
      * @return The selected destination or {@code null} if the dialog is cancelled or if no selection is performed.
+     * @throws HostingConnectorException If something went wrong due to configuration, authentication or an unknown error.
      */
-    RemoteFile chooseFile(boolean showFolders, boolean showFiles);
+    RemoteFile chooseFile(boolean showFolders, boolean showFiles) throws HostingConnectorException;
 
     /**
      * Tests if the file of the {@code engine} exists in the {@code destination} folder present remotely.
@@ -144,6 +147,7 @@ public interface IHostingConnector {
      *
      * @throws java.lang.NullPointerException If either {@code engine},
      * {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#getArchive()} or {@code destination} is null.
+     * @throws HostingConnectorException If something went wrong due to configuration, authentication or an unknown error.
      */
-    boolean fileExists(PresentationEngine engine, RemoteFile destination);
+    boolean fileExists(PresentationEngine engine, RemoteFile destination) throws HostingConnectorException;
 }

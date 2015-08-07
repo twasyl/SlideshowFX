@@ -257,7 +257,8 @@ public class SlideshowFXController implements Initializable {
 
         if (board.hasFiles()) {
             Optional<File> slideshowFXFile = board.getFiles().stream()
-                    .filter(file -> file.getName().endsWith(".sfx") || file.getName().endsWith(".sfxt"))
+                    .filter(file -> file.getName().endsWith(PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)
+                            || file.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION))
                     .findFirst();
 
             if (slideshowFXFile != null && slideshowFXFile.isPresent()) {
@@ -293,7 +294,8 @@ public class SlideshowFXController implements Initializable {
              * Check if either a template or a presentation is drag over the browser.
              */
             Optional<File> slideshowFXFile = dragEvent.getDragboard().getFiles().stream()
-                    .filter(file -> file.getName().endsWith(".sfx") || file.getName().endsWith(".sfxt"))
+                    .filter(file -> file.getName().endsWith(PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)
+                            || file.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION))
                     .findFirst();
 
             if (slideshowFXFile != null && slideshowFXFile.isPresent()) {
@@ -737,9 +739,9 @@ public class SlideshowFXController implements Initializable {
         if (!dataFile.exists()) throw new FileNotFoundException("The dataFile does not exist");
         if (!dataFile.canRead()) throw new IllegalAccessException("The dataFile can not be accessed");
 
-        final Task<PresentationEngine> loadingTask = dataFile.getName().endsWith(".sfx") ? new LoadPresentationTask(dataFile) :
-                dataFile.getName().endsWith(".sfxt") ? new LoadTemplateTask(dataFile) : null;
-
+        final Task<PresentationEngine> loadingTask = dataFile.getName().endsWith(PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)
+                ? new LoadPresentationTask(dataFile) : dataFile.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION) ?
+                new LoadTemplateTask(dataFile) : null;
 
         if(loadingTask != null) {
             TaskAction.forTask(loadingTask)

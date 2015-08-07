@@ -99,7 +99,7 @@
                     <Tooltip text="Delete selection" />
                 </tooltip>
                 <graphic>
-                    <FontAwesomeIconView glyphName="TIMES_CIRCLE" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
+                    <FontAwesomeIconView glyphName="TRASH_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
                 </graphic>
             </Button>
         </ToolBar>
@@ -152,7 +152,7 @@
                     <TitledPane text="Slide template elements">
                         <VBox spacing="5">
                             <ListDragableTemplateElement text="Element container" />
-                            <StringDragableTemplateElement text="ID" templateElementName="id" />
+                            <IntegerDragableTemplateElement text="ID" templateElementName="id" />
                             <StringDragableTemplateElement text="HTML ID" templateElementName="html-id" />
                             <StringDragableTemplateElement text="Default content" templateElementName="default-content" />
                         </VBox>

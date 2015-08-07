@@ -57,6 +57,16 @@ import java.util.stream.Collectors;
 public class PresentationEngine extends AbstractEngine<PresentationConfiguration> {
 
     private static final Logger LOGGER = Logger.getLogger(PresentationEngine.class.getName());
+
+    /**
+     * The default extension for presentation archives. Value is {@value #DEFAULT_ARCHIVE_EXTENSION}.
+     */
+    public static final String DEFAULT_ARCHIVE_EXTENSION = "sfx";
+    /**
+     * The default value, containing the dot, for presentation archives.
+     */
+    public static final String DEFAULT_DOTTED_ARCHIVE_EXTENSION = ".".concat(DEFAULT_ARCHIVE_EXTENSION);
+
     private static final String TEMPLATE_SLIDE_NUMBER_TOKEN = "slideNumber";
     private static final String TEMPLATE_SFX_JAVASCRIPT_RESOURCES_TOKEN = "sfxJavascriptResources";
     private static final String TEMPLATE_SFX_CALLBACK_TOKEN = "sfxCallback";
@@ -72,7 +82,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     private TemplateEngine templateEngine;
 
     public PresentationEngine() {
-        super("sfx", "presentation-config.json");
+        super(DEFAULT_ARCHIVE_EXTENSION, "presentation-config.json");
         this.templateEngine = new TemplateEngine();
     }
 

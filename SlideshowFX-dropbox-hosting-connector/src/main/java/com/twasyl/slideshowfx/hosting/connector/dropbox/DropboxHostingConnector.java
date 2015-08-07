@@ -304,11 +304,11 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
                         .stream()
                         .filter(entry -> {
                             if(includeFolders && includePresentations) {
-                                return entry.isFolder() || (entry.isFile() && entry.name.endsWith(".sfx"));
+                                return entry.isFolder() || (entry.isFile() && entry.name.endsWith(PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION));
                             } else if(includeFolders && !includePresentations) {
                                 return entry.isFolder();
                             } else if(!includeFolders && includePresentations) {
-                                return entry.isFolder() && entry.name.endsWith(".sfx");
+                                return entry.isFolder() && entry.name.endsWith(PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION);
                             } else return false;
                         })
                         .forEach(entry ->

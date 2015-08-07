@@ -116,6 +116,11 @@ public class TemplateBuilderController implements Initializable {
             FileChooser chooser = new FileChooser();
             chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.TEMPLATE_FILTER);
             destination = chooser.showSaveDialog(null);
+
+            // Manage if the file name doesn't end with the template extension.
+            if(!destination.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)) {
+                destination = new File(destination.getAbsolutePath().concat(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION));
+            }
         }
 
         if(destination != null) {
@@ -180,14 +185,20 @@ public class TemplateBuilderController implements Initializable {
      */
     @FXML private void deleteFromTreeView(ActionEvent event) {
         ObservableList<TreeItem<File>> selectedItems = this.templateContentTreeView.getSelectionModel().getSelectedItems();
-        selectedItems.filtered(item -> item != this.templateContentTreeView.getRoot())
-                     .forEach(item -> {
-                         try {
-                             this.templateContentTreeView.deleteContentOfTreeView(item);
-                         } catch (IOException e) {
-                             DialogHelper.showError("Error", "Can not delete the content");
-                         }
-                     });
+        if(!selectedItems.isEmpty()) {
+            final ButtonType answer = DialogHelper.showConfirmationAlert("Delete selection", "Are you sure you want to delete the selection?");
+
+            if(answer == ButtonType.YES) {
+                selectedItems.filtered(item -> item != this.templateContentTreeView.getRoot())
+                        .forEach(item -> {
+                            try {
+                                this.templateContentTreeView.deleteContentOfTreeView(item);
+                            } catch (IOException e) {
+                                DialogHelper.showError("Error", "Can not delete the content");
+                            }
+                        });
+            }
+        }
     }
 
     /**

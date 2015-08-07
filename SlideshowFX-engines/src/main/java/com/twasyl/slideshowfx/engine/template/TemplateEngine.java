@@ -46,8 +46,17 @@ import java.util.logging.Logger;
 public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
     private static final Logger LOGGER = Logger.getLogger(TemplateEngine.class.getName());
 
+    /**
+     * The default extension for template archives. Value is {@value #DEFAULT_ARCHIVE_EXTENSION}.
+     */
+    public static final String DEFAULT_ARCHIVE_EXTENSION = "sfxt";
+    /**
+     * The default value, containing the dot, for presentation archives.
+     */
+    public static final String DEFAULT_DOTTED_ARCHIVE_EXTENSION = ".".concat(DEFAULT_ARCHIVE_EXTENSION);
+
     public TemplateEngine() {
-        super("sfxt", "template-config.json");
+        super(DEFAULT_ARCHIVE_EXTENSION, "template-config.json");
     }
 
     @Override

@@ -1,4 +1,4 @@
-build_environment: Ubuntu 13.10
+build_environment: Ubuntu 14.04
 
 language: java
 
@@ -6,11 +6,13 @@ branches:
     only:
         - master
 
-script:
-    - gradle assemble
-
 jdk:
     - oraclejdk8
+
+script:
+    - sudo apt-get update && sudo apt-get install oracle-java8-installer
+    - java -version
+    - ./gradlew assemble
 
 notifications:
     email:

@@ -127,7 +127,7 @@ asciidoctor {
             'freemarker-version': "${configurations.freemarker.dependencies[0].version}",
             'fontawesomefx-version' : "${configurations.fontawesomefx.dependencies[0].version}",
             'jsoup-version': "${configurations.jsoup.dependencies[0].version}",
-            'leapmotion-sdk-version': '2.2.7.30199',
+            'leapmotion-sdk-version': '2.3.0.31543',
             'wikitext-core-version': '2.6.0.N20150709-0448',
             'wikitext-textile-core-version': '2.6.0.N20150629-1933',
             'twitter4j-version': "${configurations.twitter4j.dependencies[0].version}",

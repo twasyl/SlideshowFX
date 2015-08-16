@@ -1,4 +1,4 @@
-h1. What is SlideshowFX ? !https://api.shippable.com/projects/54d3e4795ab6cc13528afdb7/badge?branchName=master&no=1423172966814!:https://app.shippable.com/projects/54d3e4795ab6cc13528afdb7 !https://travis-ci.org/twasyl/SlideshowFX.svg!:https://travis-ci.org/twasyl/SlideshowFX
+h1. What is SlideshowFX ? !https://travis-ci.org/twasyl/SlideshowFX.svg!:https://travis-ci.org/twasyl/SlideshowFX
 
 p. SlideshowFX is a tool allowing you to create slideshow using HTML5 frameworks. Maybe have you heard about "reveal.js":http://lab.hakim.se/reveal-js/ or "impress.js":https://github.com/bartaz/impress.js/ that allow you  to create beautiful slideshows, entirely customizable by using HTML5 and CSS3 technologies.
 
@@ -24,10 +24,10 @@ h1. How to get started
 p. As SlideshowFX is a still young project, you will need to build it manually in order to test it. In order to do so, you will need:
 
 * A JDK 8 update 51 ;
-* The @JAVA_HOME@ system variable set to point to you JDK 8 update 40 installation.
+* The @JAVA_HOME@ system variable set to point to you JDK 8 update 51 installation.
 
 p. Then in order to build the application:
 
 * Open a command line in the repository folder ;
-* Execute the command @gradle packageSlideshowFX@ and wait for it to finish successfully ;
+* Execute the command @gradlew packageSlideshowFX@ and wait for it to finish successfully ;
 * Go in @REPOSITORY_HOME/build/distributions/@ in order to have the SlideshowFX binaries.

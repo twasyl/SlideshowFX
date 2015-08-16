@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,11 +32,11 @@ import com.twasyl.slideshowfx.utils.beans.Pair;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import javafx.embed.swing.SwingFXUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
 
 import javax.imageio.ImageIO;
 import java.io.*;
@@ -101,10 +101,10 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         presentationConfiguration.setPresentationFile(new File(this.getWorkingDirectory(), PresentationConfiguration.DEFAULT_PRESENTATION_FILENAME));
 
         JsonObject configurationJson = JSONHelper.readFromFile(configurationFile);
-        JsonObject presentationJson = configurationJson.getObject("presentation");
+        JsonObject presentationJson = configurationJson.getJsonObject("presentation");
 
-        if(presentationJson.getArray("custom-resources") != null) {
-            presentationJson.getArray("custom-resources")
+        if(presentationJson.getJsonArray("custom-resources") != null) {
+            presentationJson.getJsonArray("custom-resources")
                     .forEach(customResource -> {
                         final Resource resource = new Resource(
                                 ResourceType.valueOf(((JsonObject) customResource).getString("type")),
@@ -115,8 +115,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                     });
         }
 
-        if(presentationJson.getArray("variables") != null) {
-            presentationJson.getArray("variables")
+        if(presentationJson.getJsonArray("variables") != null) {
+            presentationJson.getJsonArray("variables")
                     .forEach(variableJson -> {
                         final Pair<String, String> variable = new Pair<>();
                         variable.setKey(((JsonObject) variableJson).getString("name"));
@@ -125,13 +125,14 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                     });
         }
 
-        presentationJson.getArray("slides")
+        presentationJson.getJsonArray("slides")
                 .forEach(slideJson -> {
                     final Slide slide = new Slide();
 
                     slide.setId(((JsonObject) slideJson).getString("id"));
                     slide.setSlideNumber(((JsonObject) slideJson).getString("number"));
-                    slide.setTemplate(this.templateEngine.getConfiguration().getSlideTemplate(((JsonObject) slideJson).getNumber("template-id").intValue()));
+                    slide.setTemplate(this.templateEngine.getConfiguration().getSlideTemplate(((JsonObject) slideJson).getInteger(
+                        "template-id")));
 
                     try {
                         slide.setThumbnail(SwingFXUtils.toFXImage(ImageIO.read(new File(this.templateEngine.getConfiguration().getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png"))), null));
@@ -139,10 +140,11 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                         LOGGER.log(Level.INFO, "Error setting the thumbnail", e);
                     }
 
-                    ((JsonObject) slideJson).getArray("elements")
+                    ((JsonObject) slideJson).getJsonArray("elements")
                             .forEach(slideElementJson -> {
                                 final SlideElement slideElement = new SlideElement();
-                                slideElement.setTemplate(slide.getTemplate().getSlideElementTemplate(((JsonObject) slideElementJson).getNumber("template-id").intValue()));
+                                slideElement.setTemplate(slide.getTemplate().getSlideElementTemplate(((JsonObject) slideElementJson).getInteger(
+                                    "template-id")));
                                 slideElement.setId(((JsonObject) slideElementJson).getString("element-id"));
                                 slideElement.setOriginalContentCode(((JsonObject) slideElementJson).getString("original-content-code"));
                                 slideElement.setOriginalContentAsBase64(((JsonObject) slideElementJson).getString("original-content"));
@@ -171,19 +173,19 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                     .stream()
                     .forEach(resource -> {
                         final JsonObject resourceJson = new JsonObject()
-                                .putString("type", resource.getType().name())
-                                .putString("content", Base64.getEncoder().encodeToString(resource.getContent().getBytes()));
+                                .put("type", resource.getType().name())
+                                .put("content", Base64.getEncoder().encodeToString(resource.getContent().getBytes()));
 
-                        customResourcesJson.addObject(resourceJson);
+                        customResourcesJson.add(resourceJson);
                     });
 
             this.configuration.getVariables()
                     .forEach(variable -> {
                         final JsonObject variableJson = new JsonObject()
-                                .putString("name", variable.getKey())
-                                .putString("value", Base64.getEncoder().encodeToString(variable.getValue().getBytes()));
+                                .put("name", variable.getKey())
+                                .put("value", Base64.getEncoder().encodeToString(variable.getValue().getBytes()));
 
-                        variablesJson.addObject(variableJson);
+                        variablesJson.add(variableJson);
                     });
 
             this.configuration.getSlides()
@@ -192,33 +194,33 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                         final JsonArray elementsJson = new JsonArray();
                         final JsonObject slideJson = new JsonObject();
 
-                        slideJson.putNumber("template-id", slide.getTemplate().getId())
-                                .putString("id", slide.getId())
-                                .putString("number", slide.getSlideNumber());
+                        slideJson.put("template-id", slide.getTemplate().getId())
+                                .put("id", slide.getId())
+                                .put("number", slide.getSlideNumber());
 
                         slide.getElements()
                                 .stream()
                                 .forEach(slideElement -> {
                                     final JsonObject elementJson = new JsonObject();
-                                    elementJson.putNumber("template-id", slideElement.getTemplate().getId())
-                                            .putString("element-id", slideElement.getId())
-                                            .putString("original-content-code", slideElement.getOriginalContentCode())
-                                            .putString("original-content", slideElement.getOriginalContentAsBase64())
-                                            .putString("html-content", slideElement.getHtmlContentAsBase64());
+                                    elementJson.put("template-id", slideElement.getTemplate().getId())
+                                            .put("element-id", slideElement.getId())
+                                            .put("original-content-code", slideElement.getOriginalContentCode())
+                                            .put("original-content", slideElement.getOriginalContentAsBase64())
+                                            .put("html-content", slideElement.getHtmlContentAsBase64());
 
-                                    elementsJson.addObject(elementJson);
+                                    elementsJson.add(elementJson);
                                 });
 
-                        slideJson.putArray("elements", elementsJson);
-                        slidesJson.addObject(slideJson);
+                        slideJson.put("elements", elementsJson);
+                        slidesJson.add(slideJson);
                     });
 
-            presentationJson.putArray("custom-resources", customResourcesJson);
-            presentationJson.putArray("variables", variablesJson);
-            presentationJson.putArray("slides", slidesJson);
+            presentationJson.put("custom-resources", customResourcesJson);
+            presentationJson.put("variables", variablesJson);
+            presentationJson.put("slides", slidesJson);
 
             final JsonObject finalObject = new JsonObject();
-            finalObject.putObject("presentation", presentationJson);
+            finalObject.put("presentation", presentationJson);
 
             JSONHelper.writeObject(finalObject, configurationFile);
         }

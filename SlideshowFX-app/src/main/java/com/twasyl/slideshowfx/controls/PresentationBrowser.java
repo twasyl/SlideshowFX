@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -145,6 +145,7 @@ public final class PresentationBrowser extends StackPane {
         this.internalBrowser.disableProperty().bind(this.interactionAllowed.not());
         this.internalBrowser.getEngine().setJavaScriptEnabled(true);
         this.internalBrowser.getEngine().getLoadWorker().stateProperty().addListener((stateValue, oldState, newState) -> {
+
             if (newState == Worker.State.RUNNING) {
                 this.progressIndicator.setProgress(-1d);
                 this.getChildren().add(this.progressIndicator);
@@ -154,6 +155,7 @@ public final class PresentationBrowser extends StackPane {
             }
 
             PresentationBrowser.this.injectBackend(this.getBackend());
+            PresentationBrowser.this.injectServer(SlideshowFXServer.getSingleton());
         });
         this.internalBrowser.getEngine().setOnError(errorEvent -> {
             LOGGER.log(Level.SEVERE, "An error occurred in the internal browser", errorEvent.getException());

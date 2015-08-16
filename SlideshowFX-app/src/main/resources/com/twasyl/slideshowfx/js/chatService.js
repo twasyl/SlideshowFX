@@ -15,7 +15,7 @@
  */
 
 function requestChatHistory() {
-    var request = "{ \"service\" : \"slideshowfx.chat.attendee.history\", \"data\" : {} }";
+    var request = "{ \"service\": \"slideshowfx.chat.attendee.history\", \"data\": {} }";
     socket.send(request);
 }
 /*

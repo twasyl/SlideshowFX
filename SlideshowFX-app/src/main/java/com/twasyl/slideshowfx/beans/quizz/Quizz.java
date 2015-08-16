@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,12 +16,12 @@
 
 package com.twasyl.slideshowfx.beans.quizz;
 
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -150,28 +150,28 @@ public class Quizz {
      */
     public JsonObject toJSON() {
         final JsonObject object = new JsonObject();
-        object.putNumber("id", this.getId());
-        object.putNumber("correctAnswers", this.getCorrectAnswers().size());
+        object.put("id", this.getId());
+        object.put("correctAnswers", this.getCorrectAnswers().size());
 
         if(this.getQuestion() != null) {
             final JsonObject questionObject = new JsonObject();
-            questionObject.putNumber("id", this.getQuestion().getId());
-            questionObject.putString("text", this.getQuestion().getText());
+            questionObject.put("id", this.getQuestion().getId());
+            questionObject.put("text", this.getQuestion().getText());
 
-            object.putObject("question", questionObject);
+            object.put("question", questionObject);
         }
 
         if(!this.getAnswers().isEmpty()) {
             final JsonArray answersArray = new JsonArray();
 
             for(Answer answer : this.getAnswers()) {
-                answersArray.addObject(new JsonObject()
-                                            .putNumber("id", answer.getId())
-                                            .putString("text", answer.getText())
-                                            .putBoolean("correct", answer.isCorrect()));
+                answersArray.add(new JsonObject()
+                                        .put("id", answer.getId())
+                                        .put("text", answer.getText())
+                                        .put("correct", answer.isCorrect()));
             }
 
-            object.putArray("answers", answersArray);
+            object.put("answers", answersArray);
         }
 
         return object;
@@ -191,24 +191,24 @@ public class Quizz {
         final JsonObject object = new JsonObject(json);
         final Quizz quizz = new Quizz();
 
-        quizz.setId(object.getNumber("id").longValue());
+        quizz.setId(object.getLong("id"));
 
-        final JsonObject questionJson = object.getObject("question");
+        final JsonObject questionJson = object.getJsonObject("question");
         if(questionJson != null) {
             final Question question = new Question();
             question.setQuizz(quizz);
             question.setText(questionJson.getString("text"));
-            question.setId(questionJson.getNumber("id").longValue());
+            question.setId(questionJson.getLong("id"));
 
             quizz.setQuestion(question);
         }
 
-        final JsonArray answersJson = object.getArray("answers");
+        final JsonArray answersJson = object.getJsonArray("answers");
         if(answersJson != null) {
             answersJson.forEach(answerJson -> {
                 final Answer answer = new Answer();
                 answer.setQuizz(quizz);
-                answer.setId(((JsonObject) answerJson).getNumber("id").longValue());
+                answer.setId(((JsonObject) answerJson).getLong("id"));
                 answer.setText(((JsonObject) answerJson).getString("text"));
                 answer.setCorrect(((JsonObject) answerJson).getBoolean("correct"));
 

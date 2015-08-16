@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,8 +16,9 @@
 
 package com.twasyl.slideshowfx.snippet.executor;
 
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -98,17 +99,17 @@ public class CodeSnippet implements Serializable {
      */
     public String toJson() {
         final JsonObject objectJson = new JsonObject();
-        objectJson.putString("code", Base64.getEncoder().encodeToString(this.code.getBytes()));
+        objectJson.put("code", Base64.getEncoder().encodeToString(this.code.getBytes()));
 
         final JsonArray propertiesJson = new JsonArray();
 
         this.properties.forEach((propertyName, propertyValue) -> {
-            propertiesJson.addObject(new JsonObject()
-                    .putString("name", propertyName)
-                    .putString("value", Base64.getEncoder().encodeToString(propertyValue.getBytes())));
+            propertiesJson.add(new JsonObject()
+                    .put("name", propertyName)
+                    .put("value", Base64.getEncoder().encodeToString(propertyValue.getBytes())));
         });
 
-        objectJson.putArray("properties", propertiesJson);
+        objectJson.put("properties", propertiesJson);
 
         return objectJson.encode();
     }
@@ -125,7 +126,7 @@ public class CodeSnippet implements Serializable {
                 LOGGER.log(Level.SEVERE, "Can not decode the code of the snippet");
             }
 
-            JsonArray properties = document.getArray("properties");
+            JsonArray properties = document.getJsonArray("properties");
 
             if(properties != null && properties.size() > 0) {
                 properties.forEach(property -> {

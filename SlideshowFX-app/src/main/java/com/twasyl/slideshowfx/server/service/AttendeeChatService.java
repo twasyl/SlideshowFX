@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,17 +20,18 @@ import com.twasyl.slideshowfx.beans.chat.ChatMessage;
 import com.twasyl.slideshowfx.beans.chat.ChatMessageAction;
 import com.twasyl.slideshowfx.beans.chat.ChatMessageStatus;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import com.twasyl.slideshowfx.utils.TemplateProcessor;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.http.RouteMatcher;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Verticle;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.shareddata.LocalMap;
+import io.vertx.ext.web.Router;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +41,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.twasyl.slideshowfx.server.service.IServicesCode.*;
 /**
  * This class represents the attendee part of the internal SlideshowFX chat.
  *
@@ -47,7 +49,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class AttendeeChatService extends Verticle {
+public class AttendeeChatService extends AbstractSlideshowFXService {
     private static final Logger LOGGER = Logger.getLogger(AttendeeChatService.class.getName());
 
     private final Map<String, ChatMessage> chatHistory = new HashMap<>();
@@ -56,47 +58,47 @@ public class AttendeeChatService extends Verticle {
     public void start() {
         this.updateRouteMatcher();
 
-        this.vertx.eventBus().registerHandler("slideshowfx.chat.attendee.message.add", buildAddMessageHandler())
-                .registerHandler("slideshowfx.chat.attendee.message.update", buildUpdateMessageHandler())
-                .registerHandler("slideshowfx.chat.attendee.history", buildHistoryMessageHandler());
+        this.register(SERVICE_CHAT_ATTENDEE_MESSAGE_ADD, buildAddMessageHandler())
+            .register(SERVICE_CHAT_ATTENDEE_MESSAGE_UPDATE, buildUpdateMessageHandler())
+            .register(SERVICE_CHAT_ATTENDEE_HISTORY, buildHistoryMessageHandler());
     }
 
     @Override
     public void stop() {
+        this.unregisterAll();
         this.chatHistory.clear();
     }
 
     private void updateRouteMatcher() {
-        final Map serverInfo = this.vertx.sharedData().getMap(SlideshowFXServer.SHARED_DATA_SERVERS);
         final SlideshowFXServer singleton = SlideshowFXServer.getSingleton();
-        final RouteMatcher routeMatcher = (RouteMatcher) singleton.getHttpServer().requestHandler();
+        final Router router = singleton.getRouter();
 
         // Route that get the image of an answered message
-        routeMatcher.get("/slideshowfx/chat/images/check.png", request -> {
-            try (final InputStream in = AttendeeChatService.class.getResourceAsStream("/com/twasyl/slideshowfx/html/images/check.png")) {
+        router.get("/slideshowfx/chat/images/check.png").handler(routingContext -> {
+            try (final InputStream in = ResourceHelper.getInputStream("/com/twasyl/slideshowfx/html/images/check.png")) {
 
                 byte[] imageBuffer = new byte[1028];
                 int numberOfBytesRead;
-                Buffer buffer = new Buffer();
+                Buffer buffer = Buffer.buffer();
 
                 while ((numberOfBytesRead = in.read(imageBuffer)) != -1) {
                     buffer.appendBytes(imageBuffer, 0, numberOfBytesRead);
                 }
 
-                request.response().setChunked(true).write(buffer).end();
+                routingContext.response().setChunked(true).write(buffer).end();
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Can not send check images", e);
             }
-        })
+        });
         // Get the JavaScript resources
-        .get("/slideshowfx/chat/js/chatService.js", request -> {
-            final Map templateTokens = this.vertx.sharedData().getMap(SlideshowFXServer.SHARED_DATA_TEMPLATE_TOKENS);
+        router.get("/slideshowfx/chat/js/chatService.js").handler(request -> {
+            final LocalMap templateTokens = this.vertx.sharedData().getLocalMap(SlideshowFXServer.SHARED_DATA_TEMPLATE_TOKENS);
 
             final Configuration configuration = TemplateProcessor.getJsConfiguration();
 
             final Map tokenValues = new HashMap();
-            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_HOST_TOKEN).toString(), serverInfo.get(SlideshowFXServer.SHARED_DATA_HTTP_SERVER_HOST).toString());
-            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_PORT_TOKEN).toString(), ((Integer) serverInfo.get(SlideshowFXServer.SHARED_DATA_HTTP_SERVER_PORT)).toString());
+            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_HOST_TOKEN).toString(), singleton.getHost());
+            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_PORT_TOKEN).toString(), singleton.getPort() + "");
 
             try (final StringWriter writer = new StringWriter()) {
                 final Template template = configuration.getTemplate("chatService.js");
@@ -104,7 +106,7 @@ public class AttendeeChatService extends Verticle {
 
                 writer.flush();
 
-                request.response().putHeader("Content-Type", "text/javascript").setStatusCode(200).setChunked(true).write(writer.toString()).end();
+                request.response().putHeader("Content-Type", "application/javascript").setStatusCode(200).setChunked(true).write(Buffer.buffer(writer.toString())).end();
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Error when a client tried to access the chat", e);
 
@@ -118,31 +120,36 @@ public class AttendeeChatService extends Verticle {
 
     private Handler<Message<JsonObject>> buildUpdateMessageHandler() {
         final Handler<Message<JsonObject>> handler = message -> {
-            final ChatMessage chatMessage = this.chatHistory.get(message.body().getObject("message").getString("id"));
+            final String messageId = message.body().getJsonObject(JSON_KEY_MESSAGE).getString(JSON_KEY_MESSAGE_ID);
+            final ChatMessage chatMessage = this.chatHistory.get(messageId);
+
+            int responseCode;
+            Object responseContent;
 
             if (chatMessage != null) {
-                JsonArray fields = message.body().getArray("fields");
+                JsonArray fields = message.body().getJsonArray(JSON_KEY_FIELDS);
                 fields.forEach(value -> {
-                    if("status".equals(value)) {
-                        chatMessage.setStatus(ChatMessageStatus.fromString(message.body().getObject("message").getString("status")));
-                    } else if("action".equals(value)) {
-                        final String action = message.body().getObject("message").getString("action");
+                    if(JSON_KEY_FIELD_STATUS.equals(value)) {
+                        chatMessage.setStatus(ChatMessageStatus.fromString(message.body().getJsonObject(JSON_KEY_MESSAGE).getString(JSON_KEY_MESSAGE_STATUS)));
+                    } else if(JSON_KEY_FIELD_ACTION.equals(value)) {
+                        final String action = message.body().getJsonObject(JSON_KEY_MESSAGE).getString(JSON_KEY_MESSAGE_ACTION);
                         chatMessage.setAction("null".equals(action) ? null : ChatMessageAction.fromString(action));
                     }
                 });
 
                 this.chatHistory.put(chatMessage.getId(), chatMessage);
 
-                final JsonObject object = new JsonObject();
-                object.putString("service", "slideshowfx.chat.attendee.message.update");
-                object.putObject("data", chatMessage.toJSON());
+                final JsonObject object = this.buildResponse(SERVICE_CHAT_ATTENDEE_MESSAGE_UPDATE, RESPONSE_CODE_MESSAGE_UPDATED, chatMessage.toJSON());
+                this.sendResponseToWebSocketClients(object);
 
-                for(Object textHandlerId : this.vertx.sharedData().getSet(SlideshowFXServer.SHARED_DATA_WEBSOCKET_CLIENTS)) {
-                    this.vertx.eventBus().send((String) textHandlerId, object.encode());
-                }
+                responseCode = RESPONSE_CODE_MESSAGE_UPDATED;
+                responseContent = chatMessage.toJSON();
+            } else {
+                responseCode = RESPONSE_CODE_MESSAGE_NOT_FOUND;
+                responseContent = new JsonObject().put(JSON_KEY_MESSAGE_ID, messageId);
             }
 
-            message.reply();
+            message.reply(this.buildResponse(SERVICE_CHAT_ATTENDEE_MESSAGE_UPDATE, responseCode, responseContent));
         };
 
         return handler;
@@ -154,17 +161,13 @@ public class AttendeeChatService extends Verticle {
             chatMessage.setId("msg-" + System.currentTimeMillis());
             this.chatHistory.put(chatMessage.getId(), chatMessage);
 
-            final JsonObject object = new JsonObject();
-            object.putString("service", "slideshowfx.chat.attendee.message.add");
-            object.putObject("data", chatMessage.toJSON());
+            final JsonObject object = this.buildResponse(SERVICE_CHAT_ATTENDEE_MESSAGE_ADD, RESPONSE_CODE_MESSAGE_ADDED, chatMessage.toJSON());
 
-            for(Object textHandlerId : this.vertx.sharedData().getSet(SlideshowFXServer.SHARED_DATA_WEBSOCKET_CLIENTS)) {
-                this.vertx.eventBus().send((String) textHandlerId, object.encode());
-            }
+            final String origin = message.body().getString(JSON_KEY_ORIGIN);
+            this.sendResponseToWebSocketClients(object, origin);
 
-            this.vertx.eventBus().send("slideshowfx.chat.presenter.message.add", chatMessage.toJSON());
-
-            message.reply();
+            this.vertx.eventBus().send(SERVICE_CHAT_PRESENTER_MESSAGE_ADD, chatMessage.toJSON());
+            message.reply(object);
         };
 
         return handler;
@@ -175,10 +178,10 @@ public class AttendeeChatService extends Verticle {
             final JsonArray array = new JsonArray();
 
             for(ChatMessage chatMessage : this.chatHistory.values()) {
-                array.addObject(chatMessage.toJSON());
+                array.add(chatMessage.toJSON());
             }
 
-            message.reply(array);
+            message.reply(this.buildResponse(SERVICE_CHAT_ATTENDEE_HISTORY, RESPONSE_CODE_OK, array));
         };
 
         return handler;

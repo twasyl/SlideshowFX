@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,12 +21,15 @@ import com.twasyl.slideshowfx.beans.quizz.QuizzResult;
 import com.twasyl.slideshowfx.controls.*;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.server.service.ISlideshowFXServices;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
@@ -36,9 +39,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonElement;
-import org.vertx.java.core.json.JsonObject;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -47,6 +47,8 @@ import java.util.Base64;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.twasyl.slideshowfx.server.service.AbstractSlideshowFXService.*;
 
 /**
  * A pane that displays a presentation.
@@ -78,16 +80,19 @@ public class SlideshowPane extends StackPane {
     public SlideshowPane(Context context) {
         super();
 
+        singleton = this;
+
         this.setAlignment(Pos.TOP_LEFT);
         this.getStylesheets().add(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/css/Default.css"));
 
         this.context = context;
 
+        this.initializeBrowser()
+        ;
         if(SlideshowFXServer.getSingleton() != null) {
             this.initializeChatPanel();
             this.initializeCollapsibleToolPane();
         }
-        this.initializeBrowser();
 
         this.setCursor(null);
     }
@@ -186,18 +191,15 @@ public class SlideshowPane extends StackPane {
      */
     private void initializeChatPanel() {
         final JsonObject request = new JsonObject()
-                .putString("service", "slideshowfx.chat.attendee.history")
-                .putObject("data", new JsonObject());
+                .put(JSON_KEY_SERVICE, ISlideshowFXServices.SERVICE_CHAT_ATTENDEE_HISTORY)
+                .put(JSON_KEY_DATA, new JsonObject());
 
-        final JsonElement history = SlideshowFXServer.getSingleton().callService(request.encode());
+        final JsonArray history = SlideshowFXServer.getSingleton().callService(request.encode())
+                .getJsonArray(JSON_KEY_CONTENT);
 
         if(history != null) {
-            if(history.isArray()) {
-                JsonArray messages = history.asArray();
-
-                for(Object message : messages) {
-                    this.publishMessage((JsonObject) message);
-                }
+            for(Object message : history) {
+                this.publishMessage((JsonObject) message);
             }
         }
     }

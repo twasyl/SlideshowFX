@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,8 +18,8 @@ package com.twasyl.slideshowfx.controls.builder.elements;
 
 import com.twasyl.slideshowfx.controls.builder.labels.ChoiceBoxDragableTemplateElement;
 import com.twasyl.slideshowfx.controls.builder.labels.DragableTemplateElementLabel;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -46,12 +46,12 @@ public final class TemplateElementFactory {
         if(label == null) throw new NullPointerException("The label can not be null");
 
         JsonObject object = new JsonObject();
-        object.putString(FIELD_CLASS_NAME, label.getTemplateElementClassName());
+        object.put(FIELD_CLASS_NAME, label.getTemplateElementClassName());
 
         /**
          * Only put the name if the values is not null
          */
-        if(label.getTemplateElementName() != null) object.putString(FIELD_NAME, label.getTemplateElementName());
+        if(label.getTemplateElementName() != null) object.put(FIELD_NAME, label.getTemplateElementName());
 
         if(label instanceof ChoiceBoxDragableTemplateElement) {
             ChoiceBoxDragableTemplateElement choiceBox = (ChoiceBoxDragableTemplateElement) label;
@@ -60,8 +60,8 @@ public final class TemplateElementFactory {
              */
             if(choiceBox.getValues() != null && !choiceBox.getValues().isEmpty()) {
                 final JsonArray valuesArray = new JsonArray();
-                choiceBox.getValues().stream().forEach(value -> valuesArray.addString(value));
-                object.putArray(FIELD_VALUES, valuesArray);
+                choiceBox.getValues().stream().forEach(value -> valuesArray.add(value));
+                object.put(FIELD_VALUES, valuesArray);
             }
         }
 
@@ -79,8 +79,8 @@ public final class TemplateElementFactory {
 
             element = (ITemplateElement) constructor.newInstance(object.getString(FIELD_NAME));
 
-            if(element != null && clazz.equals(ChoiceBoxTemplateElement.class) && object.getArray(FIELD_VALUES) != null) {
-                JsonArray valuesArray = object.getArray(FIELD_VALUES);
+            if(element != null && clazz.equals(ChoiceBoxTemplateElement.class) && object.getJsonArray(FIELD_VALUES) != null) {
+                JsonArray valuesArray = object.getJsonArray(FIELD_VALUES);
 
                 if(valuesArray.size() > 0) {
                     Iterator<Object> iterator = valuesArray.iterator();

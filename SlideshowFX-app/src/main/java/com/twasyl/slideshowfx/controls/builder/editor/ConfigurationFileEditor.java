@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,11 +17,10 @@
 package com.twasyl.slideshowfx.controls.builder.editor;
 
 import com.twasyl.slideshowfx.controls.builder.elements.*;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonElement;
-import org.vertx.java.core.json.JsonObject;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -97,22 +96,28 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
         }
     }
 
-    public ITemplateElement buildTemplateElementStructure(JsonElement jsonElement) {
+    /**
+     * <p>Build the structure for a template template element from a given JSON structure. The given {@code jsonElement}
+     * must be either of type {@link JsonObject} or {@link JsonArray}.</p>
+     * @param jsonElement The template element to build.
+     * @return The template element that has been built.
+     */
+    public ITemplateElement buildTemplateElementStructure(Object jsonElement) {
 
         ITemplateElement templateElement;
 
-        if(jsonElement.isObject()) {
+        if(jsonElement instanceof JsonObject) {
 
-            final JsonObject object = jsonElement.asObject();
+            final JsonObject object = (JsonObject) jsonElement;
             templateElement = new ListTemplateElement(null);
             ITemplateElement element;
             Object value;
 
-            for(String fieldName : object.getFieldNames()) {
-                value = object.getField(fieldName);
+            for(String fieldName : object.fieldNames()) {
+                value = object.getValue(fieldName);
 
-                if(value instanceof JsonElement) {
-                    element = buildTemplateElementStructure((JsonElement) value);
+                if(value instanceof JsonObject || value instanceof JsonArray) {
+                    element = buildTemplateElementStructure(value);
                 } else if(Arrays.binarySearch(FILES_ATTRIBUTES, fieldName) >= 0) {
                     element = new FileTemplateElement(null);
                     element.setWorkingPath(this.getWorkingPath());
@@ -137,18 +142,16 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
                 ((ListTemplateElement) templateElement).getValue().add(element);
             }
 
-        } else if(jsonElement.isArray()) {
+        } else if(jsonElement instanceof JsonArray) {
 
-            final JsonArray array = jsonElement.asArray();
+            final JsonArray array = (JsonArray) jsonElement;
             templateElement = new ArrayTemplateElement(null);
             ITemplateElement element;
-            Object value;
+            //Object value;
 
-            for(int index = 0; index < array.size(); index++) {
-                value = array.get(index);
-
-                if(value instanceof JsonElement) {
-                    element = buildTemplateElementStructure((JsonElement) value);
+            for(Object value : array) {
+                if(value instanceof JsonObject || value instanceof JsonArray) {
+                    element = buildTemplateElementStructure(value);
                     element.setWorkingPath(this.getWorkingPath());
                 } else if(value instanceof Number) {
                     element = new IntegerTemplateElement(null);
@@ -162,6 +165,7 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
                 }
 
                 ((ArrayTemplateElement) templateElement).getValue().add(element);
+
             }
         } else {
             templateElement = new StringTemplateElement(null);

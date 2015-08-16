@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,7 @@
 
 package com.twasyl.slideshowfx.beans.chat;
 
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
@@ -153,7 +153,7 @@ public class ChatMessage {
         JsonObject jsonObject = getJSONObject();
 
         if(this.getIp() != null && this.getIp().equals(ip)) {
-            jsonObject.getObject(JSON_MESSAGE_OBJECT).putString(JSON_MESSAGE_AUTHOR_ATTR, "I");
+            jsonObject.getJsonObject(JSON_MESSAGE_OBJECT).put(JSON_MESSAGE_AUTHOR_ATTR, "I");
         }
 
         return jsonObject;
@@ -168,17 +168,17 @@ public class ChatMessage {
     private JsonObject getJSONObject() {
         JsonObject jsonMessage = new JsonObject();
 
-        if(getId() != null) jsonMessage.putString(JSON_MESSAGE_ID_ATTR, getId());
+        if(getId() != null) jsonMessage.put(JSON_MESSAGE_ID_ATTR, getId());
 
-        if(getAuthor() != null) jsonMessage.putString(JSON_MESSAGE_AUTHOR_ATTR, getAuthor());
+        if(getAuthor() != null) jsonMessage.put(JSON_MESSAGE_AUTHOR_ATTR, getAuthor());
 
-        if(getContent() != null) jsonMessage.putString(JSON_MESSAGE_CONTENT_ATTR, encodeContent());
+        if(getContent() != null) jsonMessage.put(JSON_MESSAGE_CONTENT_ATTR, encodeContent());
 
-        if(getSource() != null) jsonMessage.putString(JSON_MESSAGE_SOURCE_ATTR, getSource().getAsString());
+        if(getSource() != null) jsonMessage.put(JSON_MESSAGE_SOURCE_ATTR, getSource().getAsString());
 
-        if(getAction() != null) jsonMessage.putString(JSON_MESSAGE_ACTION_ATTR, getAction().getAsString());
+        if(getAction() != null) jsonMessage.put(JSON_MESSAGE_ACTION_ATTR, getAction().getAsString());
 
-        if(getStatus() != null) jsonMessage.putString(JSON_MESSAGE_STATUS_ATTR, getStatus().getAsString());
+        if(getStatus() != null) jsonMessage.put(JSON_MESSAGE_STATUS_ATTR, getStatus().getAsString());
 
         return jsonMessage;
     }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,12 +16,12 @@
 
 package com.twasyl.slideshowfx.utils;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.List;
 
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This class provides tests for the class {@link com.twasyl.slideshowfx.utils.NetworkUtils}.
@@ -35,7 +35,8 @@ public class NetworkUtilsTest {
     /**
      * Tests the method of {@link NetworkUtils#getIPs()} that returns all IPv4 addresses for the host.
      */
-    @Test public void testGetIps() {
+    @Test
+    public void testGetIps() {
         final List<String> ips = NetworkUtils.getIPs();
 
         assertNotNull(ips);

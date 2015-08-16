@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,17 +20,23 @@ import com.twasyl.slideshowfx.beans.chat.ChatMessage;
 import com.twasyl.slideshowfx.beans.chat.ChatMessageAction;
 import com.twasyl.slideshowfx.beans.chat.ChatMessageStatus;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.server.service.ISlideshowFXServices;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
 
+import static com.twasyl.slideshowfx.server.service.AbstractSlideshowFXService.*;
 /**
- * This class is used to display a {@link com.twasyl.slideshowfx.beans.chat.ChatMessage} in the {@link SlideshowScene}
+ * <p>This class is used to display a {@link com.twasyl.slideshowfx.beans.chat.ChatMessage} in the
+ * {@link com.twasyl.slideshowfx.controls.slideshow.SlideshowPane}. A {@link ChatBubble} is inserted inside a
+ * {@link ChatPanel}.</p>
+ * <p>When creating a bubble, the {@link ChatBubble} will respond to a double click in order to update the message
+ * it contains.</p>
  *
  * @author Thierry Wasylczenko
  * @version 1.0
@@ -52,16 +58,16 @@ public class ChatBubble extends VBox {
                 this.authorLabel.pseudoClassStateChanged(this.answeredPseudoClass, true);
                 this.messageContent.pseudoClassStateChanged(this.answeredPseudoClass, true);
 
-                JsonObject request = new JsonObject();
-                request.putString("service", "slideshowfx.chat.attendee.message.update")
-                        .putObject("data", new JsonObject()
-                                                .putObject("message", new JsonObject()
-                                                        .putString("id", this.getChatMessage().getId())
-                                                        .putString("status", ChatMessageStatus.ANSWERED.toString().toLowerCase())
-                                                        .putString("action", ChatMessageAction.MARK_READ.toString()))
-                                                .putArray("fields", new JsonArray()
-                                                        .addString("status")
-                                                        .addString("action")));
+                final JsonObject request = new JsonObject();
+                request.put(JSON_KEY_SERVICE, ISlideshowFXServices.SERVICE_CHAT_ATTENDEE_MESSAGE_UPDATE)
+                        .put(JSON_KEY_DATA, new JsonObject()
+                                                .put(JSON_KEY_MESSAGE, new JsonObject()
+                                                        .put(JSON_KEY_MESSAGE_ID, this.getChatMessage().getId())
+                                                        .put(JSON_KEY_MESSAGE_STATUS, ChatMessageStatus.ANSWERED.toString().toLowerCase())
+                                                        .put(JSON_KEY_MESSAGE_ACTION, ChatMessageAction.MARK_READ.toString()))
+                                                .put(JSON_KEY_FIELDS, new JsonArray()
+                                                        .add(JSON_KEY_FIELD_STATUS)
+                                                        .add(JSON_KEY_FIELD_ACTION)));
 
                 SlideshowFXServer.getSingleton().callService(request.encode());
             }
@@ -95,7 +101,7 @@ public class ChatBubble extends VBox {
     }
 
     /**
-     * Get the ChatMessage associated to this component.
+     * Get the {@link ChatMessage} associated to this component.
      * @return The ChatMessage associated to this component.
      */
     public ObjectProperty<ChatMessage> chatMessageProperty() { return chatMessage; }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -64,9 +64,9 @@ allprojects {
         wikitext
         zxing
 
-        testng
-        cucumber
         automaton
+        junit
+        vertxunit
     }
 
     dependencies {
@@ -80,13 +80,13 @@ allprojects {
         leapmotion fileTree(dir: allLibs, include: 'Leap/*')
         markdown 'com.github.rjeschke:txtmark:0.13'
         twitter4j 'org.twitter4j:twitter4j-core:4.0.4', 'org.twitter4j:twitter4j-stream:4.0.4'
-        vertx 'io.vertx:vertx-core:2.1.5', 'io.vertx:vertx-platform:2.1.5'
+        vertx 'io.vertx:vertx-core:3.0.0', 'io.vertx:vertx-web:3.0.0'
         wikitext fileTree(dir: new File(allLibs, 'WikiText'), include: '*.jar')
         zxing 'com.google.zxing:core:3.2.0', 'com.google.zxing:javase:3.2.0'
 
-        testng 'org.testng:testng:6.8.13', 'com.beust:jcommander:1.47'
-        cucumber 'info.cukes:cucumber-core:1.2.2', 'info.cukes:cucumber-java:1.2.2', 'info.cukes:cucumber-testng:1.2.2'
         automaton 'com.athaydes.automaton:Automaton:1.1.0'
+        junit 'junit:junit:4.12'
+        vertxunit 'io.vertx:vertx-unit:3.0.0'
     }
 
 }
@@ -99,7 +99,7 @@ subprojects {
     targetCompatibility = 1.8
 
     test {
-        useTestNG()
+        useJUnit()
         reports.html.enabled = true
     }
 }

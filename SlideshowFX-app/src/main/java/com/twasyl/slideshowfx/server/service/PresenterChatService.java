@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,12 +17,11 @@
 package com.twasyl.slideshowfx.server.service;
 
 import com.twasyl.slideshowfx.controls.slideshow.SlideshowPane;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Verticle;
+import io.vertx.core.Handler;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonObject;
 
-import java.util.logging.Logger;
+import static com.twasyl.slideshowfx.server.service.IServicesCode.RESPONSE_CODE_MESSAGE_ADDED;
 
 /**
  * This class represents the presenter part of the internal SlideshowFX chat.
@@ -31,22 +30,15 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class PresenterChatService extends Verticle {
-    private static final Logger LOGGER = Logger.getLogger(PresenterChatService.class.getName());
-
-    private final String handlerAddress = "slideshowfx.chat.presenter.message.add";
-    private Handler<Message<JsonObject>> messagehandler;
+public class PresenterChatService extends AbstractSlideshowFXService {
 
     @Override
     public void start() {
-        this.messagehandler = buildMessageHandler();
-        this.vertx.eventBus().registerHandler(this.handlerAddress, this.messagehandler);
+        this.register(SERVICE_CHAT_PRESENTER_MESSAGE_ADD, this.buildMessageHandler());
     }
 
     @Override
-    public void stop() {
-        this.vertx.eventBus().unregisterHandler(this.handlerAddress, this.messagehandler);
-    }
+    public void stop() { this.unregisterAll(); }
 
     private Handler<Message<JsonObject>> buildMessageHandler() {
         final Handler<Message<JsonObject>> handler = message -> {
@@ -54,7 +46,7 @@ public class PresenterChatService extends Verticle {
 
             if(SlideshowPane.getSingleton() != null) SlideshowPane.getSingleton().publishMessage(messageContent);
 
-            message.reply();
+            message.reply(this.buildResponse(SERVICE_CHAT_PRESENTER_MESSAGE_ADD, RESPONSE_CODE_MESSAGE_ADDED, ""));
         };
 
         return handler;

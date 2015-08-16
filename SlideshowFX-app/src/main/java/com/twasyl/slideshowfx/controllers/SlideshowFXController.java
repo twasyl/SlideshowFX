@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -924,7 +924,7 @@ public class SlideshowFXController implements Initializable {
             this.chatIpAddress.setValue(ip);
             this.chatPort.setText(port + "");
 
-            new SlideshowFXServer(ip, port, this.twitterHashtag.getText());
+            SlideshowFXServer.create(ip, port, this.twitterHashtag.getText()).start();
 
             icon = new FontAwesomeIconView(FontAwesomeIcon.POWER_OFF);
             icon.setGlyphSize(20);

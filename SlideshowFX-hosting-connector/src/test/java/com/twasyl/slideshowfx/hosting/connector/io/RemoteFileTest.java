@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,9 +16,9 @@
 
 package com.twasyl.slideshowfx.hosting.connector.io;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import static org.testng.Assert.*;
+import static org.junit.Assert.*;
 
 /**
  * Performs test on the {@link RemoteFile} class.
@@ -33,7 +33,8 @@ public class RemoteFileTest {
      * Ensure the {@link RemoteFile#toString()} method to return the expected value when a RemoteFile is constructed
      * with only the name and no parent.
      */
-    @Test public void toStringWithOnlyName() {
+    @Test
+    public void toStringWithOnlyName() {
         final RemoteFile parent = new RemoteFile("parent");
 
         assertEquals(parent.toString(), "/parent");
@@ -65,7 +66,6 @@ public class RemoteFileTest {
      */
     @Test public void isNotEmptyForParent() {
         final RemoteFile parent = new RemoteFile("parent");
-        final RemoteFile child = new RemoteFile(parent, "child");
 
         assertFalse(parent.isEmpty());
     }

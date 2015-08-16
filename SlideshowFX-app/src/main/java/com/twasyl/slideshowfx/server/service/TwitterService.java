@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import com.twasyl.slideshowfx.beans.chat.ChatMessage;
 import com.twasyl.slideshowfx.beans.chat.ChatMessageSource;
 import com.twasyl.slideshowfx.beans.chat.ChatMessageStatus;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import io.vertx.core.json.JsonObject;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -29,15 +30,12 @@ import javafx.concurrent.Worker;
 import javafx.scene.Scene;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Verticle;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,7 +46,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class TwitterService extends Verticle {
+public class TwitterService extends AbstractSlideshowFXService {
     private static final Logger LOGGER = Logger.getLogger(TwitterService.class.getName());
 
     private Configuration twitterConfiguration;
@@ -60,8 +58,7 @@ public class TwitterService extends Verticle {
 
     @Override
     public void start() {
-        final Map twitter = this.vertx.sharedData().getMap(SlideshowFXServer.SHARED_DATA_TWITTER);
-        final String hashtag = (String) twitter.get(SlideshowFXServer.SHARED_DATA_TWITTER_HASHTAG);
+        final String hashtag = SlideshowFXServer.getSingleton().getTwitterHashtag();
 
         this.twitterConfiguration = new ConfigurationBuilder()
                 .setOAuthConsumerKey("5luxVGxswd42RgTfbF02g")
@@ -85,7 +82,12 @@ public class TwitterService extends Verticle {
 
     @Override
     public void stop() {
-        super.stop();
+        try {
+            super.stop();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Can not stop the TwitterService properly", e);
+        }
+
         if(this.twitterStream != null) {
             try {
                 this.twitterStream.shutdown();
@@ -102,7 +104,7 @@ public class TwitterService extends Verticle {
             this.twitter.setOAuthConsumer(this.twitterConfiguration.getOAuthConsumerKey(),
                     this.twitterConfiguration.getOAuthConsumerSecret());
         } catch(IllegalStateException e) {
-            LOGGER.fine("Consumer keys alreay set up");
+            LOGGER.fine("Consumer keys already set up");
         }
 
         try {
@@ -158,8 +160,8 @@ public class TwitterService extends Verticle {
 
                 final JsonObject jsonTweet = chatMessage.toJSON();
 
-                TwitterService.this.vertx.eventBus().publish("slideshowfx.chat.attendee.message.add",jsonTweet);
-                TwitterService.this.vertx.eventBus().publish("slideshowfx.chat.presenter.message.add",jsonTweet);
+                TwitterService.this.vertx.eventBus().publish(SERVICE_CHAT_ATTENDEE_MESSAGE_ADD, jsonTweet);
+                TwitterService.this.vertx.eventBus().publish(SERVICE_CHAT_PRESENTER_MESSAGE_ADD, jsonTweet);
             }
 
             @Override

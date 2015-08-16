@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,7 +38,7 @@ public class TemplateProcessor {
      */
     public static synchronized Configuration getDefaultConfiguration() {
         if(configurationSingleton == null) {
-            configurationSingleton = new Configuration(Configuration.VERSION_2_3_22);
+            configurationSingleton = new Configuration(Configuration.VERSION_2_3_23);
             configurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
             configurationSingleton.setDefaultEncoding("UTF-8");
         }
@@ -55,7 +55,7 @@ public class TemplateProcessor {
      */
     public static synchronized Configuration getJsConfiguration() {
         if(jsConfigurationSingleton == null) {
-            jsConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_22);
+            jsConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_23);
             jsConfigurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
             jsConfigurationSingleton.setDefaultEncoding("UTF-8");
             jsConfigurationSingleton.setClassForTemplateLoading(TemplateProcessor.class, "/com/twasyl/slideshowfx/js/");
@@ -73,7 +73,7 @@ public class TemplateProcessor {
      */
     public static synchronized Configuration getHtmlConfiguration() {
         if(htmlConfigurationSingleton == null) {
-            htmlConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_22);
+            htmlConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_23);
             htmlConfigurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
             htmlConfigurationSingleton.setDefaultEncoding("UTF-8");
             htmlConfigurationSingleton.setClassForTemplateLoading(TemplateProcessor.class, "/com/twasyl/slideshowfx/html/");

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,13 +24,13 @@ import com.twasyl.slideshowfx.utils.TemplateProcessor;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.VoidHandler;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.http.RouteMatcher;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Verticle;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.shareddata.LocalMap;
+import io.vertx.ext.web.Router;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.twasyl.slideshowfx.server.service.IServicesCode.*;
+
 /**
  * This class provides the quizz services.
  *
@@ -47,7 +49,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class QuizzService extends Verticle {
+public class QuizzService extends AbstractSlideshowFXService {
     private static final Logger LOGGER = Logger.getLogger(QuizzService.class.getName());
 
     private final String url = "/slideshowfx/quizz";
@@ -64,66 +66,57 @@ public class QuizzService extends Verticle {
 
         this.updatedRouteMatcher();
 
-
-        this.vertx.eventBus().registerHandler("slideshowfx.quizz.start", buildStartQuizzHandler())
-                             .registerHandler("slideshowfx.quizz.stop", buildStopQuizzHandler())
-                             .registerHandler("slideshowfx.quizz.current", buildGetCurrentQuizzHandler());
+        this.register(SERVICE_QUIZZ_START, this.buildStartQuizzHandler())
+            .register(SERVICE_QUIZZ_STOP, this.buildStopQuizzHandler())
+            .register(SERVICE_QUIZZ_CURRENT, buildGetCurrentQuizzHandler());
     }
 
     private void updatedRouteMatcher() {
-        final Map serverInfo = this.vertx.sharedData().getMap(SlideshowFXServer.SHARED_DATA_SERVERS);
-        final SlideshowFXServer singleton = SlideshowFXServer.getSingleton();
-        final RouteMatcher routeMatcher = (RouteMatcher) singleton.getHttpServer().requestHandler();
+        final Router router = SlideshowFXServer.getSingleton().getRouter();
 
         // URL for answering a quizz
-        routeMatcher.post(this.url.concat("/:quizzid/answer"), request -> {
-            request.expectMultiPart(true);
-            request.endHandler(new VoidHandler() {
-                @Override
-                protected void handle() {
-                    int statusCode = 500;
+        router.post(this.url.concat("/:quizzid/answer")).handler(routingContext -> {
+            int statusCode = 500;
 
-                    try {
-                        if (currentQuizz != null && currentQuizz.getId() == Long.parseLong(request.params().get("quizzid"))) {
+            try {
+                if (currentQuizz != null && currentQuizz.getId() == Long.parseLong(routingContext.request().getParam("quizzid"))) {
 
-                            final String stringAnswer = request.formAttributes().get("answer");
-                            final JsonObject jsonAnswer = new JsonObject(new String(Base64.getDecoder().decode(stringAnswer)));
-                            final JsonArray answersArray = jsonAnswer.getArray("answers");
+                    final String stringAnswer = routingContext.request().getFormAttribute("answer");
+                    final JsonObject jsonAnswer = new JsonObject(new String(Base64.getDecoder().decode(stringAnswer)));
+                    final JsonArray answersArray = jsonAnswer.getJsonArray("answers");
 
-                            final Long[] answers = new Long[answersArray.size()];
-                            int index = 0;
-                            for(Object object : answersArray) {
-                                answers[index++] = ((Number) object).longValue();
-                            }
-
-                            boolean isCorrect = currentQuizz.checkAnswers(answers);
-                            final QuizzResult result = results.get(currentQuizz.getId());
-
-                            if (result != null) {
-                                if (isCorrect) result.addCorrectAnswer();
-                                else result.addWrongAnswer();
-                            }
-
-                            statusCode = 200;
-                        } else {
-                            statusCode = 406;
-                            request.response().setStatusCode(406).end();
-                        }
-                    } finally {
-                        request.response().setStatusCode(statusCode).end();
+                    final Long[] answers = new Long[answersArray.size()];
+                    int index = 0;
+                    for (Object object : answersArray) {
+                        answers[index++] = ((Number) object).longValue();
                     }
+
+                    boolean isCorrect = currentQuizz.checkAnswers(answers);
+                    final QuizzResult result = results.get(currentQuizz.getId());
+
+                    if (result != null) {
+                        if (isCorrect) result.addCorrectAnswer();
+                        else result.addWrongAnswer();
+                    }
+
+                    statusCode = 200;
+                } else {
+                    statusCode = 406;
+                    routingContext.response().setStatusCode(406).end();
                 }
-            });
-        })
+            } finally {
+                routingContext.response().setStatusCode(statusCode).end();
+            }
+        });
         // Get the JavaScript resources
-        .get("/slideshowfx/quizz/js/quizzService.js", request -> {
-            final Map templateTokens = this.vertx.sharedData().getMap(SlideshowFXServer.SHARED_DATA_TEMPLATE_TOKENS);
+        router.get("/slideshowfx/quizz/js/quizzService.js").handler(routingContext -> {
+            final LocalMap<String, String> templateTokens = this.vertx.sharedData().getLocalMap(SlideshowFXServer.SHARED_DATA_TEMPLATE_TOKENS);
 
             final Configuration configuration = TemplateProcessor.getJsConfiguration();
 
             final Map tokenValues = new HashMap();
-            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_HOST_TOKEN).toString(), serverInfo.get(SlideshowFXServer.SHARED_DATA_HTTP_SERVER_HOST).toString());
-            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_PORT_TOKEN).toString(), ((Integer) serverInfo.get(SlideshowFXServer.SHARED_DATA_HTTP_SERVER_PORT)).toString());
+            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_HOST_TOKEN).toString(), SlideshowFXServer.getSingleton().getHost());
+            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_PORT_TOKEN).toString(), SlideshowFXServer.getSingleton().getPort() + "");
 
             try (final StringWriter writer = new StringWriter()) {
                 final Template template = configuration.getTemplate("quizzService.js");
@@ -131,14 +124,14 @@ public class QuizzService extends Verticle {
 
                 writer.flush();
 
-                request.response().putHeader("Content-Type", "text/javascript").setStatusCode(200).setChunked(true).write(writer.toString()).end();
+                routingContext.response().putHeader("Content-Type", "application/javascript").setStatusCode(200).setChunked(true).write(Buffer.buffer(writer.toString())).end();
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Error when a client tried to access the chat", e);
 
-                request.response().setStatusCode(500).end();
+                routingContext.response().setStatusCode(500).end();
             } catch (TemplateException e) {
                 LOGGER.log(Level.WARNING, "Error when processing the chat template", e);
-                request.response().setStatusCode(500).end();
+                routingContext.response().setStatusCode(500).end();
             }
         });
     }
@@ -149,8 +142,6 @@ public class QuizzService extends Verticle {
      */
     private Handler<Message<JsonObject>> buildStartQuizzHandler() {
         final Handler<Message<JsonObject>> handler = message -> {
-            message.reply();
-
             final JsonObject object = message.body();
             final String quizzString = new String(Base64.getDecoder().decode(object.getString("encoded-quizz")));
 
@@ -164,15 +155,14 @@ public class QuizzService extends Verticle {
                 QuizzService.this.results.put(QuizzService.this.currentQuizz.getId(), quizzResult);
             }
 
-            final JsonObject reply = new JsonObject();
-            reply.putString("service", "slideshowfx.quizz.start");
-            reply.putObject("data", new JsonObject().putString("encoded-quizz", Base64.getEncoder().encodeToString(this.currentQuizz.toJSON().encode().getBytes())));
-
-            for(Object textHandlerId : this.vertx.sharedData().getSet(SlideshowFXServer.SHARED_DATA_WEBSOCKET_CLIENTS)) {
-                this.vertx.eventBus().send((String) textHandlerId, reply.encode());
-            }
+            final JsonObject encodedQuizz = new JsonObject()
+                    .put("encoded-quizz", Base64.getEncoder().encodeToString(this.currentQuizz.toJSON().encode().getBytes()));
+            final JsonObject reply = this.buildResponse(SERVICE_QUIZZ_START, RESPONSE_CODE_QUIZZ_STARTED, encodedQuizz);
+            this.sendResponseToWebSocketClients(reply);
 
             if(SlideshowPane.getSingleton() != null) SlideshowPane.getSingleton().publishQuizzResult(QuizzService.this.results.get(QuizzService.this.currentQuizz.getId()));
+
+            message.reply(reply);
         };
 
         return handler;
@@ -180,23 +170,19 @@ public class QuizzService extends Verticle {
 
     private Handler<Message<JsonObject>> buildStopQuizzHandler() {
         final Handler<Message<JsonObject>> handler = message -> {
-            message.reply();
-
             final JsonObject object = message.body();
-            final Long quizzId = object.getNumber("id").longValue();
+            final Long quizzId = object.getLong("id");
 
             // Ensure the ID is equal to the current quizz
             if(this.currentQuizz != null && this.currentQuizz.getId() == quizzId) {
                 this.currentQuizz = null;
 
-                final JsonObject reply = new JsonObject();
-                reply.putString("service", "slideshowfx.quizz.stop");
-                reply.putObject("data", new JsonObject().putString("message", "The quizz has been stopped"));
 
-                for(Object textHandlerId : this.vertx.sharedData().getSet(SlideshowFXServer.SHARED_DATA_WEBSOCKET_CLIENTS)) {
-                    this.vertx.eventBus().send((String) textHandlerId, reply.encode());
-                }
+                final JsonObject reply = this.buildResponse(SERVICE_QUIZZ_STOP, RESPONSE_CODE_QUIZZ_STOPPED, "The quizz has been stopped");
+                this.sendResponseToWebSocketClients(reply);
             }
+
+            message.reply(this.buildResponse(SERVICE_QUIZZ_STOP, RESPONSE_CODE_QUIZZ_STOPPED, "Quizz stopped"));
         };
 
         return handler;
@@ -205,9 +191,9 @@ public class QuizzService extends Verticle {
     private Handler<Message<JsonObject>> buildGetCurrentQuizzHandler() {
         final Handler<Message<JsonObject>> handler = message -> {
             if(this.currentQuizz != null) {
-                message.reply(this.currentQuizz.toJSON());
+                message.reply(this.buildResponse(SERVICE_QUIZZ_CURRENT, RESPONSE_CODE_QUIZZ_RETRIEVED, this.currentQuizz.toJSON()));
             } else {
-                message.reply();
+                message.reply(this.buildResponse(SERVICE_QUIZZ_CURRENT, RESPONSE_CODE_QUIZZ_NOT_ACTIVE, "No quizz active"));
             }
         };
 

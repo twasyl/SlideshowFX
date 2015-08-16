@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,10 +18,10 @@ package com.twasyl.slideshowfx.io;
 
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.utils.ZipUtils;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class ZipTest {
 
     }
 
-    @Test(enabled = false)
+    @Test
     public void unzipRevealjsTemplate() throws IOException {
         try {
             templateEngine.loadArchive(revealjsTemplateFile);
@@ -82,12 +82,12 @@ public class ZipTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test
     public void zipRevealjsTemplateFolder() throws IOException {
         ZipUtils.zip(reveljsTemplateFolder, revealjsTemplateFile);
     }
 
-    @Test(enabled = false)
+    @Test
     public void unzipImpressjsTemplate() throws IOException {
         try {
             templateEngine.loadArchive(impressjsTemplateFile);
@@ -97,12 +97,12 @@ public class ZipTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test
     public void zipImpressjsTemplateFolder() throws IOException {
         ZipUtils.zip(impressjsTemplateFolder, impressjsTemplateFile);
     }
 
-    @Test(enabled = false)
+    @Test
     public void unzipBespokejsTemplate() throws IOException {
         try {
             templateEngine.loadArchive(bespokejsTemplateFile);
@@ -112,12 +112,12 @@ public class ZipTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test
     public void zipBespokejsTemplateFolder() throws IOException {
         ZipUtils.zip(bespokejsTemplateFolder, bespokejsTemplateFile);
     }
 
-    @Test(enabled = false)
+    @Test
     public void zipPresentationExample() throws IOException {
         ZipUtils.zip(presentationExampleFolder, presentationExampleFile);
     }

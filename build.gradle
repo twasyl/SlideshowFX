@@ -74,7 +74,7 @@ allprojects {
         drive 'com.google.apis:google-api-services-drive:v2-rev155-1.19.1'
         dropbox 'com.dropbox.core:dropbox-core-sdk:1.7.7'
         felix 'org.apache.felix:org.apache.felix.framework:5.0.1'
-        fontawesomefx 'de.jensd:fontawesomefx:8.5'
+        fontawesomefx 'de.jensd:fontawesomefx:8.6'
         freemarker 'org.freemarker:freemarker:2.3.23'
         jsoup 'org.jsoup:jsoup:1.8.2'
         leapmotion fileTree(dir: allLibs, include: 'Leap/*')

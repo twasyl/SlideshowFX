@@ -19,8 +19,8 @@ package com.twasyl.slideshowfx.content.extension.code.controllers;
 import com.twasyl.slideshowfx.content.extension.code.enums.SupportedLanguage;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
@@ -38,7 +38,7 @@ public class CodeContentExtensionController implements Initializable {
 
     @FXML private ChoiceBox<SupportedLanguage> language;
     @FXML private TextArea code;
-    @FXML private ColorPicker backgroundColor;
+    @FXML private CheckBox showingLineNumbers;
 
     /**
      * Get the selected programming language in the UI.
@@ -53,10 +53,10 @@ public class CodeContentExtensionController implements Initializable {
     public String getCode() { return this.code.getText(); }
 
     /**
-     * Get the background color for the code that will be displayed in the presentation.
-     * @return The background color.
+     * Indicates if the line numbers should be showed.
+     * @return {@code true} if the line numbers showed, {@code false} otherwise.
      */
-    public Color getBackgroundColor() { return this.backgroundColor.getValue(); }
+    public Boolean isShowingLineNumbers() { return this.showingLineNumbers.isSelected(); }
 
     /**
      * Get the background color for the code that will be displayed in the presentation as hexedecimal string. For the
@@ -64,13 +64,11 @@ public class CodeContentExtensionController implements Initializable {
      * @return The background color as hexadecimal string.
      */
     public String getBackgroundColorHexadecimal() {
-        return "#" + Integer.toHexString(getBackgroundColor().hashCode()).substring(0, 6).toUpperCase();
+        return "#" + Integer.toHexString(isShowingLineNumbers().hashCode()).substring(0, 6).toUpperCase();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.backgroundColor.setValue(Color.LIGHTGRAY);
-
         this.language.setConverter(new StringConverter<SupportedLanguage>() {
             @Override
             public String toString(SupportedLanguage object) { return object.getName(); }

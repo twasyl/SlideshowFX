@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 /**
  * The CodeContentExtension extends the AbstractContentExtension. It allows to build a content containing code to insert
  * inside a SlideshowFX presentation.
- * This extension uses highlightjs in order to manage programming language syntax coloration.
+ * This extension uses PrismJS in order to manage programming language syntax coloration.
  * This extension supports HTML and Textile markup languages.
  *
  * @author Thierry Wasylczenko
@@ -45,18 +45,16 @@ public class CodeContentExtension extends AbstractContentExtension {
 
     public CodeContentExtension() {
         super("CODE",
-                CodeContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/code/resources/highlightjs.zip"),
+                CodeContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/code/resources/prism.zip"),
                 FontAwesomeIcon.CODE,
                 "Insert code",
                 "Insert code");
 
-
-        final String baseURL = "highlightjs/8.4/";
+        final String baseURL = "prism/";
 
         // Add URL
-        this.putResource(ResourceType.CSS_FILE, baseURL.concat("styles/github.css"));
-        this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("highlight.pack.js"));
-        this.putResource(ResourceType.SCRIPT, "hljs.initHighlightingOnLoad();");
+        this.putResource(ResourceType.CSS_FILE, baseURL.concat("prism.css"));
+        this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("prism.js"));
     }
 
     @Override
@@ -83,8 +81,13 @@ public class CodeContentExtension extends AbstractContentExtension {
             builder.append(this.buildDefaultContentString());
         } else if("TEXTILE".equals(markup.getCode())) {
             builder.append("bc(")
-                    .append(this.controller.getLanguage().getCssClass())
-                    .append("){background-color: ").append(this.controller.getBackgroundColorHexadecimal()).append("; width: 93%;}.. ")
+                    .append(this.controller.getLanguage().getCssClass());
+
+            if(this.controller.isShowingLineNumbers()) {
+                builder.append(" line-numbers");
+            }
+
+            builder.append(").. ")
                     .append(this.controller.getCode());
         } else {
             builder.append(this.buildDefaultContentString());
@@ -97,9 +100,16 @@ public class CodeContentExtension extends AbstractContentExtension {
     public String buildDefaultContentString() {
 
         final StringBuilder builder = new StringBuilder();
-        builder.append("<pre><code class=\"")
+        builder.append("<pre class=\"")
+                .append(this.controller.getLanguage().getCssClass());
+
+        if(this.controller.isShowingLineNumbers()) {
+            builder.append(" line-numbers");
+        }
+
+        builder.append("\"><code class=\"")
                 .append(this.controller.getLanguage().getCssClass())
-                .append("\" style=\"background-color: ").append(this.controller.getBackgroundColorHexadecimal()).append("; width: 93%\">")
+                .append("\">")
                 .append(this.controller.getCode())
                 .append("</code></pre>");
 

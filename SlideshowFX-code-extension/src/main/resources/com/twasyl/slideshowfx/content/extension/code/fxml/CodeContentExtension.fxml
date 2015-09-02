@@ -24,8 +24,7 @@
     <HBox spacing="5" alignment="BASELINE_LEFT">
         <Label text="Language:" />
         <ChoiceBox fx:id="language" />
-        <Label text="Background color:" />
-        <ColorPicker fx:id="backgroundColor" />
+        <CheckBox fx:id="showingLineNumbers" text="Show lines number" />
     </HBox>
 
     <TextArea fx:id="code" prefColumnCount="50" prefRowCount="20" />

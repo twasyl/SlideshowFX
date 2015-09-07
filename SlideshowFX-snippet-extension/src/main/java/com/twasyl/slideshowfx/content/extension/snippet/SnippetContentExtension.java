@@ -45,17 +45,17 @@ public class SnippetContentExtension extends AbstractContentExtension {
 
     public SnippetContentExtension() {
         super("SNIPPET",
-                SnippetContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/snippet/resources/highlightjs.zip"),
+                SnippetContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/snippet/resources/snippet-executor.zip"),
                 FontAwesomeIcon.TERMINAL,
                 "Insert an executable code snippet",
                 "Insert an executable code snippet");
 
-        final String baseURL = "highlightjs/8.4/";
+        final String baseURL = "snippet-executor/";
 
         // Add URL
-        this.putResource(ResourceType.CSS_FILE, baseURL.concat("styles/github.css"));
-        this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("highlight.pack.js"));
-        this.putResource(ResourceType.SCRIPT, "hljs.initHighlightingOnLoad();");
+        this.putResource(ResourceType.CSS_FILE, baseURL.concat("font-awesome-4.4.0/font-awesome.min.css"));
+        this.putResource(ResourceType.CSS_FILE, baseURL.concat("prism/prism.css"));
+        this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("prism/prism.js"));
     }
 
     @Override
@@ -84,23 +84,26 @@ public class SnippetContentExtension extends AbstractContentExtension {
         final StringBuilder builder = new StringBuilder();
 
         long id = System.currentTimeMillis();
-        final String codeSnippetId = "code-snippet-" + id;
+        final String codeSnippetId= "code-snippet-" + id;
+        final String codeSnippetConsoleOuputId= "code-snippet-output-" + id;
         final String codeSnippetConsoleId = "code-snippet-console-" + id;
+        final String executeCodeSnippetId = "code-snippet-execute-" + id;
 
-        builder.append("<div style=\"width: 93%; overflow: hidden'\">\n")
-                .append("   <div style=\"width: 50%; float: left\">\n")
-                .append("       <pre><code id=\"").append(codeSnippetId).append("\" class=\"").append(this.controller.getSnippetExecutor().getCssClass()).append("\">")
+        builder.append("<div style=\"width: 100%; height: 50px; background-color: #ECECEC;")
+                .append("border-radius: 10px 10px 0 0\" id=\"").append(codeSnippetId).append("\">\n")
+                .append("   <i id=\"").append(executeCodeSnippetId).append("\" class=\"fa fa-terminal fa-fw\" ")
+                .append("onclick=\"javascript:executeCodeSnippet('")
+                .append(this.controller.getSnippetExecutor().getCode())
+                .append("', '").append(Base64.getEncoder().encodeToString(this.controller.getCodeSnippet().toJson().getBytes())).append("', '")
+                .append(id).append("');\"></i>\n")
+                .append("</div>\n")
+                .append("<pre id=\"").append(codeSnippetConsoleId).append("\" style=\"margin-top: 0\" ")
+                .append("class=\"").append(this.controller.getSnippetExecutor().getCssClass()).append("\">")
+                .append("<code class=\"").append(this.controller.getSnippetExecutor().getCssClass()).append("\">")
                 .append(this.controller.getCodeSnippet().getCode())
                 .append("</code></pre>\n")
-                .append("       <button type=\"button\" onclick=\"javascript:executeCodeSnippet('").append(this.controller.getSnippetExecutor().getCode())
-                .append("', '").append(Base64.getEncoder().encodeToString(this.controller.getCodeSnippet().toJson().getBytes())).append("', '")
-                .append(codeSnippetConsoleId).append("');\">Execute code</button><br />\n")
-                .append("   </div>\n")
-                .append("   <div style=\"width: 50%; float: left\">\n")
-                .append(        "<pre><code id=\"").append(codeSnippetConsoleId).append("\" class=\"bash\" style=\"background-color: black; color: white; width: 93%;\"></code></pre>\n")
-                .append("   </div>\n")
-                .append("</div>");
-
+                .append("<pre id=\"").append(codeSnippetConsoleOuputId).append("\" class=\"language-bash\" style=\"display: none; margin-top: 0;\">")
+                .append("<code class=\"language-bash\"></code></pre>");
         return builder.toString();
     }
 }

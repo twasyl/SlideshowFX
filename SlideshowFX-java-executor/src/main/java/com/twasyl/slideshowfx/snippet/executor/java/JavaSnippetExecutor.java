@@ -51,7 +51,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
     private static final String CLASS_NAME_PROPERTY = "class";
 
     public JavaSnippetExecutor() {
-        super("JAVA", "Java", "java");
+        super("JAVA", "Java", "language-java");
         this.setOptions(new JavaSnippetExecutorOptions());
 
         final String javaHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(JAVA_HOME_PROPERTY_SUFFIX));

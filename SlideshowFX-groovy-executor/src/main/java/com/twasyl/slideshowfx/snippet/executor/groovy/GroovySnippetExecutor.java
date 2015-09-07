@@ -59,7 +59,7 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
     private static final String MAKE_SCRIPT = "makeScript";
 
     public GroovySnippetExecutor() {
-        super("GROOVY", "Groovy", "groovy");
+        super("GROOVY", "Groovy", "language-groovy");
         this.setOptions(new GroovySnippetExecutorOptions());
 
         final String groovyHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(GROOVY_HOME_PROPERTY_SUFFIX));

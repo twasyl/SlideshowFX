@@ -51,7 +51,7 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
     private static final String IMPORTS_PROPERTY = "imports";
 
     public GoloSnippetExecutor() {
-        super("GOLO", "Golo", "");
+        super("GOLO", "Golo", "language-java");
         this.setOptions(new GoloSnippetExecutorOptions());
 
         final String goloHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(GOLO_HOME_PROPERTY_SUFFIX));
@@ -59,7 +59,7 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
             try {
                 this.getOptions().setGoloHome(new File(goloHome));
             } catch (FileNotFoundException e) {
-                LOGGER.log(Level.SEVERE, "Can not set the JAVA_HOME", e);
+                LOGGER.log(Level.SEVERE, "Can not set the GOLO_HOME", e);
             }
         }
     }

@@ -56,10 +56,15 @@ public class PresentationConfiguration implements IConfiguration {
         this.variables.addAll(variables);
     }
 
+    /**
+     * Update the thumbnail of a given slide identified by its number.
+     * @param slideNumber The number of the slide to update the thumbnail.
+     * @param image The new thumbnail.
+     * @throws IllegalArgumentException If the slide number is {@code null}.
+     */
     public void updateSlideThumbnail(String slideNumber, Image image) {
         if(slideNumber == null) throw new IllegalArgumentException("The slide number can not be null");
 
-        Slide slideToUpdate = null;
         for (Slide s : getSlides()) {
             if (slideNumber.equals(s.getSlideNumber())) {
                 s.setThumbnail(image);

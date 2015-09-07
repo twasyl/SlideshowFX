@@ -48,7 +48,7 @@ public class UploadPresentationTask extends Task<Void> {
     private RemoteFile destination;
 
     public UploadPresentationTask(PresentationEngine engine, IHostingConnector hostingConnector, RemoteFile destination) {
-        ((SimpleStringProperty) this.titleProperty()).set(String.format("uploading presentation to %1$s: %2$s", hostingConnector.getName(), engine.getArchive().getName()));
+        ((SimpleStringProperty) this.titleProperty()).set(String.format("Uploading presentation to %1$s: %2$s", hostingConnector.getName(), engine.getArchive().getName()));
         this.engine = engine;
         this.hostingConnector = hostingConnector;
         this.destination = destination;

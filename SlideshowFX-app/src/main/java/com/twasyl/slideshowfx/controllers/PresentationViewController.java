@@ -47,6 +47,7 @@ import javafx.beans.property.adapter.JavaBeanObjectProperty;
 import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -56,6 +57,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
 import org.xml.sax.SAXException;
 
+import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.File;
@@ -164,8 +166,8 @@ public class PresentationViewController implements Initializable {
      * with the HTML content converted in Base64.
      * A screenshot of the slide is taken to update the menu of available slides.
      *
-     * @param markup
-     * @param originalContent
+     * @param markup The markup with which the new content was generated.
+     * @param originalContent The original content, in Base64, with which the slide will be updated.
      * @throws javax.xml.transform.TransformerException
      * @throws java.io.IOException
      * @throws javax.xml.parsers.ParserConfigurationException
@@ -196,7 +198,6 @@ public class PresentationViewController implements Initializable {
 
         ((SimpleBooleanProperty) this.presentationModified).set(true);
     }
-
 
     /**
      * Update the JavaFX UI with the data from the element that has been clicked in the HTML page.

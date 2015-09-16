@@ -36,9 +36,9 @@ function manageGetCurrentQuizz(data) {
 
         var cookieQuizzAnswered = getCookie('quizz-' + data.id);
         if(cookieQuizzAnswered === "" && cookieQuizzAnswered != 'answered') {
-            quizzElement += "<button id=\"answer-quizz-button\" onclick=\"sendQuizzAnswer();\" class=\"custom-button blue-background width-to-container\">Answer !</button>";
+            quizzElement += "<button id=\"answer-quizz-button\" onclick=\"sendQuizzAnswer();\" class=\"custom-button width-to-container\">Answer !</button>";
         } else {
-            quizzElement += "<button class=\"custom-button width-to-container blue-background\" onclick=\"javascript:alert('Do not try to cheat :)');\">You have already answered this quizz !</button>";
+            quizzElement += "<button class=\"custom-button width-to-container\" onclick=\"javascript:alert('Do not try to cheat :)');\">You have already answered this quizz !</button>";
         }
 
         quizzElement += "</div>";

@@ -25,7 +25,8 @@ function requestChatHistory() {
     var messagesDiv = document.getElementById("chat-messages");
 
     var htmlMessage = "<div class=\"chat-message\" id=\"" + data.id + "\">"
-                + "<div id=\"" + data.id + "-check\" style=\"display: none; margin-right: 5px;\"><img src=\"http://${slideshowfx_server_ip}:${slideshowfx_server_port}/slideshowfx/chat/images/check.png\" width=\"10px\" /></div>"
+                + "<div id=\"" + data.id + "-check\" style=\"display: none; margin-right: 5px;\">"
+                + "<i class=\"fa fa-check-circle-o fw\" style=\"color: green\"></i></div>"
                 + "<span class=\"author\">" + data.author + " ";
 
     if( data.author == "I") {

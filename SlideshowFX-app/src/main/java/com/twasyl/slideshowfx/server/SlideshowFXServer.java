@@ -290,7 +290,7 @@ public class SlideshowFXServer {
             tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_PORT_TOKEN).toString(), this.getPort() + "");
 
             try (final StringWriter writer = new StringWriter()) {
-                final Template template = configuration.getTemplate("index.html");
+                final Template template = configuration.getTemplate("slideshowfx.html");
                 template.process(tokenValues, writer);
 
                 writer.flush();
@@ -305,8 +305,8 @@ public class SlideshowFXServer {
                 routingContext.response().setStatusCode(500).end();
             }
         });
-        router.get(CONTEXT_PATH.concat("/images/logo.png")).handler(routingContext -> {
-            try (final InputStream in = ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/64.png")) {
+        router.get(CONTEXT_PATH.concat("/images/logo.svg")).handler(routingContext -> {
+            try (final InputStream in = ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/logo.svg")) {
 
                 byte[] imageBuffer = new byte[1028];
                 int numberOfBytesRead;
@@ -316,7 +316,7 @@ public class SlideshowFXServer {
                     buffer.appendBytes(imageBuffer, 0, numberOfBytesRead);
                 }
 
-                routingContext.response().headers().set("Content-Type", "image/png");
+                routingContext.response().headers().set("Content-Type", "image/svg+xml");
                 routingContext.response().setChunked(true).write(buffer).end();
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Can not send check images", e);

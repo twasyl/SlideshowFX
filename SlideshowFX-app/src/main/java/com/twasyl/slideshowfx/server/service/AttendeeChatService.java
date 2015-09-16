@@ -74,8 +74,11 @@ public class AttendeeChatService extends AbstractSlideshowFXService {
         final Router router = singleton.getRouter();
 
         // Route that get the image of an answered message
-        router.get("/slideshowfx/chat/images/check.png").handler(routingContext -> {
-            try (final InputStream in = ResourceHelper.getInputStream("/com/twasyl/slideshowfx/html/images/check.png")) {
+        final String FONT_AWESOME_PREFIX = "/slideshowfx/font-awesome/";
+        router.get(FONT_AWESOME_PREFIX.concat("*")).handler(routingContext -> {
+            final String file = routingContext.request().path().substring(FONT_AWESOME_PREFIX.length());
+
+            try (final InputStream in = ResourceHelper.getInputStream("/com/twasyl/slideshowfx/webapp/font-awesome/4.4.0/".concat(file))) {
 
                 byte[] imageBuffer = new byte[1028];
                 int numberOfBytesRead;
@@ -87,7 +90,7 @@ public class AttendeeChatService extends AbstractSlideshowFXService {
 
                 routingContext.response().setChunked(true).write(buffer).end();
             } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Can not send check images", e);
+                LOGGER.log(Level.WARNING, "Can not send the font awesome css", e);
             }
         });
         // Get the JavaScript resources

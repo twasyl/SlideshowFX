@@ -76,13 +76,13 @@ allprojects {
         felix 'org.apache.felix:org.apache.felix.framework:5.0.1'
         fontawesomefx 'de.jensd:fontawesomefx:8.6'
         freemarker 'org.freemarker:freemarker:2.3.23'
-        jsoup 'org.jsoup:jsoup:1.8.2'
+        jsoup 'org.jsoup:jsoup:1.8.3'
         leapmotion fileTree(dir: allLibs, include: 'Leap/*')
         markdown 'com.github.rjeschke:txtmark:0.13'
         twitter4j 'org.twitter4j:twitter4j-core:4.0.4', 'org.twitter4j:twitter4j-stream:4.0.4'
         vertx 'io.vertx:vertx-core:3.0.0', 'io.vertx:vertx-web:3.0.0'
         wikitext fileTree(dir: new File(allLibs, 'WikiText'), include: '*.jar')
-        zxing 'com.google.zxing:core:3.2.0', 'com.google.zxing:javase:3.2.0'
+        zxing 'com.google.zxing:core:3.2.1', 'com.google.zxing:javase:3.2.1'
 
         automaton 'com.athaydes.automaton:Automaton:1.1.0'
         junit 'junit:junit:4.12'

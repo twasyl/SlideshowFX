@@ -173,7 +173,9 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
                         LOGGER.log(Level.SEVERE, "Can not finish authentication", e);
                         this.accessToken = null;
                     } finally {
-                        GlobalConfiguration.setProperty(getConfigurationBaseName().concat(ACCESS_TOKEN_PROPERTY_SUFFIX), this.accessToken);
+                        if(this.accessToken != null) {
+                            GlobalConfiguration.setProperty(getConfigurationBaseName().concat(ACCESS_TOKEN_PROPERTY_SUFFIX), this.accessToken);
+                        }
                         stage.close();
                     }
                 }

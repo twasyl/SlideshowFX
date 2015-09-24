@@ -195,8 +195,10 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
                         LOGGER.log(Level.WARNING, "Failed to get access token", e);
                         this.accessToken = null;
                     } finally {
-                        GlobalConfiguration.setProperty(getConfigurationBaseName().concat(ACCESS_TOKEN_PROPERTY_SUFFIX),
-                                this.accessToken);
+                        if(this.accessToken != null) {
+                            GlobalConfiguration.setProperty(getConfigurationBaseName().concat(ACCESS_TOKEN_PROPERTY_SUFFIX),
+                                    this.accessToken);
+                        }
                         stage.close();
                     }
 

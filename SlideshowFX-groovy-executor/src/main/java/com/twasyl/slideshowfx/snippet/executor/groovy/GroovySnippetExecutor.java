@@ -170,8 +170,9 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
         final Thread snippetThread = new Thread(() -> {
 
             // Build code file content according properties
-            final StringBuilder codeBuilder = new StringBuilder();
-            String className = "Snippet";
+            // Manage the class name
+            String className = codeSnippet.getProperties().get(CLASS_NAME_PROPERTY);
+            if(className == null || className.isEmpty()) className = "Snippet";
 
             final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_METHOD_RUNNER) ?
                     Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_METHOD_RUNNER)) :
@@ -181,28 +182,28 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
                     Boolean.parseBoolean(codeSnippet.getProperties().get(MAKE_SCRIPT)) :
                     false;
 
+            final StringBuilder codeBuilder = new StringBuilder();
+
+            // Manage imports
+            if(makeScript) codeBuilder.append("import org.codehaus.groovy.runtime.InvokerHelper\n");
+
+            final String imports = codeSnippet.getProperties().get(IMPORTS_PROPERTY);
+            if(imports != null) codeBuilder.append(imports).append("\n");
+
+            codeBuilder.append("\nclass ").append(className).append(makeScript ? " extends Script" : "").append(" {\n");
+
+            // Manage if a main method must be generated or not
             if(wrapInMain) {
-                if(makeScript) codeBuilder.append("import org.codehaus.groovy.runtime.InvokerHelper\n");
-
-                final String imports = codeSnippet.getProperties().get(IMPORTS_PROPERTY);
-                if(imports != null) codeBuilder.append(imports).append("\n");
-
-                if(codeSnippet.getProperties().get(CLASS_NAME_PROPERTY) != null && !codeSnippet.getProperties().get(CLASS_NAME_PROPERTY).isEmpty()) {
-                    className = codeSnippet.getProperties().get(CLASS_NAME_PROPERTY);
-                }
-
-                codeBuilder.append("\nclass ").append(className).append(makeScript ? " extends Script" : "").append(" {\n");
-
                 if(makeScript) codeBuilder.append("\tdef run() {\n");
                 else codeBuilder.append("\tdef static main(String...args) {\n");
 
                 codeBuilder.append("\t\t").append(codeSnippet.getCode()).append("\n")
-                           .append("\t}\n}");
+                           .append("\t}");
             } else {
-                if(makeScript) codeBuilder.append("import org.codehaus.groovy.runtime.InvokerHelper\n");
-
                 codeBuilder.append(codeSnippet.getCode());
             }
+
+            codeBuilder.append("\n}");
 
             final File codeFile = new File(this.getTemporaryDirectory(), className.concat(".groovy"));
             try (final FileWriter codeFileWriter = new FileWriter(codeFile)) {

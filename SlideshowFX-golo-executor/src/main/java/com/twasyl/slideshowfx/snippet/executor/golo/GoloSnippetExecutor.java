@@ -138,17 +138,17 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
         final Thread snippetThread = new Thread(() -> {
 
             // Build code file content according properties
-            final StringBuilder codeBuilder = new StringBuilder();
-
             final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_MAIN_PROPERTY) ?
                                                     Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_MAIN_PROPERTY)) :
                                                     false;
 
+            final StringBuilder codeBuilder = new StringBuilder("module slideshowfx.Snippet\n\n");
+
             if(wrapInMain) {
-                codeBuilder.append("module slideshowfx.Snippet\n\n")
-                        .append("\tfunction main = |args| {\n")
-                        .append("\t").append(codeSnippet.getCode()).append("\n")
-                        .append("\t}");
+                codeBuilder.append("\tfunction main = |args| {\n")
+                            .append("\t")
+                            .append(codeSnippet.getCode()).append("\n")
+                            .append("\t}");
             } else {
                 codeBuilder.append(codeSnippet.getCode());
             }

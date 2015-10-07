@@ -147,28 +147,32 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
         final Thread snippetThread = new Thread(() -> {
 
             // Build code file content according properties
-            final StringBuilder codeBuilder = new StringBuilder();
-            String className = "Snippet";
+            // Manage the class name
+            String className = codeSnippet.getProperties().get(CLASS_NAME_PROPERTY);
+            if(className == null || className.isEmpty()) className = "Snippet";
 
             final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_MAIN_PROPERTY) ?
                     Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_MAIN_PROPERTY)) :
                     false;
 
+            final StringBuilder codeBuilder = new StringBuilder();
+
+            // Manage imports
+            final String imports = codeSnippet.getProperties().get(IMPORTS_PROPERTY);
+            if(imports != null) codeBuilder.append(imports).append("\n");
+
+            codeBuilder.append("\npublic class ").append(className).append(" {\n");
+
+            // Manage if a main method must be generated or not
             if(wrapInMain) {
-                final String imports = codeSnippet.getProperties().get(IMPORTS_PROPERTY);
-                if(imports != null) codeBuilder.append(imports).append("\n");
-
-                if(codeSnippet.getProperties().get(CLASS_NAME_PROPERTY) != null && !codeSnippet.getProperties().get(CLASS_NAME_PROPERTY).isEmpty()) {
-                    className = codeSnippet.getProperties().get(CLASS_NAME_PROPERTY);
-                }
-
-                codeBuilder.append("\npublic class ").append(className).append(" {\n")
-                        .append("\tpublic static void main(String[] args) {\n")
-                        .append("\t\t").append(codeSnippet.getCode()).append("\n")
-                        .append("\t}\n}");
+                codeBuilder.append("\tpublic static void main(String[] args) {\n")
+                            .append("\t\t").append(codeSnippet.getCode()).append("\n")
+                            .append("\t}");
             } else {
                 codeBuilder.append(codeSnippet.getCode());
             }
+
+            codeBuilder.append("\n}");
 
             final File codeFile = new File(this.getTemporaryDirectory(), className.concat(".java"));
             try (final FileWriter codeFileWriter = new FileWriter(codeFile)) {
@@ -192,7 +196,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
                             .directory(this.getTemporaryDirectory())
                             .start();
 
-                try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+                try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                     errorStream.lines().forEach(line -> consoleOutput.add(line));
                 }
             } catch (IOException e) {

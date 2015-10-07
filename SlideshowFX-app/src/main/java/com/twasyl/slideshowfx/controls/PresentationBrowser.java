@@ -273,6 +273,7 @@ public final class PresentationBrowser extends StackPane {
 
     /**
      * Prints the current page displayed within the internal browser, not necessarily the {@link #presentationProperty()}.
+     * If no printers are installed on the system, an awareness is displayed.
      */
     public final void print() {
         final PrinterJob job = PrinterJob.createPrinterJob();
@@ -294,6 +295,8 @@ public final class PresentationBrowser extends StackPane {
             } else {
                 job.cancelJob();
             }
+        } else {
+            DialogHelper.showError("No printer", "There is no printer installed on your system.");
         }
     }
 

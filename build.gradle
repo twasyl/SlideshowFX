@@ -197,6 +197,10 @@ task installSnippetExecutorPlugins(dependsOn : [':SlideshowFX-golo-executor:jar'
     }
 }
 
+task installAllPlugins(dependsOn: [ ':installMarkupPlugins', ':installContentExtensionPlugins',
+        ':installHostingConnectorPlugins', ':installSnippetExecutorPlugins']) << {
+}
+
 task packageSlideshowFX(dependsOn : [ 'clean',
                                       ':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar', ':SlideshowFX-textile:jar',
                                       ':SlideshowFX-code-extension:jar', ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar', ':SlideshowFX-quote-extension:jar', ':SlideshowFX-sequence-diagram-extension:jar', ':SlideshowFX-snippet-extension:jar',

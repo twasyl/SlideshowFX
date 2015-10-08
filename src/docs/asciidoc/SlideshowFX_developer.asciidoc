@@ -105,6 +105,7 @@ In order to build SlideshowFX, some gradle tasks have been created:
 - `installContentExtensionPlugins` (in the root project) which copies the content extensions to the directory of plugins ;
 - `installHostingConnectorPlugins` (in the root project) which copies the hosting connectors to the directory of plugins ;
 - `installSnippetExecutor` (in the root project) which copies the snippet executors to the directory of plugins ;
+- `installAllPlugins` (in the root project) which copies all plugins to the directory of plugins ;
 - `packageSlideshowFX` (in the root project) which packages the application, markups, extensions and documentation together.
 
 === Set up your environment

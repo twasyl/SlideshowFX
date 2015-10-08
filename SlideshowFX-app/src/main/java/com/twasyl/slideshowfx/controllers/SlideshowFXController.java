@@ -734,7 +734,7 @@ public class SlideshowFXController implements Initializable {
      * @throws java.io.FileNotFoundException      If dataFile does not exist.
      * @throws java.lang.IllegalAccessException   If the file can not be accessed.
      */
-    private void openTemplateOrPresentation(final File dataFile) throws IllegalArgumentException, IllegalAccessException, FileNotFoundException {
+    public void openTemplateOrPresentation(final File dataFile) throws IllegalArgumentException, IllegalAccessException, FileNotFoundException {
         if (dataFile == null) throw new IllegalArgumentException("The dataFile can not be null");
         if (!dataFile.exists()) throw new FileNotFoundException("The dataFile does not exist");
         if (!dataFile.canRead()) throw new IllegalAccessException("The dataFile can not be accessed");

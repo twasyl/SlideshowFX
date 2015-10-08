@@ -18,6 +18,7 @@ package com.twasyl.slideshowfx.app;
 
 import com.sun.javafx.PlatformUtil;
 import com.sun.javafx.application.LauncherImpl;
+import com.twasyl.slideshowfx.controllers.SlideshowFXController;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.io.DeleteFileVisitor;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
@@ -32,11 +33,15 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -109,22 +114,45 @@ public class SlideshowFX extends Application {
     }
 
     private static final Logger LOGGER = Logger.getLogger(SlideshowFX.class.getName());
+    private static final String PRESENTATION_ARGUMENT_PREFIX = "presentation";
+    private static final String TEMPLATE_ARGUMENT_PREFIX = "template";
+
     private static final ReadOnlyObjectProperty<Stage> stage = new SimpleObjectProperty<>();
     private static final ReadOnlyObjectProperty<Scene> presentationBuilderScene = new SimpleObjectProperty<>();
-
+    private Set<File> filesToOpen;
 
     @Override
     public void init() throws Exception {
         // Start the MarkupManager
         LOGGER.info("Starting Felix");
         OSGiManager.startAndDeploy();
+
+        // Retrieve the files to open at startup
+        final Map<String, String> params = getParameters().getNamed();
+        if(params != null && !params.isEmpty()) {
+            this.filesToOpen = new HashSet<>();
+
+            // Only files that exist and can be read and opened are added to the list of files to open
+            params.forEach((paramName, paramValue) -> {
+                if(paramName != null && (paramName.startsWith(PRESENTATION_ARGUMENT_PREFIX) ||
+                        paramName.startsWith(TEMPLATE_ARGUMENT_PREFIX))) {
+
+                    final File file = new File(paramValue);
+
+                    if (file.exists() && file.canRead() && file.canWrite() && !this.filesToOpen.contains(file)) {
+                        this.filesToOpen.add(file);
+                    }
+                }
+            });
+        }
     }
 
     @Override
     public void start(Stage stage) throws Exception {
         ((SimpleObjectProperty<Stage>) SlideshowFX.stage).set(stage);
 
-        final Parent root = FXMLLoader.load(getClass().getResource("/com/twasyl/slideshowfx/fxml/SlideshowFX.fxml"));
+        final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/twasyl/slideshowfx/fxml/SlideshowFX.fxml"));
+        final Parent root = loader.load();
 
         final Scene scene = new Scene(root);
         ((SimpleObjectProperty<Scene>) presentationBuilderScene).set(scene);
@@ -140,6 +168,18 @@ public class SlideshowFX extends Application {
                 new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/256.png")),
                 new Image(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/images/appicons/512.png")));
         stage.show();
+
+        if(this.filesToOpen != null && !this.filesToOpen.isEmpty()) {
+            final SlideshowFXController controller = loader.getController();
+
+            this.filesToOpen.forEach(file -> {
+                try {
+                    controller.openTemplateOrPresentation(file);
+                } catch (IllegalAccessException | FileNotFoundException e) {
+                    LOGGER.log(Level.SEVERE, "Can not open file at startup", e);
+                }
+            });
+        }
     }
 
     @Override
@@ -150,16 +190,16 @@ public class SlideshowFX extends Application {
         File tempDirectory = new File(System.getProperty("java.io.tmpdir"));
 
         Arrays.stream(tempDirectory.listFiles())
-              .filter(file -> file.getName().startsWith("sfx-"))
-              .forEach(file -> {
-                  try {
-                      Files.walkFileTree(file.toPath(), new DeleteFileVisitor());
-                  } catch (IOException e) {
-                      LOGGER.log(Level.SEVERE,
-                              String.format("Can not delete temporary file %1$s", file.getAbsolutePath()),
-                              e);
-                  }
-              });
+                .filter(file -> file.getName().startsWith("sfx-"))
+                .forEach(file -> {
+                    try {
+                        Files.walkFileTree(file.toPath(), new DeleteFileVisitor());
+                    } catch (IOException e) {
+                        LOGGER.log(Level.SEVERE,
+                                String.format("Can not delete temporary file %1$s", file.getAbsolutePath()),
+                                e);
+                    }
+                });
 
         LOGGER.info("Closing the chat");
         if(SlideshowFXServer.getSingleton() != null) SlideshowFXServer.getSingleton().stop();

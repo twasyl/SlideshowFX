@@ -230,10 +230,6 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
                     try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                         inputStream.lines().forEach(line -> consoleOutput.add(line));
                     }
-
-                    try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-                        errorStream.lines().forEach(line -> consoleOutput.add(line));
-                    }
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE, "Can not execute code snippet", e);
                     consoleOutput.add("ERROR: ".concat(e.getMessage()));

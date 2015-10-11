@@ -18,10 +18,10 @@ package com.twasyl.slideshowfx.markup.textile;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-import static org.testng.Assert.*;
+import static org.junit.Assert.*;
 
 /**
  * @author Thierry Wasylczenko
@@ -30,7 +30,8 @@ public class TextileMarkupTest {
 
     private static TextileMarkup markup;
 
-    @BeforeClass public static void setUp() {
+    @BeforeClass
+    public static void setUp() {
         markup = new TextileMarkup();
     }
 
@@ -38,7 +39,8 @@ public class TextileMarkupTest {
      * Try to convert a null String in HTML. The except result is to catch an {@link java.lang.IllegalArgumentException}
      * otherwise the test is considered as failed.
      */
-    @Test public void tryWithNullString() {
+    @Test
+    public void tryWithNullString() {
         try {
             markup.convertAsHtml(null);
             fail("When parsing a null String doesn't throw an IllegalArgumentException");
@@ -58,9 +60,9 @@ public class TextileMarkupTest {
             Element h1Result = Jsoup.parse(result).body().child(0);
 
             assertNotNull(h1Result);
-            assertEquals(h1Result.tagName(), "h1", "The generated element is not an H1 markup");
-            assertTrue(h1Result.hasText(), "The H1 markup doesn't contain text");
-            assertEquals(h1Result.html(), "Test my textile");
+            assertEquals("The generated element is not an H1 markup", "h1", h1Result.tagName());
+            assertTrue("The H1 markup doesn't contain text", h1Result.hasText());
+            assertEquals("Test my textile", h1Result.html());
         } catch(IllegalArgumentException e) {
             fail("An IllegalArgumentException has been thrown");
         }

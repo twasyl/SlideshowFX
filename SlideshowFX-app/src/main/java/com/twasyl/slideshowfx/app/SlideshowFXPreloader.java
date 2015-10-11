@@ -16,6 +16,7 @@
 
 package com.twasyl.slideshowfx.app;
 
+import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.animation.FadeTransition;
 import javafx.application.Preloader;
 import javafx.scene.Scene;
@@ -27,7 +28,7 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 /**
- * This class is the custom preloader for SlideshowFX. I t displays a splash screen that fade in and fade out
+ * This class is the custom preloader for SlideshowFX. It displays a splash screen that fade in and fade out
  * before the application starts.
  *
  * @author Thierry Wasylczenko
@@ -42,7 +43,7 @@ public class SlideshowFXPreloader extends Preloader {
     public void start(Stage primaryStage) throws Exception {
         this.currentStage = primaryStage;
 
-        final Image splashImage = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/splash.png"));
+        final Image splashImage = new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/splash.png"));
         final ImageView view = new ImageView(splashImage);
 
         final BorderPane pane = new BorderPane();

@@ -19,6 +19,8 @@ package com.twasyl.slideshowfx.app;
 import com.sun.javafx.PlatformUtil;
 import com.sun.javafx.application.LauncherImpl;
 import com.twasyl.slideshowfx.controllers.SlideshowFXController;
+import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.io.DeleteFileVisitor;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
@@ -38,10 +40,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -142,6 +141,20 @@ public class SlideshowFX extends Application {
                     if (file.exists() && file.canRead() && file.canWrite() && !this.filesToOpen.contains(file)) {
                         this.filesToOpen.add(file);
                     }
+                }
+            });
+        }
+
+        // Try to load parameters that are passed dynamically with just a value
+        final List<String> unnamedParams = getParameters().getUnnamed();
+        if(unnamedParams != null && !unnamedParams.isEmpty()) {
+            unnamedParams.forEach(param -> {
+                final File file = new File(param);
+
+                if((file.getName().endsWith(TemplateEngine.DEFAULT_ARCHIVE_EXTENSION) ||
+                        file.getName().endsWith(PresentationEngine.DEFAULT_ARCHIVE_EXTENSION))
+                        && file.exists() && file.canRead() && file.canWrite() && !this.filesToOpen.contains(file)) {
+                    this.filesToOpen.add(file);
                 }
             });
         }

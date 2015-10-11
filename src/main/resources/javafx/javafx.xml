@@ -16,8 +16,11 @@
 
 <project name="JavaFXApplication"
          xmlns:fx="javafx:com.sun.javafx.tools.ant">
-    <target name="javafxdeploy">
 
+    <!--
+        This task is used when the operating system is not known
+    -->
+    <target name="deployUnknown">
         <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
                  uri="javafx:com.sun.javafx.tools.ant"
                  classpath=".:${classpath}"/>
@@ -29,9 +32,45 @@
                             preloaderClass="com.twasyl.slideshowfx.app.SlideshowFXPreloader"
                             fallbackClass="com.javafx.main.NoJavaFXFallback" />
 
-            <fx:info>
-                <fx:association extension="sfxt" description="SlideshowFX templates" />
-                <fx:association extension="sfx" description="SlideshowFX presentations" />
+            <fx:info title="SlideshowFX" vendor="Thierry Wasylczenko"
+                     copyright="Copyright SlideshowFX" license="Apache 2 license">
+                <fx:association extension="sfxt" mimetype="application/sfxt" description="SlideshowFX templates" />
+                <fx:association extension="sfx" mimetype="application/sfx" description="SlideshowFX presentations" />
+            </fx:info>
+
+            <fx:platform javafx="8.0+" j2se="8.0">
+                <fx:jvmarg value="-Xms512m" />
+                <fx:jvmarg value="-Xmx2048m" />
+                <fx:jvmarg value="-Dfile.encoding=UTF-8" />
+                <fx:jvmarg value="-Djavafx.preloader=com.twasyl.slideshowfx.app.SlideshowFXPreloader"/>
+                <fx:jvmarg value="-Ddynamic.java.library.path=true"/>
+            </fx:platform>
+
+            <fx:resources>
+                <fx:fileset dir="${deployResourcesDir}" />
+            </fx:resources>
+        </fx:deploy>
+    </target>
+
+    <target name="deployOSX">
+        <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+                 uri="javafx:com.sun.javafx.tools.ant"
+                 classpath=".:${classpath}"/>
+
+        <fx:deploy nativeBundles="image" outdir="${deployOutDir}" outfile="SlideshowFX">
+            <fx:application id="application"
+                            name="SlideshowFX"
+                            mainClass="com.twasyl.slideshowfx.app.SlideshowFX"
+                            preloaderClass="com.twasyl.slideshowfx.app.SlideshowFXPreloader"
+                            fallbackClass="com.javafx.main.NoJavaFXFallback">git
+            </fx:application>
+
+            <fx:info title="SlideshowFX" vendor="Thierry Wasylczenko"
+                     copyright="Copyright SlideshowFX" license="Apache 2 license">
+                <fx:association extension="sfxt" mimetype="application/sfxt" description="SlideshowFX templates"
+                                icon="src/main/resources/package/macosx/SlideshowFX.icns" />
+                <fx:association extension="sfx" mimetype="application/sfx" description="SlideshowFX presentations"
+                                icon="src/main/resources/package/macosx/SlideshowFX.icns" />
             </fx:info>
 
             <fx:platform javafx="8.0+" j2se="8.0">

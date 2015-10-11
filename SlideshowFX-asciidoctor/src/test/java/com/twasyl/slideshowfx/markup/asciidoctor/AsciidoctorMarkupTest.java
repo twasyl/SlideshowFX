@@ -16,8 +16,8 @@
 
 package com.twasyl.slideshowfx.markup.asciidoctor;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * Performs tests for the Asciidoctor markup syntax.

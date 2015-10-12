@@ -62,7 +62,7 @@
                             name="SlideshowFX"
                             mainClass="com.twasyl.slideshowfx.app.SlideshowFX"
                             preloaderClass="com.twasyl.slideshowfx.app.SlideshowFXPreloader"
-                            fallbackClass="com.javafx.main.NoJavaFXFallback">git
+                            fallbackClass="com.javafx.main.NoJavaFXFallback">
             </fx:application>
 
             <fx:info title="SlideshowFX" vendor="Thierry Wasylczenko"

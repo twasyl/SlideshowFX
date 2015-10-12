@@ -16,6 +16,7 @@
 
 package com.twasyl.slideshowfx.controls;
 
+import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -36,6 +37,7 @@ import java.util.logging.Logger;
  */
 public class SlideContentEditor extends BorderPane {
     private static final Logger LOGGER = Logger.getLogger(SlideContentEditor.class.getName());
+
     private final WebView browser = new WebView();
 
     public SlideContentEditor() {
@@ -43,7 +45,6 @@ public class SlideContentEditor extends BorderPane {
 
         this.browser.setOnKeyPressed(event -> {
             final boolean isShortcutDown = event.isShortcutDown();
-
             if(isShortcutDown) {
                 if("A".equalsIgnoreCase(event.getText())) SlideContentEditor.this.selectAll();
 
@@ -140,5 +141,18 @@ public class SlideContentEditor extends BorderPane {
         } else {
             this.browser.getEngine().executeScript(String.format("setMode('%1$s');", mode));
         }
+    }
+
+    /**
+     * Make the editor requests the focus in the application. The text that is already present in the editor will be
+     * fully selected and the editor will ask for the focus.
+     */
+    @Override
+    public void requestFocus() {
+        PlatformHelper.run(() -> {
+            this.browser.requestFocus();
+            this.browser.getEngine().executeScript("selectAll();");
+            this.browser.getEngine().executeScript("requestEditorFocus();");
+        });
     }
 }

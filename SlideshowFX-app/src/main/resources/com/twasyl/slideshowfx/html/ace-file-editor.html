@@ -72,6 +72,12 @@
             var editor = ace.edit("editor");
             editor.selectAll();
         }
+
+        // Request the focus in the editor
+        function requestEditorFocus() {
+            var editor = ace.edit("editor");
+            editor.focus();
+        }
     </script>
     <script src="../js/ace/1.2.0/ace.js"></script>
 </head>

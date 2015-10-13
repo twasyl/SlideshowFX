@@ -71,6 +71,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
@@ -151,6 +152,8 @@ public class SlideshowFXController implements Initializable {
         }
     };
 
+    @FXML private BorderPane root;
+
     /* Main ToolBar elements */
     @FXML private SplitMenuButton addSlideButton;
     @FXML private SplitMenuButton moveSlideButton;
@@ -175,7 +178,6 @@ public class SlideshowFXController implements Initializable {
     @FXML private ObservableList<Object> saveElementsGroup;
     @FXML private ObservableList<Object> openElementsGroup;
     @FXML private ObservableList<Object> whenNoDocumentOpened;
-
 
     /* All methods called by the FXML */
 
@@ -1184,6 +1186,23 @@ public class SlideshowFXController implements Initializable {
                 if(this.openedPresentationsTabPane.getTabs().size() == 1) header.setPrefHeight(0);
                 else header.setPrefHeight(-1);
             }
+        });
+
+        // Define global shortcuts of the application
+        this.root.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            boolean consumed = false;
+
+            if(event.isShortcutDown()) {
+                if(KeyEventUtils.is(KeyCode.R, event)) {
+                    consumed = true;
+                    this.reload(null);
+                 }
+            } else if(KeyCode.DELETE.equals(event.getCode())) {
+                consumed = true;
+                this.deleteSlide(null);
+            }
+
+            if(consumed) event.consume();
         });
     }
 }

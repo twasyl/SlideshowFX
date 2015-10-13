@@ -49,11 +49,14 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import org.xml.sax.SAXException;
 
@@ -109,8 +112,7 @@ public class PresentationViewController implements Initializable {
      * @throws org.xml.sax.SAXException
      */
     @FXML private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
-        RadioButton selectedMarkup = (RadioButton) this.markupContentType.getSelectedToggle();
-        this.updateSlide((IMarkup) selectedMarkup.getUserData(), this.contentEditor.getContentEditorValue());
+        this.updateSlide();
     }
 
     /**
@@ -160,7 +162,24 @@ public class PresentationViewController implements Initializable {
     }
 
     /**
-     * This method updates a slide of the presentation. It takes the <code>markup</code> to converte the <code>originalContent</code>
+     * This method updates a slide of the presentation. The <code>markup</code> and the <code>originalContent</code> are
+     * deduced from the user interface. If all parameters can be deduced, then {@link #updateSlide(IMarkup, String)} is
+     * called, otherwise nothing is performed.
+     * @throws TransformerException
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     */
+    private void updateSlide() throws TransformerException, IOException, ParserConfigurationException, SAXException {
+        RadioButton selectedMarkup = (RadioButton) this.markupContentType.getSelectedToggle();
+
+        if(selectedMarkup != null) {
+            this.updateSlide((IMarkup) selectedMarkup.getUserData(), this.contentEditor.getContentEditorValue());
+        }
+    }
+
+    /**
+     * This method updates a slide of the presentation. It takes the <code>markup</code> to convert the <code>originalContent</code>
      * in HTML and then the slide element is updated. The presentation is then saved temporary.
      * The content is send to the page by calling the {@link com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration#getContentDefinerMethod()}
      * with the HTML content converted in Base64.
@@ -759,5 +778,17 @@ public class PresentationViewController implements Initializable {
         this.defineContent.disableProperty().bind(this.slideNumber.textProperty().isEmpty()
                 .or(this.fieldName.textProperty().isEmpty())
                 .or(this.markupContentType.selectedToggleProperty().isNull()));
+
+        // Add a shortcut to the content editor for defining the content using META + Enter
+        this.contentEditor.registerEvent(KeyEvent.KEY_PRESSED, event -> {
+            if (event.isShortcutDown() && KeyCode.ENTER.equals(event.getCode())) {
+                event.consume();
+                try {
+                    this.updateSlide();
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Can not define content", e);
+                }
+            }
+        });
     }
 }

@@ -61,6 +61,12 @@
             return window.btoa(unescape(encodeURIComponent(editor.getCopyText())));
         }
 
+        // Remove the selection
+        function removeSelection() {
+            var editor = ace.edit("editor");
+            editor.removeLines();
+        }
+
         // Set the mode of this editor
         function setMode(newMode) {
             var editor = ace.edit("editor");

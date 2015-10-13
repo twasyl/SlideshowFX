@@ -26,8 +26,10 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController"
-        minWidth="1024" minHeight="768">
+<?import javafx.scene.input.KeyCombination?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:id="root"
+            fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController"
+            minWidth="1024" minHeight="768">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
         <URL value="@/com/twasyl/slideshowfx/css/SlideshowFX.css" />
@@ -39,11 +41,24 @@
         <Double fx:id="TOOLBAR_ICON_HEIGHT" fx:value="20" />
 
         <!-- Global Menus & MenuItems -->
-        <MenuItem fx:id="newMenuItem" text="New" onAction="#loadTemplate" />
-        <MenuItem fx:id="openMenuItem" text="Open" onAction="#openPresentation" />
-        <MenuItem fx:id="closePresentationMenuItem" text="Close presentation" onAction="#closePresentation" />
-        <MenuItem fx:id="saveMenuItem" text="Save" onAction="#save" />
-        <MenuItem fx:id="saveAsMenuItem" text="Save as ..." onAction="#saveAs" />
+        <MenuItem fx:id="newMenuItem" text="New" onAction="#loadTemplate">
+            <accelerator><KeyCombination fx:value="Shortcut+N" /></accelerator>
+        </MenuItem>
+        <MenuItem fx:id="openMenuItem" text="Open" onAction="#openPresentation">
+            <accelerator><KeyCombination fx:value="Shortcut+O" /></accelerator>
+        </MenuItem>
+        <MenuItem fx:id="closePresentationMenuItem" text="Close presentation" onAction="#closePresentation">
+            <accelerator><KeyCombination fx:value="Shortcut+W" /></accelerator>
+        </MenuItem>
+        <MenuItem fx:id="saveMenuItem" text="Save" onAction="#save">
+            <accelerator><KeyCombination fx:value="Shortcut+S" /></accelerator>
+        </MenuItem>
+        <MenuItem fx:id="saveAsMenuItem" text="Save as ..." onAction="#saveAs">
+            <accelerator><KeyCombination fx:value="Shortcut+Shift+S" /></accelerator>
+        </MenuItem>
+        <MenuItem fx:id="printMenuItem" text="Print" onAction="#print">
+            <accelerator><KeyCombination fx:value="Shortcut+P" /></accelerator>
+        </MenuItem>
         <Menu fx:id="downloadersMenu" text="Download from" />
         <Menu fx:id="uploadersMenu" text="Upload to" />
         <MenuItem fx:id="editCurrentTemplateMenuItem" text="Edit current template" onAction="#editTemplate" />
@@ -176,6 +191,7 @@
             <fx:reference source="closePresentationMenuItem" />
             <fx:reference source="saveMenuItem" />
             <fx:reference source="saveAsMenuItem" />
+            <fx:reference source="printMenuItem" />
             <fx:reference source="saveButton" />
             <fx:reference source="uploadersMenu" />
             <fx:reference source="editCurrentTemplateMenuItem" />
@@ -208,7 +224,10 @@
                     <fx:reference source="downloadersMenu" />
                     <fx:reference source="uploadersMenu" />
                     <SeparatorMenuItem />
-                    <MenuItem text="Quit" fx:id="quitMenuItem" onAction="#exitApplication" />
+                    <fx:reference source="printMenuItem" />
+                    <MenuItem text="Quit" fx:id="quitMenuItem" onAction="#exitApplication">
+                        <accelerator><KeyCombination fx:value="Shortcut+Q" /></accelerator>
+                    </MenuItem>
                 </Menu>
                 <Menu text="View">
                     <MenuItem text="Internal browser" onAction="#displayInternalBrowser" />

@@ -60,6 +60,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -244,6 +245,23 @@ public class SlideshowFXController implements Initializable {
             Event.fireEvent(tab, closedEvent);
 
             this.openedPresentationsTabPane.getTabs().remove(tab);
+        }
+    }
+
+    /**
+     * Close the presentation associated to the given {@code controller}. If the controller is {@code null}, nothing is
+     * performed.
+     * @param controller The controller holding the presentation to close.
+     * @param waitToFinish Indicates if the method should wait before exiting.
+     */
+    private void closePresentation(final PresentationViewController controller, final boolean waitToFinish) {
+        if(controller != null && controller.isPresentationModified()) {
+            final ButtonType answer = DialogHelper.showConfirmationAlert("Save the presentation",
+                    String.format("Do you want to save the modifications on %1$s.", controller.getPresentationName()));
+
+            if(answer == ButtonType.YES) {
+                SlideshowFXController.this.savePresentation(controller, waitToFinish);
+            }
         }
     }
 
@@ -526,30 +544,17 @@ public class SlideshowFXController implements Initializable {
     /**
      * Save the current presentation. If the presentation has never been saved a save dialog is displayed.
      * Then the presentation is saved where the user has chosen or opened the presentation.
-     * The saving is delegated to {@link #savePresentation(java.io.File)}
+     * The saving is delegated to {@link #savePresentation(boolean)}
      *
      * @param event
      */
     @FXML private void save(ActionEvent event) {
-
-        final PresentationViewController view = this.getCurrentPresentationView();
-
-        if(view != null) {
-            File presentationArchive = null;
-
-            if (!view.isPresentationAlreadySaved()) {
-                FileChooser chooser = new FileChooser();
-                chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
-                presentationArchive = chooser.showSaveDialog(SlideshowFX.getStage());
-            } else presentationArchive = view.getArchiveFile();
-
-            this.savePresentation(presentationArchive);
-        }
+        this.savePresentation(false);
     }
 
     /**
      * Saves a copy of the existing presentation. A save dialog is displayed to the user.
-     * The saving is delegated to {@link #savePresentation(java.io.File)}.
+     * The saving is delegated to {@link #savePresentation(java.io.File, boolean)}.
      *
      * @param event
      */
@@ -559,7 +564,7 @@ public class SlideshowFXController implements Initializable {
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
         presentationArchive = chooser.showSaveDialog(SlideshowFX.getStage());
 
-        this.savePresentation(presentationArchive);
+        this.savePresentation(presentationArchive, false);
     }
 
     /**
@@ -664,12 +669,20 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
-     * This method exits the application.
+     * This method exits the application. If any opened presentation is not saved, the user will be asked if he wants to
+     * save the modifications or not.
      *
      * @param event
      */
     @FXML private void exitApplication(ActionEvent event) {
-        PlatformHelper.run(() -> Platform.exit());
+        PlatformHelper.run(() -> {
+            this.openedPresentationsTabPane.getTabs()
+                    .forEach(tab -> {
+                        final PresentationViewController controller = (PresentationViewController) tab.getUserData();
+                        this.closePresentation(controller, true);
+                    });
+            Platform.exit();
+        });
     }
 
     /**
@@ -773,6 +786,7 @@ public class SlideshowFXController implements Initializable {
                         tab.textProperty().bind(tabTitle);
                         tab.setUserData(controller);
                         tab.setContent(parent);
+                        tab.setOnCloseRequest(event -> SlideshowFXController.this.closePresentation(controller, false));
 
                         this.openedPresentationsTabPane.getTabs().addAll(tab);
                         this.openedPresentationsTabPane.getSelectionModel().select(tab);
@@ -873,13 +887,44 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
+     * Save the presentation that is currently displayed, if any. This method retrieves the displayed presentation and
+     * calls {@link #savePresentation(PresentationViewController, boolean)}.
+     * @param waitToFinish Indicates if the method should wait before exiting.
+     */
+    private void savePresentation(boolean waitToFinish) {
+        final PresentationViewController view = this.getCurrentPresentationView();
+        this.savePresentation(view, waitToFinish);
+    }
+
+    /**
+     * Save the presentation hold by the given view. If the presentation hasn't been already saved, the user is prompted
+     * to choose where to save it. Once the choice is validated, the method calls {@link #savePresentation(File, boolean)}.
+     * @param view The view of the presentation.
+     * @param waitToFinish Indicates if the method should wait before exiting.
+     */
+    private void savePresentation(final PresentationViewController view, final boolean waitToFinish) {
+        if(view != null) {
+            File presentationArchive = null;
+
+            if (!view.isPresentationAlreadySaved()) {
+                FileChooser chooser = new FileChooser();
+                chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
+                presentationArchive = chooser.showSaveDialog(SlideshowFX.getStage());
+            } else presentationArchive = view.getArchiveFile();
+
+            this.savePresentation(presentationArchive, waitToFinish);
+        }
+    }
+
+    /**
      * Save the current opened presentation to the given {@param archiveFile}. The process for
      * saving the presentation is only started if the given {@param archiveFile} is not {@code null}. If the process is
      * started, a {@link com.twasyl.slideshowfx.concurrent.SavePresentationTask} is started with the current presentation
      * and {@code archiveFile}.
      * @param archiveFile The file to save the presentation in.
+     * @param waitToFinish Indicates if the method should wait before exiting.
      */
-    private void savePresentation(File archiveFile) {
+    private void savePresentation(final File archiveFile, final boolean waitToFinish) {
         if(archiveFile != null) {
             final PresentationViewController view = this.getCurrentPresentationView();
             final Task saveTask = new SavePresentationTask(view, archiveFile);
@@ -892,6 +937,18 @@ public class SlideshowFXController implements Initializable {
             this.taskInProgress.setCurrentTask(saveTask);
 
             TaskDAO.getInstance().startTask(saveTask);
+
+            if(waitToFinish) {
+                PlatformHelper.run(() -> SlideshowFX.getStage().getScene().setCursor(Cursor.WAIT));
+                try {
+                    saveTask.get();
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Can not wait for the presentation to be saved", e);
+                } finally {
+                    PlatformHelper.run(() -> SlideshowFX.getStage().getScene().setCursor(Cursor.DEFAULT));
+                }
+
+            }
         }
     }
 

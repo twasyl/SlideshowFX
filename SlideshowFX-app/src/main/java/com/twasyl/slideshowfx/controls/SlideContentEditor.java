@@ -16,7 +16,7 @@
 
 package com.twasyl.slideshowfx.controls;
 
-import com.twasyl.slideshowfx.utils.KeyEventUtils;
+import com.twasyl.slideshowfx.utils.keys.KeyEventUtils;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.event.Event;
@@ -24,7 +24,6 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 
@@ -51,9 +50,9 @@ public class SlideContentEditor extends BorderPane {
         this.browser.setOnKeyPressed(event -> {
             final boolean isShortcutDown = event.isShortcutDown();
             if(isShortcutDown) {
-                if(KeyEventUtils.is(KeyCode.A, event)) SlideContentEditor.this.selectAll();
+                if(KeyEventUtils.isShortcutSequence("A", event)) SlideContentEditor.this.selectAll();
 
-                else if(KeyEventUtils.is(KeyCode.C, event)) {
+                else if(KeyEventUtils.isShortcutSequence("C", event)) {
                     final String selection = SlideContentEditor.this.getSelectedContentEditorValue();
                     if (selection != null) {
                         final ClipboardContent content = new ClipboardContent();
@@ -62,7 +61,7 @@ public class SlideContentEditor extends BorderPane {
                     }
                 }
 
-                else if(KeyEventUtils.is(KeyCode.X,  event)) {
+                else if(KeyEventUtils.isShortcutSequence("X",  event)) {
                     final String selection = SlideContentEditor.this.getSelectedContentEditorValue();
                     if (selection != null) {
                         final ClipboardContent content = new ClipboardContent();
@@ -72,7 +71,9 @@ public class SlideContentEditor extends BorderPane {
                     }
                 }
 
-                else if(KeyEventUtils.is(KeyCode.V, event)) SlideContentEditor.this.appendContentEditorValue(Clipboard.getSystemClipboard().getString());
+                else if(KeyEventUtils.isShortcutSequence("V", event)) {
+                    SlideContentEditor.this.appendContentEditorValue(Clipboard.getSystemClipboard().getString());
+                }
             }
         });
 

@@ -42,6 +42,7 @@ import com.twasyl.slideshowfx.utils.beans.Pair;
 import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.DisableAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.EnableAction;
+import com.twasyl.slideshowfx.utils.keys.KeyEventUtils;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
@@ -254,15 +255,31 @@ public class SlideshowFXController implements Initializable {
      * @param controller The controller holding the presentation to close.
      * @param waitToFinish Indicates if the method should wait before exiting.
      */
-    private void closePresentation(final PresentationViewController controller, final boolean waitToFinish) {
+    public void closePresentation(final PresentationViewController controller, final boolean waitToFinish) {
         if(controller != null && controller.isPresentationModified()) {
             final ButtonType answer = DialogHelper.showConfirmationAlert("Save the presentation",
-                    String.format("Do you want to save the modifications on %1$s.", controller.getPresentationName()));
+                    String.format("Do you want to save the modifications on %1$s.", controller.getPresentationName().get()));
 
             if(answer == ButtonType.YES) {
                 SlideshowFXController.this.savePresentation(controller, waitToFinish);
             }
         }
+    }
+
+    /**
+     * Close all opened presentations. If a presentation hasn't been saved, the user is prompted if he wants to save
+     * the modifications.
+     * @param waitToFinish Indicates the method must wait for all presentations to be closed before exiting.
+     */
+    public void closeAllPresentations(final boolean waitToFinish) {
+        PlatformHelper.run(() -> {
+            this.openedPresentationsTabPane.getTabs()
+                    .forEach(tab -> {
+                        final PresentationViewController controller = (PresentationViewController) tab.getUserData();
+                        this.closePresentation(controller, waitToFinish);
+                    });
+            Platform.exit();
+        });
     }
 
     /**
@@ -675,14 +692,7 @@ public class SlideshowFXController implements Initializable {
      * @param event
      */
     @FXML private void exitApplication(ActionEvent event) {
-        PlatformHelper.run(() -> {
-            this.openedPresentationsTabPane.getTabs()
-                    .forEach(tab -> {
-                        final PresentationViewController controller = (PresentationViewController) tab.getUserData();
-                        this.closePresentation(controller, true);
-                    });
-            Platform.exit();
-        });
+        this.closeAllPresentations(true);
     }
 
     /**
@@ -1250,7 +1260,7 @@ public class SlideshowFXController implements Initializable {
             boolean consumed = false;
 
             if(event.isShortcutDown()) {
-                if(KeyEventUtils.is(KeyCode.R, event)) {
+                if(KeyEventUtils.isShortcutSequence("R", event)) {
                     consumed = true;
                     this.reload(null);
                  }

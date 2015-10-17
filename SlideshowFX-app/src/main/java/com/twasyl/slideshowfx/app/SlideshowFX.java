@@ -118,6 +118,8 @@ public class SlideshowFX extends Application {
 
     private static final ReadOnlyObjectProperty<Stage> stage = new SimpleObjectProperty<>();
     private static final ReadOnlyObjectProperty<Scene> presentationBuilderScene = new SimpleObjectProperty<>();
+
+    private final ReadOnlyObjectProperty<SlideshowFXController> mainController = new SimpleObjectProperty<>();
     private Set<File> filesToOpen;
 
     @Override
@@ -166,6 +168,7 @@ public class SlideshowFX extends Application {
 
         final FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/twasyl/slideshowfx/fxml/SlideshowFX.fxml"));
         final Parent root = loader.load();
+        ((SimpleObjectProperty<SlideshowFXController>) this.mainController).set(loader.getController());
 
         final Scene scene = new Scene(root);
         ((SimpleObjectProperty<Scene>) presentationBuilderScene).set(scene);
@@ -183,11 +186,9 @@ public class SlideshowFX extends Application {
         stage.show();
 
         if(this.filesToOpen != null && !this.filesToOpen.isEmpty()) {
-            final SlideshowFXController controller = loader.getController();
-
             this.filesToOpen.forEach(file -> {
                 try {
-                    controller.openTemplateOrPresentation(file);
+                    this.mainController.get().openTemplateOrPresentation(file);
                 } catch (IllegalAccessException | FileNotFoundException e) {
                     LOGGER.log(Level.SEVERE, "Can not open file at startup", e);
                 }
@@ -198,6 +199,8 @@ public class SlideshowFX extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
+
+        this.mainController.get().closeAllPresentations(true);
 
         LOGGER.info("Cleaning temporary files");
         File tempDirectory = new File(System.getProperty("java.io.tmpdir"));

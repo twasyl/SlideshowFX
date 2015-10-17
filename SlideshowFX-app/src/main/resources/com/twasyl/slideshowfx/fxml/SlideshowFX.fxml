@@ -18,6 +18,7 @@
 
 <?import com.twasyl.slideshowfx.controls.notification.NotificationCenter?>
 <?import com.twasyl.slideshowfx.controls.TextFieldCheckMenuItem?>
+<?import com.twasyl.slideshowfx.utils.keys.*?>
 <?import com.twasyl.slideshowfx.utils.NetworkUtils?>
 <?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import de.jensd.fx.glyphs.GlyphsStack?>
@@ -26,7 +27,6 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
-<?import javafx.scene.input.KeyCombination?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:id="root"
             fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController"
             minWidth="1024" minHeight="768">
@@ -42,28 +42,34 @@
 
         <!-- Global Menus & MenuItems -->
         <MenuItem fx:id="newMenuItem" text="New" onAction="#loadTemplate">
-            <accelerator><KeyCombination fx:value="Shortcut+N" /></accelerator>
+            <accelerator><KeyTextCombination fx:value="Shortcut+N" /></accelerator>
         </MenuItem>
         <MenuItem fx:id="openMenuItem" text="Open" onAction="#openPresentation">
-            <accelerator><KeyCombination fx:value="Shortcut+O" /></accelerator>
+            <accelerator><KeyTextCombination fx:value="Shortcut+O" /></accelerator>
         </MenuItem>
         <MenuItem fx:id="closePresentationMenuItem" text="Close presentation" onAction="#closePresentation">
-            <accelerator><KeyCombination fx:value="Shortcut+W" /></accelerator>
+            <accelerator><KeyTextCombination fx:value="Shortcut+W" /></accelerator>
         </MenuItem>
         <MenuItem fx:id="saveMenuItem" text="Save" onAction="#save">
-            <accelerator><KeyCombination fx:value="Shortcut+S" /></accelerator>
+            <accelerator><KeyTextCombination fx:value="Shortcut+S" /></accelerator>
         </MenuItem>
         <MenuItem fx:id="saveAsMenuItem" text="Save as ..." onAction="#saveAs">
-            <accelerator><KeyCombination fx:value="Shortcut+Shift+S" /></accelerator>
+            <accelerator><KeyTextCombination fx:value="Shortcut+Shift+S" /></accelerator>
         </MenuItem>
         <MenuItem fx:id="printMenuItem" text="Print" onAction="#print">
-            <accelerator><KeyCombination fx:value="Shortcut+P" /></accelerator>
+            <accelerator><KeyTextCombination fx:value="Shortcut+P" /></accelerator>
         </MenuItem>
         <Menu fx:id="downloadersMenu" text="Download from" />
         <Menu fx:id="uploadersMenu" text="Upload to" />
         <MenuItem fx:id="editCurrentTemplateMenuItem" text="Edit current template" onAction="#editTemplate" />
         <MenuItem fx:id="openPresentationInBrowser" text="Open current presentation in good ol' browser" onAction="#openPresentationInBrowser"/>
         <MenuItem fx:id="openCurrentWorkingDirMenuItem" text="Open current working directory" onAction="#openWorkingDirectory" />
+        <MenuItem fx:id="enterSlideshowMode" text="Start the slideshow" onAction="#slideShow">
+            <accelerator><KeyTextCombination fx:value="Shortcut+F" /></accelerator>
+        </MenuItem>
+        <MenuItem fx:id="enterSlideshowFromCurrentSlideMode" text="Start the slideshow from current slide" onAction="#slideshowFromCurrentSlide">
+            <accelerator><KeyTextCombination fx:value="Shortcut+Shift+F" /></accelerator>
+        </MenuItem>
 
         <!-- Global ToolBar buttons -->
         <Button fx:id="openPresentation" onAction="#openPresentation" styleClass="image">
@@ -207,6 +213,8 @@
             <fx:reference source="fieldName" />
             <fx:reference source="openPresentationInBrowser" />
             <fx:reference source="openCurrentWorkingDirMenuItem" />
+            <fx:reference source="enterSlideshowMode" />
+            <fx:reference source="enterSlideshowFromCurrentSlideMode" />
         </FXCollections>
     </fx:define>
 
@@ -226,10 +234,13 @@
                     <SeparatorMenuItem />
                     <fx:reference source="printMenuItem" />
                     <MenuItem text="Quit" fx:id="quitMenuItem" onAction="#exitApplication">
-                        <accelerator><KeyCombination fx:value="Shortcut+Q" /></accelerator>
+                        <accelerator><KeyTextCombination fx:value="Shortcut+Q" /></accelerator>
                     </MenuItem>
                 </Menu>
                 <Menu text="View">
+                    <fx:reference source="enterSlideshowMode" />
+                    <fx:reference source="enterSlideshowFromCurrentSlideMode" />
+                    <SeparatorMenuItem />
                     <MenuItem text="Internal browser" onAction="#displayInternalBrowser" />
                 </Menu>
                 <Menu text="Options">
@@ -331,4 +342,3 @@
         <NotificationCenter fx:id="taskInProgress" />
     </bottom>
 </BorderPane>
-

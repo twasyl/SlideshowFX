@@ -26,11 +26,11 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Thierry Wasylczenko
  */
-public class KeyTextCombinationTest {
+public class SlideshowFXKeyCombinationTest {
 
     private void assertCombination(final ModifierValue shift, final ModifierValue alt, final ModifierValue control,
                                    final ModifierValue meta, final ModifierValue shortcut, final String text,
-                                   final KeyTextCombination combination) {
+                                   final SlideshowFXKeyCombination combination) {
 
         assertEquals(shift, combination.getShift());
         assertEquals(alt, combination.getAlt());
@@ -42,43 +42,43 @@ public class KeyTextCombinationTest {
 
     @Test
     public void testShortcutA() {
-        final KeyTextCombination combination = KeyTextCombination.valueOf("Shortcut+A");
+        final SlideshowFXKeyCombination combination = SlideshowFXKeyCombination.valueOf("Shortcut+A");
         assertCombination(UP, UP, UP, UP, DOWN, "A", combination);
     }
 
     @Test
     public void testShiftA() {
-        final KeyTextCombination combination = KeyTextCombination.valueOf("Shift+A");
+        final SlideshowFXKeyCombination combination = SlideshowFXKeyCombination.valueOf("Shift+A");
         assertCombination(DOWN, UP, UP, UP, UP, "A", combination);
     }
 
     @Test
     public void testControlA() {
-        final KeyTextCombination combination = KeyTextCombination.valueOf("Ctrl+A");
+        final SlideshowFXKeyCombination combination = SlideshowFXKeyCombination.valueOf("Ctrl+A");
         assertCombination(UP, UP, DOWN, UP, UP, "A", combination);
     }
 
     @Test
     public void testMetaA() {
-        final KeyTextCombination combination = KeyTextCombination.valueOf("Meta+A");
+        final SlideshowFXKeyCombination combination = SlideshowFXKeyCombination.valueOf("Meta+A");
         assertCombination(UP, UP, UP, DOWN, UP, "A", combination);
     }
 
     @Test
     public void testAltA() {
-        final KeyTextCombination combination = KeyTextCombination.valueOf("Alt+A");
+        final SlideshowFXKeyCombination combination = SlideshowFXKeyCombination.valueOf("Alt+A");
         assertCombination(UP, DOWN, UP, UP, UP, "A", combination);
     }
 
     @Test
     public void testShortcutMetaA() {
-        final KeyTextCombination combination = KeyTextCombination.valueOf("Shortcut+Meta+A");
+        final SlideshowFXKeyCombination combination = SlideshowFXKeyCombination.valueOf("Shortcut+Meta+A");
         assertCombination(UP, UP, UP, DOWN, DOWN, "A", combination);
     }
 
     @Test
     public void testMetaShortcutA() {
-        final KeyTextCombination combination = KeyTextCombination.valueOf("Meta+Shortcut+A");
+        final SlideshowFXKeyCombination combination = SlideshowFXKeyCombination.valueOf("Meta+Shortcut+A");
         assertCombination(UP, UP, UP, DOWN, DOWN, "A", combination);
     }
 }

@@ -42,22 +42,22 @@
 
         <!-- Global Menus & MenuItems -->
         <MenuItem fx:id="newMenuItem" text="New" onAction="#loadTemplate">
-            <accelerator><KeyTextCombination fx:value="Shortcut+N" /></accelerator>
+            <accelerator><SlideshowFXKeyCombination fx:value="Shortcut+N" /></accelerator>
         </MenuItem>
         <MenuItem fx:id="openMenuItem" text="Open" onAction="#openPresentation">
-            <accelerator><KeyTextCombination fx:value="Shortcut+O" /></accelerator>
+            <accelerator><SlideshowFXKeyCombination fx:value="Shortcut+O" /></accelerator>
         </MenuItem>
         <MenuItem fx:id="closePresentationMenuItem" text="Close presentation" onAction="#closePresentation">
-            <accelerator><KeyTextCombination fx:value="Shortcut+W" /></accelerator>
+            <accelerator><SlideshowFXKeyCombination fx:value="Shortcut+W" /></accelerator>
         </MenuItem>
         <MenuItem fx:id="saveMenuItem" text="Save" onAction="#save">
-            <accelerator><KeyTextCombination fx:value="Shortcut+S" /></accelerator>
+            <accelerator><SlideshowFXKeyCombination fx:value="Shortcut+S" /></accelerator>
         </MenuItem>
         <MenuItem fx:id="saveAsMenuItem" text="Save as ..." onAction="#saveAs">
-            <accelerator><KeyTextCombination fx:value="Shortcut+Shift+S" /></accelerator>
+            <accelerator><SlideshowFXKeyCombination fx:value="Shortcut+Shift+S" /></accelerator>
         </MenuItem>
         <MenuItem fx:id="printMenuItem" text="Print" onAction="#print">
-            <accelerator><KeyTextCombination fx:value="Shortcut+P" /></accelerator>
+            <accelerator><SlideshowFXKeyCombination fx:value="Shortcut+P" /></accelerator>
         </MenuItem>
         <Menu fx:id="downloadersMenu" text="Download from" />
         <Menu fx:id="uploadersMenu" text="Upload to" />
@@ -65,10 +65,10 @@
         <MenuItem fx:id="openPresentationInBrowser" text="Open current presentation in good ol' browser" onAction="#openPresentationInBrowser"/>
         <MenuItem fx:id="openCurrentWorkingDirMenuItem" text="Open current working directory" onAction="#openWorkingDirectory" />
         <MenuItem fx:id="enterSlideshowMode" text="Start the slideshow" onAction="#slideShow">
-            <accelerator><KeyTextCombination fx:value="Shortcut+F" /></accelerator>
+            <accelerator><SlideshowFXKeyCombination fx:value="Shortcut+F" /></accelerator>
         </MenuItem>
         <MenuItem fx:id="enterSlideshowFromCurrentSlideMode" text="Start the slideshow from current slide" onAction="#slideshowFromCurrentSlide">
-            <accelerator><KeyTextCombination fx:value="Shortcut+Shift+F" /></accelerator>
+            <accelerator><SlideshowFXKeyCombination fx:value="Shortcut+Shift+F" /></accelerator>
         </MenuItem>
 
         <!-- Global ToolBar buttons -->
@@ -234,7 +234,7 @@
                     <SeparatorMenuItem />
                     <fx:reference source="printMenuItem" />
                     <MenuItem text="Quit" fx:id="quitMenuItem" onAction="#exitApplication">
-                        <accelerator><KeyTextCombination fx:value="Shortcut+Q" /></accelerator>
+                        <accelerator><SlideshowFXKeyCombination fx:value="Shortcut+Q" /></accelerator>
                     </MenuItem>
                 </Menu>
                 <Menu text="View">

@@ -22,13 +22,13 @@ public class KeyEventUtils {
     /**
      * Check if a given {@link KeyEvent} corresponds to the given key combination sequence. A sequence is typically
      * a string like {@code Shortcut+A} or {@code Shortcut+Shift+A}.
-     * In order to test the event, this method relies on the {@link KeyTextCombination#valueOf(String)} method.
+     * In order to test the event, this method relies on the {@link SlideshowFXKeyCombination#valueOf(String)} method.
      * @param value The expected sequence.
      * @param event The event to test.
      * @return {@code true} if the event matches the provided sequence, {@code false} otherwise.
      */
     public static boolean is(final String value, final KeyEvent event) {
-        final KeyTextCombination combination = KeyTextCombination.valueOf(value);
+        final SlideshowFXKeyCombination combination = SlideshowFXKeyCombination.valueOf(value);
         return combination.match(event);
     }
 

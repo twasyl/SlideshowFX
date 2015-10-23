@@ -86,7 +86,8 @@ SlideshowFX contains the following modules:
 - *SlideshowFX-snippet-executor* which defines the base classes for creating an OSGi module for executing code snippet in a presentation ;
 - *SlideshowFX-golo-executor* which defines the base classes for creating an OSGi module for executing Golo code snippet in a presentation ;
 - *SlideshowFX-groovy-executor* which defines the base classes for creating an OSGi module for executing Groovy code snippet in a presentation ;
-- *SlideshowFX-java-executor* which defines the base classes for creating an OSGi module for executing Java code snippet in a presentation.
+- *SlideshowFX-java-executor* which defines the base classes for creating an OSGi module for executing Java code snippet in a presentation ;
+- *SlideshowFX-javascript-executor* which defines the base classes for creating an OSGi module for executing JavaScript code snippet in a presentation ;
 
 === Gradle
 

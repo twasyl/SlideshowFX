@@ -23,6 +23,7 @@ import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 
 import java.net.URL;
@@ -77,13 +78,17 @@ public class SnippetContentExtensionController implements Initializable {
 
             if(newLanguage == null) this.advancedOptions.setContent(null);
             else {
-                final TitledPane titledPane = new TitledPane("Advanced options", newLanguage.getUI(codeSnippet));
-                titledPane.setPrefWidth(250);
-                titledPane.setPadding(new Insets(0, 5, 0, 0));
-                titledPane.setExpanded(true);
-                titledPane.setCollapsible(false);
+                final Node codeSnippetUI = newLanguage.getUI(codeSnippet);
+                if(codeSnippetUI == null) this.advancedOptions.setContent(null);
+                else {
+                    final TitledPane titledPane = new TitledPane("Advanced options", codeSnippetUI);
+                    titledPane.setPrefWidth(250);
+                    titledPane.setPadding(new Insets(0, 5, 0, 0));
+                    titledPane.setExpanded(true);
+                    titledPane.setCollapsible(false);
 
-                this.advancedOptions.setContent(titledPane);
+                    this.advancedOptions.setContent(titledPane);
+                }
             }
         });
 

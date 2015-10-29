@@ -297,7 +297,7 @@
 
                 <fx:reference source="slideshow" />
 
-                <CheckBox fx:id="leapMotionEnabled" selected="true">
+                <CheckBox fx:id="leapMotionEnabled" selected="false">
                     <tooltip>
                         <Tooltip text="LeapMotion controller" />
                     </tooltip>

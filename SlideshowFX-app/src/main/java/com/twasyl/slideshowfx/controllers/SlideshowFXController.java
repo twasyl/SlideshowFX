@@ -16,6 +16,9 @@
 
 package com.twasyl.slideshowfx.controllers;
 
+import com.leapmotion.leap.Controller;
+import com.leapmotion.leap.LeapJNI;
+import com.leapmotion.leap.Listener;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.beans.properties.PresentationModifiedBinding;
 import com.twasyl.slideshowfx.concurrent.*;
@@ -596,15 +599,11 @@ public class SlideshowFXController implements Initializable {
     }
 
     @FXML private void slideShow(ActionEvent event) {
-        final PresentationViewController view = this.getCurrentPresentationView();
-
-        if(view != null) view.startSlideshow(this.leapMotionEnabled.isSelected(), null);
+        this.startSlideshow(false);
     }
 
     @FXML private void slideshowFromCurrentSlide(ActionEvent event) {
-        final PresentationViewController view = this.getCurrentPresentationView();
-
-        if(view != null) view.startSlideshow(this.leapMotionEnabled.isSelected(), view.getCurrentSlideId());
+        this.startSlideshow(true);
     }
 
     /**
@@ -1138,8 +1137,55 @@ public class SlideshowFXController implements Initializable {
         return view;
     }
 
+    /**
+     * Start the slideshow. This methods determines the current presentation and if the LeapMotion controller should be
+     * enabled or not.
+     * If the {@code fromCurrentSlide} parameter is set to {@code true}, the current slide is also determined.
+     *
+     * @param fromCurrentSlide Indicates if the slideshow must be started from the current slide or not.
+     */
+    public void startSlideshow(boolean fromCurrentSlide) {
+        final PresentationViewController view = this.getCurrentPresentationView();
+
+        if(view != null) {
+            final String currentSlideId = fromCurrentSlide ? view.getCurrentSlideId() : null;
+            final boolean enabledLeapMotion = !this.leapMotionEnabled.disabledProperty().get()
+                    && this.leapMotionEnabled.selectedProperty().get();
+            view.startSlideshow(enabledLeapMotion, currentSlideId);
+        }
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Create a LeapMotion controller in order to check/uncheck the checkbox enabling the LeapMotion or not.
+        // This allows the checkbox to be in a correct state whether the LeapMotion is connected or not.
+        final Controller leapMotionController = new Controller();
+        leapMotionController.addListener(new Listener() {
+            @Override
+            public void onInit(Controller controller) {
+                if(!controller.isConnected()) {
+                    SlideshowFXController.this.leapMotionEnabled.setDisable(true);
+                } else {
+                    SlideshowFXController.this.leapMotionEnabled.setDisable(false);
+                    SlideshowFXController.this.leapMotionEnabled.setSelected(true);
+                }
+
+            }
+
+            @Override
+            public void onConnect(Controller controller) {
+                SlideshowFXController.this.leapMotionEnabled.setDisable(false);
+                // We don't select the checkbox because even if the LeapMotion becom available, the user may not want
+                // to enable it.
+            }
+
+            @Override
+            public void onDisconnect(Controller controller) {
+                SlideshowFXController.this.leapMotionEnabled.setDisable(true);
+                SlideshowFXController.this.leapMotionEnabled.setSelected(false);
+            }
+        });
+
         // Add a listener for auto-saving the presentation
         final ScheduledService<Void> service = new ScheduledService<Void>() {
             @Override

@@ -18,6 +18,8 @@ package com.twasyl.slideshowfx.markup.asciidoctor;
 
 import com.twasyl.slideshowfx.markup.AbstractMarkup;
 import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.AttributesBuilder;
+import org.asciidoctor.OptionsBuilder;
 import org.jruby.RubyInstanceConfig;
 import org.jruby.javasupport.JavaEmbedUtils;
 
@@ -49,7 +51,7 @@ public class AsciidoctorMarkup extends AbstractMarkup {
         RubyInstanceConfig config = new RubyInstanceConfig();
         config.setLoader(AsciidoctorMarkup.class.getClassLoader());
 
-        JavaEmbedUtils.initialize(Arrays.asList("META-INF/jruby.home/lib/ruby/2.0", "gems/asciidoctor-1.5.2/lib"), config);
+        JavaEmbedUtils.initialize(Arrays.asList("META-INF/jruby.home/lib/ruby/2.0", "gems/asciidoctor-1.5.3/lib"), config);
 
         this.asciidoctor = Asciidoctor.Factory.create(AsciidoctorMarkup.class.getClassLoader());
     }
@@ -58,6 +60,14 @@ public class AsciidoctorMarkup extends AbstractMarkup {
     public String convertAsHtml(String markupString) throws IllegalArgumentException {
         if(markupString == null) throw new IllegalArgumentException("Can not convert " + getName() + " to HTML : the String is null");
 
-        return this.asciidoctor.convert(markupString,new HashMap<String, Object>());
+        final AttributesBuilder attributes = AttributesBuilder.attributes()
+                                                                .sectionNumbers(false)
+                                                                .noFooter(true)
+                                                                .tableOfContents(false)
+                                                                .showTitle(false)
+                                                                .skipFrontMatter(true);
+        final OptionsBuilder options = OptionsBuilder.options().compact(true).attributes(attributes);
+
+        return this.asciidoctor.convert(markupString, options);
     }
 }

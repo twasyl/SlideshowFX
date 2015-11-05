@@ -48,11 +48,7 @@ allprojects {
     }
 
     configurations {
-        asciidoctorj {
-            resolutionStrategy {
-                force 'org.jruby:jruby-complete:1.7.19'
-            }
-        }
+        asciidoctorj
         drive
         dropbox
         felix
@@ -72,7 +68,7 @@ allprojects {
     }
 
     dependencies {
-        asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.2'
+        asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.3'
         drive 'com.google.apis:google-api-services-drive:v2-rev186-1.20.0'
         dropbox 'com.dropbox.core:dropbox-core-sdk:1.8.1'
         felix 'org.apache.felix:org.apache.felix.framework:5.0.1'
@@ -109,7 +105,7 @@ subprojects {
 apply plugin: 'org.asciidoctor.convert'
 
 asciidoctorj {
-    version = '1.5.2'
+    version = '1.5.3'
 }
 
 asciidoctor {

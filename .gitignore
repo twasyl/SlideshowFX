@@ -6,5 +6,7 @@ plugins
 *.iml
 **/*.iml
 .gradle/
+gradle.properties
+**/gradle.properties
 build
 **/build/

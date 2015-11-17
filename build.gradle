@@ -297,5 +297,5 @@ task packageSlideshowFX(dependsOn : [ 'clean',
 }
 
 wrapper {
-    gradleVersion = '2.8'
+    gradleVersion = '2.9'
 }

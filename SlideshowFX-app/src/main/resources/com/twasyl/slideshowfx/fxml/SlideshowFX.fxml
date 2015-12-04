@@ -77,7 +77,7 @@
                 <Tooltip text="Open presentation" />
             </tooltip>
             <graphic>
-                <FontAwesomeIconView glyphName="FOLDER_OPEN" glyphSize="$TOOLBAR_ICON_WIDTH"
+                <FontAwesomeIconView glyphName="FOLDER_ALTPEN" glyphSize="$TOOLBAR_ICON_WIDTH"
                                  glyphStyle="-fx-fill: #FF8000"/>
             </graphic>
         </Button>

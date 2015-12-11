@@ -37,7 +37,7 @@ dependencies {
     compile configurations.vertx
     compile configurations.zxing
 
-    testCompile configurations.automaton
+    testCompile configurations.testfx
     testCompile configurations.junit
     testCompile configurations.vertxunit
 }
@@ -52,4 +52,9 @@ jar {
                    "JavaFX-Version": "8.0+",
                    "Class-Path": configurations.compile.collect { it.getName() }.join(' '))
     }
+}
+
+test {
+    workingDir = rootDir
+    jvmArgs "-DtestResultsDir=${testResultsDir.absolutePath}"
 }

@@ -22,7 +22,7 @@ import com.twasyl.slideshowfx.controllers.SlideshowFXController;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
-import com.twasyl.slideshowfx.io.DeleteFileVisitor;
+import com.twasyl.slideshowfx.utils.io.DeleteFileVisitor;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import javafx.application.Application;

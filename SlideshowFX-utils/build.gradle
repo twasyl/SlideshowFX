@@ -23,3 +23,7 @@ dependencies {
 
     testCompile configurations.junit
 }
+
+test {
+    jvmArgs "-DtestResultsDir=${testResultsDir.absolutePath}"
+}

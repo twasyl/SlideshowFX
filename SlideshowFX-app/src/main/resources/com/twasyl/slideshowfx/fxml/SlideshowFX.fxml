@@ -237,18 +237,18 @@
                         <accelerator><SlideshowFXKeyCombination fx:value="Shortcut+Q" /></accelerator>
                     </MenuItem>
                 </Menu>
-                <Menu text="View">
+                <Menu text="View" fx:id="viewMenu">
                     <fx:reference source="enterSlideshowMode" />
                     <fx:reference source="enterSlideshowFromCurrentSlideMode" />
                     <SeparatorMenuItem />
                     <MenuItem text="Internal browser" onAction="#displayInternalBrowser" />
                 </Menu>
-                <Menu text="Options">
+                <Menu text="Options" fx:id="optionsMenu">
                     <MenuItem text="Install plugin" onAction="#installPlugin" />
                     <TextFieldCheckMenuItem fx:id="autoSaveItem" text="Auto save interval (min):" value="5" />
                     <MenuItem text="Options" onAction="#showOptionsDialog" />
                 </Menu>
-                <Menu text="Tools">
+                <Menu text="Tools" fx:id="toolsMenu">
                     <Menu text="Template builder">
                         <MenuItem text="Create template" onAction="#createTemplate" />
                         <MenuItem text="Open template" onAction="#openTemplate" />
@@ -257,7 +257,7 @@
                     <fx:reference source="openPresentationInBrowser" />
                     <fx:reference source="openCurrentWorkingDirMenuItem" />
                 </Menu>
-                <Menu text="?">
+                <Menu text="?" fx:id="helpMenu">
                     <MenuItem text="Take a tour" onAction="#takeTour" />
                     <MenuItem text="About" onAction="#displayAbout" />
                 </Menu>

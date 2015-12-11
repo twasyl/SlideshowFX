@@ -16,19 +16,17 @@
 
 package com.twasyl.slideshowfx.ui;
 
-import com.athaydes.automaton.FXApp;
-import com.athaydes.automaton.FXer;
-import com.athaydes.automaton.Speed;
 import com.twasyl.slideshowfx.app.SlideshowFX;
-import javafx.scene.Node;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.*;
+import org.junit.rules.TestName;
+import org.testfx.api.FxRobot;
+import org.testfx.api.FxService;
+import org.testfx.api.FxToolkit;
+import org.testfx.service.support.CaptureSupport;
 
-import static org.junit.Assert.*;
+import java.io.File;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
@@ -36,76 +34,57 @@ import static org.junit.Assert.*;
  *  @version 1.0
  *  @since SlideshowFX 1.0.0
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SlideshowFXTest {
 
-    private static FXer fxer;
+    @Rule public TestName testName = new TestName();
+
+    private static FxRobot fx;
+    private static CaptureSupport capture;
+    private static File testResultsDir;
 
     @BeforeClass
-    public static void setUp() {
+    public static void setUp() throws Exception {
         System.setProperty("dynamic.java.library.path", "true");
         System.setProperty("project.stage", "test");
 
-        final Thread thread = new Thread(() -> FXApp.launch(SlideshowFX.class));
-        thread.setDaemon(true);
-        thread.start();
+        testResultsDir = new File(System.getProperty("testResultsDir", "build"));
 
-        while(!FXApp.isInitialized()) {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        FxToolkit.registerPrimaryStage();
+        FxToolkit.setupApplication(SlideshowFX.class);
+        FxToolkit.showStage();
 
-        fxer = FXer.getUserWith(FXApp.getScene().getRoot());
+        fx = new FxRobot();
+        assertNotNull(fx);
+
+        capture = FxService.serviceContext().getCaptureSupport();
     }
 
-    /**
-     * Test the presence of the MenuBar in the application.
-     */
-    @Test
-    public void test_001_menuBar() {
-        final Node menuBar = fxer.getAt("#menuBar");
-
-        assertNotNull(menuBar);
-        assertTrue(menuBar instanceof MenuBar);
+    @Before public void clickOnUI() {
+        fx.clickOn(".root");
     }
 
-    /**
-     * Test that the menu bar contains four entries:
-     * <ul>
-     *     <li>File</li>
-     *     <li>Options</li>
-     *     <li>Tools</li>
-     *     <li>?</li>
-     * </ul>
-     */
-    @Test public void test_002_menuBarContent() {
-        final MenuBar menuBar = (MenuBar) fxer.getAt("#menuBar");
-
-        assertEquals(menuBar.getMenus().size(), 4);
-
-        int menuIndex = 0;
-        MenuItem menuItem = menuBar.getMenus().get(menuIndex++);
-        assertNotNull(menuItem);
-        assertEquals(menuItem.getText(), "File");
-
-        menuItem = menuBar.getMenus().get(menuIndex++);
-        assertNotNull(menuItem);
-        assertEquals(menuItem.getText(), "Options");
-
-        menuItem = menuBar.getMenus().get(menuIndex++);
-        assertNotNull(menuItem);
-        assertEquals(menuItem.getText(), "Tools");
-
-        menuItem = menuBar.getMenus().get(menuIndex++);
-        assertNotNull(menuItem);
-        assertEquals(menuItem.getText(), "?");
+    @After public void takeScreenShot() throws InterruptedException {
+        Thread.sleep(100);
+        capture.capturePrimaryScreenToFile(new File(testResultsDir, testName.getMethodName() + ".png"));
     }
 
-    @Test public void test_003_quitApp() {
-        fxer.clickOn("#fileMenu", Speed.VERY_FAST);
-        fxer.clickOn("#quitMenuItem", Speed.VERY_FAST);
+    @Test public void fileMenu() {
+        fx.clickOn("#fileMenu");
+    }
+
+    @Test public void viewMenu() {
+        fx.clickOn("#viewMenu");
+    }
+
+    @Test public void toolsMenu() {
+        fx.clickOn("#toolsMenu");
+    }
+
+    @Test public void helpMenu() {
+        fx.clickOn("#helpMenu");
+    }
+
+    @Test public void optionsMenu() {
+        fx.clickOn("#optionsMenu");
     }
 }

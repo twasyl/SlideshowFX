@@ -17,7 +17,7 @@
 package com.twasyl.slideshowfx.controls.tree;
 
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
-import com.twasyl.slideshowfx.io.DeleteFileVisitor;
+import com.twasyl.slideshowfx.utils.io.DeleteFileVisitor;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;

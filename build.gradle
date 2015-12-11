@@ -62,7 +62,7 @@ allprojects {
         wikitext
         zxing
 
-        automaton
+        testfx
         junit
         vertxunit
     }
@@ -82,7 +82,7 @@ allprojects {
         wikitext fileTree(dir: new File(allLibs, 'WikiText'), include: '*.jar')
         zxing 'com.google.zxing:core:3.2.1', 'com.google.zxing:javase:3.2.1'
 
-        automaton 'com.athaydes.automaton:Automaton:1.1.0'
+        testfx 'org.testfx:testfx-core:4.0.+', 'org.testfx:testfx-junit:4.0.+'
         junit 'junit:junit:4.12'
         vertxunit 'io.vertx:vertx-unit:3.0.0'
     }

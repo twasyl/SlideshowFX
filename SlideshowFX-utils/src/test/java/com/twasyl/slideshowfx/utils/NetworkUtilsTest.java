@@ -41,6 +41,6 @@ public class NetworkUtilsTest {
 
         assertNotNull(ips);
         assertTrue(ips.size() > 0);
+        assertTrue(ips.contains("127.0.0.1"));
     }
-
 }

@@ -21,6 +21,8 @@ dependencies {
 
     compile configurations.felix
     compile configurations.markdown
+
+    testCompile configurations.junit
 }
 
 jar {

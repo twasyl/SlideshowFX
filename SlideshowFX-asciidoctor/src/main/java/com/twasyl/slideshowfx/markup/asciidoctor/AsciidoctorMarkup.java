@@ -19,6 +19,7 @@ package com.twasyl.slideshowfx.markup.asciidoctor;
 import com.twasyl.slideshowfx.markup.AbstractMarkup;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.AttributesBuilder;
+import org.asciidoctor.Options;
 import org.asciidoctor.OptionsBuilder;
 import org.jruby.RubyInstanceConfig;
 import org.jruby.javasupport.JavaEmbedUtils;
@@ -65,9 +66,13 @@ public class AsciidoctorMarkup extends AbstractMarkup {
                                                                 .noFooter(true)
                                                                 .tableOfContents(false)
                                                                 .showTitle(false)
-                                                                .skipFrontMatter(true);
-        final OptionsBuilder options = OptionsBuilder.options().compact(true).attributes(attributes);
+                                                                .skipFrontMatter(true)
+                                                                .attribute("sectids!", "");
+        final OptionsBuilder options = OptionsBuilder.options()
+                                                     .compact(true)
+                                                     .backend("html5")
+                                                     .attributes(attributes);
 
-        return this.asciidoctor.convert(markupString, options);
+        return this.asciidoctor.convert(markupString, options).trim();
     }
 }

@@ -22,7 +22,6 @@ dependencies {
     compile configurations.wikitext
 
     testCompile configurations.junit
-    testCompile configurations.jsoup
 }
 
 jar {

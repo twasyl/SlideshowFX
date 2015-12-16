@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.markup.asciidoctor;
+package com.twasyl.slideshowfx.markup.html;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,17 +22,15 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Performs tests for the Asciidoctor markup syntax.
- *
  * @author Thierry Wasylczenko
+ * @since SlideshowFX
  */
-public class AsciidoctorMarkupTest {
-
-    private static AsciidoctorMarkup markup;
+public class HtmlMarkupTest {
+    private static HtmlMarkup markup;
 
     @BeforeClass
     public static void setUp() {
-        markup = new AsciidoctorMarkup();
+        markup = new HtmlMarkup();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -41,14 +39,14 @@ public class AsciidoctorMarkupTest {
     }
 
     @Test public void generateH1() {
-        final String result = markup.convertAsHtml("= A title");
+        final String result = markup.convertAsHtml("<h1>A title</h1>");
 
         assertEquals("<h1>A title</h1>", result);
     }
 
     @Test public void generateH2() {
-        final String result = markup.convertAsHtml("== A title");
-        System.out.println(result);
+        final String result = markup.convertAsHtml("<h2>A title</h2>");
+
         assertEquals("<h2>A title</h2>", result);
     }
 
@@ -59,13 +57,13 @@ public class AsciidoctorMarkupTest {
     }
 
     @Test public void generateCodeBloc() {
-        final String result = markup.convertAsHtml("[source,java]\n----\nfinal String s;\n----\n");
-        System.out.println(result);
+        final String result = markup.convertAsHtml("<pre><code>final String s;</code></pre>");
+
         assertEquals("<pre><code>final String s;</code></pre>", result);
     }
 
     @Test public void generateStrong() {
-        final String result = markup.convertAsHtml("*Strong text*");
+        final String result = markup.convertAsHtml("<strong>Strong text</strong>");
 
         assertEquals("<strong>Strong text</strong>", result);
     }

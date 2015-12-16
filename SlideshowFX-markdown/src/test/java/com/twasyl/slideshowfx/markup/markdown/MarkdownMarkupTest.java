@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.markup.asciidoctor;
+package com.twasyl.slideshowfx.markup.markdown;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,17 +22,16 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Performs tests for the Asciidoctor markup syntax.
- *
  * @author Thierry Wasylczenko
+ * @since SlideshowFX
  */
-public class AsciidoctorMarkupTest {
+public class MarkdownMarkupTest {
 
-    private static AsciidoctorMarkup markup;
+    private static MarkdownMarkup markup;
 
     @BeforeClass
     public static void setUp() {
-        markup = new AsciidoctorMarkup();
+        markup = new MarkdownMarkup();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -41,38 +40,38 @@ public class AsciidoctorMarkupTest {
     }
 
     @Test public void generateH1() {
-        final String result = markup.convertAsHtml("= A title");
+        final String result = markup.convertAsHtml("# A title");
 
         assertEquals("<h1>A title</h1>", result);
     }
 
     @Test public void generateH2() {
-        final String result = markup.convertAsHtml("== A title");
-        System.out.println(result);
+        final String result = markup.convertAsHtml("## A title");
+
         assertEquals("<h2>A title</h2>", result);
     }
 
     @Test public void generateInlineCode() {
-        final String result = markup.convertAsHtml("<code>public class Java { }</code>");
+        final String result = markup.convertAsHtml("`public class Java { }`");
 
-        assertEquals("<code>public class Java { }</code>", result);
+        assertEquals("<p><code>public class Java { }</code></p>", result);
     }
 
     @Test public void generateCodeBloc() {
-        final String result = markup.convertAsHtml("[source,java]\n----\nfinal String s;\n----\n");
-        System.out.println(result);
-        assertEquals("<pre><code>final String s;</code></pre>", result);
+        final String result = markup.convertAsHtml("    final String s;");
+
+        assertEquals("<pre><code>final String s;\n</code></pre>", result);
     }
 
     @Test public void generateStrong() {
         final String result = markup.convertAsHtml("*Strong text*");
 
-        assertEquals("<strong>Strong text</strong>", result);
+        assertEquals("<p><em>Strong text</em></p>", result);
     }
 
     @Test public void generateUnorderedList() {
-        final String result = markup.convertAsHtml("<ul><li>One</li><li>Two</li></ul>");
+        final String result = markup.convertAsHtml("* One\n* Two");
 
-        assertEquals("<ul><li>One</li><li>Two</li></ul>", result);
+        assertEquals("<ul>\n<li>One</li>\n<li>Two</li>\n</ul>", result);
     }
 }

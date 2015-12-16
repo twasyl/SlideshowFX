@@ -19,6 +19,8 @@ version = '1.0.0'
 dependencies {
     compile project(':SlideshowFX-markup')
     compile configurations.felix
+
+    testCompile configurations.junit
 }
 
 jar {

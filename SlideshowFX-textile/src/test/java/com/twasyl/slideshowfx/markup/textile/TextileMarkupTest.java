@@ -16,12 +16,10 @@
 
 package com.twasyl.slideshowfx.markup.textile;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Element;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Thierry Wasylczenko
@@ -35,36 +33,44 @@ public class TextileMarkupTest {
         markup = new TextileMarkup();
     }
 
-    /**
-     * Try to convert a null String in HTML. The except result is to catch an {@link java.lang.IllegalArgumentException}
-     * otherwise the test is considered as failed.
-     */
-    @Test
-    public void tryWithNullString() {
-        try {
-            markup.convertAsHtml(null);
-            fail("When parsing a null String doesn't throw an IllegalArgumentException");
-        } catch(IllegalArgumentException e) {
-            // Great
-        }
+    @Test(expected = IllegalArgumentException.class)
+    public void generateWithNull() {
+        markup.convertAsHtml(null);
     }
 
-    /**
-     * Test if the parsing of a h1. gives an expected result.
-     */
-    @Test public void testWithH1() {
-        final String textile = "h1. Test my textile";
+    @Test public void generateH1() {
+        final String result = markup.convertAsHtml("# A title");
 
-        try {
-            final String result = markup.convertAsHtml(textile);
-            Element h1Result = Jsoup.parse(result).body().child(0);
+        assertEquals("<h1>A title</h1>", result);
+    }
 
-            assertNotNull(h1Result);
-            assertEquals("The generated element is not an H1 markup", "h1", h1Result.tagName());
-            assertTrue("The H1 markup doesn't contain text", h1Result.hasText());
-            assertEquals("Test my textile", h1Result.html());
-        } catch(IllegalArgumentException e) {
-            fail("An IllegalArgumentException has been thrown");
-        }
+    @Test public void generateH2() {
+        final String result = markup.convertAsHtml("## A title");
+
+        assertEquals("<h2>A title</h2>", result);
+    }
+
+    @Test public void generateInlineCode() {
+        final String result = markup.convertAsHtml("`public class Java { }`");
+
+        assertEquals("<p><code>public class Java { }</code></p>", result);
+    }
+
+    @Test public void generateCodeBloc() {
+        final String result = markup.convertAsHtml("    final String s;");
+
+        assertEquals("<pre><code>final String s;\n</code></pre>", result);
+    }
+
+    @Test public void generateStrong() {
+        final String result = markup.convertAsHtml("*Strong text*");
+
+        assertEquals("<p><em>Strong text</em></p>", result);
+    }
+
+    @Test public void generateUnorderedList() {
+        final String result = markup.convertAsHtml("* One\n* Two");
+
+        assertEquals("<ul>\n<li>One</li>\n<li>Two</li>\n</ul>", result);
     }
 }

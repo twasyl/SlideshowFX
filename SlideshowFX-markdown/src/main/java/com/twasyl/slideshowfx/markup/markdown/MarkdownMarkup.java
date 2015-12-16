@@ -42,6 +42,6 @@ public class MarkdownMarkup extends AbstractMarkup {
     @Override
     public String convertAsHtml(String markupString) throws IllegalArgumentException {
         if(markupString == null) throw new IllegalArgumentException("Can not convert " + getName() + " to HTML : the String is null");
-        return Processor.process("[$PROFILE$]: extended\n" + markupString);
+        return Processor.process("[$PROFILE$]: extended\n" + markupString).trim();
     }
 }

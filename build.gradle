@@ -71,9 +71,9 @@ allprojects {
 
     dependencies {
         asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.3.2'
-        drive 'com.google.apis:google-api-services-drive:v2-rev186-1.20.0'
-        dropbox 'com.dropbox.core:dropbox-core-sdk:1.8.1'
-        felix 'org.apache.felix:org.apache.felix.framework:5.0.1'
+        drive 'com.google.apis:google-api-services-drive:v2-rev196-1.21.0'
+        dropbox 'com.dropbox.core:dropbox-core-sdk:1.8.2'
+        felix 'org.apache.felix:org.apache.felix.framework:5.4.0'
         fontawesomefx 'de.jensd:fontawesomefx:8.7'
         freemarker 'org.freemarker:freemarker:2.3.23'
         jsoup 'org.jsoup:jsoup:1.8.3'
@@ -130,8 +130,8 @@ asciidoctor {
             'fontawesomefx-version' : "${configurations.fontawesomefx.dependencies[0].version}",
             'jsoup-version': "${configurations.jsoup.dependencies[0].version}",
             'leapmotion-sdk-version': '2.3.1.31549',
-            'wikitext-core-version': '2.6.0.N20150709-0448',
-            'wikitext-textile-core-version': '2.6.0.N20150629-1933',
+            'wikitext-core-version': '2.7.0.N20151015-1452',
+            'wikitext-textile-core-version': '2.7.0.N20151009-1723',
             'twitter4j-version': "${configurations.twitter4j.dependencies[0].version}",
             'txtmark-version': "${configurations.markdown.dependencies[0].version}",
             'vertx-version': "${configurations.vertx.dependencies[0].version}",

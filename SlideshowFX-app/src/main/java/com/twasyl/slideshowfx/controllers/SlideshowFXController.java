@@ -40,6 +40,10 @@ import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.server.service.AttendeeChatService;
+import com.twasyl.slideshowfx.server.service.PresenterChatService;
+import com.twasyl.slideshowfx.server.service.QuizzService;
+import com.twasyl.slideshowfx.server.service.TwitterService;
 import com.twasyl.slideshowfx.utils.*;
 import com.twasyl.slideshowfx.utils.beans.Pair;
 import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
@@ -992,7 +996,12 @@ public class SlideshowFXController implements Initializable {
             this.chatIpAddress.setValue(ip);
             this.chatPort.setText(port + "");
 
-            SlideshowFXServer.create(ip, port, this.twitterHashtag.getText()).start();
+            SlideshowFXServer.create(ip, port, this.twitterHashtag.getText()).start(
+                    AttendeeChatService.class,
+                    PresenterChatService.class,
+                    QuizzService.class,
+                    TwitterService.class
+            );
 
             icon = new FontAwesomeIconView(FontAwesomeIcon.POWER_OFF);
             icon.setGlyphSize(20);

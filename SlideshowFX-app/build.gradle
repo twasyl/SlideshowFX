@@ -19,6 +19,7 @@ version = '1.0.0'
 dependencies {
     compile project(':SlideshowFX-engines')
     compile project(':SlideshowFX-global-configuration')
+    compile project(":SlideshowFX-server")
     compile project(':SlideshowFX-osgi')
     compile project(':SlideshowFX-utils')
     compile project(':SlideshowFX-plugin')

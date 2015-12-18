@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx;
+package com.twasyl.slideshowfx.server;
 
-import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import io.vertx.ext.unit.TestContext;
 import org.junit.BeforeClass;
@@ -32,10 +31,5 @@ public class SlideshowFXServerTest {
     public static void setUp() {
         SlideshowFXServer.create(NetworkUtils.getIP(), 10080, null);
         SlideshowFXServer.getSingleton().start();
-    }
-
-
-    public void startQuizz(TestContext context) {
-        context.assertTrue(true);
     }
 }

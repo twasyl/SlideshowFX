@@ -1,23 +1,23 @@
 h1. What is SlideshowFX ? !https://travis-ci.org/twasyl/SlideshowFX.svg!:https://travis-ci.org/twasyl/SlideshowFX
 
-p. SlideshowFX is a tool allowing you to create slideshow using HTML5 frameworks. Maybe have you heard about "reveal.js":http://lab.hakim.se/reveal-js/ or "impress.js":https://github.com/bartaz/impress.js/ that allow you  to create beautiful slideshows, entirely customizable by using HTML5 and CSS3 technologies.
+p. SlideshowFX is a tool allowing you to create slide decks using HTML5 frameworks. Maybe have you heard about "reveal.js":http://lab.hakim.se/reveal-js/ or "impress.js":https://github.com/bartaz/impress.js/ that allow you to create beautiful slideshows, entirely customizable by using HTML5 and CSS3 technologies.
 
-p. The main advantage is you don't need anything else than e text editor and a browser, both tools that can be find for free. Moreover, even if tools like PowerPoint and Keynote are mostly used and are really interesting, if you are a geek, you'll fall in love with creating HTML5 slideshows. It brings you a lot of freedom like adding a YouTube video right inside your presentation, playing music, automatically syntax highlighting code example and more.
+p. The main advantage is you don't need anything else than a text editor and a browser, both tools that can be find for free. Moreover, even if tools like PowerPoint and Keynote are mostly used and are really interesting, if you are a geek, you'll fall in love with creating HTML5 slideshows. It brings you a lot of freedom like adding a YouTube video right inside your presentation, playing music, automatically syntax highlighting code example and more.
 
 h3. But why SlideshowFX ?
 
 p. Even if you like web technologies, it could be long to completely create your presentation by writing HTML code. The goal of SlideshowFX is to facilitate that task by allowing you to use a template and then simply set titles, content, images, copying slides, moving them and more. All with a nice and simple interface. 
 And because you may not want to write HTML code, you will also be able to set the content using Textile, Markdown and Asciidoctor. It's up to you.
 
-But SlideshowFX also brings features that aren't provided by existing tools. Indeed you can use a LeapMotion controller to switch slides and point something on the screen. So you don't need a laser pointer that you walways forget at home.
+But SlideshowFX also brings features that aren't provided by existing tools. Indeed you can use a LeapMotion controller to switch slides and point something on the screen. So you don't need a laser pointer that you always forget at home.
 
 You can also start a chat with which your attendees can ask you questions that are resend to all others attendees connected to the chat. But questions could also be asked through Twitter with a hashtag you define. 
 
 Are you a big lover of quizs? If yes you can even create quizs in your presentations that attendees can answer to and results will be displayed live! Cool, isn't it?
 
-And developers aren't forgotten in SlideshowFX! Sometimes you display code snippets right? You would like to see the results right? In SlideshowFX, insert executable code snippets and see the console's output directly in your presentation!
+And developers aren't forgotten in SlideshowFX! Sometimes you display code snippets right? You would like to see the results right? In SlideshowFX, insert executable code snippets and see the console's output directly in your presentation! Currently you can create "Go":https://golang.org/, "golo":http://golo-lang.org/, "groovy":http://www.groovy-lang.org/, "Java":https://www.oracle.com/java/index.html and JavaScript.
 
-With SlideshowFX, bring a presentation to the next level of interactivity.
+With SlideshowFX, bring your presentation to the next level of interactivity.
 
 h1. How to get started
 

@@ -41,11 +41,9 @@ include 'SlideshowFX-hosting-connector'
 include 'SlideshowFX-dropbox-hosting-connector'
 include 'SlideshowFX-drive-hosting-connector'
 
+include 'SlideshowFX-snippet-executor'
+include 'SlideshowFX-go-executor'
 include 'SlideshowFX-golo-executor'
 include 'SlideshowFX-groovy-executor'
 include 'SlideshowFX-java-executor'
 include 'SlideshowFX-javascript-executor'
-include 'SlideshowFX-snippet-executor'
-include 'SlideshowFX-server'
-
-

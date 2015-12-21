@@ -85,6 +85,7 @@ SlideshowFX contains the following modules:
 - *SlideshowFX-dropbox-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Dropbox ;
 - *SlideshowFX-drive-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Google Drive ;
 - *SlideshowFX-snippet-executor* which defines the base classes for creating an OSGi module for executing code snippet in a presentation ;
+- *SlideshowFX-go-executor* which defines the base classes for creating an OSGi module for executing Go code snippet in a presentation ;
 - *SlideshowFX-golo-executor* which defines the base classes for creating an OSGi module for executing Golo code snippet in a presentation ;
 - *SlideshowFX-groovy-executor* which defines the base classes for creating an OSGi module for executing Groovy code snippet in a presentation ;
 - *SlideshowFX-java-executor* which defines the base classes for creating an OSGi module for executing Java code snippet in a presentation ;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Thierry Wasylczenko
+ * Copyright 2016 Thierry Wasylczenko
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -374,7 +374,7 @@ public class SlideshowFXServer {
      *
      * @param host The hostname the server will listen on.
      * @param port The port the server will listen on.
-     * @param twitterHashtag A Twitter hashatag if needed.
+     * @param twitterHashtag A Twitter hashtag if needed.
      * @return The instance of the {@link SlideshowFXServer} that has been created.
      */
     public static SlideshowFXServer create(final String host, final int port, final String twitterHashtag) {

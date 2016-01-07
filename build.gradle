@@ -70,7 +70,7 @@ allprojects {
     }
 
     dependencies {
-        asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.3.2'
+        asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.4'
         drive 'com.google.apis:google-api-services-drive:v2-rev196-1.21.0'
         dropbox 'com.dropbox.core:dropbox-core-sdk:1.8.2'
         felix 'org.apache.felix:org.apache.felix.framework:5.4.0'

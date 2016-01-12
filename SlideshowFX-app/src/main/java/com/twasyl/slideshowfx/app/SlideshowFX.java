@@ -21,10 +21,12 @@ import com.sun.javafx.application.LauncherImpl;
 import com.twasyl.slideshowfx.controllers.SlideshowFXController;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.utils.io.DeleteFileVisitor;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.utils.time.DateTimeUtils;
 import javafx.application.Application;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -40,6 +42,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
+import java.time.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -124,6 +128,13 @@ public class SlideshowFX extends Application {
 
     @Override
     public void init() throws Exception {
+        // Initialize the configuration
+        GlobalConfiguration.createApplicationDirectory();
+
+        if(GlobalConfiguration.createConfigurationFile()) {
+           GlobalConfiguration.fillConfigurationWithDefaultValue();
+        }
+
         // Start the MarkupManager
         LOGGER.info("Starting Felix");
         OSGiManager.startAndDeploy();
@@ -202,30 +213,63 @@ public class SlideshowFX extends Application {
 
         this.mainController.get().closeAllPresentations(true);
 
-        LOGGER.info("Cleaning temporary files");
-        File tempDirectory = new File(System.getProperty("java.io.tmpdir"));
+        deleteTemporaryFiles();
+        stopInternalServer();
+        stopOSGIManager();
+    }
 
-        Arrays.stream(tempDirectory.listFiles())
-                .filter(file -> file.getName().startsWith("sfx-"))
-                .forEach(file -> {
-                    try {
-                        Files.walkFileTree(file.toPath(), new DeleteFileVisitor());
-                    } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE,
-                                String.format("Can not delete temporary file %1$s", file.getAbsolutePath()),
-                                e);
-                    }
-                });
+    /**
+     * Deletes temporary files older than the configuration parameter {@link GlobalConfiguration#TEMPORARY_FILES_MAX_AGE_PARAMETER}.
+     */
+    private void deleteTemporaryFiles() {
+        if(GlobalConfiguration.canDeleteTemporaryFiles()) {
+            LOGGER.info("Cleaning temporary files");
+            final File tempDirectory = new File(System.getProperty("java.io.tmpdir"));
 
-        LOGGER.info("Closing the chat");
-        if(SlideshowFXServer.getSingleton() != null) SlideshowFXServer.getSingleton().stop();
+            Arrays.stream(tempDirectory.listFiles())
+                    .filter(file -> file.getName().startsWith("sfx-"))
+                    .filter(DateTimeUtils.getFilterForFilesOlderThanGivenDays(GlobalConfiguration.getTemporaryFilesMaxAge()))
+                    .forEach(file -> {
+                        try {
+                            Files.walkFileTree(file.toPath(), new DeleteFileVisitor());
+                        } catch (IOException e) {
+                            LOGGER.log(Level.SEVERE,
+                                    String.format("Can not delete temporary file %1$s", file.getAbsolutePath()),
+                                    e);
+                        }
+                    });
+        }
+    }
 
-        LOGGER.info("Disconnecting from all hosting connectors");
-        OSGiManager.getInstalledServices(IHostingConnector.class)
-                .forEach(hostingConnector -> hostingConnector.disconnect());
+    /**
+     * Stop the internal server if it is running.
+     */
+    private void stopInternalServer() {
+        if(SlideshowFXServer.getSingleton() != null) {
+            LOGGER.info("Closing the internal server");
+            SlideshowFXServer.getSingleton().stop();
+        }
+    }
 
+    /**
+     * Stops the OSGI manager. If some {@link IHostingConnector} are registered, disconnect from them.
+     */
+    private void stopOSGIManager() {
+        this.stopHostingConnectors();
         LOGGER.info("Stopping the OSGi manager");
         OSGiManager.stop();
+    }
+
+    /**
+     * Disconnect all hosting connectors if they are running.
+     */
+    private void stopHostingConnectors() {
+        final List<IHostingConnector> connectors = OSGiManager.getInstalledServices(IHostingConnector.class);
+
+        if(!connectors.isEmpty()) {
+            LOGGER.info("Disconnecting from all hosting connectors");
+            connectors.forEach(hostingConnector -> hostingConnector.disconnect());
+        }
     }
 
     public static ReadOnlyObjectProperty<Stage> stageProperty() { return stage; }

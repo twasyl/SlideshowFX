@@ -39,6 +39,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
 import javax.imageio.ImageIO;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
@@ -81,9 +83,13 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
     private TemplateEngine templateEngine;
 
+    private boolean modifiedSinceLatestSave;
+
     public PresentationEngine() {
         super(DEFAULT_ARCHIVE_EXTENSION, "presentation-config.json");
         this.templateEngine = new TemplateEngine();
+
+        Presentations.register(this);
     }
 
     @Override
@@ -233,6 +239,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         if(!file.canRead()) throw new IllegalAccessException("The archive file can not be read");
         if(!file.getName().endsWith(this.getArchiveExtension())) throw new IllegalArgumentException("The extension of the archive is not valid");
 
+        this.setModifiedSinceLatestSave(false);
+
         this.setArchive(file);
         this.setWorkingDirectory(this.generateWorkingDirectory());
         ZipUtils.unzip(this.getArchive(), this.getWorkingDirectory());
@@ -338,7 +346,37 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                 });
 
         ZipUtils.zip(this.getWorkingDirectory(), file);
+
+        this.setModifiedSinceLatestSave(false);
         LOGGER.fine("Presentation saved");
+    }
+
+    /**
+     * Indicates if the presentation has already been saved by testing if the {@link #getArchive()}
+     * method returns {@code null} or not.
+     * @return {@code true} if {@link #getArchive()} is not {@code null}, {@code false} otherwise.
+     */
+    public boolean isPresentationAlreadySaved() {
+        return this.getArchive() != null;
+    }
+
+    /**
+     * Indicates if the presentation has been modified since the latest save. If the presentation has never been saved,
+     * then the presentation is considered modified.
+     * @return {@code true} if the presentation has been modified since the latest save, {@code false} otherwise.
+     */
+    public boolean isModifiedSinceLatestSave() {
+        return modifiedSinceLatestSave;
+    }
+
+    /**
+     * Set if the presentation has been modified since its latest save.
+     * @param modifiedSinceLatestSave {@code true} to indicate a modification, {@code false} otherwise.
+     */
+    public void setModifiedSinceLatestSave(boolean modifiedSinceLatestSave) {
+        boolean oldValue = this.modifiedSinceLatestSave;
+        this.modifiedSinceLatestSave = modifiedSinceLatestSave;
+        PlatformHelper.run(() -> this.propertyChangeSupport.firePropertyChange("modifiedSinceLatestSave", oldValue, modifiedSinceLatestSave));
     }
 
     /**
@@ -351,6 +389,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
      */
     public void createFromTemplate(File templateArchive) throws IOException, IllegalAccessException {
         this.setArchive(null);
+
+        this.setModifiedSinceLatestSave(true);
 
         this.templateEngine = new TemplateEngine();
         this.templateEngine.loadArchive(templateArchive);
@@ -399,6 +439,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     public Slide addSlide(SlideTemplate template, String afterSlideNumber) throws IOException {
         if(template == null) throw new IllegalArgumentException("The templateConfiguration for creating a slide can not be null");
 
+        this.setModifiedSinceLatestSave(true);
         final Pair<Slide, Element> createdSlide = this.createSlide(template);
 
         if(afterSlideNumber == null) {
@@ -444,6 +485,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     public void deleteSlide(String slideNumber) {
         if(slideNumber == null) throw new IllegalArgumentException("Slide number can not be null");
 
+        this.setModifiedSinceLatestSave(true);
+
         Slide slideToRemove = this.configuration.getSlideByNumber(slideNumber);
         if(slideToRemove != null) {
             this.configuration.getSlides().remove(slideToRemove);
@@ -462,6 +505,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     public Slide duplicateSlide(Slide slide) throws IOException {
         if(slide == null) throw new IllegalArgumentException("The slide to duplicate can not be null");
 
+        this.setModifiedSinceLatestSave(true);
         final Pair<Slide, Element> duplicatedSlide = this.createSlide(slide.getTemplate());
 
         // Add the slide to the presentation's slides
@@ -510,6 +554,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         if(slideToMove == null) throw new IllegalArgumentException("The slideToMove to move can not be null");
 
         if(!slideToMove.equals(beforeSlide)) {
+            this.setModifiedSinceLatestSave(true);
+
             this.configuration.getSlides().remove(slideToMove);
 
             final String slideHtml = this.configuration.getDocument()
@@ -547,6 +593,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                 && resource.getContent() != null
                 && !resource.getContent().trim().isEmpty()) {
 
+            this.setModifiedSinceLatestSave(true);
             this.configuration.getCustomResources().add(resource);
 
             /*
@@ -597,6 +644,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     private Pair<Slide, Element> createSlide(final SlideTemplate template) throws NullPointerException, IOException {
         if(template == null) throw new NullPointerException("The template can not be null");
 
+        this.setModifiedSinceLatestSave(true);
         final Pair<Slide, Element> result = new Pair<>();
         result.setKey(new Slide(template, System.currentTimeMillis() + ""));
 

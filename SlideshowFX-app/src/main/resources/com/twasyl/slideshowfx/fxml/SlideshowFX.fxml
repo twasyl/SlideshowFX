@@ -17,7 +17,6 @@
   -->
 
 <?import com.twasyl.slideshowfx.controls.notification.NotificationCenter?>
-<?import com.twasyl.slideshowfx.controls.TextFieldCheckMenuItem?>
 <?import com.twasyl.slideshowfx.utils.keys.*?>
 <?import com.twasyl.slideshowfx.utils.NetworkUtils?>
 <?import de.jensd.fx.glyphs.fontawesome.*?>
@@ -245,7 +244,6 @@
                 </Menu>
                 <Menu text="Options" fx:id="optionsMenu">
                     <MenuItem text="Install plugin" onAction="#installPlugin" />
-                    <TextFieldCheckMenuItem fx:id="autoSaveItem" text="Auto save interval (min):" value="5" />
                     <MenuItem text="Options" onAction="#showOptionsDialog" />
                 </Menu>
                 <Menu text="Tools" fx:id="toolsMenu">

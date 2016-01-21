@@ -23,11 +23,10 @@ import com.twasyl.slideshowfx.controls.QuizzCreatorPanel;
 import com.twasyl.slideshowfx.controls.SlideContentEditor;
 import com.twasyl.slideshowfx.controls.slideshow.Context;
 import com.twasyl.slideshowfx.controls.slideshow.SlideshowStage;
-import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.engine.presentation.Presentations;
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElement;
-import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
@@ -47,9 +46,7 @@ import javafx.beans.property.adapter.JavaBeanObjectProperty;
 import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -60,7 +57,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import org.xml.sax.SAXException;
 
-import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.File;
@@ -215,7 +211,7 @@ public class PresentationViewController implements Initializable {
 
         if(this.parent != null) this.parent.updateSlideSplitMenu();
 
-        ((SimpleBooleanProperty) this.presentationModified).set(true);
+        this.presentationEngine.setModifiedSinceLatestSave(true);
     }
 
     /**
@@ -308,16 +304,6 @@ public class PresentationViewController implements Initializable {
                     LOGGER.log(Level.SEVERE, "Can not decode code snippet", e);
                 }
             }
-        }
-    }
-
-    /**
-     * Defines the parent controller of this one. This is useful if this controller is created by another one.
-     * @param controller The parent controller of this one.
-     */
-    public void setParent(final Initializable controller) {
-        if(controller != null && controller instanceof SlideshowFXController) {
-            this.parent = (SlideshowFXController) controller;
         }
     }
 
@@ -453,41 +439,6 @@ public class PresentationViewController implements Initializable {
     }
 
     /**
-     * Indicates if the presentation has already been saved by testing if the {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#getArchive()}
-     * method returns {@code null} or not.
-     * @return {@code true} if {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#getArchive()} is not
-     * {@code null}, {@code false} otherwise.
-     */
-    public boolean isPresentationAlreadySaved() {
-        return this.presentationEngine.getArchive() != null;
-    }
-
-    /**
-     * Get the archive file of this presentation if it has been defined.
-     * @return The value returned by {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#getArchive()}
-     */
-    public File getArchiveFile() {
-        return this.presentationEngine.getArchive();
-    }
-
-    /**
-     * Save the presentation hosted in this view to the given {@code archiveFile}. The process for
-     * saving the presentation is only started if the given {@code archiveFile} is not {@code null}. If the process is
-     * started, the given {@code archiveFile} is set as archive to this {@link #presentationEngine} using
-     * {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#setArchive(java.io.File)}. Then a
-     * {@link com.twasyl.slideshowfx.concurrent.SavePresentationTask} is instantiated and started.
-     * @param archiveFile The file to save the presentation in.
-     * @throws java.io.IOException If an error occurs when save the file.
-     */
-    public void savePresentation(File archiveFile) throws IOException {
-        if(archiveFile != null) {
-            this.presentationEngine.setArchive(archiveFile);
-            this.presentationEngine.saveArchive();
-            PlatformHelper.run(() -> ((SimpleBooleanProperty) this.presentationModified).set(false));
-        }
-    }
-
-    /**
      * This method refreshed the browser displaying the presentation.
      */
     public void reloadPresentationBrowser() {
@@ -526,13 +477,16 @@ public class PresentationViewController implements Initializable {
 
             ((SimpleStringProperty) this.presentationName).bind(new FilenameBinding(archiveFile));
 
-            /*
-             * Determine if the defined presentation is opened from a template or an existing presentation in order to
-             * indicate if it is considered as modified.
-             */
-            ((SimpleBooleanProperty) this.presentationModified).set(this.presentationEngine.getArchive() == null ? true : false);
+            final JavaBeanObjectProperty<Boolean> presentationModifiedSinceLatestSave = new JavaBeanObjectPropertyBuilder<>()
+                    .bean(this.presentationEngine)
+                    .getter("isModifiedSinceLatestSave")
+                    .setter("setModifiedSinceLatestSave")
+                    .name("modifiedSinceLatestSave")
+                    .build();
+
+            ((SimpleBooleanProperty) this.presentationModified).bind(presentationModifiedSinceLatestSave);
         } catch (NoSuchMethodException e) {
-            LOGGER.log(Level.SEVERE, "Can not create the property for the name of the presentation");
+            LOGGER.log(Level.SEVERE, "Can not create the property for the name of the presentation", e);
         }
     }
 
@@ -550,14 +504,6 @@ public class PresentationViewController implements Initializable {
      */
 
     public ReadOnlyBooleanProperty presentationModifiedProperty() { return presentationModified; }
-
-    /**
-     * Indicates if the presentation has been modified since the latest time it has been saved.
-     *
-     * @return {@code true} If the presentation has been modified but not saved, {@code false} is no modifications have
-     * been made on the presentation since the latest save.
-     */
-    public boolean isPresentationModified() { return presentationModified.get(); }
 
     /**
      * Get the slide number of the slide currently displayed.
@@ -583,131 +529,6 @@ public class PresentationViewController implements Initializable {
     }
 
     /**
-     * Get the {@link Slide}
-     * of the current displayed slide.
-     * @return The {@link Slide} of the
-     * current displayed slide or {@code null} if no slide is displayed.
-     */
-    public Slide getCurrentSlidePresentationConfiguration() {
-        Slide configuration = null;
-        final String slideId = this.getCurrentSlideId();
-
-        if(slideId != null && !slideId.isEmpty()) {
-            configuration = this.presentationEngine.getConfiguration().getSlideById(slideId);
-        }
-
-        return configuration;
-    }
-
-    /**
-     * Add a slide after the current slide displayed. The created slide will be defined by the given {@code template}.
-     * @param template The template used to create the slide.
-     * @throws java.lang.NullPointerException If the {@code template} is null.
-     * @throws java.io.IOException If an error occured when adding a slide.
-     */
-    public void addSlide(SlideTemplate template) throws IOException {
-        if(template == null) throw new NullPointerException("The template can not be null");
-
-        this.presentationEngine.addSlide(template, this.getCurrentSlideNumber());
-    }
-
-    /**
-     * Moves a slide before another.
-     * @param slideToMove The slide to move.
-     * @param beforeSlide The slide where {@code slideToMove} will be placed before.
-     * @throws java.lang.NullPointerException If {@code slideToMove} is {@code null}
-     */
-    public void moveSlide(Slide slideToMove, Slide beforeSlide) {
-        if(slideToMove == null) throw new NullPointerException("The slide to move can not be null");
-
-        this.presentationEngine.moveSlide(slideToMove, beforeSlide);
-    }
-
-    /**
-     * Copy the current displayed slide. If no slide is present, nothing is performed.
-     */
-    public void copyCurrentSlide() {
-        final String slideId = this.getCurrentSlideId();
-
-        if(slideId != null && !slideId.isEmpty()) {
-            final Slide slideToCopy = this.presentationEngine.getConfiguration().getSlideById(slideId);
-
-            if(slideToCopy != null) {
-                try {
-                    this.presentationEngine.duplicateSlide(slideToCopy);
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "Can not duplicate the slide", e);
-                }
-            }
-        }
-    }
-
-    /**
-     * Delete the current displayed slide. If no slide is present, nothing is performed.
-     */
-    public void deleteCurrentSlide() {
-        final ButtonType response = DialogHelper.showConfirmationAlert("Delete slide", "Are you sure you want to delete the current slide?");
-
-        if(response != null && response == ButtonType.YES) {
-            final String slideNumber = this.getCurrentSlideNumber();
-
-            if(slideNumber != null && !slideNumber.isEmpty()) {
-                this.presentationEngine.deleteSlide(slideNumber);
-            }
-        }
-    }
-
-    /**
-     * Get the working directory of this presentation.
-     * @return The file representing the working directory of this presentation.
-     */
-    public File getWorkingDirectory() {
-        return this.presentationEngine.getWorkingDirectory();
-    }
-
-    /**
-     * Get the HTML presentation file of the current presentation.
-     * @return The file pointing to the HTML presentation file.
-     */
-    public File getPresentationFile() {
-        return this.presentationEngine.getConfiguration().getPresentationFile();
-    }
-
-    /**
-     * Get the slide for this presentation.
-     * @return An array containing all slides, {@code null} if no slides are found.
-     */
-    public Slide[] getSlides() {
-        Slide[] slides = null;
-
-        if(this.presentationEngine != null
-            && this.presentationEngine.getConfiguration() != null
-            && this.presentationEngine.getConfiguration().getSlides() != null
-            && !this.presentationEngine.getConfiguration().getSlides().isEmpty()) {
-            slides = this.presentationEngine.getConfiguration().getSlides().toArray(new Slide[0]);
-        }
-
-        return slides;
-    }
-
-    /**
-     * Get the slide templates for this presentation.
-     * @return An array containing all templates, {@code null} if no templates are found.
-     */
-    public SlideTemplate[] getSlideTemplates() {
-        SlideTemplate[] templates = null;
-
-        if(this.presentationEngine != null
-                && this.presentationEngine.getTemplateConfiguration() != null
-                && this.presentationEngine.getTemplateConfiguration().getSlideTemplates() != null
-                && !this.presentationEngine.getTemplateConfiguration().getSlideTemplates().isEmpty()) {
-            templates = this.presentationEngine.getTemplateConfiguration().getSlideTemplates().toArray(new SlideTemplate[0]);
-        }
-
-        return templates;
-    }
-
-    /**
      * Print the current presentation.
      */
     public void printPresentation() {
@@ -715,40 +536,18 @@ public class PresentationViewController implements Initializable {
     }
 
     /**
-     * Start the slideshow for the current presentation. The slideshow is only started if:
-     * <ul>
-     *     <li>{@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#getConfiguration()} returns a non
-     *     null value</li>
-     *     <li>{@link com.twasyl.slideshowfx.engine.presentation.configuration.PresentationConfiguration#getPresentationFile()}
-     *     returns a non null value and a file that exists</li>
-     * </ul>
-     * @param leapMotionEnabled Indicates if the LeapMotion controller should be enabled during the slideshow.
+     * Set the presentation displayed in this view as the one currently displayed.
      */
-    public void startSlideshow(final boolean leapMotionEnabled, final String fromSlideId) {
-        if (this.presentationEngine.getConfiguration() != null
-                && this.presentationEngine.getConfiguration().getPresentationFile() != null
-                && this.presentationEngine.getConfiguration().getPresentationFile().exists()) {
-
-            final Context context = new Context();
-            context.setLeapMotionEnabled(leapMotionEnabled);
-            context.setStartAtSlideId(fromSlideId);
-            context.setPresentation(this.presentationEngine);
-
-            final SlideshowStage stage = new SlideshowStage(context);
-
-            stage.show();
-        }
+    public void setAsCurrentPresentation() {
+        Presentations.setCurrentDisplayedPresentation(this.presentationEngine);
     }
 
     /**
-     * Set the presentation contained in this controller as default presentation by calling
-     * {@link com.twasyl.slideshowfx.dao.PresentationDAO#setCurrentPresentation(com.twasyl.slideshowfx.engine.presentation.PresentationEngine)}.
-     * If the current presentation is {@code null}, nothing is performed.
+     * Get the presentation associated to this view.
+     * @return The presentation associated to this view.
      */
-    public void setAsDefault() {
-        if(this.presentationEngine != null) {
-            PresentationDAO.getInstance().setCurrentPresentation(this.presentationEngine);
-        }
+    public PresentationEngine getPresentation() {
+        return this.presentationEngine;
     }
 
     @Override

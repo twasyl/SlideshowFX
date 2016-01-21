@@ -16,8 +16,8 @@
 
 package com.twasyl.slideshowfx.concurrent;
 
-import com.twasyl.slideshowfx.dao.PresentationDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.engine.presentation.Presentations;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.utils.DialogHelper;
@@ -62,7 +62,7 @@ public class UploadPresentationTask extends Task<Void> {
                 && this.hostingConnector.isAuthenticated()) {
 
             boolean overwrite = false;
-            boolean fileExist = this.hostingConnector.fileExists(PresentationDAO.getInstance().getCurrentPresentation(), destination);
+            boolean fileExist = this.hostingConnector.fileExists(Presentations.getCurrentDisplayedPresentation(), destination);
 
             if(fileExist) {
                 final String message = String.format("The '%1$s' presentation already exist in '%2$s'.\n Do you want to overwrite it?",

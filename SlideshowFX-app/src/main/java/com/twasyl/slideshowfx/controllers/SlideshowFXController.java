@@ -17,22 +17,23 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.leapmotion.leap.Controller;
-import com.leapmotion.leap.LeapJNI;
 import com.leapmotion.leap.Listener;
 import com.twasyl.slideshowfx.app.SlideshowFX;
-import com.twasyl.slideshowfx.beans.properties.PresentationModifiedBinding;
+import com.twasyl.slideshowfx.utils.beans.binding.WildcardBinding;
 import com.twasyl.slideshowfx.concurrent.*;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
-import com.twasyl.slideshowfx.controls.TextFieldCheckMenuItem;
 import com.twasyl.slideshowfx.controls.Tour;
 import com.twasyl.slideshowfx.controls.notification.NotificationCenter;
-import com.twasyl.slideshowfx.dao.PresentationDAO;
+import com.twasyl.slideshowfx.controls.slideshow.Context;
+import com.twasyl.slideshowfx.controls.slideshow.SlideshowStage;
 import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.engine.presentation.Presentations;
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
@@ -44,6 +45,7 @@ import com.twasyl.slideshowfx.server.service.AttendeeChatService;
 import com.twasyl.slideshowfx.server.service.PresenterChatService;
 import com.twasyl.slideshowfx.server.service.QuizzService;
 import com.twasyl.slideshowfx.server.service.TwitterService;
+import com.twasyl.slideshowfx.services.AutoSavingService;
 import com.twasyl.slideshowfx.utils.*;
 import com.twasyl.slideshowfx.utils.beans.Pair;
 import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
@@ -57,7 +59,6 @@ import javafx.beans.binding.StringExpression;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
@@ -84,7 +85,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
-import javafx.util.Duration;
 
 import java.awt.*;
 import java.io.File;
@@ -95,6 +95,7 @@ import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -121,11 +122,12 @@ public class SlideshowFXController implements Initializable {
         public void handle(ActionEvent actionEvent) {
             try {
 
+                final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
                 final PresentationViewController view = SlideshowFXController.this.getCurrentPresentationView();
                 final Object userData = ((MenuItem) actionEvent.getSource()).getUserData();
 
-                if (userData instanceof SlideTemplate && view != null) {
-                    view.addSlide((SlideTemplate) userData);
+                if (userData instanceof SlideTemplate && view != null && presentation != null) {
+                    presentation.addSlide((SlideTemplate) userData, view.getCurrentSlideNumber());
 
                     final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
                     SlideshowFXController.this.taskInProgress.setCurrentTask(task);
@@ -134,7 +136,7 @@ public class SlideshowFXController implements Initializable {
                     SlideshowFXController.this.updateSlideSplitMenu();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Error when adding a slide", e);
             }
         }
     };
@@ -142,14 +144,15 @@ public class SlideshowFXController implements Initializable {
     private final EventHandler<ActionEvent> moveSlideActionEvent = new EventHandler<ActionEvent>() {
         @Override
         public void handle(ActionEvent actionEvent) {
+            final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
             final PresentationViewController view = SlideshowFXController.this.getCurrentPresentationView();
 
-            if(view != null) {
+            if(view != null && presentation != null) {
                 final SlideMenuItem menunItem = (SlideMenuItem) actionEvent.getSource();
-                final Slide slideToMove = view.getCurrentSlidePresentationConfiguration();
+                final Slide slideToMove = presentation.getConfiguration().getSlideById(view.getCurrentSlideId());
                 final Slide beforeSlide = menunItem.getSlide();
 
-                view.moveSlide(slideToMove, beforeSlide);
+                presentation.moveSlide(slideToMove, beforeSlide);
 
                 final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
                 SlideshowFXController.this.taskInProgress.setCurrentTask(task);
@@ -176,7 +179,6 @@ public class SlideshowFXController implements Initializable {
     @FXML private TabPane openedPresentationsTabPane;
 
     /* Main application menu elements */
-    @FXML private TextFieldCheckMenuItem autoSaveItem;
     @FXML private Menu uploadersMenu;
     @FXML private Menu downloadersMenu;
 
@@ -257,18 +259,17 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
-     * Close the presentation associated to the given {@code controller}. If the controller is {@code null}, nothing is
-     * performed.
-     * @param controller The controller holding the presentation to close.
+     * Close the given presentation
+     * @param presentation The presentation to close.
      * @param waitToFinish Indicates if the method should wait before exiting.
      */
-    public void closePresentation(final PresentationViewController controller, final boolean waitToFinish) {
-        if(controller != null && controller.isPresentationModified()) {
+    public void closePresentation(final PresentationEngine presentation, final boolean waitToFinish) {
+        if(presentation != null && presentation.isModifiedSinceLatestSave()) {
             final ButtonType answer = DialogHelper.showConfirmationAlert("Save the presentation",
-                    String.format("Do you want to save the modifications on %1$s.", controller.getPresentationName().get()));
+                    String.format("Do you want to save the modifications on %1$s.", presentation.getArchive().getName()));
 
             if(answer == ButtonType.YES) {
-                SlideshowFXController.this.savePresentation(controller, waitToFinish);
+                SlideshowFXController.this.savePresentation(presentation, waitToFinish);
             }
         }
     }
@@ -282,8 +283,8 @@ public class SlideshowFXController implements Initializable {
         PlatformHelper.run(() -> {
             this.openedPresentationsTabPane.getTabs()
                     .forEach(tab -> {
-                        final PresentationViewController controller = (PresentationViewController) tab.getUserData();
-                        this.closePresentation(controller, waitToFinish);
+                        final PresentationEngine presentation = ((PresentationViewController) tab.getUserData()).getPresentation();
+                        this.closePresentation(presentation, waitToFinish);
                     });
             Platform.exit();
         });
@@ -385,10 +386,10 @@ public class SlideshowFXController implements Initializable {
      */
     @FXML private void openPresentationInBrowser(ActionEvent event) {
         if(Desktop.isDesktopSupported()) {
-            final PresentationViewController view = this.getCurrentPresentationView();
+            final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
 
-            if(view != null) {
-                final File presentationFile = view.getPresentationFile();
+            if(presentation != null) {
+                final File presentationFile = presentation.getConfiguration().getPresentationFile();
 
                 if(presentationFile != null && presentationFile.exists()) {
                     try {
@@ -406,10 +407,10 @@ public class SlideshowFXController implements Initializable {
      * @param event The event associated to the request.
      */
     @FXML private void openWorkingDirectory(ActionEvent event) {
-        final PresentationViewController view = this.getCurrentPresentationView();
+        final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
 
-        if(view != null) {
-            final File workingDir = view.getWorkingDirectory();
+        if(presentation != null) {
+            final File workingDir = presentation.getWorkingDirectory();
 
             if(workingDir != null && workingDir.exists()) {
                 if(Desktop.isDesktopSupported()) {
@@ -521,10 +522,13 @@ public class SlideshowFXController implements Initializable {
      * @param event
      */
     @FXML private void copySlide(ActionEvent event) {
-        final PresentationViewController view = this.getCurrentPresentationView();
+        final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
+        final PresentationViewController view = getCurrentPresentationView();
 
-        if(view != null) {
-            view.copyCurrentSlide();
+        if(presentation != null && view != null) {
+            final Slide source = presentation.getConfiguration().getSlideById(view.getCurrentSlideId());
+
+            this.copySlide(presentation, source);
             this.updateSlideSplitMenu();
 
             final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
@@ -539,10 +543,11 @@ public class SlideshowFXController implements Initializable {
      * @param event
      */
     @FXML private void deleteSlide(ActionEvent event) {
+        final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
         final PresentationViewController view = this.getCurrentPresentationView();
 
-        if(view != null) {
-            view.deleteCurrentSlide();
+        if(presentation != null && view != null) {
+            presentation.deleteSlide(view.getCurrentSlideNumber());
 
             final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
             SlideshowFXController.this.taskInProgress.setCurrentTask(task);
@@ -678,11 +683,11 @@ public class SlideshowFXController implements Initializable {
      * @param event The event associated to the click that should open the template builder.
      */
     @FXML private void editTemplate(ActionEvent event) {
-        final PresentationViewController view = this.getCurrentPresentationView();
+        final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
 
-        if(view != null) {
+        if(presentation != null) {
             final TemplateEngine engine = new TemplateEngine();
-            engine.setWorkingDirectory(view.getWorkingDirectory());
+            engine.setWorkingDirectory(presentation.getWorkingDirectory());
 
             this.showTemplateBuilder(engine);
         }
@@ -794,18 +799,23 @@ public class SlideshowFXController implements Initializable {
                         controller.definePresentation(loadingTask.getValue());
 
                         final Tab tab = new Tab();
-                        final PresentationModifiedBinding presentationModifiedBinding = new PresentationModifiedBinding(controller.presentationModifiedProperty());
+                        final WildcardBinding presentationModifiedBinding = new WildcardBinding(controller.presentationModifiedProperty());
                         final StringExpression tabTitle = controller.getPresentationName().concat(presentationModifiedBinding);
                         tab.textProperty().bind(tabTitle);
                         tab.setUserData(controller);
                         tab.setContent(parent);
-                        tab.setOnCloseRequest(event -> SlideshowFXController.this.closePresentation(controller, false));
+                        tab.setOnCloseRequest(event -> SlideshowFXController.this.closePresentation(loadingTask.getValue(), false));
 
                         this.openedPresentationsTabPane.getTabs().addAll(tab);
                         this.openedPresentationsTabPane.getSelectionModel().select(tab);
 
                         this.updateSlideTemplatesSplitMenu();
                         this.updateSlideSplitMenu();
+
+                        final AutoSavingService autoSavingService = new AutoSavingService(loadingTask.getValue());
+                        if(GlobalConfiguration.isAutoSavingEnabled()) {
+                            PlatformHelper.run(() -> autoSavingService.start());
+                        }
                     } catch (IOException e) {
                         LOGGER.log(Level.SEVERE, "Can not load the view", e);
                     }
@@ -858,20 +868,18 @@ public class SlideshowFXController implements Initializable {
     private void updateSlideTemplatesSplitMenu() {
         this.addSlideButton.getItems().clear();
 
-        final PresentationViewController view = this.getCurrentPresentationView();
-        if (view != null) {
-            SlideTemplate[] templates = view.getSlideTemplates();
+        final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
+        if (presentation != null) {
+            List<SlideTemplate> templates = presentation.getTemplateConfiguration().getSlideTemplates();
 
             if(templates != null) {
-                MenuItem item;
-
-                for (SlideTemplate template : templates) {
-                    item = new MenuItem();
+                templates.forEach(template -> {
+                    final MenuItem item = new MenuItem();
                     item.setText(template.getName());
                     item.setUserData(template);
                     item.setOnAction(addSlideActionEvent);
                     this.addSlideButton.getItems().add(item);
-                }
+                });
             }
         }
     }
@@ -883,47 +891,62 @@ public class SlideshowFXController implements Initializable {
     protected void updateSlideSplitMenu() {
         SlideshowFXController.this.moveSlideButton.getItems().clear();
 
-        final PresentationViewController view = this.getCurrentPresentationView();
-        if (view != null) {
-            Slide[] slides = view.getSlides();
+        final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
+        if (presentation != null) {
+            List<Slide> slides = presentation.getConfiguration().getSlides();
 
             if(slides != null) {
-                SlideMenuItem menuItem;
-
-                for (Slide slide : slides) {
-                    menuItem = new SlideMenuItem(slide);
+                slides.forEach(slide -> {
+                    final SlideMenuItem menuItem = new SlideMenuItem(slide);
                     menuItem.setOnAction(SlideshowFXController.this.moveSlideActionEvent);
                     this.moveSlideButton.getItems().add(menuItem);
-                }
+                });
             }
         }
     }
 
     /**
-     * Save the presentation that is currently displayed, if any. This method retrieves the displayed presentation and
-     * calls {@link #savePresentation(PresentationViewController, boolean)}.
-     * @param waitToFinish Indicates if the method should wait before exiting.
+     * Copy a given {@link Slide slide} of the {@link PresentationEngine presentation}.
+     * @param presentation The presentation where the slide will be copied.
+     * @param slide The slide to copy
      */
-    private void savePresentation(boolean waitToFinish) {
-        final PresentationViewController view = this.getCurrentPresentationView();
-        this.savePresentation(view, waitToFinish);
+    private void copySlide(final PresentationEngine presentation, final Slide slide) {
+        try {
+            presentation.duplicateSlide(slide);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error when copying the slide", e);
+        }
     }
 
     /**
-     * Save the presentation hold by the given view. If the presentation hasn't been already saved, the user is prompted
-     * to choose where to save it. Once the choice is validated, the method calls {@link #savePresentation(File, boolean)}.
-     * @param view The view of the presentation.
+     * Save the presentation that is currently displayed, if any. This method retrieves the displayed presentation and
+     * calls {@link #savePresentation(PresentationEngine, boolean)}.
      * @param waitToFinish Indicates if the method should wait before exiting.
      */
-    private void savePresentation(final PresentationViewController view, final boolean waitToFinish) {
-        if(view != null) {
-            File presentationArchive = null;
+    private void savePresentation(boolean waitToFinish) {
+        this.savePresentation(Presentations.getCurrentDisplayedPresentation(), waitToFinish);
+    }
 
-            if (!view.isPresentationAlreadySaved()) {
+    /**
+     * Save the given presentation. If the presentation hasn't been already saved, the user is prompted
+     * to choose where to save it. Once the choice is validated, the method calls {@link #savePresentation(File, boolean)}.
+     * @param presentation The presentation to save.
+     * @param waitToFinish Indicates if the method should wait before exiting.
+     */
+    private void savePresentation(final PresentationEngine presentation, final boolean waitToFinish) {
+        if(presentation != null) {
+            File presentationArchive;
+
+            if (!presentation.isPresentationAlreadySaved()) {
                 FileChooser chooser = new FileChooser();
                 chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
                 presentationArchive = chooser.showSaveDialog(SlideshowFX.getStage());
-            } else presentationArchive = view.getArchiveFile();
+
+                final AutoSavingService autoSavingService = new AutoSavingService(presentation);
+                if(GlobalConfiguration.isAutoSavingEnabled()) {
+                    PlatformHelper.run(() -> autoSavingService.start());
+                }
+            } else presentationArchive = presentation.getArchive();
 
             this.savePresentation(presentationArchive, waitToFinish);
         }
@@ -939,8 +962,10 @@ public class SlideshowFXController implements Initializable {
      */
     private void savePresentation(final File archiveFile, final boolean waitToFinish) {
         if(archiveFile != null) {
-            final PresentationViewController view = this.getCurrentPresentationView();
-            final Task saveTask = new SavePresentationTask(view, archiveFile);
+            final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
+            presentation.setArchive(archiveFile);
+
+            final Task saveTask = new SavePresentationTask(presentation);
 
             TaskAction.forTask(saveTask)
                     .when().stateIs(Worker.State.RUNNING).perform(DisableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup))
@@ -1041,7 +1066,7 @@ public class SlideshowFXController implements Initializable {
                         destination = hostingConnector.chooseFile(true, false);
 
                         if (destination != null) {
-                            final UploadPresentationTask task = new UploadPresentationTask(PresentationDAO.getInstance().getCurrentPresentation(),
+                            final UploadPresentationTask task = new UploadPresentationTask(Presentations.getCurrentDisplayedPresentation(),
                                     hostingConnector, destination);
                             SlideshowFXController.this.taskInProgress.setCurrentTask(task);
                             TaskDAO.getInstance().startTask(task);
@@ -1157,10 +1182,24 @@ public class SlideshowFXController implements Initializable {
         final PresentationViewController view = this.getCurrentPresentationView();
 
         if(view != null) {
+            final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
             final String currentSlideId = fromCurrentSlide ? view.getCurrentSlideId() : null;
             final boolean enabledLeapMotion = !this.leapMotionEnabled.disabledProperty().get()
                     && this.leapMotionEnabled.selectedProperty().get();
-            view.startSlideshow(enabledLeapMotion, currentSlideId);
+
+            if (presentation.getConfiguration() != null
+                    && presentation.getConfiguration().getPresentationFile() != null
+                    && presentation.getConfiguration().getPresentationFile().exists()) {
+
+                final Context context = new Context();
+                context.setLeapMotionEnabled(enabledLeapMotion);
+                context.setStartAtSlideId(currentSlideId);
+                context.setPresentation(presentation);
+
+                final SlideshowStage stage = new SlideshowStage(context);
+
+                stage.show();
+            }
         }
     }
 
@@ -1195,58 +1234,6 @@ public class SlideshowFXController implements Initializable {
             }
         });
 
-        // Add a listener for auto-saving the presentation
-        final ScheduledService<Void> service = new ScheduledService<Void>() {
-            @Override
-            protected Task<Void> createTask() {
-                final PresentationViewController view = SlideshowFXController.this.getCurrentPresentationView();
-                final File archiveFile = view == null ? null : view.getArchiveFile();
-                final SavePresentationTask task = new SavePresentationTask(view, archiveFile);
-
-                return task;
-            }
-
-            @Override
-            protected void executeTask(Task<Void> task) {
-                super.executeTask(task);
-                SlideshowFXController.this.taskInProgress.setCurrentTask(task);
-            }
-        };
-        service.setRestartOnFailure(true);
-
-        this.autoSaveItem.selectedProperty().addListener((value, oldValue, newValue) -> {
-            if (!newValue) service.cancel();
-            else {
-                Integer interval = null;
-                try {
-                    interval = Integer.parseInt(this.autoSaveItem.getValue());
-                } catch (NumberFormatException e) {
-                    LOGGER.log(Level.FINE, "Can not parse auto save interval");
-                }
-
-                if (interval != null & interval > 0) {
-                    service.setDelay(Duration.minutes(interval.doubleValue()));
-                    service.setPeriod(Duration.minutes(interval.doubleValue()));
-                    service.restart();
-                }
-            }
-        });
-
-        this.autoSaveItem.valueProperty().addListener((value, oldValue, newValue) -> {
-            Integer interval = null;
-            try {
-                interval = Integer.parseInt(this.autoSaveItem.getValue());
-            } catch (NumberFormatException e) {
-                LOGGER.log(Level.FINE, "Can not parse auto save interval");
-            }
-
-            if (interval != null & interval > 0) {
-                service.setDelay(Duration.minutes(interval.doubleValue()));
-                service.setPeriod(Duration.minutes(interval.doubleValue()));
-                service.restart();
-            }
-        });
-
         // We use reflection to disable all elements present in the list
         final Consumer<Object> disableElementLambda = element -> {
             try {
@@ -1278,17 +1265,21 @@ public class SlideshowFXController implements Initializable {
 
                 if(userData != null && userData instanceof PresentationViewController) {
                     final PresentationViewController view = (PresentationViewController) userData;
-                    view.setAsDefault();
+                    view.setAsCurrentPresentation();
 
                     this.updateSlideSplitMenu();
                     this.updateSlideTemplatesSplitMenu();
 
                     // Bind the title of the presentation with the application bar title
                     if(SlideshowFX.getStage().titleProperty().isBound()) SlideshowFX.getStage().titleProperty().unbind();
-                    SlideshowFX.getStage().titleProperty().bind(new SimpleStringProperty("SlideshowFX - ").concat(view.getPresentationName()));
 
+                    final WildcardBinding presentationModifiedBinding = new WildcardBinding(view.presentationModifiedProperty());
+                    final StringExpression title = new SimpleStringProperty("SlideshowFX - ")
+                                                            .concat(view.getPresentationName())
+                                                            .concat(presentationModifiedBinding);
+                    SlideshowFX.getStage().titleProperty().bind(title);
                 } else {
-                    PresentationDAO.getInstance().setCurrentPresentation(null);
+                    Presentations.setCurrentDisplayedPresentation(null);
                 }
             } else {
                 this.updateSlideSplitMenu();

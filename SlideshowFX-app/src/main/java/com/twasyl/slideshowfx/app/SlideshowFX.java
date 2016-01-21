@@ -276,6 +276,6 @@ public class SlideshowFX extends Application {
     public static Stage getStage() { return stageProperty().get(); }
 
     public static void main(String[] args) {
-        LauncherImpl.launchApplication(SlideshowFX.class, SlideshowFXPreloader.class, args);
+        LauncherImpl.launchApplication(SlideshowFX.class, /*SlideshowFXPreloader.class, */args);
     }
 }

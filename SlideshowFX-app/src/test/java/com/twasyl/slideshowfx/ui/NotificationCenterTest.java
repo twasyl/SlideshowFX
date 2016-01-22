@@ -19,6 +19,7 @@ package com.twasyl.slideshowfx.ui;
 import com.twasyl.slideshowfx.controls.notification.NotificationCenter;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
+import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
@@ -32,7 +33,7 @@ public class NotificationCenterTest extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        final Task<Void> indefiniteTask = new Task<Void>() {
+        final SlideshowFXTask<Void> indefiniteTask = new SlideshowFXTask<Void>() {
             @Override
             protected Void call() throws Exception {
                 PlatformHelper.run(() -> ((SimpleStringProperty) this.titleProperty()).set("Indefinite task"));
@@ -43,7 +44,7 @@ public class NotificationCenterTest extends Application {
             }
         };
 
-        final Task<Void> errorTask = new Task<Void>() {
+        final SlideshowFXTask<Void> errorTask = new SlideshowFXTask<Void>() {
             @Override
             protected Void call() throws Exception {
                 PlatformHelper.run(() -> ((SimpleStringProperty) this.titleProperty()).set("Error task"));
@@ -57,7 +58,7 @@ public class NotificationCenterTest extends Application {
             }
         };
 
-        final Task<Void> successfulTask = new Task<Void>() {
+        final SlideshowFXTask<Void> successfulTask = new SlideshowFXTask<Void>() {
             @Override
             protected Void call() throws Exception {
                 PlatformHelper.run(() -> ((SimpleStringProperty) this.titleProperty()).set("Successful task"));

@@ -22,11 +22,10 @@ import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.utils.DialogHelper;
+import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.concurrent.Task;
 import javafx.scene.control.ButtonType;
 
-import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,7 +40,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class UploadPresentationTask extends Task<Void> {
+public class UploadPresentationTask extends SlideshowFXTask<Void> {
     private static final Logger LOGGER = Logger.getLogger(SavePresentationTask.class.getName());
 
     private PresentationEngine engine;

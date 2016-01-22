@@ -16,12 +16,10 @@
 
 package com.twasyl.slideshowfx.dao;
 
+import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
-
-import java.util.logging.Logger;
 
 /**
  * This class provides access for all tasks that are running or scheduled in the application. This class acts as a
@@ -31,9 +29,8 @@ import java.util.logging.Logger;
  * @since SlideshowFX 1.0.0
  */
 public class TaskDAO {
-    private static final Logger LOGGER = Logger.getLogger(TaskDAO.class.getName());
     private static final TaskDAO singleton = new TaskDAO();
-    private final ObservableList<Task> currentTasks = FXCollections.observableArrayList();
+    private final ObservableList<SlideshowFXTask> currentTasks = FXCollections.observableArrayList();
 
 
     private TaskDAO() {
@@ -46,7 +43,7 @@ public class TaskDAO {
      * @param task The task to start.
      * @throws java.lang.NullPointerException If the given task is null.
      */
-    public void startTask(final Task task) {
+    public void startTask(final SlideshowFXTask task) {
         if(task == null) throw new NullPointerException("The task to start can not be null");
 
         synchronized(this.currentTasks) {

@@ -36,14 +36,9 @@ public class FilenameBindingTest {
     /**
      * Test that creating a binding with a null property throws a NullPointerException.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testWithNullProperty() {
-        try {
-            final FilenameBinding binding = new FilenameBinding(null);
-            fail("No exception is thrown when creating a binding with a null value");
-        } catch(NullPointerException e) {
-            // Great
-        }
+        final FilenameBinding binding = new FilenameBinding(null);
     }
 
     /**
@@ -53,7 +48,7 @@ public class FilenameBindingTest {
         final ObjectProperty<File> prop = new SimpleObjectProperty<>(null);
         final FilenameBinding binding = new FilenameBinding(prop);
 
-        assertEquals(binding.get(), "Untitled");
+        assertEquals("Untitled", binding.get());
     }
 
     /**
@@ -63,7 +58,7 @@ public class FilenameBindingTest {
         final ObjectProperty<File> prop = new SimpleObjectProperty<>(new File("/Test.sfx"));
         final FilenameBinding binding = new FilenameBinding(prop);
 
-        assertEquals(binding.get(), "Test.sfx");
+        assertEquals("Test.sfx", binding.get());
     }
 
     /**
@@ -73,9 +68,9 @@ public class FilenameBindingTest {
         final ObjectProperty<File> prop = new SimpleObjectProperty<>(null);
         final FilenameBinding binding = new FilenameBinding(prop);
 
-        assertEquals(binding.get(), "Untitled");
+        assertEquals("Untitled", binding.get());
 
         prop.set(new File("/Test.sfx"));
-        assertEquals(binding.get(), "Test.sfx");
+        assertEquals("Test.sfx", binding.get());
     }
 }

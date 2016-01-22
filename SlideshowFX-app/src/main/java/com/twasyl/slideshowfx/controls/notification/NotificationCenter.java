@@ -17,6 +17,7 @@
 package com.twasyl.slideshowfx.controls.notification;
 
 import com.twasyl.slideshowfx.utils.PlatformHelper;
+import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
@@ -54,8 +55,8 @@ public class NotificationCenter extends StackPane {
     /*
      * Properties of the notification center
      */
-    private final ReadOnlySetProperty<Task> registeredTasks = new SimpleSetProperty<>(FXCollections.observableSet(new HashSet<>()));
-    private final ObjectProperty<Task> currentTask = new SimpleObjectProperty<>();
+    private final ReadOnlySetProperty<SlideshowFXTask> registeredTasks = new SimpleSetProperty<>(FXCollections.observableSet(new HashSet<>()));
+    private final ObjectProperty<SlideshowFXTask> currentTask = new SimpleObjectProperty<>();
 
     /*
      * UI elements
@@ -150,14 +151,14 @@ public class NotificationCenter extends StackPane {
      * decides to delete them from the UI.
      * @return The list containing the current tasks of the notification center.
      */
-    public ReadOnlySetProperty<Task> registeredTasksProperty() { return registeredTasks; }
+    public ReadOnlySetProperty<SlideshowFXTask> registeredTasksProperty() { return registeredTasks; }
 
     /**
      * Get the tasks currently registered to the notification center. tasks are present in the list until the user
      * decides to delete them from the UI.
      * @return The list containing the current tasks of the notification center.
      */
-    public ObservableSet<Task> getRegisteredTasks() { return registeredTasks.get(); }
+    public ObservableSet<SlideshowFXTask> getRegisteredTasks() { return registeredTasks.get(); }
 
 
     public String getText() { return this.currentTaskMessage.getText(); }
@@ -183,7 +184,7 @@ public class NotificationCenter extends StackPane {
      * displayed next to the progress bar.
      * @return The current task of the notification center.
      */
-    public ObjectProperty<Task> currentTaskProperty() { return this.currentTask; }
+    public ObjectProperty<SlideshowFXTask> currentTaskProperty() { return this.currentTask; }
 
     /**
      * Get the current task registered to the notification center. The current task is the one which informations is
@@ -201,7 +202,7 @@ public class NotificationCenter extends StackPane {
      *
      * @param task The task to set to this indicator
      */
-    public void setCurrentTask(final Task task) {
+    public void setCurrentTask(final SlideshowFXTask task) {
         this.currentTask.set(task);
         this.registerTask(task);
     }

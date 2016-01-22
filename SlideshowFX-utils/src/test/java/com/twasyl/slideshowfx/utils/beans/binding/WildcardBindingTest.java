@@ -43,7 +43,7 @@ public class WildcardBindingTest {
         final BooleanProperty prop = new SimpleBooleanProperty();
         final WildcardBinding binding = new WildcardBinding(prop);
 
-        assertEquals(binding.get(), "");
+        assertEquals("", binding.get());
     }
 
     /**
@@ -53,7 +53,7 @@ public class WildcardBindingTest {
         final BooleanProperty prop = new SimpleBooleanProperty(true);
         final WildcardBinding binding = new WildcardBinding(prop);
 
-        assertEquals(binding.get(), "*");
+        assertEquals("*", binding.get());
     }
 
     /**
@@ -70,10 +70,10 @@ public class WildcardBindingTest {
         final BooleanProperty prop = new SimpleBooleanProperty(false);
         final WildcardBinding binding = new WildcardBinding(prop);
 
-        assertEquals(binding.get(), "");
+        assertEquals("", binding.get());
 
         prop.set(true);
 
-        assertEquals(binding.get(), "*");
+        assertEquals("*", binding.get());
     }
 }

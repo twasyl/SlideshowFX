@@ -48,6 +48,7 @@ import com.twasyl.slideshowfx.server.service.TwitterService;
 import com.twasyl.slideshowfx.services.AutoSavingService;
 import com.twasyl.slideshowfx.utils.*;
 import com.twasyl.slideshowfx.utils.beans.Pair;
+import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.DisableAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.EnableAction;
@@ -774,7 +775,7 @@ public class SlideshowFXController implements Initializable {
         if (!dataFile.exists()) throw new FileNotFoundException("The dataFile does not exist");
         if (!dataFile.canRead()) throw new IllegalAccessException("The dataFile can not be accessed");
 
-        final Task<PresentationEngine> loadingTask = dataFile.getName().endsWith(PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)
+        final SlideshowFXTask<PresentationEngine> loadingTask = dataFile.getName().endsWith(PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)
                 ? new LoadPresentationTask(dataFile) : dataFile.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION) ?
                 new LoadTemplateTask(dataFile) : null;
 
@@ -967,7 +968,7 @@ public class SlideshowFXController implements Initializable {
             final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
             presentation.setArchive(archiveFile);
 
-            final Task saveTask = new SavePresentationTask(presentation);
+            final SlideshowFXTask saveTask = new SavePresentationTask(presentation);
 
             TaskAction.forTask(saveTask)
                     .when().stateIs(Worker.State.RUNNING).perform(DisableAction.forElements(this.saveElementsGroup).and(this.openElementsGroup))

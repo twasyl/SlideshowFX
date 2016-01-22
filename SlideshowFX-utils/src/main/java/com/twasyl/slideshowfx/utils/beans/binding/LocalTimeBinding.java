@@ -14,45 +14,42 @@
  * limitations under the License.
  */
 
-package com.twasyl.slideshowfx.beans.properties;
+package com.twasyl.slideshowfx.utils.beans.binding;
 
+import javafx.beans.binding.ObjectExpression;
 import javafx.beans.binding.StringBinding;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.concurrent.Task;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
 /**
- * This binding returns the time each time the status of a given {@link javafx.concurrent.Task} changes.
+ * This binding returns the time each time a {@link java.time.LocalTime} changes.
  *
  * @author Thierry Wasylczenko
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class TaskStatusTimeBinding extends StringBinding {
+public class LocalTimeBinding extends StringBinding {
 
-    private final ObjectProperty<Task> task = new SimpleObjectProperty<>();
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
+    private final ObjectExpression<LocalTime> time;
 
-    public TaskStatusTimeBinding(final Task task) {
-        if(task == null) throw new NullPointerException("The task can not be null");
+    public LocalTimeBinding(final ObjectExpression<LocalTime> time) {
+        if(time == null) throw new NullPointerException("The time can not be null");
 
-        this.task.set(task);
-
-        super.bind(this.task.get().stateProperty());
+        this.time = time;
+        super.bind(this.time);
     }
 
     @Override
     protected String computeValue() {
-        LocalTime time = LocalTime.now();
-
-        return time.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM));
+        return time.get() == null ? "" : time.get().format(formatter);
     }
 
     @Override
     public void dispose() {
-        super.unbind(this.task.get().stateProperty());
+        super.unbind(this.time);
     }
 }

@@ -17,8 +17,8 @@
 package com.twasyl.slideshowfx.concurrent;
 
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.concurrent.Task;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class LoadTemplateTask extends Task<PresentationEngine> {
+public class LoadTemplateTask extends SlideshowFXTask<PresentationEngine> {
 
     private static final Logger LOGGER = Logger.getLogger(LoadTemplateTask.class.getName());
     private File dataFile;

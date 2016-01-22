@@ -18,8 +18,8 @@ package com.twasyl.slideshowfx.concurrent;
 
 import com.twasyl.slideshowfx.controllers.PresentationViewController;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
+import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.concurrent.Task;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +32,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class ReloadPresentationViewTask extends Task<Void> {
+public class ReloadPresentationViewTask extends SlideshowFXTask<Void> {
     private static final Logger LOGGER = Logger.getLogger(ReloadPresentationViewTask.class.getName());
 
     private final PresentationViewController presentationView;

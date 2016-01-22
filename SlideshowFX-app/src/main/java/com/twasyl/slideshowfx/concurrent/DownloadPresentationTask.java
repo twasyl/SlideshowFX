@@ -19,9 +19,8 @@ package com.twasyl.slideshowfx.concurrent;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
-import com.twasyl.slideshowfx.utils.beans.Pair;
+import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.concurrent.Task;
 
 import java.io.File;
 import java.util.logging.Level;
@@ -37,7 +36,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class DownloadPresentationTask extends Task<File> {
+public class DownloadPresentationTask extends SlideshowFXTask<File> {
     private static final Logger LOGGER = Logger.getLogger(SavePresentationTask.class.getName());
 
     private IHostingConnector hostingConnector;

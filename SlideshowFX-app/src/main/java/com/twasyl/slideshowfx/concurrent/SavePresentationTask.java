@@ -16,14 +16,11 @@
 
 package com.twasyl.slideshowfx.concurrent;
 
-import com.twasyl.slideshowfx.controllers.PresentationViewController;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
-import com.twasyl.slideshowfx.utils.PlatformHelper;
+import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,7 +35,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class SavePresentationTask extends Task<Void> {
+public class SavePresentationTask extends SlideshowFXTask<Void> {
     private static final Logger LOGGER = Logger.getLogger(SavePresentationTask.class.getName());
 
     private final PresentationEngine presentation;

@@ -18,8 +18,9 @@ package com.twasyl.slideshowfx.controls.notification;
 
 import com.twasyl.slideshowfx.beans.properties.TaskStatusGlyphNameBinding;
 import com.twasyl.slideshowfx.beans.properties.TaskStatusGlyphStyleBinding;
-import com.twasyl.slideshowfx.beans.properties.TaskStatusTimeBinding;
+import com.twasyl.slideshowfx.utils.beans.binding.LocalTimeBinding;
 import com.twasyl.slideshowfx.utils.DialogHelper;
+import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.animation.Animation;
@@ -46,7 +47,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Represents a notification to be present in the {@link NotificationCenter}. It displays the title of the {@link Task}
+ * Represents a notification to be present in the {@link NotificationCenter}. It displays the title of the {@link SlideshowFXTask}
  * that is associated to the notification, as well as an icon representing the status of the task and a button for deleting
  * the notification in the notification center.
  *
@@ -56,9 +57,9 @@ import java.util.logging.Logger;
  */
 public class Notification extends MenuItem {
     private static final Logger LOGGER = Logger.getLogger(Notification.class.getName());
-    private final ReadOnlyObjectProperty<Task> task = new SimpleObjectProperty<>();
+    private final ReadOnlyObjectProperty<SlideshowFXTask> task = new SimpleObjectProperty<>();
 
-    public Notification(final Task task) {
+    public Notification(final SlideshowFXTask task) {
         ((SimpleObjectProperty) this.task).set(task);
 
         final Text taskTitle = this.getTaskTitle();
@@ -124,7 +125,7 @@ public class Notification extends MenuItem {
     private Text getStatusChangeTimeText() {
         final Text statusChangeTime = new Text();
         statusChangeTime.getStyleClass().addAll("text", "notification", "time");
-        statusChangeTime.textProperty().bind(new TaskStatusTimeBinding(this.task.get()));
+        statusChangeTime.textProperty().bind(new LocalTimeBinding(this.task.get().statusChangedTimeProperty()));
 
         return statusChangeTime;
     }
@@ -177,7 +178,7 @@ public class Notification extends MenuItem {
      * Get the task associated to this notification.
      * @return The property containing the task associated to this notification.
      */
-    public ReadOnlyObjectProperty<Task> taskProperty() { return task; }
+    public ReadOnlyObjectProperty<SlideshowFXTask> taskProperty() { return task; }
 
     /**
      * Get the task associated to this notification.

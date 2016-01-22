@@ -21,6 +21,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,20 +47,11 @@ public class LoadTemplateTask extends Task<PresentationEngine> {
 
     @Override
     protected PresentationEngine call() throws Exception {
-        PresentationEngine engine = null;
+        if(this.dataFile == null) throw new NullPointerException("The data file is null");
+        if(!this.dataFile.exists()) throw new FileNotFoundException("The data file doesn't exist");
 
-        if(this.dataFile != null && this.dataFile.exists()) {
-            engine = new PresentationEngine();
-            try {
-                engine.createFromTemplate(this.dataFile);
-            } catch(Exception e) {
-                engine = null;
-                this.setException(e);
-                this.failed();
-            }
-        } else {
-            this.failed();
-        }
+        final PresentationEngine engine = new PresentationEngine();
+        engine.createFromTemplate(this.dataFile);
 
         return engine;
     }

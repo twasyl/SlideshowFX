@@ -18,6 +18,7 @@ package com.twasyl.slideshowfx.concurrent;
 
 import com.twasyl.slideshowfx.controllers.PresentationViewController;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
+import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 
@@ -53,15 +54,11 @@ public class SavePresentationTask extends Task<Void> {
     @Override
     protected Void call() throws Exception {
         // Ensure the presentation has already been saved
-        if(this.presentation != null && this.presentation.getArchive() != null) {
-            try {
-                this.presentation.saveArchive();
-                this.succeeded();
-            } catch(IOException e) {
-                this.setException(e);
-                this.failed();
-            }
-        } else this.failed();
+        if(this.presentation == null) throw new NullPointerException("The presentation is null");
+        if(this.presentation.getArchive() == null) throw new NullPointerException("The presentation archive is null");
+
+        this.presentation.saveArchive();
+        this.succeeded();
 
         return null;
     }

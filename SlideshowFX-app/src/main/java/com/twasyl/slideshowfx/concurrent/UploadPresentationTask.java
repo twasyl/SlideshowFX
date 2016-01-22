@@ -19,6 +19,7 @@ package com.twasyl.slideshowfx.concurrent;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.Presentations;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
+import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.utils.DialogHelper;
 import javafx.beans.property.SimpleStringProperty;
@@ -56,35 +57,27 @@ public class UploadPresentationTask extends Task<Void> {
 
     @Override
     protected Void call() throws Exception {
+        if(this.engine == null) throw new NullPointerException("The presentation is null");
+        if(this.engine.getArchive() == null) throw new NullPointerException("The presentation's archive is null");
+        if(!this.hostingConnector.isAuthenticated()) throw new HostingConnectorException(HostingConnectorException.NOT_AUTHENTICATED);
 
-        // Ensure the presentation has already been saved
-        if(this.engine != null && this.engine.getArchive() != null
-                && this.hostingConnector.isAuthenticated()) {
+        boolean overwrite = false;
+        boolean fileExist = this.hostingConnector.fileExists(Presentations.getCurrentDisplayedPresentation(), destination);
 
-            boolean overwrite = false;
-            boolean fileExist = this.hostingConnector.fileExists(Presentations.getCurrentDisplayedPresentation(), destination);
+        if(fileExist) {
+            final String message = String.format("The '%1$s' presentation already exist in '%2$s'.\n Do you want to overwrite it?",
+                    engine.getArchive().getName(), destination.toString());
 
-            if(fileExist) {
-                final String message = String.format("The '%1$s' presentation already exist in '%2$s'.\n Do you want to overwrite it?",
-                        engine.getArchive().getName(), destination.toString());
+            final ButtonType response = DialogHelper.showConfirmationAlert("Overwrite presentation", message);
 
-                final ButtonType response = DialogHelper.showConfirmationAlert("Overwrite presentation", message);
+            overwrite = response != null && response == ButtonType.YES;
+        }
 
-                overwrite = response != null && response == ButtonType.YES;
-            }
-
-            if(fileExist && !overwrite) {
-                this.cancelled();
-            } else {
-                try {
-                    this.hostingConnector.upload(this.engine, this.destination, overwrite);
-                    this.succeeded();
-                } catch (FileNotFoundException e) {
-                    this.setException(e);
-                    this.failed();
-                }
-            }
-        } else this.failed();
+        if(fileExist && !overwrite) {
+            this.cancel();
+        } else {
+            this.hostingConnector.upload(this.engine, this.destination, overwrite);
+        }
 
         return null;
     }

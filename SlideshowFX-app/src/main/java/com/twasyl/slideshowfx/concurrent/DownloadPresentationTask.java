@@ -17,7 +17,9 @@
 package com.twasyl.slideshowfx.concurrent;
 
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
+import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
+import com.twasyl.slideshowfx.utils.beans.Pair;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 
@@ -52,12 +54,11 @@ public class DownloadPresentationTask extends Task<File> {
     @Override
     protected File call() throws Exception {
 
-        File result = null;
+        if(!this.hostingConnector.isAuthenticated()) {
+            throw new HostingConnectorException(HostingConnectorException.NOT_AUTHENTICATED);
+        }
 
-        if(this.hostingConnector.isAuthenticated()) {
-            result = this.hostingConnector.download(this.destination, this.file);
-            this.succeeded();
-        } else this.failed();
+        final File result = this.hostingConnector.download(this.destination, this.file);
 
         return result;
     }

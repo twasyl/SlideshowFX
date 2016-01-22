@@ -44,8 +44,9 @@ public class ReloadPresentationViewTask extends Task<Void> {
 
     @Override
     protected Void call() throws Exception {
-        if(this.presentationView != null) PlatformHelper.run(() -> this.presentationView.reloadPresentationBrowser());
-        else this.failed();
+        if(this.presentationView == null) throw new NullPointerException("The presentation view is null");
+
+        PlatformHelper.run(() -> this.presentationView.reloadPresentationBrowser());
 
         return null;
     }

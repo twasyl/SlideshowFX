@@ -19,6 +19,7 @@ package com.twasyl.slideshowfx.services;
 import com.twasyl.slideshowfx.concurrent.SavePresentationTask;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.util.Duration;
@@ -75,6 +76,13 @@ public class AutoSavingService extends ScheduledService<Void> {
     protected void setDelayAndPeriod(final long delayInMinutes) {
         this.setDelay(Duration.minutes(delayInMinutes));
         this.setPeriod(Duration.minutes(delayInMinutes));
+    }
+
+    /**
+     * Resume all services that have been cancelled.
+     */
+    public static void resumeAll() {
+        runningServices.forEach(service -> PlatformHelper.run(() -> service.restart()));
     }
 
     /**

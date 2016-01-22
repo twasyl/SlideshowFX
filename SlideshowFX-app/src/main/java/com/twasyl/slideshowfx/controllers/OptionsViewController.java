@@ -70,6 +70,12 @@ public class OptionsViewController implements Initializable {
     private void saveAutoSavingOptions() {
         GlobalConfiguration.enableAutoSaving(this.enableAutoSaving.isSelected());
 
+        if(!this.enableAutoSaving.isSelected()) {
+            AutoSavingService.cancelAll();
+        } else {
+            AutoSavingService.resumeAll();
+        }
+
         final String autoSavingInterval = this.autoSavingInterval.getText();
 
         if(autoSavingInterval != null) {

@@ -33,11 +33,15 @@ public class PresentationConfiguration implements IConfiguration {
     private static final Logger LOGGER = Logger.getLogger(PresentationConfiguration.class.getName());
     public static final String DEFAULT_PRESENTATION_FILENAME = "presentation.html";
 
+    private long id;
     private Document document;
     private File presentationFile;
     private Set<Resource> customResources = new LinkedHashSet<>();
     private Set<Pair<String, String>> variables = new LinkedHashSet<>();
     private List<Slide> slides = new ArrayList<>();
+
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
 
     public File getPresentationFile() { return presentationFile; }
     public void setPresentationFile(File presentationFile) { this.presentationFile = presentationFile; }

@@ -271,6 +271,8 @@ public class SlideshowFXController implements Initializable {
             if(answer == ButtonType.YES) {
                 SlideshowFXController.this.savePresentation(presentation, waitToFinish);
             }
+
+            AutoSavingService.cancelFor(presentation);
         }
     }
 

@@ -25,6 +25,7 @@ import javafx.util.Duration;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -87,6 +88,23 @@ public class AutoSavingService extends ScheduledService<Void> {
             iterator.remove();
         }
     }
+
+    /**
+     * Cancel the service for a given presentation.
+     * @param presentation The presentation to cancel the auto saving service for.
+     */
+    public static void cancelFor(final PresentationEngine presentation) {
+        if(presentation != null) {
+            final long id = presentation.getConfiguration().getId();
+            runningServices.stream()
+                    .filter(service -> service.presentation.getConfiguration().getId() == id)
+                    .findFirst()
+                    .ifPresent(service -> {
+                        service.cancel();
+                        runningServices.remove(service);
+                    });
+        }
+    };
 
     /**
      * Change the delay and the period for all {@link AutoSavingService services}. Each service is then restarted.

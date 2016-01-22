@@ -109,6 +109,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         JsonObject configurationJson = JSONHelper.readFromFile(configurationFile);
         JsonObject presentationJson = configurationJson.getJsonObject("presentation");
 
+        presentationConfiguration.setId(presentationJson.getLong("id", System.currentTimeMillis()));
+
         if(presentationJson.getJsonArray("custom-resources") != null) {
             presentationJson.getJsonArray("custom-resources")
                     .forEach(customResource -> {
@@ -174,6 +176,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             final JsonArray slidesJson = new JsonArray();
             final JsonArray customResourcesJson = new JsonArray();
             final JsonArray variablesJson = new JsonArray();
+
+            presentationJson.put("id", this.configuration.getId());
 
             this.configuration.getCustomResources()
                     .stream()

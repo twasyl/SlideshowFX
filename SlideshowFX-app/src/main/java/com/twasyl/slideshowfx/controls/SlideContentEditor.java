@@ -16,9 +16,10 @@
 
 package com.twasyl.slideshowfx.controls;
 
-import com.twasyl.slideshowfx.utils.keys.KeyEventUtils;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
+import com.twasyl.slideshowfx.utils.ZipUtils;
+import com.twasyl.slideshowfx.utils.keys.KeyEventUtils;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -27,6 +28,9 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.logging.Level;
@@ -45,7 +49,7 @@ public class SlideContentEditor extends BorderPane {
     private final WebView browser = new WebView();
 
     public SlideContentEditor() {
-        this.browser.getEngine().load(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/html/ace-file-editor.html"));
+        this.browser.getEngine().load(this.prepareAndGetEditorPageURI());
 
         this.browser.setOnKeyPressed(event -> {
             final boolean isShortcutDown = event.isShortcutDown();
@@ -78,6 +82,28 @@ public class SlideContentEditor extends BorderPane {
         });
 
         this.setCenter(this.browser);
+    }
+
+    /**
+     * Prepare the HTML page that is used to define and edit slides' content and return the {@link java.net.URI} of the
+     * page in order to be loaded by a {@link WebView}.
+     * @return The {@link java.net.URI} of the page to load.
+     */
+    private String prepareAndGetEditorPageURI() {
+        final File tempDirectory = new File(System.getProperty("java.io.tmpdir"));
+        final File editorDir = new File(tempDirectory, "sfx-slide-content-editor");
+        final File editorFile = new File(editorDir, "ace-file-editor.html");
+        final String uri = editorFile.toURI().toASCIIString();
+
+        if(!editorFile.exists()) {
+            try(final InputStream editorZip = ResourceHelper.getInputStream("/com/twasyl/slideshowfx/sfx-slide-content-editor.zip")) {
+                ZipUtils.unzip(editorZip, tempDirectory);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Can not extract the slide content editor ZIP", e);
+            }
+        }
+
+        return uri;
     }
 
     /**

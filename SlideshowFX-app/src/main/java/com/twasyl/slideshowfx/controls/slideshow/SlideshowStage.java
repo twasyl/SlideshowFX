@@ -20,12 +20,14 @@ import com.leapmotion.leap.Controller;
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.leap.SlideshowFXLeapListener;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 
 import java.util.logging.Logger;
 
@@ -47,6 +49,7 @@ public class SlideshowStage {
     private Controller controller;
     private SlideshowFXLeapListener listener;
 
+    private Runnable onCloseAction = null;
     private Stage slideshowStage, informationStage;
     private SlideshowPane slideshowPane;
     private InformationPane informationPane;
@@ -179,6 +182,8 @@ public class SlideshowStage {
     private final void initializeKeyEvents() {
         EventHandler<KeyEvent> handler = event -> {
             if (event.getCode().equals(KeyCode.ESCAPE)) {
+                if(this.onCloseAction != null) this.onCloseAction.run();
+
                 this.slideshowStage.close();
                 if (this.informationStage != null) this.informationStage.close();
             } else if(this.informationPane != null && !DO_NOT_CONSIDER_EVENT_TEXT.equals(event.getText())) {
@@ -253,5 +258,26 @@ public class SlideshowStage {
         }
 
         if(this.informationStage != null) this.informationStage.show();
+    }
+
+    /**
+     * Defines the process that is executed when the stage is closed. The action is given as a {@link Runnable} object
+     * but a new thread will not be created for running it. The type is just for having an interface which can describe
+     * a process. The {@link Runnable#run()} method is called directly.
+     * @param action The action to perform when the stage is closed.
+     */
+    public void onClose(Runnable action) {
+        this.onCloseAction = action;
+    }
+
+    /**
+     * Get the ID of the displayed slide.
+     * @return The ID of the current slide or {@code null} if no slide is considered displayed.
+     */
+    public String getDisplayedSlideId() {
+        if(this.slideshowStage != null) {
+            return this.slideshowPane.getBrowser().getCurrentSlideId();
+        }
+        return null;
     }
 }

@@ -529,6 +529,16 @@ public class PresentationViewController implements Initializable {
     }
 
     /**
+     * Go to a specific slide ID. If the given ID is {@code null} or empty, nothing will be performed.
+     * @param slideId The ID of the slide to go to.
+     */
+    public void goToSlide(final String slideId) {
+        if(slideId != null && !slideId.isEmpty()) {
+            this.browser.slide(slideId);
+        }
+    }
+
+    /**
      * Print the current presentation.
      */
     public void printPresentation() {

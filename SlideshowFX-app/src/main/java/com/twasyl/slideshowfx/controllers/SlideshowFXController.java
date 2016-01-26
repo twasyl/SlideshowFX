@@ -1200,7 +1200,10 @@ public class SlideshowFXController implements Initializable {
                 context.setPresentation(presentation);
 
                 final SlideshowStage stage = new SlideshowStage(context);
-
+                stage.onClose(() -> {
+                    final String slideId = stage.getDisplayedSlideId();
+                    view.goToSlide(slideId);
+                });
                 stage.show();
             }
         }

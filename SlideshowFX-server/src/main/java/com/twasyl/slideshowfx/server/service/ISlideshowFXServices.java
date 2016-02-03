@@ -30,7 +30,7 @@ public interface ISlideshowFXServices {
 
     String SERVICE_CHAT_PRESENTER_MESSAGE_ADD = "slideshowfx.chat.presenter.message.add";
 
-    String SERVICE_QUIZZ_START = "slideshowfx.quizz.start";
-    String SERVICE_QUIZZ_STOP = "slideshowfx.quizz.stop";
-    String SERVICE_QUIZZ_CURRENT = "slideshowfx.quizz.current";
+    String SERVICE_QUIZ_START = "slideshowfx.quiz.start";
+    String SERVICE_QUIZ_STOP = "slideshowfx.quiz.stop";
+    String SERVICE_QUIZ_CURRENT = "slideshowfx.quiz.current";
 }

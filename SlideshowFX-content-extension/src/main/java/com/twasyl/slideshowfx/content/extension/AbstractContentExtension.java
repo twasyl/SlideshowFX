@@ -18,6 +18,7 @@ package com.twasyl.slideshowfx.content.extension;
 
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import de.jensd.fx.glyphs.GlyphIcons;
+import javafx.application.Platform;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,9 +90,12 @@ public abstract class AbstractContentExtension implements IContentExtension {
     }
 
     @Override
-    public void extractResources(File directory) {
+    public void extractResources(final File directory) {
         if(directory == null) throw new NullPointerException("The directory where to extract the resources can not be null");
-        if(!directory.exists()) throw new IllegalArgumentException("The directory where to extract the resources doesn't exist");
+
+        if(!directory.exists()) {
+            directory.mkdir();
+        }
 
         try {
             ZipUtils.unzip(this.getClass().getResourceAsStream(this.getResourcesArchive().getFile()), directory);

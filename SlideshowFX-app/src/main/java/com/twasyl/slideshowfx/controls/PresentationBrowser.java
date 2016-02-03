@@ -198,7 +198,7 @@ public final class PresentationBrowser extends StackPane {
      */
     private final void injectServer(final SlideshowFXServer server) {
         if(server != null
-                &&this.internalBrowser.getEngine().getLoadWorker().getState() == Worker.State.SUCCEEDED
+                && this.internalBrowser.getEngine().getLoadWorker().getState() == Worker.State.SUCCEEDED
                 && this.getPresentation() != null
                 && this.getPresentation().getTemplateConfiguration() != null
                 && this.getPresentation().getTemplateConfiguration().getSfxServerObject() != null) {
@@ -208,7 +208,7 @@ public final class PresentationBrowser extends StackPane {
             // Only inject the server if it is not already present
             final Object member = window.getMember(this.getPresentation().getTemplateConfiguration().getSfxServerObject());
             if("undefined".equals(member)) {
-                window.setMember(this.getPresentation().getTemplateConfiguration().getSfxServerObject(), SlideshowFXServer.getSingleton());
+                window.setMember(this.getPresentation().getTemplateConfiguration().getSfxServerObject(), server);
             }
         }
     }

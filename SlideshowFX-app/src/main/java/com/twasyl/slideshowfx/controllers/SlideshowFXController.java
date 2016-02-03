@@ -43,7 +43,7 @@ import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.server.service.AttendeeChatService;
 import com.twasyl.slideshowfx.server.service.PresenterChatService;
-import com.twasyl.slideshowfx.server.service.QuizzService;
+import com.twasyl.slideshowfx.server.service.QuizService;
 import com.twasyl.slideshowfx.server.service.TwitterService;
 import com.twasyl.slideshowfx.services.AutoSavingService;
 import com.twasyl.slideshowfx.utils.*;
@@ -60,7 +60,6 @@ import javafx.beans.binding.StringExpression;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -170,10 +169,10 @@ public class SlideshowFXController implements Initializable {
     /* Main ToolBar elements */
     @FXML private SplitMenuButton addSlideButton;
     @FXML private SplitMenuButton moveSlideButton;
-    @FXML private ComboBox<String> chatIpAddress;
-    @FXML private TextField chatPort;
+    @FXML private ComboBox<String> serverIpAddress;
+    @FXML private TextField serverPort;
     @FXML private TextField twitterHashtag;
-    @FXML private Button startChatButton;
+    @FXML private Button startServerButton;
     @FXML private CheckBox leapMotionEnabled;
 
     /* Main application UI elements */
@@ -442,10 +441,10 @@ public class SlideshowFXController implements Initializable {
             .addStep(new Tour.Step("#reloadPresentation", "Reload the current presentation."))
             .addStep(new Tour.Step("#slideshow", "Enter in the presentation mode."))
             .addStep(new Tour.Step("#leapMotionEnabled", "Enable or disable LeapMotion in the presentation mode. If enabled, you will be able to change slides using your index and middle fingers with a swipe, and show a pointer using your index finder."))
-            .addStep(new Tour.Step("#chatIpAddress", "The IP address of the embedded server. If nothing is provided, an automatic IP will be used."))
-            .addStep(new Tour.Step("#chatPort", "The port of the embedded server. If nothing is provided, 8080 will be used."))
+            .addStep(new Tour.Step("#serverIpAddress", "The IP address of the embedded server. If nothing is provided, an automatic IP will be used."))
+            .addStep(new Tour.Step("#serverPort", "The port of the embedded server. If nothing is provided, 8080 will be used."))
             .addStep(new Tour.Step("#twitterHashtag", "Look for the given hashtag on Twitter. If left blank, the Twitter service will not be started."))
-            .addStep(new Tour.Step("#startChatButton", "Start or stop the embedded server."))
+            .addStep(new Tour.Step("#startServerButton", "Start or stop the embedded server."))
             .addStep(new Tour.Step("#browser", "Your presentation is displayed here."))
             .addStep(new Tour.Step("#contentExtensionToolBar", "Extensions are added here. If you install new ones they will also appear here. An extension provides a feature that adds something to your presentation, like inserting an image."))
             .addStep(new Tour.Step("#markupContentTypeBox", "The syntaxes available to define slides's content are located here. If you install new ones, they will also appear here."))
@@ -623,8 +622,8 @@ public class SlideshowFXController implements Initializable {
      *
      * @param event
      */
-    @FXML private void startChatByKeyPressed(KeyEvent event) {
-        if(event.getCode().equals(KeyCode.ENTER)) this.startChat();
+    @FXML private void startServerByKeyPressed(KeyEvent event) {
+        if(event.getCode().equals(KeyCode.ENTER)) this.startServer();
     }
 
     /**
@@ -632,8 +631,8 @@ public class SlideshowFXController implements Initializable {
      *
      * @param event
      */
-    @FXML private void startChatByButton(ActionEvent event) {
-        this.startChat();
+    @FXML private void startServerByButton(ActionEvent event) {
+        this.startServer();
     }
 
     /**
@@ -997,7 +996,7 @@ public class SlideshowFXController implements Initializable {
      * Start the chat. This method takes the text entered in the IP, port and Twitter's hashtag fields to start the chat.
      * If no text is entered for the IP address and the port number, the IP address of the computer is used and the port 80 is chosen.
      */
-    private void startChat() {
+    private void startServer() {
         FontAwesomeIconView icon;
 
         if (SlideshowFXServer.getSingleton() != null) {
@@ -1007,27 +1006,27 @@ public class SlideshowFXController implements Initializable {
             icon.setGlyphSize(20);
             icon.setGlyphStyle("-fx-fill: green");
         } else {
-            String ip = this.chatIpAddress.getValue();
+            String ip = this.serverIpAddress.getValue();
             if (ip == null || ip.isEmpty()) {
                 ip = NetworkUtils.getIP();
             }
 
             int port = 80;
-            if (this.chatPort.getText() != null && !this.chatPort.getText().isEmpty()) {
+            if (this.serverPort.getText() != null && !this.serverPort.getText().isEmpty()) {
                 try {
-                    port = Integer.parseInt(this.chatPort.getText());
+                    port = Integer.parseInt(this.serverPort.getText());
                 } catch(NumberFormatException ex) {
                     LOGGER.log(Level.WARNING, "Can not parse given chat port, use the default one instead", ex);
                 }
             }
 
-            this.chatIpAddress.setValue(ip);
-            this.chatPort.setText(port + "");
+            this.serverIpAddress.setValue(ip);
+            this.serverPort.setText(port + "");
 
             SlideshowFXServer.create(ip, port, this.twitterHashtag.getText()).start(
                     AttendeeChatService.class,
                     PresenterChatService.class,
-                    QuizzService.class,
+                    QuizService.class,
                     TwitterService.class
             );
 
@@ -1036,9 +1035,9 @@ public class SlideshowFXController implements Initializable {
             icon.setGlyphStyle("-fx-fill: app-color-orange");
         }
 
-        this.startChatButton.setGraphic(icon);
-        this.chatIpAddress.setDisable(!this.chatIpAddress.isDisable());
-        this.chatPort.setDisable(!this.chatPort.isDisable());
+        this.startServerButton.setGraphic(icon);
+        this.serverIpAddress.setDisable(!this.serverIpAddress.isDisable());
+        this.serverPort.setDisable(!this.serverPort.isDisable());
     }
 
     /**

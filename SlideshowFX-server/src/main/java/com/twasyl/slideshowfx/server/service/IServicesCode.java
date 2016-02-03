@@ -40,19 +40,19 @@ public interface IServicesCode {
     int RESPONSE_CODE_MESSAGE_UPDATED = 202;
 
     /**
-     * The status code indicating the quizz has been started successfully.
+     * The status code indicating the quiz has been started successfully.
      */
-    int RESPONSE_CODE_QUIZZ_STARTED = 203;
+    int RESPONSE_CODE_QUIZ_STARTED = 203;
 
     /**
-     * The status code indicating the quizz has been stopped successfully.
+     * The status code indicating the quiz has been stopped successfully.
      */
-    int RESPONSE_CODE_QUIZZ_STOPPED = 204;
+    int RESPONSE_CODE_QUIZ_STOPPED = 204;
 
     /**
-     * The status code indicating the current quizz has been retrieved successfully.
+     * The status code indicating the current quiz has been retrieved successfully.
      */
-    int RESPONSE_CODE_QUIZZ_RETRIEVED = 205;
+    int RESPONSE_CODE_QUIZ_RETRIEVED = 205;
 
     /**
      * The status code indicating an error occurred.
@@ -65,7 +65,7 @@ public interface IServicesCode {
     int RESPONSE_CODE_MESSAGE_NOT_FOUND = 404;
 
     /**
-     * The status code indicating tno quizz is currently active.
+     * The status code indicating tno quiz is currently active.
      */
-    int RESPONSE_CODE_QUIZZ_NOT_ACTIVE = 404;
+    int RESPONSE_CODE_QUIZ_NOT_ACTIVE = 404;
 }

@@ -39,8 +39,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
 import javax.imageio.ImageIO;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
@@ -77,7 +75,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     private static final String TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT = "/com/twasyl/slideshowfx/js/setField.js";
     private static final String TEMPLATE_SFX_SNIPPET_EXECUTOR_SCRIPT = "/com/twasyl/slideshowfx/js/snippetExecutor.js";
     private static final String TEMPLATE_SFX_CALLBACK_SCRIPT = "/com/twasyl/slideshowfx/js/sendInformationToSlideshowFX.js";
-    private static final String TEMPLATE_SFX_QUIZZ_CALLER_SCRIPT = "/com/twasyl/slideshowfx/js/quizzCaller.js";
+    private static final String TEMPLATE_SFX_QUIZ_CALLER_SCRIPT = "/com/twasyl/slideshowfx/js/quizCaller.js";
 
     private static final String TEMPLATE_SFX_CALLBACK_CALL = "sendInformationToSlideshowFX(this);";
 
@@ -632,7 +630,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         builder.append(ResourceHelper.readResource(TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT)).append("\n\n")
                 .append(ResourceHelper.readResource(TEMPLATE_SFX_SNIPPET_EXECUTOR_SCRIPT)).append("\n\n")
                 .append(ResourceHelper.readResource(TEMPLATE_SFX_CALLBACK_SCRIPT)).append("\n\n")
-                .append(ResourceHelper.readResource(TEMPLATE_SFX_QUIZZ_CALLER_SCRIPT)).append("\n\n");
+                .append(ResourceHelper.readResource(TEMPLATE_SFX_QUIZ_CALLER_SCRIPT)).append("\n\n");
 
         return builder.toString();
     }

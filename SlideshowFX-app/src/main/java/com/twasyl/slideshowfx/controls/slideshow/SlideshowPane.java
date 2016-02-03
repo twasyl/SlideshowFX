@@ -17,7 +17,7 @@
 package com.twasyl.slideshowfx.controls.slideshow;
 
 import com.twasyl.slideshowfx.beans.chat.ChatMessage;
-import com.twasyl.slideshowfx.beans.quizz.QuizzResult;
+import com.twasyl.slideshowfx.beans.quiz.QuizResult;
 import com.twasyl.slideshowfx.controls.*;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
@@ -67,7 +67,7 @@ public class SlideshowPane extends StackPane {
     private final ObjectProperty<Circle> pointer = new SimpleObjectProperty<>();
 
     private final ChatPanel chatPanel = new ChatPanel();
-    private final QuizzPanel quizzPanel = new QuizzPanel();
+    private final QuizPanel quizPanel = new QuizPanel();
     private final CollapsibleToolPane collapsibleToolPane = new CollapsibleToolPane();
 
     /**
@@ -118,13 +118,13 @@ public class SlideshowPane extends StackPane {
         chatIcon.setGlyphSize(32);
         chatIcon.setGlyphStyle("-fx-fill: app-color-orange");
 
-        final FontAwesomeIconView quizzIcon = new FontAwesomeIconView(FontAwesomeIcon.QUESTION);
-        quizzIcon.setGlyphSize(32);
-        quizzIcon.setGlyphStyle("-fx-fill: app-color-orange");
+        final FontAwesomeIconView quizIcon = new FontAwesomeIconView(FontAwesomeIcon.QUESTION);
+        quizIcon.setGlyphSize(32);
+        quizIcon.setGlyphStyle("-fx-fill: app-color-orange");
 
         this.collapsibleToolPane.addContent(qrCodeIcon, new QRCodePanel())
                 .addContent(chatIcon, this.chatPanel)
-                .addContent(quizzIcon, this.quizzPanel);
+                .addContent(quizIcon, this.quizPanel);
 
         this.getChildren().add(this.collapsibleToolPane);
     }
@@ -233,14 +233,14 @@ public class SlideshowPane extends StackPane {
     }
 
     /**
-     * This method publish the given {@link com.twasyl.slideshowfx.beans.quizz.QuizzResult} to the scene.
+     * This method publish the given {@link QuizResult} to the scene.
      * @param result The result to publish.
      * @throws java.lang.NullPointerException If the result is null
      */
-    public void publishQuizzResult(QuizzResult result) {
-        if(result == null) throw new NullPointerException("The QuizzResult to publish can not be null");
+    public void publishQuizResult(QuizResult result) {
+        if(result == null) throw new NullPointerException("The QuizResult to publish can not be null");
 
-        this.quizzPanel.setQuizzResult(result);
+        this.quizPanel.setQuizResult(result);
     }
 
     /**

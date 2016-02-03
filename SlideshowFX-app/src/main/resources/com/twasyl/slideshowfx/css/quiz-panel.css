@@ -1,0 +1,14 @@
+.default-color0.chart-pie { -fx-pie-color: #adff2f; }
+.default-color1.chart-pie { -fx-pie-color: #ff5700; }
+
+.chart {
+    -fx-background-color: RGBA(128,128,128,0.8);
+    -fx-background-radius: 5px;
+}
+
+.chart-title {
+    -fx-text-fill: white;
+    -fx-background-color: darkgray;
+    -fx-background-radius: 5px;
+    -fx-padding: 0 20px 0 20px;
+}

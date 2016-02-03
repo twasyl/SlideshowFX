@@ -1,12 +1,19 @@
+# IntelliJ IDEA files
 out
-src/test/resources/iCode
-felix-cache
-plugins
 .idea/
 *.iml
 **/*.iml
+
+# Application stuff
+felix-cache
+plugins
+
+# gradle files
 .gradle/
 gradle.properties
 **/gradle.properties
 build
 **/build/
+
+# Error files generated when JavaFX crashes
+hs_err_*

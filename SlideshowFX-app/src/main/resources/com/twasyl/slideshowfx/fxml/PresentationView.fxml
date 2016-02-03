@@ -18,7 +18,6 @@
 
 <?import com.twasyl.slideshowfx.controls.PresentationBrowser?>
 <?import com.twasyl.slideshowfx.controls.SlideContentEditor?>
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -38,14 +37,6 @@
 
         <!-- Content extension toolbar -->
         <ToolBar fx:id="contentExtensionToolBar">
-            <Button onAction="#insertQuizz" styleClass="image">
-                <tooltip>
-                    <Tooltip text="Insert a quizz" />
-                </tooltip>
-                <graphic>
-                    <FontAwesomeIconView glyphName="QUESTION" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
-                </graphic>
-            </Button>
             <Button onAction="#definePresentationVariables" styleClass="image">
                 <tooltip>
                     <Tooltip text="Insert a variable" />

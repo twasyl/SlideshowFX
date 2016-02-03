@@ -24,7 +24,7 @@
         <link rel="stylesheet" href="/slideshowfx/font-awesome/css/font-awesome.min.css" />
 
         <script type="text/javascript" src="/slideshowfx/chat/js/chatService.js"></script>
-        <script type="text/javascript" src="/slideshowfx/quizz/js/quizzService.js"></script>
+        <script type="text/javascript" src="/slideshowfx/quiz/js/quizService.js"></script>
 
         <script type="text/javascript">
             var socket;
@@ -58,7 +58,7 @@
                     document.getElementById("menu").className = "show";
                     document.getElementById("chat-container").className = "show";
                     document.getElementById("chat-container-menu-entry").className += " active";
-                    document.getElementById("quizz-container").className = "hide";
+                    document.getElementById("quiz-container").className = "hide";
                 }
             }
 
@@ -111,12 +111,12 @@
                         manageUpdateChatMessage(data);
                     } else if(service === "slideshowfx.chat.attendee.history") {
                         displayChatHistory(data);
-                    } else if(service === "slideshowfx.quizz.current" && statusCode == 205) {
-                        manageGetCurrentQuizz(data);
-                    } else if(service === "slideshowfx.quizz.start") {
-                        manageQuizzStarted(data);
-                    }  else if(service === "slideshowfx.quizz.stop") {
-                        manageQuizzStopped(data);
+                    } else if(service === "slideshowfx.quiz.current" && statusCode == 205) {
+                        manageGetCurrentQuiz(data);
+                    } else if(service === "slideshowfx.quiz.start") {
+                        manageQuizStarted(data);
+                    }  else if(service === "slideshowfx.quiz.stop") {
+                        manageQuizStopped(data);
                     }
                 }
             }
@@ -128,7 +128,7 @@
 
                 socket.onopen = function(event) {
                     requestChatHistory();
-                    requestCurrentQuizz();
+                    requestCurrentQuiz();
                 };
 
                 socket.onclose = function(event) {
@@ -137,9 +137,9 @@
                     messagesDiv.innerHTML = messagesDiv.innerHTML + "<div class=\"chat-ended\">Chat has ended</div>";
                     document.getElementById("send-form").style.display = "none";
 
-                    var quizzDiv = document.getElementById("quizz-container");
+                    var quizDiv = document.getElementById("quiz-container");
 
-                    quizzDiv.innerHTML = "No quizz currently active";
+                    quizDiv.innerHTML = "No quiz currently active";
                 };
 
                 socket.onmessage = function(event) {
@@ -317,8 +317,8 @@
                 text-align: center;
             }
 
-            /* QUIZZ STYLE */
-            #answer-quizz-button {
+            /* QUIZ STYLE */
+            #answer-quiz-button {
                 margin-top: 10px;
             }
 
@@ -357,7 +357,7 @@
                 <div><p style="padding-left: 20px; font-size: 20px">SlideshowFX</p></div>
                 <div id="menu" class="hide">
                     <i id="chat-container-menu-entry" class="fa fa-comments-o fa-2x fw" onclick="javascript:displayContent('chat-container');"></i>
-                    <i id="quizz-container-menu-entry" class="fa fa-question fa-2x fw" onclick="javascript:displayContent('quizz-container');"></i>
+                    <i id="quiz-container-menu-entry" class="fa fa-question fa-2x fw" onclick="javascript:displayContent('quiz-container');"></i>
                     <i id="logout-menu-entry" class="fa fa-sign-out fa-2x fw" onclick="javascript:logout();"></i>
                     </article>
                 </div>
@@ -379,8 +379,8 @@
                     </div>
                 </section>
 
-                <section id="quizz-container" class="hide">
-                    No quizz currently active
+                <section id="quiz-container" class="hide">
+                    No quiz currently active
                 </section>
             </div>
         </div>

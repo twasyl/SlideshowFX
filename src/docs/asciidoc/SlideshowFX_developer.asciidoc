@@ -12,7 +12,7 @@ SlideshowFX lets programming languages to developers and presentations' creation
 But SlideshowFX isn't just another simple presentation engine. It brings much more for you:
 
 - A chat is provided so your audience can send you questions using their smartphones and you will answer them whenever you want ;
-- A quizz creator so your audience can answer your quizz using their smartphones and you see results live ;
+- A quiz creator so your audience can answer your quiz using their smartphones and you see results live ;
 - Present using your hands by changing slides with two fingers, have a "laser" pointer by using one finger. It's cool isn't it? All of this brought to you by LeapMotion.
 - Save your presentations on Dropbox or Google Drive ;
 - Insert code snippets that can be executed directly from the presentation and console's output is displayed in the slide.
@@ -78,6 +78,7 @@ SlideshowFX contains the following modules:
 - *SlideshowFX-code-extension* which defines the implementation of SlideshowFX-content-extension to insert code in slides ;
 - *SlideshowFX-image-extension* which defines the implementation of SlideshowFX-content-extension to insert images in slides ;
 - *SlideshowFX-link-extension* which defines the implementation of SlideshowFX-content-extension to insert HTML links in slides ;
+- *SlideshowFX-quiz-extension* which defines the implementation of SlideshowFX-content-extension to insert quiz in slides ;
 - *SlideshowFX-quote-extension* which defines the implementation of SlideshowFX-content-extension to insert quotes in slides ;
 - *SlideshowFX-sequence-diagram-extension* which defines the implementation of SlideshowFX-content-extension to insert sequence diagrams in slides ;
 - *SlideshowFX-snippet-extension* which defines the implementation of SlideshowFX-content-extension to insert executable code snippet in slides ;

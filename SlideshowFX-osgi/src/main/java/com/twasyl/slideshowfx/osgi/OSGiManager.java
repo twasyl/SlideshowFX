@@ -55,24 +55,28 @@ public class OSGiManager {
         configurationMap.put("org.osgi.framework.storage.clean", "onFirstInit");
         configurationMap.put("org.osgi.framework.storage", System.getProperty("user.home") + "/.SlideshowFX/felix-cache");
         configurationMap.put("org.osgi.framework.bundle.parent", "app");
-        configurationMap.put("org.osgi.framework.bootdelegation", "com.twasyl.slideshowfx.markup," +
-                "com.twasyl.slideshowfx.content.extension," +
-                "com.twasyl.slideshowfx.hosting.connector," +
-                "com.twasyl.slideshowfx.hosting.connector.io," +
-                "com.twasyl.slideshowfx.hosting.connector.exceptions," +
-                "com.twasyl.slideshowfx.snippet.executor," +
-                "com.twasyl.slideshowfx.osgi," +
-                "com.twasyl.slideshowfx.engine.*," +
-                "com.twasyl.slideshowfx.global.configuration," +
-                "com.twasyl.slideshowfx.utils.*," +
-                "com.twasyl.slideshowfx.plugin," +
-                "de.jensd.fx.glyphs," +
-                "de.jensd.fx.glyphs.fontawesome," +
-                "sun.misc," +
-                "org.w3c.*," +
-                "javax.*," +
-                "javafx.*," +
-                "com.sun.javafx");
+
+        final StringJoiner bootdelegation = new StringJoiner(",");
+        bootdelegation.add("com.twasyl.slideshowfx.markup")
+                      .add("com.twasyl.slideshowfx.content.extension")
+                      .add("com.twasyl.slideshowfx.hosting.connector")
+                      .add("com.twasyl.slideshowfx.hosting.connector.io")
+                      .add("com.twasyl.slideshowfx.hosting.connector.exceptions")
+                      .add("com.twasyl.slideshowfx.snippet.executor")
+                      .add("com.twasyl.slideshowfx.osgi")
+                      .add("com.twasyl.slideshowfx.engine.*")
+                      .add("com.twasyl.slideshowfx.global.configuration")
+                      .add("com.twasyl.slideshowfx.utils.*")
+                      .add("com.twasyl.slideshowfx.plugin")
+                      .add("com.twasyl.slideshowfx.beans.quiz")
+                      .add("de.jensd.fx.glyphs")
+                      .add("de.jensd.fx.glyphs.fontawesome")
+                      .add("sun.misc")
+                      .add("org.w3c.*")
+                      .add("javax.*")
+                      .add("javafx.*")
+                      .add("com.sun.javafx");
+        configurationMap.put("org.osgi.framework.bootdelegation", bootdelegation.toString());
         configurationMap.put("felix.auto.deploy.action", "install,start");
 
         // Starting OSGi

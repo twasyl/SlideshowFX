@@ -74,7 +74,7 @@ allprojects {
         drive 'com.google.apis:google-api-services-drive:v2-rev196-1.21.0'
         dropbox 'com.dropbox.core:dropbox-core-sdk:1.8.2'
         felix 'org.apache.felix:org.apache.felix.framework:5.4.0'
-        fontawesomefx 'de.jensd:fontawesomefx:8.8'
+        fontawesomefx 'de.jensd:fontawesomefx:8.9'
         freemarker 'org.freemarker:freemarker:2.3.23'
         jsoup 'org.jsoup:jsoup:1.8.3'
         leapmotion fileTree(dir: allLibs, include: 'Leap/*')
@@ -160,6 +160,7 @@ task installContentExtensionPlugins(dependsOn: [':SlideshowFX-alert-extension:ja
                                                ':SlideshowFX-code-extension:jar',
                                                ':SlideshowFX-image-extension:jar',
                                                ':SlideshowFX-link-extension:jar',
+                                               ':SlideshowFX-quiz-extension:jar',
                                                ':SlideshowFX-quote-extension:jar',
                                                ':SlideshowFX-sequence-diagram-extension:jar',
                                                ':SlideshowFX-snippet-extension:jar']) << {
@@ -169,6 +170,7 @@ task installContentExtensionPlugins(dependsOn: [':SlideshowFX-alert-extension:ja
         from project(':SlideshowFX-code-extension').jar.archivePath
         from project(':SlideshowFX-image-extension').jar.archivePath
         from project(':SlideshowFX-link-extension').jar.archivePath
+        from project(':SlideshowFX-quiz-extension').jar.archivePath
         from project(':SlideshowFX-quote-extension').jar.archivePath
         from project(':SlideshowFX-sequence-diagram-extension').jar.archivePath
         from project(':SlideshowFX-snippet-extension').jar.archivePath
@@ -208,7 +210,7 @@ task installAllPlugins(dependsOn: [ ':installMarkupPlugins', ':installContentExt
 }
 
 task packageSlideshowFX(dependsOn : [':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar', ':SlideshowFX-textile:jar',
-                                     ':SlideshowFX-code-extension:jar', ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar', ':SlideshowFX-quote-extension:jar', ':SlideshowFX-sequence-diagram-extension:jar', ':SlideshowFX-snippet-extension:jar',
+                                     ':SlideshowFX-code-extension:jar', ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar', ':SlideshowFX-quiz-extension:jar', ':SlideshowFX-quote-extension:jar', ':SlideshowFX-sequence-diagram-extension:jar', ':SlideshowFX-snippet-extension:jar',
                                      ':SlideshowFX-go-executor:jar', ':SlideshowFX-golo-executor:jar', ':SlideshowFX-groovy-executor:jar', ':SlideshowFX-java-executor:jar', ':SlideshowFX-javascript-executor:jar',
                                      ':SlideshowFX-app:jar',
                                      'asciidoctor']) {
@@ -240,6 +242,7 @@ task packageSlideshowFX(dependsOn : [':SlideshowFX-asciidoctor:jar', ':Slideshow
             from project(':SlideshowFX-code-extension').jar.archivePath
             from project(':SlideshowFX-image-extension').jar.archivePath
             from project(':SlideshowFX-link-extension').jar.archivePath
+            from project(':SlideshowFX-quiz-extension').jar.archivePath
             from project(':SlideshowFX-quote-extension').jar.archivePath
             from project(':SlideshowFX-sequence-diagram-extension').jar.archivePath
             from project(':SlideshowFX-snippet-extension').jar.archivePath

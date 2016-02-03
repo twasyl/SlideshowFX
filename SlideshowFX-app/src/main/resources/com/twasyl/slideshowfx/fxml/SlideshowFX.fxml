@@ -308,19 +308,19 @@
 
                 <FontAwesomeIconView glyphName="COMMENTS_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
 
-                <ComboBox  promptText="IP address" fx:id="chatIpAddress">
+                <ComboBox  promptText="IP address" fx:id="serverIpAddress">
                     <items>
                         <NetworkUtils fx:factory="getObservableIps" />
                     </items>
                 </ComboBox>
 
-                <TextField prefColumnCount="3" promptText="Port" fx:id="chatPort" onKeyPressed="#startChatByKeyPressed" />
+                <TextField prefColumnCount="3" promptText="Port" fx:id="serverPort" onKeyPressed="#startServerByKeyPressed" />
 
                 <FontAwesomeIconView glyphName="TWITTER" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
 
-                <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" onKeyPressed="#startChatByKeyPressed" />
+                <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" onKeyPressed="#startServerByKeyPressed" />
 
-                <Button onAction="#startChatByButton" fx:id="startChatButton" styleClass="image">
+                <Button onAction="#startServerByButton" fx:id="startServerButton" styleClass="image">
                     <graphic>
                         <FontAwesomeIconView glyphName="PLAY" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: green" />
                     </graphic>

@@ -19,10 +19,7 @@ package com.twasyl.slideshowfx.controllers;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.PresentationBrowser;
 import com.twasyl.slideshowfx.controls.PresentationVariablesPanel;
-import com.twasyl.slideshowfx.controls.QuizzCreatorPanel;
 import com.twasyl.slideshowfx.controls.SlideContentEditor;
-import com.twasyl.slideshowfx.controls.slideshow.Context;
-import com.twasyl.slideshowfx.controls.slideshow.SlideshowStage;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.Presentations;
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
@@ -109,20 +106,6 @@ public class PresentationViewController implements Initializable {
      */
     @FXML private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
         this.updateSlide();
-    }
-
-    /**
-     * Displays the wizard allowing to insert a quiz in the presentation.
-     * @param event
-     */
-    @FXML private void insertQuizz(ActionEvent event) {
-        final QuizzCreatorPanel quizzCreatorPanel = new QuizzCreatorPanel();
-
-        final ButtonType response = DialogHelper.showCancellableDialog("Insert a quizz", quizzCreatorPanel);
-
-        if(response != null && response == ButtonType.OK) {
-            this.contentEditor.appendContentEditorValue(quizzCreatorPanel.convertToHtml());
-        }
     }
 
     /**

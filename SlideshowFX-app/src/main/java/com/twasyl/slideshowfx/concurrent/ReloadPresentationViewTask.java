@@ -21,6 +21,7 @@ import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import javafx.beans.property.SimpleStringProperty;
 
+import java.util.concurrent.RunnableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,18 +36,24 @@ import java.util.logging.Logger;
 public class ReloadPresentationViewTask extends SlideshowFXTask<Void> {
     private static final Logger LOGGER = Logger.getLogger(ReloadPresentationViewTask.class.getName());
 
+    protected Runnable action;
     private final PresentationViewController presentationView;
 
     public ReloadPresentationViewTask(final PresentationViewController presentationView) {
+        this(presentationView, () -> presentationView.reloadPresentationBrowser());
+    }
+
+    protected ReloadPresentationViewTask(final PresentationViewController presentationView, final Runnable action) {
         ((SimpleStringProperty) this.titleProperty()).set("Reloading the presentation");
         this.presentationView = presentationView;
+        this.action = action;
     }
 
     @Override
     protected Void call() throws Exception {
         if(this.presentationView == null) throw new NullPointerException("The presentation view is null");
 
-        PlatformHelper.run(() -> this.presentationView.reloadPresentationBrowser());
+        PlatformHelper.run(action);
 
         return null;
     }

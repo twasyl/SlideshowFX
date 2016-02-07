@@ -19,7 +19,6 @@ package com.twasyl.slideshowfx.controllers;
 import com.leapmotion.leap.Controller;
 import com.leapmotion.leap.Listener;
 import com.twasyl.slideshowfx.app.SlideshowFX;
-import com.twasyl.slideshowfx.utils.beans.binding.WildcardBinding;
 import com.twasyl.slideshowfx.concurrent.*;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
@@ -48,6 +47,7 @@ import com.twasyl.slideshowfx.server.service.TwitterService;
 import com.twasyl.slideshowfx.services.AutoSavingService;
 import com.twasyl.slideshowfx.utils.*;
 import com.twasyl.slideshowfx.utils.beans.Pair;
+import com.twasyl.slideshowfx.utils.beans.binding.WildcardBinding;
 import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.DisableAction;
@@ -107,7 +107,7 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /**
- *  This class is the controller of the <code>Slideshow.fxml</code> file. It defines all actions possible inside the view
+ *  This class is the controller of the {@code Slideshow.fxml} file. It defines all actions possible inside the view
  *  represented by the FXML.
  *  
  *  @author Thierry Wasyczenko
@@ -549,11 +549,16 @@ public class SlideshowFXController implements Initializable {
         final PresentationViewController view = this.getCurrentPresentationView();
 
         if(presentation != null && view != null) {
-            presentation.deleteSlide(view.getCurrentSlideNumber());
+            final String slideNumberToDelete = view.getCurrentSlideNumber();
 
-            final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
-            SlideshowFXController.this.taskInProgress.setCurrentTask(task);
-            TaskDAO.getInstance().startTask(task);
+            if(slideNumberToDelete != null) {
+                final Slide slideBefore = presentation.getConfiguration().getSlideBefore(slideNumberToDelete);
+
+                presentation.deleteSlide(slideNumberToDelete);
+
+                if(slideBefore == null) this.reloadPresentation(view);
+                else reloadPresentationAndGoToSlide(view, slideBefore.getId());
+            }
         }
     }
 
@@ -563,13 +568,7 @@ public class SlideshowFXController implements Initializable {
      * @param event
      */
     @FXML private void reload(ActionEvent event) {
-        final PresentationViewController view = this.getCurrentPresentationView();
-
-        if(view != null) {
-            final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
-            SlideshowFXController.this.taskInProgress.setCurrentTask(task);
-            TaskDAO.getInstance().startTask(task);
-        }
+        reloadPresentation(this.getCurrentPresentationView());
     }
 
     /**
@@ -989,6 +988,35 @@ public class SlideshowFXController implements Initializable {
                 }
 
             }
+        }
+    }
+
+    /**
+     * Reloads a presentation for a given view.
+     * @param view The view of the presentation to reload.
+     */
+    private void reloadPresentation(final PresentationViewController view) {
+        reloadPresentationAndGoToSlide(view, null);
+    }
+
+    /**
+     * Reloads a presentation contained in a given {@link PresentationViewController view} and then go to a given slide
+     * identified by its id. If the provided ID is {@code null}, the presentation will only be reloaded.
+     * @param view The view of the presentation to reload.
+     * @param id The ID of the slide to go to when the presentation has been successfully reloaded.
+     */
+    private void reloadPresentationAndGoToSlide(final PresentationViewController view, final String id) {
+        if(view != null) {
+            final ReloadPresentationViewTask task;
+
+            if(id != null && !id.isEmpty()) {
+                task = new ReloadPresentationViewAndGoToTask(view, id);
+            } else {
+                task = new ReloadPresentationViewTask(view);
+            }
+
+            SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+            TaskDAO.getInstance().startTask(task);
         }
     }
 

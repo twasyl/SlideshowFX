@@ -137,6 +137,32 @@ public class PresentationConfiguration implements IConfiguration {
     }
 
     /**
+     * Get the slide before a given slide number. If the slide identified by the given slide number is not found,
+     * {@code null} will be returned.
+     * @param slideNumber The slide number of the slide to get the previous slide.
+     * @return The slide before the given slide number.
+     */
+    public Slide getSlideBefore(final String slideNumber) {
+        Slide slide = null;
+
+        if(!this.slides.isEmpty()) {
+            int index = 0;
+
+            while(slide == null && index < this.slides.size()) {
+                final Slide currentSlide = this.slides.get(index);
+
+                if(currentSlide.getSlideNumber().equals(slideNumber)) {
+                    if (index != 0) slide = this.slides.get(index - 1);
+                    break;
+                }
+                index++;
+            }
+        }
+
+        return slide;
+    }
+
+    /**
      * Update the given {@code slide} in the HTML file. Each {@link SlideElement}
      * of the {@code slide} in the HTML document is updated.
      * If {@link Slide#elements elements}

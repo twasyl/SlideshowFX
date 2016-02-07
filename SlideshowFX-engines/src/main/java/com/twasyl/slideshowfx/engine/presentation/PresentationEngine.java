@@ -35,10 +35,12 @@ import freemarker.template.TemplateException;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.WritableImage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
@@ -141,7 +143,10 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                         "template-id")));
 
                     try {
-                        slide.setThumbnail(SwingFXUtils.toFXImage(ImageIO.read(new File(this.templateEngine.getConfiguration().getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png"))), null));
+                        final File thumbnailFile = this.getThumbnailFile(slide);
+                        if(thumbnailFile.exists()) {
+                            slide.setThumbnail(this.getThumbnailImage(thumbnailFile));
+                        }
                     } catch (IOException e) {
                         LOGGER.log(Level.INFO, "Error setting the thumbnail", e);
                     }
@@ -163,6 +168,30 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                 });
 
         return presentationConfiguration;
+    }
+
+    /**
+     * Get the thumbnail file for the given slide. This methods only creates a {@link File} without checking its existence.
+     * The file is supposed to be found in the {@link TemplateConfiguration#getSlidesThumbnailDirectory() thumbnail directory}
+     *  of the template configuration of this presentation.
+     * @param slide The slide to get the thumbnail file for.
+     * @return The supposed file corresponding to the thumbnail.
+     */
+    private File getThumbnailFile(final Slide slide) {
+        final File thumbnailFile = new File(this.templateEngine.getConfiguration().getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png"));
+        return thumbnailFile;
+    }
+
+    /**
+     * Get the {@link WritableImage image} located in the {@link File thumbnail file}.
+     * @param thumbnailFile The file of the image.
+     * @return The thumbnail image.
+     * @throws IOException If something went wrong.
+     */
+    private WritableImage getThumbnailImage(final File thumbnailFile) throws IOException {
+        final BufferedImage bufferedImage = ImageIO.read(thumbnailFile);
+        final WritableImage image = SwingFXUtils.toFXImage(bufferedImage, null);
+        return image;
     }
 
     @Override

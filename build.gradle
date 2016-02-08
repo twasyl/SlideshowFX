@@ -83,8 +83,39 @@ subprojects {
     apply plugin: 'java'
     group = "com.twasyl.slideshowfx"
 
+    sourceSets {
+        integrationTest {
+            java {
+                compileClasspath += main.output + test.output
+                runtimeClasspath += main.output + test.output
+                srcDir file('src/integration-test/java')
+            }
+            resources {
+                srcDir 'src/integration-test/resources'
+            }
+        }
+    }
+
+    configurations {
+        integrationTestCompile.extendsFrom testCompile
+        integrationTestRuntime.extendsFrom testRuntime
+    }
+
+    task integrationTest(type: Test) {
+        testClassesDir = sourceSets.integrationTest.output.classesDir
+        classpath = sourceSets.integrationTest.runtimeClasspath
+        outputs.upToDateWhen { false }
+    }
+
+    check.dependsOn integrationTest
+    integrationTest.mustRunAfter test
+
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
+
+    tasks.withType(Test) {
+        reports.html.destination = file("${reporting.baseDir}/${name}")
+    }
 
     test {
         useJUnit()

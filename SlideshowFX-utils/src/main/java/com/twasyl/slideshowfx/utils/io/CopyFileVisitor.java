@@ -52,17 +52,21 @@ public class CopyFileVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-        Path copiedDirectory = target.resolve(source.getParent().relativize(dir));
+        final Path parent = source.getParent();
 
-        /**
-         * Manages the fact <code>dir</code> is equal to <code>source</code>
-         */
-        if(copiedDirectory.equals(target)) {
-            copiedDirectory = new File(target.toFile(), dir.toFile().getName()).toPath();
-        }
+        if(parent != null) {
+            Path copiedDirectory = target.resolve(parent.relativize(dir));
 
-        if(!Files.exists(copiedDirectory)) {
-            Files.createDirectories(copiedDirectory);
+            /**
+             * Manages the fact {@code dir} is equal to {@code source}
+             */
+            if(copiedDirectory.equals(target)) {
+                copiedDirectory = new File(target.toFile(), dir.toFile().getName()).toPath();
+            }
+
+            if(!Files.exists(copiedDirectory)) {
+                Files.createDirectories(copiedDirectory);
+            }
         }
 
         return FileVisitResult.CONTINUE;
@@ -70,8 +74,12 @@ public class CopyFileVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        Path copiedFile = target.resolve(source.getParent().relativize(file));
-        Files.copy(file, copiedFile, StandardCopyOption.REPLACE_EXISTING);
+        final Path parent = source.getParent();
+
+        if(parent != null) {
+            Path copiedFile = target.resolve(parent.relativize(file));
+            Files.copy(file, copiedFile, StandardCopyOption.REPLACE_EXISTING);
+        }
 
         return FileVisitResult.CONTINUE;
     }

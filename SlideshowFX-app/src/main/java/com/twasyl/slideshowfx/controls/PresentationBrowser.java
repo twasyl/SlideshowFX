@@ -328,7 +328,7 @@ public final class PresentationBrowser extends StackPane {
                             String.format("%1$s('%2$s', '%3$s');",
                                     this.getPresentation().getTemplateConfiguration().getUpdateCodeSnippetConsoleMethod(),
                                     consoleOutputId,
-                                    Base64.getEncoder().encodeToString(consoleLine.getBytes())
+                                    Base64.getEncoder().encodeToString(consoleLine.getBytes(StandardCharsets.UTF_8))
                             ));
     }
 

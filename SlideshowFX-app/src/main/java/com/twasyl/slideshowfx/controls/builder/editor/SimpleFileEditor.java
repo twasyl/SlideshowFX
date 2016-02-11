@@ -3,6 +3,7 @@ package com.twasyl.slideshowfx.controls.builder.editor;
 import javafx.scene.control.TextArea;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +32,8 @@ public class SimpleFileEditor extends AbstractFileEditor<TextArea> {
     public void updateFileContent() {
         if(getFile() == null) throw new NullPointerException("The fileProperty is null");
 
-        try(final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(getFile())))) {
+        try(final InputStreamReader inputReader = new InputStreamReader(new FileInputStream(getFile()), StandardCharsets.UTF_8);
+                final BufferedReader reader = new BufferedReader(inputReader)) {
             final StringBuilder builder = new StringBuilder();
 
             reader.lines().forEach(line -> builder.append(line).append("\n"));

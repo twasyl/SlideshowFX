@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -219,19 +220,25 @@ public class TemplateBuilderController implements Initializable {
                     final File tmpFile = new File(parent.getValue(), name);
                     tmpItem = new TreeItem<>(tmpFile);
 
-                    if(!tmpFile.exists()) tmpFile.mkdir();
+                    if(!tmpFile.exists()) {
+                        final boolean result = tmpFile.mkdir();
+                        if(result) {
+                            // Avoid duplicates in the tree
+                            Optional<TreeItem<File>> sameItem = parent.getChildren()
+                                    .stream()
+                                    .filter(item -> item.getValue().equals(tmpFile))
+                                    .findFirst();
 
-                    // Avoid duplicates in the tree
-                    Optional<TreeItem<File>> sameItem = parent.getChildren()
-                            .stream()
-                            .filter(item -> item.getValue().equals(tmpFile))
-                            .findFirst();
+                            if(!sameItem.isPresent()) {
+                                parent.getChildren().add(tmpItem);
+                                parent = tmpItem;
+                            } else {
+                                parent = sameItem.get();
+                            }
 
-                    if(!sameItem.isPresent()) {
-                        parent.getChildren().add(tmpItem);
-                        parent = tmpItem;
-                    } else {
-                        parent = sameItem.get();
+                        } else {
+                            LOGGER.log(Level.INFO, "Could not create directory: " + tmpFile.getAbsolutePath());
+                        }
                     }
                 }
             }
@@ -324,8 +331,9 @@ public class TemplateBuilderController implements Initializable {
             this.templateContentTreeView.setEngine(this.templateEngine);
             this.templateContentTreeView.setRoot(root);
 
-            for(File file : this.templateEngine.getWorkingDirectory().listFiles()) {
-                this.addContentToTreeView(file);
+            final File[] children = this.templateEngine.getWorkingDirectory().listFiles();
+            if(children != null) {
+                Arrays.stream(children).forEach(child -> this.addContentToTreeView(child));
             }
         }
     }

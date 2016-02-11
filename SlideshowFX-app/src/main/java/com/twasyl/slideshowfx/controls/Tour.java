@@ -98,9 +98,6 @@ public class Tour extends StackPane {
         this.tourHighlight.setFill(Color.BLACK);
         this.tourHighlight.setOpacity(1);
 
-        // Start tour screen with information
-        final Node instructionsPane = this.getInstructionsNode();
-
         // Initialize the Tooltip
         this.tourTooltip = new Tooltip();
         this.tourTooltip.setAutoHide(false);

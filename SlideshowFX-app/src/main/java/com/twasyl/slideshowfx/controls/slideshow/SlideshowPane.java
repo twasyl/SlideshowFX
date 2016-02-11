@@ -46,7 +46,6 @@ public class SlideshowPane extends StackPane {
 
     private static SlideshowPane singleton = null;
 
-    private final Context context;
     private final ObjectProperty<PresentationBrowser> browser = new SimpleObjectProperty<>();
     private final ObjectProperty<Circle> pointer = new SimpleObjectProperty<>();
 
@@ -68,8 +67,6 @@ public class SlideshowPane extends StackPane {
 
         this.setAlignment(Pos.TOP_LEFT);
         this.getStylesheets().add(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/css/Default.css"));
-
-        this.context = context;
 
         this.initializeBrowser()
         ;
@@ -122,7 +119,7 @@ public class SlideshowPane extends StackPane {
     /**
      * Closes the slideshow pane. It takes care to set to {@code null} the singleton for this class.
      */
-    public void close() {
+    public synchronized void close() {
         SlideshowPane.singleton = null;
     }
 

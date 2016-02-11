@@ -87,7 +87,7 @@ public class OptionsViewController implements Initializable {
 
         if(temporaryFilesMaxAge != null) {
             try {
-                GlobalConfiguration.setTemporaryFilesMaxAge(Long.valueOf(temporaryFilesMaxAge));
+                GlobalConfiguration.setTemporaryFilesMaxAge(Long.parseLong(temporaryFilesMaxAge));
             } catch(NumberFormatException ex) {
                 LOGGER.log(Level.WARNING, "Invalid temporary files max age", ex);
                 GlobalConfiguration.removeTemporaryFilesMaxAge();

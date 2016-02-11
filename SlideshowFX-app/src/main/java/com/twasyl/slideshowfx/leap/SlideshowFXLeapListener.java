@@ -5,6 +5,7 @@ import com.twasyl.slideshowfx.controls.slideshow.SlideshowPane;
 import javafx.scene.input.KeyCode;
 
 import java.util.Iterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -104,6 +105,8 @@ public class SlideshowFXLeapListener extends Listener {
                             case TYPE_SCREEN_TAP:
                                 click(controller, gesture);
                                 break;
+                            default:
+                                LOGGER.log(Level.INFO, "The gesture is not supported: " + gesture.type());
                         }
                     }
                 }
@@ -123,9 +126,6 @@ public class SlideshowFXLeapListener extends Listener {
 
             if(this.lastSwipeGesture != null) {
                 // Timestamp are in microseconds
-                long lastSwipeTimestamp = this.lastSwipeGesture.frame().timestamp();
-                long currentTimestamp = swipe.frame().timestamp();
-
                 boolean acceptSwipe = swipe.durationSeconds() >= 0.1;
 
                 changeSlide(controller, swipe);

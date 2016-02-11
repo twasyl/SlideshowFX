@@ -7,6 +7,7 @@ import com.twasyl.slideshowfx.concurrent.*;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.Tour;
+import com.twasyl.slideshowfx.controls.about.AboutStage;
 import com.twasyl.slideshowfx.controls.notification.NotificationCenter;
 import com.twasyl.slideshowfx.controls.slideshow.Context;
 import com.twasyl.slideshowfx.controls.slideshow.SlideshowStage;
@@ -52,23 +53,22 @@ import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.*;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.File;
@@ -76,16 +76,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -442,47 +438,7 @@ public class SlideshowFXController implements Initializable {
      * @param event The source of the event
      */
     @FXML private void displayAbout(ActionEvent event) {
-
-        String appVersion = null;
-        try {
-            final File file = new File(SlideshowFXController.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-            final JarFile jarFile = new JarFile(file);
-            final Manifest manifest = jarFile.getManifest();
-            final Attributes attrs = manifest.getMainAttributes();
-
-            if(attrs != null) {
-                appVersion = attrs.getValue("Implementation-Version");
-            }
-        } catch (IOException | URISyntaxException e) {
-            LOGGER.log(Level.SEVERE, "Can not get application's version", e);
-        }
-
-        final Image logoImage = new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/about.png"));
-        final ImageView logoView = new ImageView(new Image(getClass().getResourceAsStream("/com/twasyl/slideshowfx/images/about.png")));
-        final Label sfxVersion = new Label(String.format("SlideshowFX version: %1$s", appVersion));
-        sfxVersion.setStyle("-fx-text-fill: white;");
-        final Label javaVersion = new Label(String.format("Java version: %1$s", System.getProperty("java.version")));
-        javaVersion.setStyle("-fx-text-fill: white;");
-
-        final VBox labels = new VBox(10);
-        labels.getChildren().setAll(sfxVersion, javaVersion);
-        labels.setTranslateX(25);
-        labels.setTranslateY(150);
-
-        final StackPane stack = new StackPane(logoView, labels);
-        stack.setAlignment(Pos.CENTER);
-        stack.setPrefSize(logoImage.getWidth(), logoImage.getHeight());
-        stack.setBackground(null);
-
-        final Scene scene = new Scene(stack, null);
-
-        final Stage stage = new Stage(StageStyle.TRANSPARENT);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.initOwner(SlideshowFX.getStage());
-        stage.setScene(scene);
-        stage.show();
-
-        scene.setOnMouseClicked(mouseEvent -> stage.close());
+        new AboutStage(SlideshowFX.getStage()).show();
     }
 
     /**
@@ -625,14 +581,15 @@ public class SlideshowFXController implements Initializable {
     @FXML private void createTemplate(ActionEvent event) {
         final TemplateEngine engine = new TemplateEngine();
         engine.setWorkingDirectory(engine.generateWorkingDirectory());
-        engine.getWorkingDirectory().mkdir();
 
-        final File templateConfigurationFile = new File(engine.getWorkingDirectory(), engine.getConfigurationFilename());
+        if(engine.getWorkingDirectory().mkdir()) {
+            final File templateConfigurationFile = new File(engine.getWorkingDirectory(), engine.getConfigurationFilename());
 
-        try {
-            Files.createFile(templateConfigurationFile.toPath());
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Can not create template configuration file", e);
+            try {
+                Files.createFile(templateConfigurationFile.toPath());
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Can not create template configuration file", e);
+            }
         }
 
         this.showTemplateBuilder(engine);
@@ -650,15 +607,16 @@ public class SlideshowFXController implements Initializable {
         if(file != null) {
             final TemplateEngine engine = new TemplateEngine();
             engine.setWorkingDirectory(engine.generateWorkingDirectory());
-            engine.getWorkingDirectory().mkdir();
             engine.setArchive(file);
 
-            try {
-                ZipUtils.unzip(file, engine.getWorkingDirectory());
+            if(engine.getWorkingDirectory().mkdir()) {
+                try {
+                    ZipUtils.unzip(file, engine.getWorkingDirectory());
 
-                this.showTemplateBuilder(engine);
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Can not unzip the template", e);
+                    this.showTemplateBuilder(engine);
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Can not unzip the template", e);
+                }
             }
         }
     }

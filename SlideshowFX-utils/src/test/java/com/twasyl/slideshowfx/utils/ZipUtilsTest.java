@@ -7,17 +7,17 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static org.junit.Assert.*;
 
-public class ZipTest {
+public class ZipUtilsTest {
 
-    private static final Logger LOGGER = Logger.getLogger(ZipTest.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ZipUtilsTest.class.getName());
 
     private static File testResultsDir;
     private static File resourcesDir;
@@ -108,5 +108,30 @@ public class ZipTest {
         assertTrue(unzippedFile.isFile());
 
         Files.walkFileTree(unzippedFolder.toPath(), new DeleteFileVisitor());
+    }
+
+    @Test public void testListFilesForDirectory() throws IOException {
+
+        final FileVisitor<File> visitor = new SimpleFileVisitor<File>() {
+            @Override
+            public FileVisitResult preVisitDirectory(File dir, BasicFileAttributes attrs) throws IOException {
+                return super.preVisitDirectory(dir, attrs);
+            }
+
+            @Override
+            public FileVisitResult visitFile(File file, BasicFileAttributes attrs) throws IOException {
+                if(!file.isDirectory()) {
+
+                }
+                return super.visitFile(file, attrs);
+            }
+
+
+        };
+
+        final File dir = new File(System.getProperty("user.home"), "Images");
+
+        final DirectoryStream<Path> stream = Files.newDirectoryStream(dir.toPath());
+        stream.forEach(System.out::println);
     }
 }

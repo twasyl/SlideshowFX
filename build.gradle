@@ -1,5 +1,3 @@
-
-
 import com.sun.javafx.PlatformUtil
 
 buildscript {
@@ -76,11 +74,11 @@ allprojects {
         testfx 'org.testfx:testfx-core:4.0.+', 'org.testfx:testfx-junit:4.0.+'
         vertxunit 'io.vertx:vertx-unit:3.2.1'
     }
-
 }
 
 subprojects {
     apply plugin: 'java'
+
     group = "com.twasyl.slideshowfx"
 
     sourceSets {
@@ -113,13 +111,10 @@ subprojects {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
-    tasks.withType(Test) {
-        reports.html.destination = file("${reporting.baseDir}/${name}")
-    }
-
     test {
         useJUnit()
         reports.html.enabled = true
+        reports.html.destination = file("${reporting.baseDir}/${name}")
     }
 }
 

@@ -48,7 +48,7 @@ public class UploadPresentationTask extends SlideshowFXTask<Void> {
         boolean fileExist = this.hostingConnector.fileExists(Presentations.getCurrentDisplayedPresentation(), destination);
 
         if(fileExist) {
-            final String message = String.format("The '%1$s' presentation already exist in '%2$s'.\n Do you want to overwrite it?",
+            final String message = String.format("The '%1$s' presentation already exist in '%2$s'.%nDo you want to overwrite it?",
                     engine.getArchive().getName(), destination.toString());
 
             final ButtonType response = DialogHelper.showConfirmationAlert("Overwrite presentation", message);

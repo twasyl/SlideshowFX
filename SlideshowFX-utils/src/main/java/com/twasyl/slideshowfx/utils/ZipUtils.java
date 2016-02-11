@@ -1,6 +1,9 @@
 package com.twasyl.slideshowfx.utils;
 
+import com.twasyl.slideshowfx.utils.io.ListFilesFileVisitor;
+
 import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -95,8 +98,9 @@ public class ZipUtils {
         if(!fileToZip.exists()) throw new FileNotFoundException("The file to zip does not exist");
         if(destination == null) throw new NullPointerException("The destination can not be null");
 
-        List<File> filesToZip = new ArrayList<>();
-        makeFileList(filesToZip, fileToZip);
+        final ListFilesFileVisitor visitor = new ListFilesFileVisitor();
+        Files.walkFileTree(fileToZip.toPath(), visitor);
+        final List<File> filesToZip = visitor.getFiles();
 
         FileInputStream fileInput = null;
         ZipOutputStream zipOutput = new ZipOutputStream(new FileOutputStream(destination));
@@ -143,28 +147,5 @@ public class ZipUtils {
         zipOutput.close();
 
         LOGGER.fine("File compressed");
-    }
-
-    private static void makeFileList(List<File> list, File file) {
-
-        if(list.isEmpty() && file.isDirectory()) {
-            for(File subFile : file.listFiles()) {
-                makeFileList(list, subFile);
-            }
-        } else {
-            if(file.isFile()) {
-                list.add(file);
-            } else if(file.isDirectory()) {
-                File[] listFiles = file.listFiles();
-
-                if(listFiles.length == 0) {
-                    list.add(file);
-                } else {
-                    for(File subFile : file.listFiles()) {
-                        makeFileList(list, subFile);
-                    }
-                }
-            }
-        }
     }
 }

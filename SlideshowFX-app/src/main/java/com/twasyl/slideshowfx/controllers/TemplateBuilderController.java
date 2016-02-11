@@ -314,6 +314,10 @@ public class TemplateBuilderController implements Initializable {
 
         if(this.templateEngine != null) {
 
+            if(this.templateEngine.getWorkingDirectory() == null) {
+                this.templateEngine.setWorkingDirectory(this.templateEngine.generateWorkingDirectory());
+            }
+
             final TreeItem root = new TreeItem(this.templateEngine.getWorkingDirectory());
             root.setExpanded(true);
 

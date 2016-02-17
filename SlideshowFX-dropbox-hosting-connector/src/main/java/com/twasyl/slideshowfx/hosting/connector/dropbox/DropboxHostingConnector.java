@@ -21,6 +21,7 @@ import org.w3c.dom.Element;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -226,7 +227,7 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
                 writeMode = DbxWriteMode.add();
                 if(this.fileExists(engine, folder)) {
                     fileName.append(engine.getArchive().getName())
-                            .append(String.format(" %1$tF %1$tT"))
+                            .append(String.format(" %1$tF %1$tT", Calendar.getInstance()))
                             .append(".").append(engine.getArchiveExtension());
                 } else {
                     fileName.append(engine.getArchive().getName());

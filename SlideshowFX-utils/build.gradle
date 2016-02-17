@@ -3,6 +3,7 @@
 version = '1.0.0'
 
 dependencies {
+    compile project(':SlideshowFX-global-configuration')
     compile configurations.freemarker
     compile configurations.jsoup
     compile configurations.vertx

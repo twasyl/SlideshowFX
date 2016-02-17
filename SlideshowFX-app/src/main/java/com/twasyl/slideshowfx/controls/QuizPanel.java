@@ -1,6 +1,6 @@
 package com.twasyl.slideshowfx.controls;
 
-import com.twasyl.slideshowfx.beans.quiz.QuizResult;
+import com.twasyl.slideshowfx.server.beans.quiz.QuizResult;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.beans.property.ObjectProperty;

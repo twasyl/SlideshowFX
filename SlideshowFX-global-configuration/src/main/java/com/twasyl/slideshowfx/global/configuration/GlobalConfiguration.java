@@ -1,6 +1,8 @@
 package com.twasyl.slideshowfx.global.configuration;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -42,6 +44,11 @@ public class GlobalConfiguration {
      * application. The value of this parameter must be given in seconds.
      */
     private static final String TEMPORARY_FILES_MAX_AGE_PARAMETER = "application.temporaryFiles.maxAge";
+
+    /**
+     * The default {@link Charset} used by the application when writing files, readings files and converting strings.
+     */
+    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     /**
      * Creates the configuration directory represented by the {@link #APPLICATION_DIRECTORY} variable if it doesn't
@@ -336,4 +343,10 @@ public class GlobalConfiguration {
     public static void removeTemporaryFilesMaxAge() {
         removeProperty(TEMPORARY_FILES_MAX_AGE_PARAMETER);
     }
+
+    /**
+     * Get the default {@link Charset} used by the application.
+     * @return The default charset used by the application.
+     */
+    public static Charset getDefaultCharset() { return DEFAULT_CHARSET; }
 }

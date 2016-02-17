@@ -25,7 +25,6 @@ import io.vertx.ext.web.handler.BodyHandler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,7 +43,7 @@ public class SlideshowFXServer {
 
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXServer.class.getName());
 
-    private static SlideshowFXServer singleton;
+    private static volatile SlideshowFXServer singleton;
 
     private Vertx vertx;
     private HttpServer httpServer;
@@ -87,8 +86,6 @@ public class SlideshowFXServer {
      * @param clazz The class of the Verticle to deploy.
      */
     public void deploy(Class<? extends AbstractVerticle> clazz) {
-        URL[] classpath = new URL[0];
-
         try {
             this.vertx.deployVerticle(clazz.newInstance(), result -> {
                 if (result.succeeded()) {
@@ -180,7 +177,10 @@ public class SlideshowFXServer {
         this.httpServer = null;
         this.router = null;
         this.websockets.clear();
-        singleton = null;
+
+        synchronized (singleton) {
+            singleton = null;
+        }
     }
 
     /**
@@ -367,6 +367,7 @@ public class SlideshowFXServer {
         }
 
         singleton = new SlideshowFXServer(host, port, twitterHashtag);
+
         return singleton;
     }
 }

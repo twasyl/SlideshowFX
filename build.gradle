@@ -118,6 +118,10 @@ subprojects {
         reports.html.destination = file("${project.reporting.baseDir}/${name}")
     }
 
+    findbugs {
+        ignoreFailures = true
+    }
+
     findbugsMain {
         reports {
             xml.enabled = false

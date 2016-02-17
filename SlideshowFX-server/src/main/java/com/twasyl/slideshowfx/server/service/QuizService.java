@@ -1,9 +1,9 @@
 package com.twasyl.slideshowfx.server.service;
 
-import com.twasyl.slideshowfx.beans.quiz.Quiz;
-import com.twasyl.slideshowfx.beans.quiz.QuizResult;
-import com.twasyl.slideshowfx.controls.slideshow.SlideshowPane;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.server.beans.quiz.Quiz;
+import com.twasyl.slideshowfx.server.beans.quiz.QuizResult;
+import com.twasyl.slideshowfx.server.bus.EventBus;
 import com.twasyl.slideshowfx.utils.TemplateProcessor;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.twasyl.slideshowfx.server.SlideshowFXServer.*;
 import static com.twasyl.slideshowfx.server.service.IServicesCode.*;
 
 /**
@@ -35,6 +36,8 @@ import static com.twasyl.slideshowfx.server.service.IServicesCode.*;
  */
 public class QuizService extends AbstractSlideshowFXService {
     private static final Logger LOGGER = Logger.getLogger(QuizService.class.getName());
+
+    public static final String SERVICE_QUIZ_ON_RESULT = "service.quiz.onResult";
 
     private final String url = "/slideshowfx/quiz";
     private Quiz currentQuiz = null;
@@ -94,13 +97,13 @@ public class QuizService extends AbstractSlideshowFXService {
         });
         // Get the JavaScript resources
         router.get("/slideshowfx/quiz/js/quizService.js").handler(routingContext -> {
-            final LocalMap<String, String> templateTokens = this.vertx.sharedData().getLocalMap(SlideshowFXServer.SHARED_DATA_TEMPLATE_TOKENS);
+            final LocalMap<String, String> templateTokens = this.vertx.sharedData().getLocalMap(SHARED_DATA_TEMPLATE_TOKENS);
 
             final Configuration configuration = TemplateProcessor.getJsConfiguration();
 
             final Map tokenValues = new HashMap();
-            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_HOST_TOKEN).toString(), SlideshowFXServer.getSingleton().getHost());
-            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_PORT_TOKEN).toString(), SlideshowFXServer.getSingleton().getPort() + "");
+            tokenValues.put(templateTokens.get(SHARED_DATA_SERVER_HOST_TOKEN).toString(), SlideshowFXServer.getSingleton().getHost());
+            tokenValues.put(templateTokens.get(SHARED_DATA_SERVER_PORT_TOKEN).toString(), SlideshowFXServer.getSingleton().getPort() + "");
 
             try (final StringWriter writer = new StringWriter()) {
                 final Template template = configuration.getTemplate("quizService.js");
@@ -144,7 +147,7 @@ public class QuizService extends AbstractSlideshowFXService {
             final JsonObject reply = this.buildResponse(SERVICE_QUIZ_START, RESPONSE_CODE_QUIZ_STARTED, encodedQuiz);
             this.sendResponseToWebSocketClients(reply);
 
-            if(SlideshowPane.getSingleton() != null) SlideshowPane.getSingleton().publishQuizResult(QuizService.this.results.get(QuizService.this.currentQuiz.getId()));
+            EventBus.getInstance().broadcast(SERVICE_QUIZ_ON_RESULT, QuizService.this.results.get(QuizService.this.currentQuiz.getId()));
 
             message.reply(reply);
         };

@@ -1,6 +1,6 @@
 package com.twasyl.slideshowfx.controls;
 
-import com.twasyl.slideshowfx.beans.chat.ChatMessage;
+import com.twasyl.slideshowfx.server.beans.chat.ChatMessage;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;

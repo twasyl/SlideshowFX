@@ -11,6 +11,7 @@ import com.twasyl.slideshowfx.engine.template.DynamicAttribute;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.utils.*;
 import com.twasyl.slideshowfx.utils.beans.Pair;
 import freemarker.template.Configuration;
@@ -339,8 +340,11 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         this.writeConfiguration();
 
         LOGGER.fine("Create slides thumbnails");
-        if(!this.templateEngine.getConfiguration().getSlidesThumbnailDirectory().exists()) this.templateEngine.getConfiguration().getSlidesThumbnailDirectory().mkdirs();
-        else {
+        if(!this.templateEngine.getConfiguration().getSlidesThumbnailDirectory().exists()) {
+            if(!this.templateEngine.getConfiguration().getSlidesThumbnailDirectory().mkdirs()) {
+                LOGGER.log(Level.SEVERE, "Can not create slides thumbnails directory");
+            }
+        } else {
             Arrays.stream(this.templateEngine.getConfiguration().getSlidesThumbnailDirectory()
                     .listFiles(f -> f.isFile()))
                     .forEach(slideFile -> slideFile.delete());
@@ -625,11 +629,13 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     }
 
     public void savePresentationFile() {
-        try(final Writer writer = new FileWriter(this.configuration.getPresentationFile())) {
+        try(final FileOutputStream fileOutputStream = new FileOutputStream(this.configuration.getPresentationFile());
+            final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, GlobalConfiguration.getDefaultCharset());
+            final Writer writer = new BufferedWriter(outputStreamWriter)) {
             writer.write(this.configuration.getDocument().html());
             writer.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Can not save presentation file", e);
         }
     }
 
@@ -687,7 +693,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
 
         // Add dynamic attributes to the tokens by asking their values to the user
-        // INCUBATING
+        // TODO INCUBATING
         tokens.clear();
         if(result.getKey().getTemplate().getDynamicAttributes() != null && result.getKey().getTemplate().getDynamicAttributes().length > 0) {
             Scanner scanner = new Scanner(System.in);

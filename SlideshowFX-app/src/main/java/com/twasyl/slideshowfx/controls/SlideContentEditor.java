@@ -15,11 +15,11 @@ import javafx.scene.web.WebView;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 
 /**
  * This control allows to define the content for a slide. It provides helper methods for inserting the current slide
@@ -99,13 +99,7 @@ public class SlideContentEditor extends BorderPane {
         final String valueAsBase64 = (String) this.browser.getEngine().executeScript("getContent();");
         final byte[] valueAsBytes = Base64.getDecoder().decode(valueAsBase64);
 
-        String value = null;
-
-        try {
-            value = new String(valueAsBytes, "UTF8");
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.log(Level.INFO, "Can not get value for slide content", e);
-        }
+        String value = new String(valueAsBytes, getDefaultCharset());
 
         return value;
     }
@@ -118,13 +112,7 @@ public class SlideContentEditor extends BorderPane {
         final String valueAsBase64 = (String) this.browser.getEngine().executeScript("getSelectedContent();");
         final byte[] valueAsBytes = Base64.getDecoder().decode(valueAsBase64);
 
-        String value = null;
-
-        try {
-            value = new String(valueAsBytes, "UTF8");
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.log(Level.INFO, "Can not get value for slide content", e);
-        }
+        String value = new String(valueAsBytes, getDefaultCharset());
 
         return value;
     }
@@ -135,7 +123,7 @@ public class SlideContentEditor extends BorderPane {
      * @param value The new value of this editor
      */
     public void setContentEditorValue(final String value) {
-        final String encodedValue = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+        final String encodedValue = Base64.getEncoder().encodeToString(value.getBytes(getDefaultCharset()));
 
         this.browser.getEngine().executeScript(String.format("setContent('%1$s');", encodedValue));
     }
@@ -146,7 +134,7 @@ public class SlideContentEditor extends BorderPane {
      * @param value The value to append to the content editor.
      */
     public void appendContentEditorValue(final String value) {
-        final String encodedValue = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+        final String encodedValue = Base64.getEncoder().encodeToString(value.getBytes(getDefaultCharset()));
 
         this.browser.getEngine().executeScript(String.format("appendContent('%1$s');", encodedValue));
     }

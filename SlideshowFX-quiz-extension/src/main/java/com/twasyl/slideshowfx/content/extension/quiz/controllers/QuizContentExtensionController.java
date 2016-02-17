@@ -1,9 +1,9 @@
 package com.twasyl.slideshowfx.content.extension.quiz.controllers;
 
-import com.twasyl.slideshowfx.beans.quiz.Answer;
-import com.twasyl.slideshowfx.beans.quiz.Question;
-import com.twasyl.slideshowfx.beans.quiz.Quiz;
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtensionController;
+import com.twasyl.slideshowfx.server.beans.quiz.Answer;
+import com.twasyl.slideshowfx.server.beans.quiz.Question;
+import com.twasyl.slideshowfx.server.beans.quiz.Quiz;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -31,7 +31,7 @@ public class QuizContentExtensionController extends AbstractContentExtensionCont
     private final ObjectProperty<Quiz> quiz = new SimpleObjectProperty<>();
 
     /**
-     * Add an answer to this {@link #quiz}. This method creates an {@link com.twasyl.slideshowfx.beans.quiz.Answer}
+     * Add an answer to this {@link #quiz}. This method creates an {@link com.twasyl.slideshowfx.server.beans.quiz.Answer}
      * object and binds it to the elements that are used to specify the text of it and if it is considered as a right
      * answer.
      * The method also updates this panel with elements used to define the answer. The answer is also added to this

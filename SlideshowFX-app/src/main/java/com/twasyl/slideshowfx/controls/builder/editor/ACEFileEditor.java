@@ -5,11 +5,12 @@ import javafx.concurrent.Worker;
 import javafx.scene.web.WebView;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 
 /**
  * This file editor uses ACE in order to display the content of files. ACE provides
@@ -42,7 +43,7 @@ public class ACEFileEditor extends AbstractFileEditor<WebView> {
         if(getFile() == null) throw new NullPointerException("The fileProperty is null");
 
         try(final FileInputStream fileInput = new FileInputStream(getFile());
-            final InputStreamReader inputReader = new InputStreamReader(fileInput, StandardCharsets.UTF_8);
+            final InputStreamReader inputReader = new InputStreamReader(fileInput, getDefaultCharset());
             final BufferedReader reader = new BufferedReader(inputReader)) {
             final StringBuilder builder = new StringBuilder();
 
@@ -87,7 +88,7 @@ public class ACEFileEditor extends AbstractFileEditor<WebView> {
             final String content = (String) this.getFileContent().getEngine().executeScript("getContent();");
             byte[] bytes = Base64.getDecoder().decode(content);
 
-            writer.write(new String(bytes, StandardCharsets.UTF_8));
+            writer.write(new String(bytes, getDefaultCharset()));
             writer.flush();
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Can not save the content", e);

@@ -52,7 +52,7 @@ public class OSGiManager {
                       .add("com.twasyl.slideshowfx.global.configuration")
                       .add("com.twasyl.slideshowfx.utils.*")
                       .add("com.twasyl.slideshowfx.plugin")
-                      .add("com.twasyl.slideshowfx.beans.quiz")
+                      .add("com.twasyl.slideshowfx.server.beans.quiz")
                       .add("de.jensd.fx.glyphs")
                       .add("de.jensd.fx.glyphs.fontawesome")
                       .add("sun.misc")

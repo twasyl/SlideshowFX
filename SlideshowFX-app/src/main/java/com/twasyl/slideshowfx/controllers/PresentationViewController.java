@@ -8,6 +8,7 @@ import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.Presentations;
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElement;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.markup.MarkupManager;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
@@ -42,7 +43,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Base64;
 import java.util.Iterator;
@@ -214,14 +214,11 @@ public class PresentationViewController implements Initializable {
 
                 this.selectMarkupRadioButton(element.getOriginalContentCode());
             } else {
-                try {
-                    this.contentEditor.setContentEditorValue(new String(Base64.getDecoder().decode(currentElementContent), "UTF8"));
-                } catch (UnsupportedEncodingException e) {
-                    LOGGER.log(Level.WARNING, "Can not decode String in UTF8", e);
-                } finally {
-                    this.selectMarkupRadioButton(null);
-                    this.contentEditor.selectAll();
-                }
+                final String decodedContent = new String(Base64.getDecoder().decode(currentElementContent), GlobalConfiguration.getDefaultCharset());
+                this.contentEditor.setContentEditorValue(decodedContent);
+                this.selectMarkupRadioButton(null);
+                this.contentEditor.selectAll();
+
             }
 
             this.contentEditor.requestFocus();
@@ -250,26 +247,23 @@ public class PresentationViewController implements Initializable {
                     .findFirst();
 
             if(snippetExecutor.isPresent()) {
-                try {
-                    final CodeSnippet codeSnippetDecoded = CodeSnippet.toObject(new String(Base64.getDecoder().decode(base64CodeSnippet), "UTF8"));
-                    final ObservableList<String> consoleOutput = snippetExecutor.get().execute(codeSnippetDecoded);
+                final String decodedString = new String(Base64.getDecoder().decode(base64CodeSnippet), GlobalConfiguration.getDefaultCharset());
+                final CodeSnippet codeSnippetDecoded = CodeSnippet.toObject(decodedString);
+                final ObservableList<String> consoleOutput = snippetExecutor.get().execute(codeSnippetDecoded);
 
-                    consoleOutput.addListener((ListChangeListener<String>) change -> {
-                        // Push the execution result to the presentation.
-                        PlatformHelper.run(() -> {
-                            while (change.next()) {
-                                if (change.wasAdded()) {
-                                    change.getAddedSubList()
-                                            .stream()
-                                            .forEach(line -> this.browser.updateCodeSnippetConsole(consoleOutputId, line));
-                                }
+                consoleOutput.addListener((ListChangeListener<String>) change -> {
+                    // Push the execution result to the presentation.
+                    PlatformHelper.run(() -> {
+                        while (change.next()) {
+                            if (change.wasAdded()) {
+                                change.getAddedSubList()
+                                        .stream()
+                                        .forEach(line -> this.browser.updateCodeSnippetConsole(consoleOutputId, line));
                             }
-                            change.reset();
-                        });
+                        }
+                        change.reset();
                     });
-                } catch (UnsupportedEncodingException e) {
-                    LOGGER.log(Level.SEVERE, "Can not decode code snippet", e);
-                }
+                });
             }
         }
     }

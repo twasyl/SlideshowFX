@@ -2,9 +2,10 @@ package com.twasyl.slideshowfx.controls.builder.elements;
 
 import javafx.scene.control.TextField;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.logging.Logger;
+
+import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 
 /**
  * The Base64TemplateElement allows to enter a String as value in a text field. The value sent to
@@ -32,7 +33,7 @@ public class Base64TemplateElement extends AbstractTemplateElement<String> {
 
     @Override
     public void setValue(String value) {
-        super.setValue(new String(Base64.getDecoder().decode(value), StandardCharsets.UTF_8));
+        super.setValue(new String(Base64.getDecoder().decode(value), getDefaultCharset()));
     }
 
     @Override
@@ -41,7 +42,7 @@ public class Base64TemplateElement extends AbstractTemplateElement<String> {
 
         if(getName() != null) builder.append(String.format("\"%1$s\": ", getName()));
 
-        builder.append(String.format("\"%1$s\"", Base64.getEncoder().encodeToString(getValue().getBytes(StandardCharsets.UTF_8))));
+        builder.append(String.format("\"%1$s\"", Base64.getEncoder().encodeToString(getValue().getBytes(getDefaultCharset()))));
 
         return builder.toString();
     }

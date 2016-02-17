@@ -20,6 +20,7 @@ import java.util.Map;
  */
 public class AbstractSlideshowFXService extends AbstractVerticle implements ISlideshowFXServices {
 
+    public static final String JSON_KEY_BROADCAST_MESSAGE_TYPE = "type";
     public static final String JSON_KEY_SERVICE = "service";
     public static final String JSON_KEY_DATA = "data";
     public static final String JSON_KEY_CODE = "code";

@@ -10,13 +10,14 @@ import freemarker.template.TemplateException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 
 public class SlideElement {
     private static final Logger LOGGER = Logger.getLogger(SlideElement.class.getName());
@@ -33,13 +34,7 @@ public class SlideElement {
     public String getHtmlContent() { return htmlContent; }
 
     public String getHtmlContentAsBase64() {
-        String base64 = null;
-        try {
-            base64 = Base64.getEncoder().encodeToString(getHtmlContent().getBytes("UTF8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
+        String base64 = Base64.getEncoder().encodeToString(getHtmlContent().getBytes(getDefaultCharset()));
         return base64;
     }
 
@@ -68,33 +63,50 @@ public class SlideElement {
         return builder.toString();
     }
 
+    /**
+     * Sets the HTML content for this {@link SlideElement}. The HTML content must not be encoded.
+     * @param htmlContent The HTML content.
+     */
     public void setHtmlContent(String htmlContent) { this.htmlContent = htmlContent; }
 
+    /**
+     * Sets the HTML content for this {@link SlideElement}. The provided HTML content is decoded and then set using
+     * {@link #setHtmlContent(String)}.
+     * @param htmlContentAsBase64 The HTML content encoded in Base64.
+     */
     public void setHtmlContentAsBase64(String htmlContentAsBase64) {
-        setHtmlContent(new String(
-                Base64.getDecoder().decode(htmlContentAsBase64.getBytes())
-        ));
+        final byte[] bytes = Base64.getDecoder().decode(htmlContentAsBase64);
+        setHtmlContent(new String(bytes, getDefaultCharset()));
     }
 
+    /**
+     * Get the original content of this {@link SlideElement}. The content is not encoded.
+     * @return The original content.
+     */
     public String getOriginalContent() { return originalContent; }
 
+    /**
+     * Get the original content of this {@link SlideElement}. The content is encoded in Base64.
+     * @return The encoded original content.
+     */
     public String getOriginalContentAsBase64() {
-        String base64 = null;
-        try {
-            base64 = Base64.getEncoder().encodeToString(getOriginalContent().getBytes("UTF8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
+        String base64 = Base64.getEncoder().encodeToString(getOriginalContent().getBytes(getDefaultCharset()));
         return base64;
     }
 
+    /**
+     * Sets the original content of this {@link SlideElement}. The original content must not be encoded.
+     * @param originalContent The original content.
+     */
     public void setOriginalContent(String originalContent) { this.originalContent = originalContent; }
 
+    /**
+     * Sets the original content of this {@link SlideElement}. The original content is decoded and set using {@link #setOriginalContent(String)}.
+     * @param originalContentAsBase64 The original content encoded in Base64.
+     */
     public void setOriginalContentAsBase64(String originalContentAsBase64) {
-        setOriginalContent(new String(
-                Base64.getDecoder().decode(originalContentAsBase64.getBytes())
-        ));
+        final byte[] bytes = Base64.getDecoder().decode(originalContentAsBase64);
+        setOriginalContent(new String(bytes, getDefaultCharset()));
     }
 
     public String getOriginalContentCode() { return originalContentCode; }

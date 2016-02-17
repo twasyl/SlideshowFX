@@ -261,9 +261,15 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
             } else {
                 body = new com.google.api.services.drive.model.File();
                 body.setMimeType(SLIDESHOWFX_MIME_TYPE);
-                body.setParents(Arrays.asList(new ParentReference()
-                                .setId(((GoogleFile) folder).getId())
-                ));
+
+                if(folder instanceof GoogleFile) {
+                    final GoogleFile googleFolder = (GoogleFile) folder;
+
+                    final ParentReference parent = new ParentReference();
+                    parent.setId(googleFolder.getId());
+
+                    body.setParents(Arrays.asList(parent));
+                }
 
                 if(this.fileExists(engine, folder)) {
                     final String nameWithoutExtension = engine.getArchive().getName().substring(0, engine.getArchive().getName().lastIndexOf("."));

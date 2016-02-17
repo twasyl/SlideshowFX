@@ -1,10 +1,10 @@
 package com.twasyl.slideshowfx.content.extension.quiz;
 
-import com.twasyl.slideshowfx.beans.quiz.Quiz;
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.quiz.controllers.QuizContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.server.beans.quiz.Quiz;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;

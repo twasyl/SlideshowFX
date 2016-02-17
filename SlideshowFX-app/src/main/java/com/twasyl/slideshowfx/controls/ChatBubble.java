@@ -1,9 +1,9 @@
 package com.twasyl.slideshowfx.controls;
 
-import com.twasyl.slideshowfx.beans.chat.ChatMessage;
-import com.twasyl.slideshowfx.beans.chat.ChatMessageAction;
-import com.twasyl.slideshowfx.beans.chat.ChatMessageStatus;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.server.beans.chat.ChatMessage;
+import com.twasyl.slideshowfx.server.beans.chat.ChatMessageAction;
+import com.twasyl.slideshowfx.server.beans.chat.ChatMessageStatus;
 import com.twasyl.slideshowfx.server.service.ISlideshowFXServices;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -16,7 +16,7 @@ import javafx.scene.text.Text;
 
 import static com.twasyl.slideshowfx.server.service.AbstractSlideshowFXService.*;
 /**
- * <p>This class is used to display a {@link com.twasyl.slideshowfx.beans.chat.ChatMessage} in the
+ * <p>This class is used to display a {@link com.twasyl.slideshowfx.server.beans.chat.ChatMessage} in the
  * {@link com.twasyl.slideshowfx.controls.slideshow.SlideshowPane}. A {@link ChatBubble} is inserted inside a
  * {@link ChatPanel}.</p>
  * <p>When creating a bubble, the {@link ChatBubble} will respond to a double click in order to update the message

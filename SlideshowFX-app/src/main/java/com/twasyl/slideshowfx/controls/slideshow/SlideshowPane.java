@@ -1,11 +1,13 @@
 package com.twasyl.slideshowfx.controls.slideshow;
 
-import com.twasyl.slideshowfx.beans.chat.ChatMessage;
-import com.twasyl.slideshowfx.beans.quiz.QuizResult;
 import com.twasyl.slideshowfx.controls.*;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
-import com.twasyl.slideshowfx.server.service.ISlideshowFXServices;
+import com.twasyl.slideshowfx.server.beans.chat.ChatMessage;
+import com.twasyl.slideshowfx.server.beans.quiz.QuizResult;
+import com.twasyl.slideshowfx.server.bus.Actor;
+import com.twasyl.slideshowfx.server.bus.EventBus;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
@@ -26,13 +28,15 @@ import javafx.scene.shape.Circle;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
-import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.server.service.AbstractSlideshowFXService.*;
+import static com.twasyl.slideshowfx.server.service.ISlideshowFXServices.SERVICE_CHAT_ATTENDEE_HISTORY;
+import static com.twasyl.slideshowfx.server.service.PresenterChatService.SERVICE_CHAT_PRESENTER_ON_MESSAGE;
+import static com.twasyl.slideshowfx.server.service.QuizService.SERVICE_QUIZ_ON_RESULT;
 
 /**
  * A pane that displays a presentation.
@@ -41,10 +45,8 @@ import static com.twasyl.slideshowfx.server.service.AbstractSlideshowFXService.*
  * @version 1.0.0
  * @since SlideshowFX 1.0.0
  */
-public class SlideshowPane extends StackPane {
+public class SlideshowPane extends StackPane implements Actor {
     private static final Logger LOGGER = Logger.getLogger(SlideshowPane.class.getName());
-
-    private static SlideshowPane singleton = null;
 
     private final ObjectProperty<PresentationBrowser> browser = new SimpleObjectProperty<>();
     private final ObjectProperty<Circle> pointer = new SimpleObjectProperty<>();
@@ -63,7 +65,8 @@ public class SlideshowPane extends StackPane {
     public SlideshowPane(Context context) {
         super();
 
-        singleton = this;
+        EventBus.getInstance().subscribe(SERVICE_QUIZ_ON_RESULT, this)
+                .subscribe(SERVICE_CHAT_PRESENTER_ON_MESSAGE, this);
 
         this.setAlignment(Pos.TOP_LEFT);
         this.getStylesheets().add(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/css/Default.css"));
@@ -76,6 +79,29 @@ public class SlideshowPane extends StackPane {
         }
 
         this.setCursor(null);
+    }
+
+    @Override
+    public boolean supportsMessage(Object message) {
+        return message != null && (message instanceof QuizResult || message instanceof JsonObject);
+    }
+
+    @Override
+    public void onMessage(Object message) {
+        if(message instanceof QuizResult) {
+            this.publishQuizResult((QuizResult) message);
+        } else if(message instanceof JsonObject) {
+
+            final JsonObject jsonMessage = (JsonObject) message;
+
+            if("chat-message".equals(jsonMessage.getString(JSON_KEY_BROADCAST_MESSAGE_TYPE))) {
+                final JsonObject content = jsonMessage.getJsonObject(JSON_KEY_MESSAGE);
+
+                if(content != null) {
+                    this.publishMessage(ChatMessage.build(content.encode(), null));
+                }
+            }
+        }
     }
 
     /**
@@ -111,19 +137,6 @@ public class SlideshowPane extends StackPane {
     }
 
     /**
-     * Get the instance of {@link SlideshowPane} that is currently displayed.
-     * @return The instance of {@link SlideshowPane} currently displayed or {@code null} if there's none.
-     */
-    public static SlideshowPane getSingleton() { return singleton; }
-
-    /**
-     * Closes the slideshow pane. It takes care to set to {@code null} the singleton for this class.
-     */
-    public synchronized void close() {
-        SlideshowPane.singleton = null;
-    }
-
-    /**
      * This method is called by the presentation in order to execute a code snippet. The executor is identified by the
      * {@code snippetExecutorCode} and retrieved in the OSGi context to get the {@link com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor}
      * instance that will execute the code.
@@ -143,26 +156,23 @@ public class SlideshowPane extends StackPane {
                     .findFirst();
 
             if(snippetExecutor.isPresent()) {
-                try {
-                    final CodeSnippet codeSnippetDecoded = CodeSnippet.toObject(new String(Base64.getDecoder().decode(base64CodeSnippet), "UTF8"));
-                    final ObservableList<String> consoleOutput = snippetExecutor.get().execute(codeSnippetDecoded);
+                final String decodedSnippet = new String(Base64.getDecoder().decode(base64CodeSnippet), GlobalConfiguration.getDefaultCharset());
+                final CodeSnippet codeSnippetDecoded = CodeSnippet.toObject(decodedSnippet);
+                final ObservableList<String> consoleOutput = snippetExecutor.get().execute(codeSnippetDecoded);
 
-                    consoleOutput.addListener((ListChangeListener<String>) change -> {
-                        // Push the execution result to the presentation.
-                        PlatformHelper.run(() -> {
-                            while (change.next()) {
-                                if (change.wasAdded()) {
-                                    change.getAddedSubList()
-                                            .stream()
-                                            .forEach(line -> this.browser.get().updateCodeSnippetConsole(consoleOutputId, line));
-                                }
+                consoleOutput.addListener((ListChangeListener<String>) change -> {
+                    // Push the execution result to the presentation.
+                    PlatformHelper.run(() -> {
+                        while (change.next()) {
+                            if (change.wasAdded()) {
+                                change.getAddedSubList()
+                                        .stream()
+                                        .forEach(line -> this.browser.get().updateCodeSnippetConsole(consoleOutputId, line));
                             }
-                            change.reset();
-                        });
+                        }
+                        change.reset();
                     });
-                } catch (UnsupportedEncodingException e) {
-                    LOGGER.log(Level.SEVERE, "Can not decode code snippet", e);
-                }
+                });
             }
         }
     }
@@ -172,7 +182,7 @@ public class SlideshowPane extends StackPane {
      */
     private void initializeChatPanel() {
         final JsonObject request = new JsonObject()
-                .put(JSON_KEY_SERVICE, ISlideshowFXServices.SERVICE_CHAT_ATTENDEE_HISTORY)
+                .put(JSON_KEY_SERVICE, SERVICE_CHAT_ATTENDEE_HISTORY)
                 .put(JSON_KEY_DATA, new JsonObject());
 
         final JsonArray history = SlideshowFXServer.getSingleton().callService(request.encode())
@@ -180,7 +190,7 @@ public class SlideshowPane extends StackPane {
 
         if(history != null) {
             for(Object message : history) {
-                this.publishMessage((JsonObject) message);
+                this.publishMessage(ChatMessage.build(((JsonObject) message).encode(), null));
             }
         }
     }
@@ -207,10 +217,10 @@ public class SlideshowPane extends StackPane {
      * @param chatMessage The message to publish.
      * @throws java.lang.NullPointerException If the message is null
      */
-    public void publishMessage(JsonObject chatMessage) {
+    public void publishMessage(ChatMessage chatMessage) {
         if(chatMessage == null) throw new NullPointerException("The message to publish can not be null");
 
-        PlatformHelper.run(() -> this.chatPanel.addMessage(ChatMessage.build(chatMessage.encode(), null)));
+        PlatformHelper.run(() -> this.chatPanel.addMessage(chatMessage));
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.twasyl.slideshowfx.beans.quiz;
+package com.twasyl.slideshowfx.server.beans.quiz;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;

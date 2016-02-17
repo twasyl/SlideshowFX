@@ -5,12 +5,12 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 
 /**
  * Represent a code snippet that can be executed.
@@ -104,22 +104,14 @@ public class CodeSnippet implements Serializable {
         if(jsonString != null) {
             JsonObject document = new JsonObject(jsonString);
 
-            try {
-                snippet.setCode(new String(Base64.getDecoder().decode(document.getString("code").getBytes()), "UTF8"));
-            } catch (UnsupportedEncodingException e) {
-                LOGGER.log(Level.SEVERE, "Can not decode the code of the snippet");
-            }
+            snippet.setCode(new String(Base64.getDecoder().decode(document.getString("code").getBytes()), getDefaultCharset()));
 
             JsonArray properties = document.getJsonArray("properties");
 
             if(properties != null && properties.size() > 0) {
                 properties.forEach(property -> {
-                    try {
-                        snippet.properties.put(((JsonObject) property).getString("name"),
-                                new String(Base64.getDecoder().decode(((JsonObject) property).getString("value").getBytes()), "UTF8"));
-                    } catch (UnsupportedEncodingException e) {
-                        LOGGER.log(Level.SEVERE, "Can not decode a property value", e);
-                    }
+                    final String decodedValue = new String(Base64.getDecoder().decode(((JsonObject) property).getString("value")), getDefaultCharset());
+                    snippet.properties.put(((JsonObject) property).getString("name"), decodedValue);
                 });
             }
         }

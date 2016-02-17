@@ -23,10 +23,11 @@ import javafx.scene.web.WebView;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 
 /**
  * A browser that displays a presentation and provides methods for interacting with the presentation (like go to a given
@@ -305,7 +306,7 @@ public final class PresentationBrowser extends StackPane {
      * @param htmlContent The HTML content, not Base64 encoded, for the element to define.
      */
     public final void defineContent(final String slideNumber, final String elementName, final String htmlContent) {
-        String clearedContent = Base64.getEncoder().encodeToString(htmlContent.getBytes(StandardCharsets.UTF_8));
+        String clearedContent = Base64.getEncoder().encodeToString(htmlContent.getBytes(getDefaultCharset()));
         String jsCommand = String.format("%1$s(%2$s, \"%3$s\", '%4$s');",
                 this.getPresentation().getTemplateConfiguration().getContentDefinerMethod(),
                 slideNumber,
@@ -328,7 +329,7 @@ public final class PresentationBrowser extends StackPane {
                             String.format("%1$s('%2$s', '%3$s');",
                                     this.getPresentation().getTemplateConfiguration().getUpdateCodeSnippetConsoleMethod(),
                                     consoleOutputId,
-                                    Base64.getEncoder().encodeToString(consoleLine.getBytes(StandardCharsets.UTF_8))
+                                    Base64.getEncoder().encodeToString(consoleLine.getBytes(getDefaultCharset()))
                             ));
     }
 

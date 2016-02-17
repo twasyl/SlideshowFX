@@ -14,12 +14,13 @@ import io.vertx.core.json.JsonObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.logging.Logger;
+
+import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 
 /**
  * This class is used to managed the templates provided by SlideshowFX.
@@ -101,7 +102,7 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                 templateConfiguration.getDefaultVariables().add(
                         new Pair<>(
                                 variableJson.getString("name"),
-                                new String(Base64.getDecoder().decode(variableJson.getString("value")), StandardCharsets.UTF_8)
+                                new String(Base64.getDecoder().decode(variableJson.getString("value")), getDefaultCharset())
                         ));
             });
         }
@@ -226,7 +227,7 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                     .forEach(variable -> {
                         defaultVariablesJson.add(new JsonObject()
                                 .put("name", variable.getKey())
-                                .put("value", Base64.getEncoder().encodeToString(variable.getValue().getBytes(StandardCharsets.UTF_8))));
+                                .put("value", Base64.getEncoder().encodeToString(variable.getValue().getBytes(getDefaultCharset()))));
 
                     });
 

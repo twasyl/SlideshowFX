@@ -2,6 +2,8 @@ package com.twasyl.slideshowfx.utils;
 
 import freemarker.template.Configuration;
 
+import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
+
 /**
  * This class provides utility methods to interact with the template library, which is currently freemarker.
  *
@@ -24,7 +26,7 @@ public class TemplateProcessor {
         if(configurationSingleton == null) {
             configurationSingleton = new Configuration(Configuration.VERSION_2_3_23);
             configurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-            configurationSingleton.setDefaultEncoding("UTF-8");
+            configurationSingleton.setDefaultEncoding(getDefaultCharset().displayName());
         }
 
         return configurationSingleton;
@@ -41,7 +43,7 @@ public class TemplateProcessor {
         if(jsConfigurationSingleton == null) {
             jsConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_23);
             jsConfigurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-            jsConfigurationSingleton.setDefaultEncoding("UTF-8");
+            jsConfigurationSingleton.setDefaultEncoding(getDefaultCharset().displayName());
             jsConfigurationSingleton.setClassForTemplateLoading(TemplateProcessor.class, "/com/twasyl/slideshowfx/js/");
         }
 
@@ -59,7 +61,7 @@ public class TemplateProcessor {
         if(htmlConfigurationSingleton == null) {
             htmlConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_23);
             htmlConfigurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-            htmlConfigurationSingleton.setDefaultEncoding("UTF-8");
+            htmlConfigurationSingleton.setDefaultEncoding(getDefaultCharset().displayName());
             htmlConfigurationSingleton.setClassForTemplateLoading(TemplateProcessor.class, "/com/twasyl/slideshowfx/html/");
         }
 

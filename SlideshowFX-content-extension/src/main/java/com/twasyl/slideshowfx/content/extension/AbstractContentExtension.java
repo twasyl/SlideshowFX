@@ -77,7 +77,9 @@ public abstract class AbstractContentExtension implements IContentExtension {
         if(directory == null) throw new NullPointerException("The directory where to extract the resources can not be null");
 
         if(!directory.exists()) {
-            directory.mkdir();
+            if(!directory.mkdir()) {
+                LOGGER.log(Level.SEVERE, "Can not create the directory where the resources must be extracted");
+            }
         }
 
         try {

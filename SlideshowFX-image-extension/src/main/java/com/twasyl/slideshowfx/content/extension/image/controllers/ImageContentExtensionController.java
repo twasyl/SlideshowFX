@@ -17,6 +17,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -31,7 +32,7 @@ import java.util.logging.Logger;
  */
 public class ImageContentExtensionController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(ImageContentExtensionController.class.getName());
-    public static FileChooser.ExtensionFilter IMAGES_FILES = new FileChooser.ExtensionFilter("Image files", "*.png", "*.bmp", "*.jpg", "*.jpeg", "*.gif", "*.svg");
+    public static final FileChooser.ExtensionFilter IMAGES_FILES = new FileChooser.ExtensionFilter("Image files", "*.png", "*.bmp", "*.jpg", "*.jpeg", "*.gif", "*.svg");
     public static final FileFilter IMAGE_FILTER = new FileFilter() {
         private final String[] extensions = new String[] { ".png", ".bmp", ".gif", ".jpg", ".jpeg", ".svg" };
 
@@ -88,9 +89,11 @@ public class ImageContentExtensionController implements Initializable {
     private List<File> lookupResources() {
         final List<File> images = new ArrayList<>();
 
-        for(File img : ((File) OSGiManager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER)).listFiles(IMAGE_FILTER)) {
-            images.add(img);
+        final File resourcesFolder = (File) OSGiManager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER);
+        final File[] files = resourcesFolder.listFiles();
 
+        if(files != null) {
+            Arrays.stream(files).forEach(images::add);
         }
 
         return images;

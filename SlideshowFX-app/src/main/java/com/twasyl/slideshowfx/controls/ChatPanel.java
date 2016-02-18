@@ -15,7 +15,7 @@ import javafx.scene.layout.VBox;
  */
 public class ChatPanel extends ScrollPane {
 
-    private final double width = 400;
+    private final static double WIDTH = 400;
     private final VBox messages = new VBox(5);
 
     public ChatPanel() {
@@ -25,9 +25,9 @@ public class ChatPanel extends ScrollPane {
         this.setContent(this.messages);
         this.setBackground(null);
 
-        this.setPrefViewportWidth(width);
-        this.setPrefWidth(width + 10);
-        this.setMaxWidth(width + 10);
+        this.setPrefViewportWidth(WIDTH);
+        this.setPrefWidth(WIDTH + 10);
+        this.setMaxWidth(WIDTH + 10);
 
         /*
          * Ensure the height of this panel is always the height of the screen
@@ -52,9 +52,9 @@ public class ChatPanel extends ScrollPane {
 
         final ChatBubble bubble = new ChatBubble();
         bubble.setChatMessage(message);
-        bubble.setPrefWidth(width);
-        bubble.setMinWidth(width);
-        bubble.setMaxWidth(width);
+        bubble.setPrefWidth(WIDTH);
+        bubble.setMinWidth(WIDTH);
+        bubble.setMaxWidth(WIDTH);
 
         this.messages.getChildren().add(bubble);
 

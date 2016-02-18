@@ -1,6 +1,8 @@
 package com.twasyl.slideshowfx.utils;
 
 
+import com.twasyl.slideshowfx.utils.io.DefaultCharsetReader;
+import com.twasyl.slideshowfx.utils.io.DefaultCharsetWriter;
 import io.vertx.core.json.JsonObject;
 
 import java.io.*;
@@ -28,7 +30,7 @@ public class JSONHelper {
         final StringBuilder dataAsString = new StringBuilder();
         String line;
 
-        try(final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
+        try(final BufferedReader reader = new DefaultCharsetReader(file)) {
             while((line = reader.readLine()) != null) {
                 dataAsString.append(line);
             }
@@ -46,12 +48,12 @@ public class JSONHelper {
      * @param file The file where the JSON object is saved.
      * @throws java.io.FileNotFoundException If the file is not found.
      */
-    public static void writeObject(JsonObject object, File file) throws FileNotFoundException {
+    public static void writeObject(JsonObject object, File file) throws IOException {
         if(object == null) throw new NullPointerException("The JSON object to save can not be null");
         if(file == null) throw new NullPointerException("The file can not be null");
 
-        try(final PrintWriter writer = new PrintWriter(file)) {
-            writer.print(object.encodePrettily());
+        try(final Writer writer = new DefaultCharsetWriter(file)) {
+            writer.write(object.encodePrettily());
         }
     }
 }

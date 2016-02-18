@@ -41,10 +41,6 @@ public class HostingConnectorException extends Exception {
         final Pair<String, String> pair = new Pair<>();
 
         switch(this.errorCode) {
-            case UNKNOWN_ERROR:
-                pair.setKey("Unknown error");
-                pair.setValue("An error occurred when interacting with the service");
-                break;
             case NOT_AUTHENTICATED:
                 pair.setKey("Not authenticated");
                 pair.setValue("Authentication is required");
@@ -56,6 +52,10 @@ public class HostingConnectorException extends Exception {
             case MISSING_CONFIGURATION:
                 pair.setKey("Missing configuration");
                 pair.setValue("A configuration is missing in order to interact with the service");
+            case UNKNOWN_ERROR:
+            default:
+                pair.setKey("Unknown error");
+                pair.setValue("An error occurred when interacting with the service");
         }
         return pair;
     }

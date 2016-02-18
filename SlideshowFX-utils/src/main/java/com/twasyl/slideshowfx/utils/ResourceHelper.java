@@ -1,9 +1,10 @@
 package com.twasyl.slideshowfx.utils;
 
+import com.twasyl.slideshowfx.utils.io.DefaultCharsetReader;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +27,7 @@ public class ResourceHelper {
     public static String readResource(String url) {
         final StringBuilder builder = new StringBuilder();
 
-        try(final BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceHelper.class.getResourceAsStream(url)))) {
+        try(final BufferedReader reader = new DefaultCharsetReader(ResourceHelper.class.getResourceAsStream(url))) {
             reader.lines().forEach(line -> builder.append(line).append("\n"));
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Can not read the resource content", e);

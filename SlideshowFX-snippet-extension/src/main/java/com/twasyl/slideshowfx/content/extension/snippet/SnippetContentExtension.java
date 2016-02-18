@@ -13,6 +13,8 @@ import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
+
 /**
  * The content extension that allows to insert code snippet in a presentation. This extension only supports HTML for
  * inserting the content in the presentation, meaning that HTML code will always be returned when calling
@@ -78,7 +80,7 @@ public class SnippetContentExtension extends AbstractContentExtension {
                 .append("   <i id=\"").append(executeCodeSnippetId).append("\" class=\"fa fa-terminal fa-fw\" ")
                 .append("onclick=\"javascript:executeCodeSnippet('")
                 .append(this.controller.getSnippetExecutor().getCode())
-                .append("', '").append(Base64.getEncoder().encodeToString(this.controller.getCodeSnippet().toJson().getBytes())).append("', '")
+                .append("', '").append(Base64.getEncoder().encodeToString(this.controller.getCodeSnippet().toJson().getBytes(getDefaultCharset()))).append("', '")
                 .append(id).append("');\"></i>\n")
                 .append("</div>\n")
                 .append("<pre id=\"").append(codeSnippetConsoleId).append("\" style=\"margin-top: 0\" ")

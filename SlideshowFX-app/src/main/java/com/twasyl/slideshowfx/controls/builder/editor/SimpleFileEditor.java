@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.controls.builder.editor;
 
+import com.twasyl.slideshowfx.utils.io.DefaultCharsetWriter;
 import javafx.scene.control.TextArea;
 
 import java.io.*;
@@ -49,7 +50,7 @@ public class SimpleFileEditor extends AbstractFileEditor<TextArea> {
     public void saveContent() {
         if(getFile() == null) throw new NullPointerException("The fileProperty is null");
 
-        try(final FileWriter writer = new FileWriter(getFile())) {
+        try(final DefaultCharsetWriter writer = new DefaultCharsetWriter(getFile())) {
             writer.write(this.getFileContent().getText());
             writer.flush();
         } catch (IOException e) {

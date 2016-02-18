@@ -12,12 +12,12 @@ public class KeyEventUtils {
     /**
      * Constant for prefixing a string with {@code Shortcut+}.
      */
-    public static String SHORTCUT = "Shortcut+";
+    public static final String SHORTCUT = "Shortcut+";
 
     /**
      * Constant for prefixing a string with {@code Shortcut+Shift+}.
      */
-    public static String SHORTCUT_SHIFT = "Shortcut+Shift+";
+    public static final String SHORTCUT_SHIFT = "Shortcut+Shift+";
 
     /**
      * Check if a given {@link KeyEvent} corresponds to the given key combination sequence. A sequence is typically

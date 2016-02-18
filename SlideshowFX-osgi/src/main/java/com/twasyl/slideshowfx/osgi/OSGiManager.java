@@ -84,16 +84,22 @@ public class OSGiManager {
         start();
 
         // Deploy initially present plugins
-        if(!GlobalConfiguration.PLUGINS_DIRECTORY.exists()) GlobalConfiguration.PLUGINS_DIRECTORY.mkdirs();
+        if(!GlobalConfiguration.PLUGINS_DIRECTORY.exists()) {
+            if(!GlobalConfiguration.PLUGINS_DIRECTORY.mkdirs()) {
+                LOGGER.log(Level.SEVERE, "Can not create plugins directory");
+            }
+        }
 
-        Arrays.stream(GlobalConfiguration.PLUGINS_DIRECTORY.listFiles((dir, name) -> name.endsWith(".jar")))
-                .forEach(file -> {
-                    try {
-                        OSGiManager.deployBundle(file);
-                    } catch (IOException e) {
-                        LOGGER.log(Level.WARNING, "Can not deploy bundle", e);
-                    }
-                });
+        if(GlobalConfiguration.PLUGINS_DIRECTORY.exists()) {
+            Arrays.stream(GlobalConfiguration.PLUGINS_DIRECTORY.listFiles((dir, name) -> name.endsWith(".jar")))
+                    .forEach(file -> {
+                        try {
+                            OSGiManager.deployBundle(file);
+                        } catch (IOException e) {
+                            LOGGER.log(Level.WARNING, "Can not deploy bundle", e);
+                        }
+                    });
+        }
     }
 
     /**

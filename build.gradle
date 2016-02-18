@@ -79,6 +79,7 @@ allprojects {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'findbugs'
+    apply plugin: 'jacoco'
 
     group = "com.twasyl.slideshowfx"
 
@@ -125,6 +126,14 @@ subprojects {
     findbugsMain {
         reports {
             xml.enabled = false
+            html.enabled = true
+        }
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled = false
+            csv.enabled = false
             html.enabled = true
         }
     }

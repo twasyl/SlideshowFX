@@ -1,12 +1,15 @@
 package com.twasyl.slideshowfx.controls.builder.editor;
 
 import com.twasyl.slideshowfx.controls.builder.elements.*;
+import com.twasyl.slideshowfx.utils.io.DefaultCharsetReader;
+import com.twasyl.slideshowfx.utils.io.DefaultCharsetWriter;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Base64;
@@ -64,7 +67,7 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
         if(!getFile().exists()) throw new IllegalArgumentException("The file does not exist.");
         if(!getFile().canRead()) throw new IllegalArgumentException("The file can not be read.");
 
-        try(final BufferedReader reader = new BufferedReader(new FileReader(getFile()))) {
+        try(final DefaultCharsetReader reader = new DefaultCharsetReader(getFile())) {
             final StringBuilder builder = new StringBuilder();
 
             reader.lines().forEach(line -> builder.append(line));
@@ -164,7 +167,7 @@ public class ConfigurationFileEditor extends AbstractFileEditor<ListTemplateElem
     public void saveContent() {
         if(getFile() == null) throw new NullPointerException("The fileProperty is null");
 
-        try(final FileWriter writer = new FileWriter(getFile())) {
+        try(final DefaultCharsetWriter writer = new DefaultCharsetWriter(getFile())) {
             JsonObject json = new JsonObject(this.getFileContent().getAsString());
             writer.write(json.encodePrettily());
             writer.flush();

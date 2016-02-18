@@ -83,7 +83,7 @@ public class CodeSnippet implements Serializable {
      */
     public String toJson() {
         final JsonObject objectJson = new JsonObject();
-        objectJson.put("code", Base64.getEncoder().encodeToString(this.code.getBytes()));
+        objectJson.put("code", Base64.getEncoder().encodeToString(this.code.getBytes(getDefaultCharset())));
 
         final JsonArray propertiesJson = new JsonArray();
 
@@ -104,7 +104,7 @@ public class CodeSnippet implements Serializable {
         if(jsonString != null) {
             JsonObject document = new JsonObject(jsonString);
 
-            snippet.setCode(new String(Base64.getDecoder().decode(document.getString("code").getBytes()), getDefaultCharset()));
+            snippet.setCode(new String(Base64.getDecoder().decode(document.getString("code").getBytes(getDefaultCharset())), getDefaultCharset()));
 
             JsonArray properties = document.getJsonArray("properties");
 

@@ -46,6 +46,7 @@ public class EventBusTest {
 
     public static final String ENDPOINT_1 = "endpoint.1";
     public static final String ENDPOINT_2 = "endpoint.2";
+    public static final String ENDPOINT_UNKNOWN = "endpoint.unknown";
 
     public static DontSupportMessage DONT_SUPPORT_MESSAGE_ACTOR;
     public static SupportMessage SUPPORT_MESSAGE_ACTOR_1;
@@ -119,11 +120,19 @@ public class EventBusTest {
         assertFalse(SUPPORT_MESSAGE_ACTOR_1.gotMessage);
     }
 
+    @Test public void unSubscribeWithUnknownEndpoint() {
+        EventBus.getInstance().unsubscribe(ENDPOINT_UNKNOWN, SUPPORT_MESSAGE_ACTOR_1);
+    }
+
     @Test public void onMessageOnlyCalledForSpecificEndpoint() throws InterruptedException {
         EventBus.getInstance().broadcast(ENDPOINT_1, "Test");
         Thread.sleep(10);
 
         assertTrue(SUPPORT_MESSAGE_ACTOR_1.gotMessage);
         assertFalse(SUPPORT_MESSAGE_ACTOR_2.gotMessage);
+    }
+
+    @Test public void broadcastToUnknownEndpoint() {
+        EventBus.getInstance().broadcast(ENDPOINT_UNKNOWN, "Test");
     }
 }

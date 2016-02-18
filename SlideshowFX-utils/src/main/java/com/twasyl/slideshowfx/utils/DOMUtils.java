@@ -1,14 +1,15 @@
 package com.twasyl.slideshowfx.utils;
 
 
+import com.twasyl.slideshowfx.utils.io.DefaultCharsetWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Writer;
 
 public class DOMUtils {
 
@@ -42,8 +43,8 @@ public class DOMUtils {
 
         document.outputSettings().prettyPrint(true);
 
-        try(FileOutputStream output = new FileOutputStream(file)) {
-            output.write(document.outerHtml().getBytes());
+        try(final Writer output = new DefaultCharsetWriter(file)) {
+            output.write(document.outerHtml());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

@@ -177,10 +177,6 @@ public class SlideshowFXServer {
         this.httpServer = null;
         this.router = null;
         this.websockets.clear();
-
-        synchronized (singleton) {
-            singleton = null;
-        }
     }
 
     /**
@@ -362,7 +358,7 @@ public class SlideshowFXServer {
      * @return The instance of the {@link SlideshowFXServer} that has been created.
      */
     public static SlideshowFXServer create(final String host, final int port, final String twitterHashtag) {
-        if(singleton != null) {
+        if(singleton != null && singleton.vertx != null) {
             singleton.stop();
         }
 

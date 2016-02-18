@@ -48,34 +48,43 @@ public class ZipUtils {
         if(archive == null) throw new NullPointerException("The ZIP file can not be null");
         if(destination == null) throw new NullPointerException("The destination can not be null");
 
-        if(!destination.exists()) destination.mkdirs();
+        if(!destination.exists()) {
+            if(!destination.mkdirs()) {
+                throw new IOException("Can not create destination folder");
+            }
+        }
 
         ZipInputStream zipReader = new ZipInputStream(archive);
         ZipEntry zipEntry;
         File extractedFile;
-        FileOutputStream extractedFileOutputStream;
 
         while((zipEntry = zipReader.getNextEntry()) != null) {
             extractedFile = new File(destination, zipEntry.getName());
 
             LOGGER.fine("Extracting file: " + extractedFile.getAbsolutePath());
 
-            if(zipEntry.isDirectory()) extractedFile.mkdirs();
+            if(zipEntry.isDirectory()) {
+                if(!extractedFile.mkdirs()) {
+                    throw new IOException("Can not create folder");
+                }
+            }
             else {
                 // Ensure to create the parents directories
-                extractedFile.getParentFile().mkdirs();
+                if(!extractedFile.getParentFile().mkdirs()) {
+                    throw new IOException("Can not create the parent folder");
+                }
 
                 int length;
                 byte[] buffer = new byte[1024];
 
-                extractedFileOutputStream = new FileOutputStream(extractedFile);
+                try(final FileOutputStream extractedFileOutputStream = new FileOutputStream(extractedFile)) {
 
-                while((length = zipReader.read(buffer)) > 0) {
-                    extractedFileOutputStream.write(buffer, 0, length);
+                    while ((length = zipReader.read(buffer)) > 0) {
+                        extractedFileOutputStream.write(buffer, 0, length);
+                    }
+
+                    extractedFileOutputStream.flush();
                 }
-
-                extractedFileOutputStream.flush();
-                extractedFileOutputStream.close();
             }
         }
 

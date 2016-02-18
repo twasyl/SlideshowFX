@@ -14,6 +14,8 @@ import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
+
 /**
  * The {@link QuizContentExtension} extends the {@link AbstractContentExtension}. It allows to build a content containing
  * quiz to insert inside a SlideshowFX presentation.
@@ -69,7 +71,7 @@ public class QuizContentExtension extends AbstractContentExtension {
         final StringBuilder builder = new StringBuilder("<div id=\"quiz-").append(quiz.getId()).append("\" class=\"slideshowfx-quiz\" style=\"width: 100%\">\n");
         builder.append("\t<span id=\"").append(System.currentTimeMillis()).append("\" style=\"display: block; width: 100%; background-color: #ECECEC; border-radius: 10px 10px 0 0\">\n")
                 .append("\t\t<span id=\"quiz-action-button-").append(quiz.getId()).append("\" onclick=\"javascript:quiz(this, '")
-                .append(Base64.getEncoder().encodeToString(quiz.toJSONString().getBytes())).append("');\">")
+                .append(Base64.getEncoder().encodeToString(quiz.toJSONString().getBytes(getDefaultCharset()))).append("');\">")
                 .append("<i class=\"fa fa-play fa-fw\" title=\"Start the quiz\"></i></span>\n\t\t&nbsp;")
                 .append(quiz.getQuestion().getText()).append("\n\t</span>\n");
         builder.append("\t<ul>");

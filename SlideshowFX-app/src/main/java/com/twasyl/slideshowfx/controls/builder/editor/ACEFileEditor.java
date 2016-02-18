@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.controls.builder.editor;
 
 import com.twasyl.slideshowfx.utils.ResourceHelper;
+import com.twasyl.slideshowfx.utils.io.DefaultCharsetWriter;
 import javafx.concurrent.Worker;
 import javafx.scene.web.WebView;
 
@@ -84,7 +85,7 @@ public class ACEFileEditor extends AbstractFileEditor<WebView> {
     public void saveContent() {
         if(getFile() == null) throw new NullPointerException("The fileProperty is null");
 
-        try(final FileWriter writer = new FileWriter(getFile())) {
+        try(final DefaultCharsetWriter writer = new DefaultCharsetWriter(getFile())) {
             final String content = (String) this.getFileContent().getEngine().executeScript("getContent();");
             byte[] bytes = Base64.getDecoder().decode(content);
 

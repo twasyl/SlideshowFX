@@ -64,13 +64,13 @@ public class ZipUtils {
             LOGGER.fine("Extracting file: " + extractedFile.getAbsolutePath());
 
             if(zipEntry.isDirectory()) {
-                if(!extractedFile.mkdirs()) {
+                if(!extractedFile.exists() && !extractedFile.mkdirs()) {
                     throw new IOException("Can not create folder");
                 }
             }
             else {
                 // Ensure to create the parents directories
-                if(!extractedFile.getParentFile().mkdirs()) {
+                if(!extractedFile.getParentFile().exists() && !extractedFile.getParentFile().mkdirs()) {
                     throw new IOException("Can not create the parent folder");
                 }
 

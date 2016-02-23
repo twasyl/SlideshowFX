@@ -2,11 +2,11 @@ package com.twasyl.slideshowfx.global.configuration;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * This class provides methods for accessing configuration properties.
@@ -48,7 +48,7 @@ public class GlobalConfiguration {
     /**
      * The default {@link Charset} used by the application when writing files, readings files and converting strings.
      */
-    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+    private static final Charset DEFAULT_CHARSET = UTF_8;
 
     /**
      * Creates the configuration directory represented by the {@link #APPLICATION_DIRECTORY} variable if it doesn't
@@ -93,6 +93,13 @@ public class GlobalConfiguration {
             setTemporaryFilesMaxAge(7);
             enableAutoSaving(false);
             setAutoSavingInterval(5);
+            setLogLevel(Level.INFO);
+            setLogHandler(FileHandler.class);
+            setLogFileAppend(true);
+            setLogFileEncoding(UTF_8);
+            setLogFileFormatter(SimpleFormatter.class);
+            setLogFileLimit(50000);
+            setLogFilePattern("%h/.SlideshowFX/sfx%g.log");
         }
     }
 
@@ -310,6 +317,62 @@ public class GlobalConfiguration {
     public static boolean isTemporaryFilesDeletionOnExitEnabled() {
         final Boolean deleteTemporaryFiles = getBooleanProperty(TEMPORARY_FILES_DELETION_ON_EXIT_PARAMETER);
         return deleteTemporaryFiles == null ? false : deleteTemporaryFiles;
+    }
+
+    /**
+     * Sets the default log level of the application.
+     * @param level The desired log level.
+     */
+    public static void setLogLevel(final Level level) {
+        setProperty(".level", level.getName());
+    }
+
+    /**
+     * Sets the default log handler.
+     * @param handler The handler of logs.
+     */
+    public static void setLogHandler(final Class<? extends Handler> handler) {
+        setProperty("handlers", handler.getName());
+    }
+
+    /**
+     * Sets the encoding of log files.
+     * @param charset The encoding of log files.
+     */
+    public static void setLogFileEncoding(final Charset charset) {
+        setProperty("java.util.logging.FileHandler.encoding", charset.displayName());
+    }
+
+    /**
+     * Sets the size in bytes of the log files.
+     * @param size The size, in bytes, of log files.
+     */
+    public static void setLogFileLimit(final long size) {
+        setProperty("java.util.logging.FileHandler.limit", String.valueOf(size));
+    }
+
+    /**
+     * Sets the log files pattern.
+     * @param pattern The pattern of log files.
+     */
+    public static void setLogFilePattern(final String pattern) {
+        setProperty("java.util.logging.FileHandler.pattern", pattern);
+    }
+
+    /**
+     * Sets the class responsible of formatting log files.
+     * @param formatter The formatter to use for log files.
+     */
+    public static void setLogFileFormatter(final Class<? extends Formatter> formatter) {
+        setProperty("java.util.logging.FileHandler.formatter", formatter.getName());
+    }
+
+    /**
+     * Defines if the logs should be append or not to the log files.
+     * @param append {@code true} to allow appending, {@code false} otherwise.
+     */
+    public static void setLogFileAppend(final boolean append) {
+        setProperty("java.util.logging.FileHandler.append", String.valueOf(append));
     }
 
     /**

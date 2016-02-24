@@ -172,7 +172,9 @@ public class SlideshowFXServer {
      * Stops the embedded server.
      */
     public void stop() {
-        this.vertx.close();
+        if(this.vertx != null) {
+            this.vertx.close();
+        }
         this.vertx = null;
         this.httpServer = null;
         this.router = null;

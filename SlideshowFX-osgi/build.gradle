@@ -1,8 +1,7 @@
-
-
 version = '1.0.0'
 
 dependencies {
+    compile project(':SlideshowFX-engines')
     compile project(':SlideshowFX-global-configuration')
 
     compile configurations.felix

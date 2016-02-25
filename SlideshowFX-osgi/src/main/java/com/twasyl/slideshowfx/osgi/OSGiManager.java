@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.osgi;
 
+import com.twasyl.slideshowfx.engine.presentation.Presentations;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import org.osgi.framework.*;
 import org.osgi.framework.launch.Framework;
@@ -8,8 +9,6 @@ import org.osgi.framework.launch.FrameworkFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
@@ -189,54 +188,14 @@ public class OSGiManager {
     public static Object getPresentationProperty(String property) {
         Object value = null;
 
-        try {
-            // Class and methods for PresentationDAO
-            final Class presentationDaoClass = Class.forName("com.twasyl.slideshowfx.dao.PresentationDAO");
-            final Method getInstanceMethod = presentationDaoClass.getMethod("getInstance");
-            final Method getCurrentPresentationMethod = presentationDaoClass.getMethod("getCurrentPresentation");
-
-            // Class and methods for AbstractEngine
-            final Class abstractEngineClass = Class.forName("com.twasyl.slideshowfx.engine.AbstractEngine");
-            final Method getWorkingDirectoryMethod = abstractEngineClass.getMethod("getWorkingDirectory");
-
-            // Class and methods for PresentationEngine
-            final Class presentationEngineClass = Class.forName("com.twasyl.slideshowfx.engine.presentation.PresentationEngine");
-            final Method getTemplateConfigurationMethod = presentationEngineClass.getMethod("getTemplateConfiguration");
-
-            // Class and methods for TemplateConfiguration
-            final Class templateConfigurationClass = Class.forName("com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration");
-            final Method getResourcesDirectoryMethod = templateConfigurationClass.getMethod("getResourcesDirectory");
-
-            final Object presentationDaoInstance = getInstanceMethod.invoke(presentationDaoClass);
-            final Object currentPresentation = getCurrentPresentationMethod.invoke(presentationDaoInstance);
-
-            if(currentPresentation != null) {
-                if(PRESENTATION_FOLDER.equals(property)) value = getWorkingDirectoryMethod.invoke(currentPresentation);
-                else if(PRESENTATION_RESOURCES_FOLDER.equals(property)) {
-                    final Object templateConfiguration = getTemplateConfigurationMethod.invoke(currentPresentation);
-
-                    if(templateConfiguration != null) {
-                        value = getResourcesDirectoryMethod.invoke(templateConfiguration);
-                    }
-                }
+        if(Presentations.getCurrentDisplayedPresentation() != null) {
+            if(PRESENTATION_FOLDER.equals(property)) {
+                value = Presentations.getCurrentDisplayedPresentation().getWorkingDirectory();
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            else if(PRESENTATION_RESOURCES_FOLDER.equals(property)) {
+                value = Presentations.getCurrentDisplayedPresentation().getTemplateConfiguration().getResourcesDirectory();
+            }
         }
-
-        /*if(PRESENTATION_FOLDER.equals(property) && PresentationDAO.getInstance().getCurrentPresentation() != null) {
-            value = PresentationDAO.getInstance().getCurrentPresentation().getWorkingDirectory();
-        } else if(PRESENTATION_RESOURCES_FOLDER.equals(property)
-                && PresentationDAO.getInstance().getCurrentPresentation() != null
-                && PresentationDAO.getInstance().getCurrentPresentation().getTemplateConfiguration() != null) {
-            value = PresentationDAO.getInstance().getCurrentPresentation().getTemplateConfiguration().getResourcesDirectory();
-        }      */
 
         return value;
     }

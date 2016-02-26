@@ -90,7 +90,7 @@ public class ImageContentExtensionController implements Initializable {
         final List<File> images = new ArrayList<>();
 
         final File resourcesFolder = (File) OSGiManager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER);
-        final File[] files = resourcesFolder.listFiles();
+        final File[] files = resourcesFolder.listFiles(IMAGE_FILTER);
 
         if(files != null) {
             Arrays.stream(files).forEach(images::add);

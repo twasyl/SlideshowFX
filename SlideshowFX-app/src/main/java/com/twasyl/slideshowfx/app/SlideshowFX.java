@@ -115,6 +115,8 @@ public class SlideshowFX extends Application {
 
         if(GlobalConfiguration.createConfigurationFile()) {
            GlobalConfiguration.fillConfigurationWithDefaultValue();
+        } else {
+            GlobalConfiguration.fillConfigurationWithDefaultValue();
         }
 
         // Start the MarkupManager

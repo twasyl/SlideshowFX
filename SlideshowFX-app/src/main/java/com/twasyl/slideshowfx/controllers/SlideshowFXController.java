@@ -5,6 +5,7 @@ import com.leapmotion.leap.Listener;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.concurrent.*;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
+import com.twasyl.slideshowfx.controls.LogsStage;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.Tour;
 import com.twasyl.slideshowfx.controls.about.AboutStage;
@@ -65,10 +66,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.stage.*;
 
 import java.awt.*;
 import java.io.File;
@@ -454,6 +452,24 @@ public class SlideshowFXController implements Initializable {
             this.openedPresentationsTabPane.getSelectionModel().select(tab);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Can not open internal browser", e);
+        }
+    }
+
+    /**
+     * Displays the window allowing to display the logs.
+     * @param event The source event.
+     */
+    @FXML private void displayLogs(final ActionEvent event) {
+        try {
+            final Parent root = FXMLLoader.load(ResourceHelper.getURL("/com/twasyl/slideshowfx/fxml/Logs.fxml"));
+
+            final Scene scene = new Scene(root);
+
+            final LogsStage stage = new LogsStage();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Can not display the logs viewer", e);
         }
     }
 

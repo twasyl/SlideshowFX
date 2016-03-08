@@ -1,21 +1,20 @@
-
-
 include 'SlideshowFX-app'
 include 'SlideshowFX-engines'
-include ':SlideshowFX-server'
 include 'SlideshowFX-global-configuration'
+include 'SlideshowFX-logs'
 include 'SlideshowFX-osgi'
-include 'SlideshowFX-utils'
 include 'SlideshowFX-plugin'
+include ':SlideshowFX-server'
+include 'SlideshowFX-utils'
 
+include 'SlideshowFX-markup'
 include 'SlideshowFX-asciidoctor'
 include 'SlideshowFX-html'
 include 'SlideshowFX-markdown'
-include 'SlideshowFX-markup'
 include 'SlideshowFX-textile'
 
-include 'SlideshowFX-alert-extension'
 include 'SlideshowFX-content-extension'
+include 'SlideshowFX-alert-extension'
 include 'SlideshowFX-code-extension'
 include 'SlideshowFX-image-extension'
 include 'SlideshowFX-link-extension'

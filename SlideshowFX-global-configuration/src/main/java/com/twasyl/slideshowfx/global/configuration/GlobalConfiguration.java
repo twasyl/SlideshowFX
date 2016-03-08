@@ -1,8 +1,12 @@
 package com.twasyl.slideshowfx.global.configuration;
 
+import com.twasyl.slideshowfx.logs.SlideshowFXHandler;
+
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Properties;
+import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
@@ -58,12 +62,12 @@ public class GlobalConfiguration {
     /**
      * Name of the parameter for specifying the log handler.
      */
-    private static final String LOG_HANDLER_PARAMETER = "handlers";
+    private static final String LOG_HANDLERS_PARAMETER = "handlers";
 
     /**
-     * Name of the parameter for the specifing the encoding of the log file.
+     * Name of the parameter suffix for the specifying the encoding of the log file.
      */
-    private static final String LOG_FILE_ENCODING_PARAMETER = "java.util.logging.FileHandler.encoding";
+    private static final String LOG_ENCODING_SUFFIX = ".encoding";
 
     /**
      * Name of the parameter for specifying the file log limit.
@@ -76,9 +80,9 @@ public class GlobalConfiguration {
     private static final String LOG_FILE_PATTERN_PARAMETER = "java.util.logging.FileHandler.pattern";
 
     /**
-     * Name of the parameter for the log file formatter.
+     * Name of the parameter suffix for the log file formatter.
      */
-    private static final String LOG_FILE_FORMATTER_PARAMETER = "java.util.logging.FileHandler.formatter";
+    private static final String LOG_FORMATTER_SUFFIX = ".formatter";
 
     /**
      * Name of the parameter for specifying if logs must be appended to the log file.
@@ -131,12 +135,14 @@ public class GlobalConfiguration {
             if(!properties.containsKey(AUTO_SAVING_ENABLED_PARAMETER)) enableAutoSaving(false);
             if(!properties.containsKey(AUTO_SAVING_INTERVAL_PARAMETER)) setAutoSavingInterval(5);
             if(!properties.containsKey(LOG_LEVEL_PARAMETER)) setLogLevel(Level.INFO);
-            if(!properties.containsKey(LOG_HANDLER_PARAMETER)) setLogHandler(FileHandler.class);
+            if(!properties.containsKey(LOG_HANDLERS_PARAMETER)) setLogHandler(FileHandler.class, SlideshowFXHandler.class);
             if(!properties.containsKey(LOG_FILE_APPEND_PARAMETER)) setLogFileAppend(true);
-            if(!properties.containsKey(LOG_FILE_ENCODING_PARAMETER)) setLogFileEncoding(UTF_8);
-            if(!properties.containsKey(LOG_FILE_FORMATTER_PARAMETER)) setLogFileFormatter(SimpleFormatter.class);
+            if(!properties.containsKey(FileHandler.class.getName().concat(LOG_ENCODING_SUFFIX))) setLogEncoding(FileHandler.class, UTF_8);
+            if(!properties.containsKey(FileHandler.class.getName().concat(LOG_FORMATTER_SUFFIX))) setLogFormatter(FileHandler.class, SimpleFormatter.class);
             if(!properties.containsKey(LOG_FILE_LIMIT_PARAMETER)) setLogFileLimit(50000);
             if(!properties.containsKey(LOG_FILE_PATTERN_PARAMETER)) setLogFilePattern("%h/.SlideshowFX/sfx%g.log");
+            if(!properties.containsKey(SlideshowFXHandler.class.getName().concat(LOG_ENCODING_SUFFIX))) setLogEncoding(SlideshowFXHandler.class, UTF_8);
+            if(!properties.containsKey(SlideshowFXHandler.class.getName().concat(LOG_FORMATTER_SUFFIX))) setLogFormatter(SlideshowFXHandler.class, SimpleFormatter.class);
         }
     }
 
@@ -365,19 +371,23 @@ public class GlobalConfiguration {
     }
 
     /**
-     * Sets the default log handler.
-     * @param handler The handler of logs.
+     * Sets the default log handlers.
+     * @param handlers The handlers of logs.
      */
-    public static void setLogHandler(final Class<? extends Handler> handler) {
-        setProperty(LOG_HANDLER_PARAMETER, handler.getName());
+    public static void setLogHandler(final Class<? extends Handler> ... handlers) {
+        final StringJoiner joiner = new StringJoiner(" ");
+        Arrays.stream(handlers).forEach(handler -> joiner.add(handler.getName()));
+
+        setProperty(LOG_HANDLERS_PARAMETER, joiner.toString());
     }
 
     /**
      * Sets the encoding of log files.
+     * @param handler The class handler to set the encoding for.
      * @param charset The encoding of log files.
      */
-    public static void setLogFileEncoding(final Charset charset) {
-        setProperty(LOG_FILE_ENCODING_PARAMETER, charset.displayName());
+    public static void setLogEncoding(final Class<? extends Handler> handler, final Charset charset) {
+        setProperty(handler.getName().concat(LOG_ENCODING_SUFFIX), charset.displayName());
     }
 
     /**
@@ -398,10 +408,11 @@ public class GlobalConfiguration {
 
     /**
      * Sets the class responsible of formatting log files.
+     * @param handler The class handler to set the formatter for.
      * @param formatter The formatter to use for log files.
      */
-    public static void setLogFileFormatter(final Class<? extends Formatter> formatter) {
-        setProperty(LOG_FILE_FORMATTER_PARAMETER, formatter.getName());
+    public static void setLogFormatter(final Class<? extends Handler> handler, final Class<? extends Formatter> formatter) {
+        setProperty(handler.getName().concat(LOG_FORMATTER_SUFFIX), formatter.getName());
     }
 
     /**

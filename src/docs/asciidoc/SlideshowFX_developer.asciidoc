@@ -66,6 +66,7 @@ SlideshowFX contains the following modules:
 - *SlideshowFX-engines* which defines the engines that are used in SlideshowFX for working with templates and presentations ;
 - *SlideshowFX-controls* which defines the custom graphical controls that may be used in other modules ;
 - *SlideshowFX-global-configuration* which defines the classes allowing to access and interact the SlideshowFX configuration ;
+- *SlideshowFX-logs* which defines the classes for the logging ;
 - *SlideshowFX-osgi* which defines the OSGi classes that are useful for other modules ;
 - *SlideshowFX-server* which defines a server that is used by SlideshowFX ;
 - *SlideshowFX-markup* which defines the base classes for creating an OSGi module for supporting a new markup syntax in SlideshowFX to define slides' content ;

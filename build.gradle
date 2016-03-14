@@ -339,5 +339,5 @@ task packageSlideshowFX(dependsOn : [':SlideshowFX-asciidoctor:jar', ':Slideshow
 }
 
 wrapper {
-    gradleVersion = '2.11'
+    gradleVersion = '2.12'
 }

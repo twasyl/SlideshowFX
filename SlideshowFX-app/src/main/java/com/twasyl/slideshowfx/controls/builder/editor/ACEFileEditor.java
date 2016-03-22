@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.controls.builder.editor;
 
 import com.twasyl.slideshowfx.utils.ResourceHelper;
+import com.twasyl.slideshowfx.utils.ZipUtils;
 import com.twasyl.slideshowfx.utils.io.DefaultCharsetWriter;
 import javafx.concurrent.Worker;
 import javafx.scene.web.WebView;
@@ -29,7 +30,7 @@ public class ACEFileEditor extends AbstractFileEditor<WebView> {
         super();
 
         final WebView webView = new WebView();
-        webView.getEngine().load(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/html/ace-file-editor.html"));
+        webView.getEngine().load(this.prepareAndGetEditorPageURI());
 
         this.setFileContent(webView);
     }
@@ -37,6 +38,28 @@ public class ACEFileEditor extends AbstractFileEditor<WebView> {
     public ACEFileEditor(File file) {
         this();
         this.setFile(file);
+    }
+
+    /**
+     * Prepare the HTML page that is used to define and edit slides' content and return the {@link java.net.URI} of the
+     * page in order to be loaded by a {@link WebView}.
+     * @return The {@link java.net.URI} of the page to load.
+     */
+    private String prepareAndGetEditorPageURI() {
+        final File tempDirectory = new File(System.getProperty("java.io.tmpdir"));
+        final File editorDir = new File(tempDirectory, "sfx-slide-content-editor");
+        final File editorFile = new File(editorDir, "ace-file-editor.html");
+        final String uri = editorFile.toURI().toASCIIString();
+
+        if(!editorFile.exists()) {
+            try(final InputStream editorZip = ResourceHelper.getInputStream("/com/twasyl/slideshowfx/sfx-slide-content-editor.zip")) {
+                ZipUtils.unzip(editorZip, tempDirectory);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Can not extract the slide content editor ZIP", e);
+            }
+        }
+
+        return uri;
     }
 
     @Override

@@ -44,7 +44,7 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
             try {
                 this.getOptions().setGoHome(new File(javaHome));
             } catch (FileNotFoundException e) {
-                LOGGER.log(Level.SEVERE, "Can not set the JAVA_HOME", e);
+                LOGGER.log(Level.SEVERE, "Can not set the GO_HOME", e);
             }
         }
     }

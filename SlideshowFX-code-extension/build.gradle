@@ -5,6 +5,10 @@ version = '1.0.0'
 dependencies {
     compile project(':SlideshowFX-content-extension')
     compile configurations.felix
+
+    testCompile configurations.junit
+    testCompile configurations.mockito
+    testCompile project(':SlideshowFX-textile')
 }
 
 jar {

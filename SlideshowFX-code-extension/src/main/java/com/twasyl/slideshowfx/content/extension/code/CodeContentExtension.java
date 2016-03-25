@@ -11,6 +11,10 @@ import javafx.scene.layout.Pane;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.util.regex.Pattern.MULTILINE;
 
 /**
  * The CodeContentExtension extends the AbstractContentExtension. It allows to build a content containing code to insert
@@ -25,7 +29,7 @@ import java.util.logging.Logger;
 public class CodeContentExtension extends AbstractContentExtension {
     private static final Logger LOGGER = Logger.getLogger(CodeContentExtension.class.getName());
 
-    private CodeContentExtensionController controller;
+    protected CodeContentExtensionController controller;
 
     public CodeContentExtension() {
         super("CODE",
@@ -64,15 +68,7 @@ public class CodeContentExtension extends AbstractContentExtension {
         if(markup == null || "HTML".equals(markup.getCode())) {
             builder.append(this.buildDefaultContentString());
         } else if("TEXTILE".equals(markup.getCode())) {
-            builder.append("bc(")
-                    .append(this.controller.getLanguage().getCssClass());
-
-            if(this.controller.isShowingLineNumbers()) {
-                builder.append(" line-numbers");
-            }
-
-            builder.append(").. ")
-                    .append(this.controller.getCode());
+            builder.append(buildTextileContentString());
         } else {
             builder.append(this.buildDefaultContentString());
         }
@@ -82,7 +78,6 @@ public class CodeContentExtension extends AbstractContentExtension {
 
     @Override
     public String buildDefaultContentString() {
-
         final StringBuilder builder = new StringBuilder();
         builder.append("<pre class=\"")
                 .append(this.controller.getLanguage().getCssClass());
@@ -98,5 +93,28 @@ public class CodeContentExtension extends AbstractContentExtension {
                 .append("</code></pre>");
 
         return builder.toString();
+    }
+
+    private String buildTextileContentString() {
+        final StringBuilder builder = new StringBuilder("bc(")
+                .append(this.controller.getLanguage().getCssClass());
+
+        if(this.controller.isShowingLineNumbers()) {
+            builder.append(" line-numbers");
+        }
+
+        builder.append(")")
+               .append(codeContainsBlankLines(this.controller.getCode()) ? ".." : ".")
+               .append(" ")
+               .append(this.controller.getCode());
+
+        return builder.toString();
+    }
+
+    private boolean codeContainsBlankLines(final String code) {
+        final Pattern pattern = Pattern.compile("^\\s*$", MULTILINE);
+        final Matcher matcher = pattern.matcher(code);
+
+        return matcher.find();
     }
 }

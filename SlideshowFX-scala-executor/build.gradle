@@ -1,0 +1,21 @@
+version = '1.0.0'
+
+dependencies {
+    compile project(':SlideshowFX-snippet-executor')
+    compile configurations.felix
+}
+
+jar {
+    manifest {
+        attributes('Manifest-Version': '1.0',
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'SlideshowFX Scala executor',
+                'Bundle-SymbolicName': 'com.twasyl.slideshowfx.snippet.executor.scala',
+                'Bundle-Description': 'Allow to execute Scala code inside a presentation',
+                'Bundle-Version': '1.0.0',
+                'Bundle-Activator': 'com.twasyl.slideshowfx.snippet.executor.scala.activator.ScalaSnippetExecutorActivator',
+                'Bundle-Vendor': 'Thierry Wasylczenko',
+                'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.scala,com.twasyl.slideshowfx.snippet.executor.scala.activator',
+                'Import-Package': 'org.osgi.framework')
+    }
+}

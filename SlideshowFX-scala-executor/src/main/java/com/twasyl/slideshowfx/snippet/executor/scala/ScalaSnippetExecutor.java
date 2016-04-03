@@ -129,39 +129,9 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
         final ObservableList<String> consoleOutput = FXCollections.observableArrayList();
 
         final Thread snippetThread = new Thread(() -> {
-
-            // Build code file content according properties
-            // Manage the class name
-            String className = codeSnippet.getProperties().get(CLASS_NAME_PROPERTY);
-            if(className == null || className.isEmpty()) className = "Snippet";
-
-            final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_MAIN_PROPERTY) ?
-                    Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_MAIN_PROPERTY)) :
-                    false;
-
-            final StringBuilder codeBuilder = new StringBuilder();
-
-            // Manage imports
-            final String imports = codeSnippet.getProperties().get(IMPORTS_PROPERTY);
-            if(imports != null) codeBuilder.append(imports).append("\n");
-
-            codeBuilder.append("\nobject ").append(className).append(" {\n");
-
-            // Manage if a main method must be generated or not
-            if(wrapInMain) {
-                codeBuilder.append("\tdef main(args: Array[String]) {\n")
-                            .append("\t\t").append(codeSnippet.getCode()).append("\n")
-                            .append("\t}");
-            } else {
-                codeBuilder.append(codeSnippet.getCode());
-            }
-
-            codeBuilder.append("\n}");
-
-            final File codeFile = new File(this.getTemporaryDirectory(), className.concat(".scala"));
-            try (final FileWriter codeFileWriter = new FileWriter(codeFile)) {
-                codeFileWriter.write(codeBuilder.toString());
-                codeFileWriter.flush();
+            File codeFile = null;
+            try {
+                codeFile = createSourceCodeFile(codeSnippet);
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not write code to snippet file", e);
                 consoleOutput.add("ERROR: ".concat(e.getMessage()));
@@ -200,9 +170,9 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
 
             // Execute the class only if the compilation was successful
             if(process != null && process.exitValue() == 0) {
-                final File classFile = new File(this.getTemporaryDirectory(), className);
+
                 final File scalaExecutable = new File(this.getOptions().getScalaHome(), "bin/scala");
-                final String[] executionCommand = {scalaExecutable.getAbsolutePath(), className};
+                final String[] executionCommand = {scalaExecutable.getAbsolutePath(), determineClassName(codeSnippet)};
 
                 try {
                     process = new ProcessBuilder()
@@ -227,11 +197,122 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
                     }
                 }
 
+                final File classFile = new File(this.getTemporaryDirectory(), determineClassName(codeSnippet));
                 classFile.delete();
             }
         });
         snippetThread.start();
 
         return consoleOutput;
+    }
+
+    /**
+     * Create the source code file for the given code snippet.
+     * @param codeSnippet The code snippet.
+     * @return The file created and containing the source code.
+     */
+    protected File createSourceCodeFile(final CodeSnippet codeSnippet) throws IOException {
+        final File codeFile = new File(this.getTemporaryDirectory(), determineClassName(codeSnippet).concat(".scala"));
+        try (final FileWriter codeFileWriter = new FileWriter(codeFile)) {
+            codeFileWriter.write(buildSourceCode(codeSnippet));
+            codeFileWriter.flush();
+        }
+
+        return codeFile;
+    }
+
+    /**
+     *
+     * Build code file content according properties. The source code can then be written properly inside a file in order
+     * to be compiled and then executed.
+     * @param codeSnippet The code snippet to build the source code for.
+     * @return The content of the source code file.
+     */
+    protected String buildSourceCode(final CodeSnippet codeSnippet) {
+        final StringBuilder sourceCode = new StringBuilder();
+
+        if(hasImports(codeSnippet)) {
+            sourceCode.append(codeSnippet.getProperties().get(IMPORTS_PROPERTY)).append("\n");
+        }
+
+        sourceCode.append(getStartClassDefinition(codeSnippet));
+
+        if(mustBeWrappedInMain(codeSnippet)) {
+            sourceCode.append(getStartMainMethod())
+                       .append(codeSnippet.getCode())
+                       .append(getEndMainMethod());
+        } else {
+            sourceCode.append(codeSnippet.getCode());
+        }
+
+        sourceCode.append(getEndClassDefinition(codeSnippet));
+
+        return sourceCode.toString();
+    }
+
+    /**
+     * Get the imports to be added to the source code.
+     * @param codeSnippet The code snippet.
+     */
+    protected boolean hasImports(final CodeSnippet codeSnippet) {
+        final String imports = codeSnippet.getProperties().get(IMPORTS_PROPERTY);
+        return imports != null && !imports.isEmpty();
+    }
+
+    /**
+     * Get the definition of the class.
+     * @param codeSnippet The code snippet.
+     */
+    protected String getStartClassDefinition(final CodeSnippet codeSnippet) {
+        return "\nobject ".concat(determineClassName(codeSnippet)).concat(" {\n");
+    }
+
+    /**
+     * Determine the class name of the code snippet. It looks inside the code snippet's properties and check the value
+     * of the {@link #CLASS_NAME_PROPERTY} property. If {@code null} or empty, {@code Snippet} will be returned.
+     * @param codeSnippet The code snippet.
+     * @return The class name of the code snippet.
+     */
+    protected String determineClassName(final CodeSnippet codeSnippet) {
+        String className = codeSnippet.getProperties().get(CLASS_NAME_PROPERTY);
+        if(className == null || className.isEmpty()) className = "Snippet";
+        return className;
+    }
+
+    /**
+     * Determine if the code snippet must be wrapped inside a main method. It is determined by the presence and value of
+     * the {@link #WRAP_IN_MAIN_PROPERTY} property.
+     * @param codeSnippet The code snippet.
+     * @return {@code true} if the snippet must be wrapped in main, {@code false} otherwhise.
+     */
+    protected boolean mustBeWrappedInMain(final CodeSnippet codeSnippet) {
+        final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_MAIN_PROPERTY) ?
+                Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_MAIN_PROPERTY)) :
+                false;
+        return wrapInMain;
+    }
+
+    /**
+     * Get the start of the declaration of the main method.
+     * @return The start of the main method.
+     */
+    protected String getStartMainMethod() {
+        return "\tdef main(args: Array[String]) {\n";
+    }
+
+    /**
+     * Get the end of the declaration of the main method.
+     * @return The end of the main method.
+     */
+    protected String getEndMainMethod() {
+        return "\t}";
+    }
+
+    /**
+     * Get the end of the definition of the class.
+     * @param codeSnippet The code snippet.
+     */
+    protected String getEndClassDefinition(final CodeSnippet codeSnippet) {
+        return "}";
     }
 }

@@ -29,10 +29,10 @@ import java.util.logging.Logger;
 public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetExecutorOptions> {
     private static final Logger LOGGER = Logger.getLogger(ScalaSnippetExecutor.class.getName());
 
-    private static final String SCALA_HOME_PROPERTY_SUFFIX = ".home";
-    private static final String WRAP_IN_MAIN_PROPERTY = "wrapInMain";
-    private static final String IMPORTS_PROPERTY = "imports";
-    private static final String CLASS_NAME_PROPERTY = "class";
+    protected static final String SCALA_HOME_PROPERTY_SUFFIX = ".home";
+    protected static final String WRAP_IN_MAIN_PROPERTY = "wrapInMain";
+    protected static final String IMPORTS_PROPERTY = "imports";
+    protected static final String CLASS_NAME_PROPERTY = "class";
 
     public ScalaSnippetExecutor() {
         super("SCALA", "Scala", "language-scala");

@@ -4,6 +4,7 @@ import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.utils.beans.converter.FileStringConverter;
+import com.twasyl.slideshowfx.utils.io.DefaultCharsetReader;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -14,6 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 
 import java.io.*;
+import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -228,24 +230,24 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
      * @param codeSnippet The code snippet to build the source code for.
      * @return The content of the source code file.
      */
-    protected String buildSourceCode(final CodeSnippet codeSnippet) {
+    protected String buildSourceCode(final CodeSnippet codeSnippet) throws IOException {
         final StringBuilder sourceCode = new StringBuilder();
 
         if(hasImports(codeSnippet)) {
-            sourceCode.append(codeSnippet.getProperties().get(IMPORTS_PROPERTY)).append("\n");
+            sourceCode.append(getImports(codeSnippet)).append("\n\n");
         }
 
-        sourceCode.append(getStartClassDefinition(codeSnippet));
+        sourceCode.append(getStartClassDefinition(codeSnippet)).append("\n");
 
         if(mustBeWrappedInMain(codeSnippet)) {
-            sourceCode.append(getStartMainMethod())
+            sourceCode.append("\t").append(getStartMainMethod()).append("\n")
                        .append(codeSnippet.getCode())
-                       .append(getEndMainMethod());
+                       .append("\n\t").append(getEndMainMethod());
         } else {
             sourceCode.append(codeSnippet.getCode());
         }
 
-        sourceCode.append(getEndClassDefinition(codeSnippet));
+        sourceCode.append("\n").append(getEndClassDefinition(codeSnippet));
 
         return sourceCode.toString();
     }
@@ -260,11 +262,50 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
     }
 
     /**
+     * Get the imports for the code snippets. If some lines of the imports don't contain the {@code import} keyword, it
+     * will be added properly.
+     *
+     * @param codeSnippet The code snippet.
+     * @return A well formatted string containing all imports.
+     */
+    protected String getImports(final CodeSnippet codeSnippet) throws IOException {
+        final StringJoiner imports = new StringJoiner("\n");
+
+        try (final StringReader stringReader = new StringReader(codeSnippet.getProperties().get(IMPORTS_PROPERTY));
+             final BufferedReader reader = new DefaultCharsetReader(stringReader)) {
+
+            reader.lines()
+                   .filter(line -> !line.trim().isEmpty())
+                   .forEach(line -> imports.add(formatImportLine(line)));
+        }
+
+        return imports.toString();
+    }
+
+    /**
+     * Format an import line by make sure it starts with the {@code import} keyword.
+     * @param importLine The import line to format.
+     * @return A well formatted import line.
+     */
+    protected String formatImportLine(final String importLine) {
+        final String importLineBeginning = "import ";
+        String formattedImportLine;
+
+        if(importLine.startsWith(importLineBeginning)) {
+            formattedImportLine = importLine;
+        } else {
+            formattedImportLine = importLineBeginning.concat(importLine);
+        }
+
+        return formattedImportLine;
+    }
+
+    /**
      * Get the definition of the class.
      * @param codeSnippet The code snippet.
      */
     protected String getStartClassDefinition(final CodeSnippet codeSnippet) {
-        return "\nobject ".concat(determineClassName(codeSnippet)).concat(" {\n");
+        return "object ".concat(determineClassName(codeSnippet)).concat(" {");
     }
 
     /**
@@ -297,7 +338,7 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
      * @return The start of the main method.
      */
     protected String getStartMainMethod() {
-        return "\tdef main(args: Array[String]) {\n";
+        return "def main(args: Array[String]) {";
     }
 
     /**
@@ -305,7 +346,7 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
      * @return The end of the main method.
      */
     protected String getEndMainMethod() {
-        return "\t}";
+        return "}";
     }
 
     /**

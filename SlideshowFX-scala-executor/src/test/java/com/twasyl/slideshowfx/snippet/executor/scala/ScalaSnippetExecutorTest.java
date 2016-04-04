@@ -3,6 +3,8 @@ package com.twasyl.slideshowfx.snippet.executor.scala;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static com.twasyl.slideshowfx.snippet.executor.scala.ScalaSnippetExecutor.CLASS_NAME_PROPERTY;
 import static com.twasyl.slideshowfx.snippet.executor.scala.ScalaSnippetExecutor.IMPORTS_PROPERTY;
 import static com.twasyl.slideshowfx.snippet.executor.scala.ScalaSnippetExecutor.WRAP_IN_MAIN_PROPERTY;
@@ -87,5 +89,64 @@ public class ScalaSnippetExecutorTest {
         snippet.getProperties().put(WRAP_IN_MAIN_PROPERTY, "true");
 
         assertTrue(snippetExecutor.mustBeWrappedInMain(snippet));
+    }
+
+    @Test
+    public void formatImportWithoutImportKeyword() {
+        assertEquals("import mypackage", snippetExecutor.formatImportLine("mypackage"));
+    }
+
+    @Test
+    public void formatImportWithImportKeyword() {
+        assertEquals("import mypackage", "import mypackage");
+    }
+
+    @Test
+    public void importsWithAndWithoutKeyword() throws IOException {
+        final CodeSnippet snippet = new CodeSnippet();
+        snippet.getProperties().put(IMPORTS_PROPERTY, "import mypackage\nmysecondpackage");
+
+        assertEquals("import mypackage\nimport mysecondpackage", snippetExecutor.getImports(snippet));
+    }
+
+    @Test
+    public void buildSourceCodeWithoutImportsAndWithoutWrapInMainAndWithoutClassName() throws IOException {
+        final CodeSnippet snippet = new CodeSnippet();
+        snippet.setCode("def main(args: Array[String]) {\n\tprintln(\"Hello\")\n}");
+
+        assertEquals("object Snippet {\ndef main(args: Array[String]) {\n\tprintln(\"Hello\")\n}\n}", snippetExecutor.buildSourceCode(snippet));
+    }
+
+    @Test
+    public void buildSourceCodeWithoutImportsAndWithoutWrapInMain() throws IOException {
+        final CodeSnippet snippet = new CodeSnippet();
+        snippet.getProperties().put(CLASS_NAME_PROPERTY, "TestScala");
+
+        snippet.setCode("def main(args: Array[String]) {\n\tprintln(\"Hello\")\n}");
+
+        assertEquals("object TestScala {\ndef main(args: Array[String]) {\n\tprintln(\"Hello\")\n}\n}", snippetExecutor.buildSourceCode(snippet));
+    }
+
+    @Test
+    public void buildSourceCodeWithoutWrapInMain() throws IOException {
+        final CodeSnippet snippet = new CodeSnippet();
+        snippet.getProperties().put(CLASS_NAME_PROPERTY, "TestScala");
+        snippet.getProperties().put(IMPORTS_PROPERTY, "import mypackage\nmysecondpackage");
+
+        snippet.setCode("def main(args: Array[String]) {\n\tprintln(\"Hello\")\n}");
+
+        assertEquals("import mypackage\nimport mysecondpackage\n\nobject TestScala {\ndef main(args: Array[String]) {\n\tprintln(\"Hello\")\n}\n}", snippetExecutor.buildSourceCode(snippet));
+    }
+
+    @Test
+    public void buildSourceCode() throws IOException {
+        final CodeSnippet snippet = new CodeSnippet();
+        snippet.getProperties().put(CLASS_NAME_PROPERTY, "TestScala");
+        snippet.getProperties().put(IMPORTS_PROPERTY, "import mypackage\nmysecondpackage");
+        snippet.getProperties().put(WRAP_IN_MAIN_PROPERTY, "true");
+
+        snippet.setCode("println(\"Hello\")");
+
+        assertEquals("import mypackage\nimport mysecondpackage\n\nobject TestScala {\n\tdef main(args: Array[String]) {\nprintln(\"Hello\")\n\t}\n}", snippetExecutor.buildSourceCode(snippet));
     }
 }

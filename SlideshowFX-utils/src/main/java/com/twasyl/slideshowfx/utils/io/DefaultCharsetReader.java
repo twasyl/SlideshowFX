@@ -23,4 +23,8 @@ public class DefaultCharsetReader extends BufferedReader {
     public DefaultCharsetReader(final InputStream in) {
         super(new InputStreamReader(in, getDefaultCharset()));
     }
+
+    public DefaultCharsetReader(final Reader reader) {
+        super(reader);
+    }
 }

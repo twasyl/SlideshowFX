@@ -35,6 +35,7 @@ public class LoadPresentationTask extends SlideshowFXTask<PresentationEngine> {
 
         final PresentationEngine engine = new PresentationEngine();;
         engine.loadArchive(this.dataFile);
+        engine.setModifiedSinceLatestSave(false);
 
         return engine;
     }

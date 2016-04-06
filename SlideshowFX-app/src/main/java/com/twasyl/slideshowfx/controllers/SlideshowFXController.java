@@ -206,10 +206,8 @@ public class SlideshowFXController implements Initializable {
         if (file != null) {
             try {
                 this.openTemplateOrPresentation(file);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+            } catch (IllegalAccessException | FileNotFoundException e) {
+                LOGGER.log(Level.SEVERE, "Can not open the presentation", e);
             }
         }
     }
@@ -243,8 +241,12 @@ public class SlideshowFXController implements Initializable {
      */
     public void closePresentation(final PresentationEngine presentation, final boolean waitToFinish) {
         if(presentation != null && presentation.isModifiedSinceLatestSave()) {
-            final ButtonType answer = DialogHelper.showConfirmationAlert("Save the presentation",
-                    String.format("Do you want to save the modifications on %1$s.", presentation.getArchive().getName()));
+
+            final String message = presentation.getArchive() != null ?
+                    String.format("Do you want to save the modifications on %1$s?", presentation.getArchive().getName()) :
+                    "Do you want to save this presentation?";
+
+            final ButtonType answer = DialogHelper.showConfirmationAlert("Save the presentation", message);
 
             if(answer == ButtonType.YES) {
                 SlideshowFXController.this.savePresentation(presentation, waitToFinish);

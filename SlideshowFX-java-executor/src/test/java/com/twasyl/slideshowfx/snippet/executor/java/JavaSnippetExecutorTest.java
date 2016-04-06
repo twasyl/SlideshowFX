@@ -1,4 +1,4 @@
-package com.twasyl.slideshowfx.snippet.executor.scala;
+package com.twasyl.slideshowfx.snippet.executor.java;
 
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
@@ -6,22 +6,20 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.twasyl.slideshowfx.snippet.executor.scala.ScalaSnippetExecutor.CLASS_NAME_PROPERTY;
-import static com.twasyl.slideshowfx.snippet.executor.scala.ScalaSnippetExecutor.IMPORTS_PROPERTY;
-import static com.twasyl.slideshowfx.snippet.executor.scala.ScalaSnippetExecutor.WRAP_IN_MAIN_PROPERTY;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static com.twasyl.slideshowfx.snippet.executor.java.JavaSnippetExecutor.CLASS_NAME_PROPERTY;
+import static com.twasyl.slideshowfx.snippet.executor.java.JavaSnippetExecutor.IMPORTS_PROPERTY;
+import static com.twasyl.slideshowfx.snippet.executor.java.JavaSnippetExecutor.WRAP_IN_MAIN_PROPERTY;
+import static org.junit.Assert.*;
 
 /**
- * Tests the class {@link ScalaSnippetExecutor}.
+ * Tests the class {@link JavaSnippetExecutor}.
  * @author Thierry Wasylczenko
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class ScalaSnippetExecutorTest {
+public class JavaSnippetExecutorTest {
 
-    private final ScalaSnippetExecutor snippetExecutor = new ScalaSnippetExecutor();
+    private final JavaSnippetExecutor snippetExecutor = new JavaSnippetExecutor();
 
     @Test
     public void noClassName() {
@@ -94,12 +92,17 @@ public class ScalaSnippetExecutorTest {
 
     @Test
     public void formatImportWithoutImportKeyword() {
-        assertEquals("import mypackage", snippetExecutor.formatImportLine("mypackage"));
+        assertEquals("import mypackage;", snippetExecutor.formatImportLine("mypackage"));
     }
 
     @Test
     public void formatImportWithImportKeyword() {
-        assertEquals("import mypackage", snippetExecutor.formatImportLine("import mypackage"));
+        assertEquals("import mypackage;", snippetExecutor.formatImportLine("import mypackage;"));
+    }
+
+    @Test
+    public void formatImportWithImportKeywordAndWithoutColumn() {
+        assertEquals("import mypackage;", snippetExecutor.formatImportLine("import mypackage"));
     }
 
     @Test
@@ -107,51 +110,51 @@ public class ScalaSnippetExecutorTest {
         final CodeSnippet snippet = new CodeSnippet();
         snippet.getProperties().put(IMPORTS_PROPERTY, "import mypackage\nmysecondpackage");
 
-        assertEquals("import mypackage\nimport mysecondpackage", snippetExecutor.getImports(snippet));
+        assertEquals("import mypackage;\nimport mysecondpackage;", snippetExecutor.getImports(snippet));
     }
 
     @Test
     public void buildSourceCodeWithoutImportsAndWithoutWrapInMainAndWithoutClassName() throws IOException {
         final CodeSnippet snippet = new CodeSnippet();
-        snippet.setCode("def main(args: Array[String]) {\n\tprintln(\"Hello\")\n}");
+        snippet.setCode("public static void main(String ... args) {\n\tSystem.out.println(\"Hello\");\n}");
 
-        final String expected = ResourceHelper.readResource("/com/twasyl/slideshowfx/snippet/executor/scala/buildSourceCodeWithoutImportsAndWithoutWrapInMainAndWithoutClassName_expected.txt");
+        final String expected = ResourceHelper.readResource("/com/twasyl/slideshowfx/snippet/executor/java/buildSourceCodeWithoutImportsAndWithoutWrapInMainAndWithoutClassName_expected.txt");
         assertEquals(expected, snippetExecutor.buildSourceCode(snippet));
     }
 
     @Test
     public void buildSourceCodeWithoutImportsAndWithoutWrapInMain() throws IOException {
         final CodeSnippet snippet = new CodeSnippet();
-        snippet.getProperties().put(CLASS_NAME_PROPERTY, "TestScala");
+        snippet.getProperties().put(CLASS_NAME_PROPERTY, "TestJava");
 
-        snippet.setCode("def main(args: Array[String]) {\n\tprintln(\"Hello\")\n}");
+        snippet.setCode("public static void main(String ... args) {\n\tSystem.out.println(\"Hello\");\n}");
 
-        final String expected = ResourceHelper.readResource("/com/twasyl/slideshowfx/snippet/executor/scala/buildSourceCodeWithoutImportsAndWithoutWrapInMain_expected.txt");
+        final String expected = ResourceHelper.readResource("/com/twasyl/slideshowfx/snippet/executor/java/buildSourceCodeWithoutImportsAndWithoutWrapInMain_expected.txt");
         assertEquals(expected, snippetExecutor.buildSourceCode(snippet));
     }
 
     @Test
     public void buildSourceCodeWithoutWrapInMain() throws IOException {
         final CodeSnippet snippet = new CodeSnippet();
-        snippet.getProperties().put(CLASS_NAME_PROPERTY, "TestScala");
+        snippet.getProperties().put(CLASS_NAME_PROPERTY, "TestJava");
         snippet.getProperties().put(IMPORTS_PROPERTY, "import mypackage\nmysecondpackage");
 
-        snippet.setCode("def main(args: Array[String]) {\n\tprintln(\"Hello\")\n}");
+        snippet.setCode("public static void main(String ... args) {\n\tSystem.out.println(\"Hello\");\n}");
 
-        final String expected = ResourceHelper.readResource("/com/twasyl/slideshowfx/snippet/executor/scala/buildSourceCodeWithoutWrapInMain_expected.txt");
+        final String expected = ResourceHelper.readResource("/com/twasyl/slideshowfx/snippet/executor/java/buildSourceCodeWithoutWrapInMain_expected.txt");
         assertEquals(expected, snippetExecutor.buildSourceCode(snippet));
     }
 
     @Test
     public void buildSourceCode() throws IOException {
         final CodeSnippet snippet = new CodeSnippet();
-        snippet.getProperties().put(CLASS_NAME_PROPERTY, "TestScala");
+        snippet.getProperties().put(CLASS_NAME_PROPERTY, "TestJava");
         snippet.getProperties().put(IMPORTS_PROPERTY, "import mypackage\nmysecondpackage");
         snippet.getProperties().put(WRAP_IN_MAIN_PROPERTY, "true");
 
-        snippet.setCode("println(\"Hello\")");
+        snippet.setCode("System.out.println(\"Hello\");");
 
-        final String expected = ResourceHelper.readResource("/com/twasyl/slideshowfx/snippet/executor/scala/buildSourceCode_expected.txt");
+        final String expected = ResourceHelper.readResource("/com/twasyl/slideshowfx/snippet/executor/java/buildSourceCode_expected.txt");
         assertEquals(expected, snippetExecutor.buildSourceCode(snippet));
     }
 }

@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,10 +26,10 @@ public class ResourceHelper {
      * @return The String representing the content of the resource
      */
     public static String readResource(String url) {
-        final StringBuilder builder = new StringBuilder();
+        final StringJoiner builder = new StringJoiner("\n");
 
         try(final BufferedReader reader = new DefaultCharsetReader(ResourceHelper.class.getResourceAsStream(url))) {
-            reader.lines().forEach(line -> builder.append(line).append("\n"));
+            reader.lines().forEach(builder::add);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Can not read the resource content", e);
         }

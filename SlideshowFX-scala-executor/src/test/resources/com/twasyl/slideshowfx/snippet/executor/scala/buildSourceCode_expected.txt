@@ -1,0 +1,8 @@
+import mypackage
+import mysecondpackage
+
+object TestScala {
+	def main(args: Array[String]) {
+println("Hello")
+	}
+}

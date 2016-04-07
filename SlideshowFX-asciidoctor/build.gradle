@@ -1,5 +1,4 @@
-
-
+description = 'Snippet executor allowing to define slide\'s content using the asciidoctor syntax'
 version = '1.0.0'
 
 dependencies {

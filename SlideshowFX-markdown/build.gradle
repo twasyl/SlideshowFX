@@ -1,5 +1,4 @@
-
-
+description = 'Extension allowing to define slide\'s content using the mardown syntax'
 version = '1.0.0'
 
 dependencies {

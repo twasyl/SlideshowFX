@@ -1,5 +1,4 @@
-
-
+description = 'Extension allowing to insert code snippets inside a SlideshowFX presentation'
 version = '1.0.0'
 
 dependencies {

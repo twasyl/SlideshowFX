@@ -10,6 +10,7 @@ buildscript {
     dependencies {
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
         classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6"
     }
 }
 
@@ -80,6 +81,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'findbugs'
     apply plugin: 'jacoco'
+    apply plugin: 'com.jfrog.bintray'
 
     group = "com.twasyl.slideshowfx"
 
@@ -135,6 +137,29 @@ subprojects {
             xml.enabled = false
             csv.enabled = false
             html.enabled = true
+        }
+    }
+
+    bintray {
+        user = bintray_user_name
+        key = bintray_api_key
+        configurations = ['archives']
+
+        pkg {
+            repo = 'SlideshowFX'
+            name = project.name
+            websiteUrl = 'https://slideshowfx.github.io'
+            issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
+            vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
+
+            desc = project.description
+
+            licenses = ['Apache-2.0']
+
+            version {
+                name = project.version
+                desc = project.description
+            }
         }
     }
 }

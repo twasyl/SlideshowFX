@@ -1,4 +1,4 @@
-package com.twasyl.slideshowfx.snippet.executor.golo;
+package com.twasyl.slideshowfx.snippet.executor.go;
 
 import com.sun.javafx.PlatformUtil;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
@@ -173,7 +173,6 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
 
         return consoleOutput;
     }
-
 
     /**
      * Create the source code file for the given code snippet.

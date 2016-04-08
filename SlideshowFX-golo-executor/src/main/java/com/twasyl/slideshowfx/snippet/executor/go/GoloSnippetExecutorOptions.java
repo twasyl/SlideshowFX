@@ -1,4 +1,4 @@
-package com.twasyl.slideshowfx.snippet.executor.golo;
+package com.twasyl.slideshowfx.snippet.executor.go;
 
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutorOptions;
 import javafx.beans.property.ObjectProperty;

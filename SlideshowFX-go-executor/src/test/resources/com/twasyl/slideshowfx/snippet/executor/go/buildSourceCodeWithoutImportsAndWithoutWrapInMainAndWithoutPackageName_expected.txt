@@ -1,0 +1,5 @@
+package slideshowfx
+
+func main() {
+	fmt.Printf("Hello, world.\n")
+}

@@ -1,0 +1,10 @@
+package sfx
+
+import (
+	"mypackage"
+	"mysecondpackage"
+)
+
+func main() {
+fmt.Printf("Hello, world.\n")
+}

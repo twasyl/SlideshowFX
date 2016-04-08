@@ -1,0 +1,9 @@
+module sfx.Golo
+
+import mypackage
+import mysecondpackage
+
+function main = |args| {
+println("Hello")
+}
+

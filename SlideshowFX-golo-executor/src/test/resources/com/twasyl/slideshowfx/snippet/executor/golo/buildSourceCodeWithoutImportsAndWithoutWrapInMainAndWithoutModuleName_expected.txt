@@ -1,0 +1,6 @@
+module slideshowfx.Snippet
+
+function main = |args| {
+	println("Hello")
+}
+

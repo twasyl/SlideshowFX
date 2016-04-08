@@ -1,0 +1,6 @@
+module sfx.Golo
+
+function main = |args| {
+	println("Hello")
+}
+

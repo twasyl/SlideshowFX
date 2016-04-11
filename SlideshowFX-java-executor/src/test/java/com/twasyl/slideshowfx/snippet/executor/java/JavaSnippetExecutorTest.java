@@ -39,9 +39,9 @@ public class JavaSnippetExecutorTest {
     @Test
     public void givenClassName() {
         final CodeSnippet snippet = new CodeSnippet();
-        snippet.getProperties().put(CLASS_NAME_PROPERTY, "ScalaTest");
+        snippet.getProperties().put(CLASS_NAME_PROPERTY, "JavaTest");
 
-        assertEquals("ScalaTest", snippetExecutor.determineClassName(snippet));
+        assertEquals("JavaTest", snippetExecutor.determineClassName(snippet));
     }
 
     @Test

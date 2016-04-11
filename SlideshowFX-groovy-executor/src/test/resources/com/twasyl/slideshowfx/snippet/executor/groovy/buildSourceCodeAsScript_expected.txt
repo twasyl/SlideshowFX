@@ -1,0 +1,9 @@
+import org.codehaus.groovy.runtime.InvokerHelper
+import mypackage
+import mysecondpackage
+
+class TestGroovy extends Script {
+	def run() {
+println("Hello")
+	}
+}

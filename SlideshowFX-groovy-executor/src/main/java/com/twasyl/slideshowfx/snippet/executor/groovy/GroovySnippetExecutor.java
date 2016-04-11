@@ -5,6 +5,7 @@ import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.utils.beans.converter.FileStringConverter;
+import com.twasyl.slideshowfx.utils.io.DefaultCharsetReader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -17,6 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 
 import java.io.*;
+import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,10 +39,10 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
     /**
      * Indicates if the code should be wrapped in a main or run method (depending it is a Groovy Script or Class)
      */
-    private static final String WRAP_IN_METHOD_RUNNER = "wrapInMethodRunner";
-    private static final String IMPORTS_PROPERTY = "imports";
-    private static final String CLASS_NAME_PROPERTY = "class";
-    private static final String MAKE_SCRIPT = "makeScript";
+    protected static final String WRAP_IN_METHOD_RUNNER = "wrapInMethodRunner";
+    protected static final String IMPORTS_PROPERTY = "imports";
+    protected static final String CLASS_NAME_PROPERTY = "class";
+    protected static final String MAKE_SCRIPT = "makeScript";
 
     public GroovySnippetExecutor() {
         super("GROOVY", "Groovy", "language-groovy");
@@ -152,47 +154,9 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
         final ObservableList<String> consoleOutput = FXCollections.observableArrayList();
 
         final Thread snippetThread = new Thread(() -> {
-
-            // Build code file content according properties
-            // Manage the class name
-            String className = codeSnippet.getProperties().get(CLASS_NAME_PROPERTY);
-            if(className == null || className.isEmpty()) className = "Snippet";
-
-            final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_METHOD_RUNNER) ?
-                    Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_METHOD_RUNNER)) :
-                    false;
-
-            final Boolean makeScript = codeSnippet.getProperties().containsKey(MAKE_SCRIPT) ?
-                    Boolean.parseBoolean(codeSnippet.getProperties().get(MAKE_SCRIPT)) :
-                    false;
-
-            final StringBuilder codeBuilder = new StringBuilder();
-
-            // Manage imports
-            if(makeScript) codeBuilder.append("import org.codehaus.groovy.runtime.InvokerHelper\n");
-
-            final String imports = codeSnippet.getProperties().get(IMPORTS_PROPERTY);
-            if(imports != null) codeBuilder.append(imports).append("\n");
-
-            codeBuilder.append("\nclass ").append(className).append(makeScript ? " extends Script" : "").append(" {\n");
-
-            // Manage if a main method must be generated or not
-            if(wrapInMain) {
-                if(makeScript) codeBuilder.append("\tdef run() {\n");
-                else codeBuilder.append("\tdef static main(String...args) {\n");
-
-                codeBuilder.append("\t\t").append(codeSnippet.getCode()).append("\n")
-                           .append("\t}");
-            } else {
-                codeBuilder.append(codeSnippet.getCode());
-            }
-
-            codeBuilder.append("\n}");
-
-            final File codeFile = new File(this.getTemporaryDirectory(), className.concat(".groovy"));
-            try (final FileWriter codeFileWriter = new FileWriter(codeFile)) {
-                codeFileWriter.write(codeBuilder.toString());
-                codeFileWriter.flush();
+            File codeFile = null;
+            try {
+                codeFile = createSourceCodeFile(codeSnippet);
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not write code to snippet file", e);
                 consoleOutput.add("ERROR: ".concat(e.getMessage()));
@@ -233,5 +197,196 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
         snippetThread.start();
 
         return consoleOutput;
+    }
+
+    /**
+     * Create the source code file for the given code snippet.
+     * @param codeSnippet The code snippet.
+     * @return The file created and containing the source code.
+     */
+    protected File createSourceCodeFile(final CodeSnippet codeSnippet) throws IOException {
+        final File codeFile = new File(this.getTemporaryDirectory(), determineClassName(codeSnippet).concat(".groovy"));
+        try (final FileWriter codeFileWriter = new FileWriter(codeFile)) {
+            codeFileWriter.write(buildSourceCode(codeSnippet));
+            codeFileWriter.flush();
+        }
+
+        return codeFile;
+    }
+
+    /**
+     *
+     * Build code file content according properties. The source code can then be written properly inside a file in order
+     * to be compiled and then executed.
+     * @param codeSnippet The code snippet to build the source code for.
+     * @return The content of the source code file.
+     */
+    protected String buildSourceCode(final CodeSnippet codeSnippet) throws IOException {
+        final StringBuilder sourceCode = new StringBuilder();
+
+        boolean someImportsPresent = false;
+
+        if(makeScript(codeSnippet)) {
+            sourceCode.append(getScriptImport()).append("\n");
+            someImportsPresent = true;
+        }
+
+        if(hasImports(codeSnippet)) {
+            sourceCode.append(getImports(codeSnippet)).append("\n");
+            someImportsPresent = true;
+        }
+
+        if(someImportsPresent) sourceCode.append("\n");
+
+        sourceCode.append(getStartClassDefinition(codeSnippet)).append("\n");
+
+        if(mustBeWrappedInMethodRunner(codeSnippet)) {
+            sourceCode.append("\t").append(getStartMainMethod(codeSnippet)).append("\n")
+                    .append(codeSnippet.getCode())
+                    .append("\n\t").append(getEndMainMethod());
+        } else {
+            sourceCode.append(codeSnippet.getCode());
+        }
+
+        sourceCode.append("\n").append(getEndClassDefinition(codeSnippet));
+
+        return sourceCode.toString();
+    }
+
+    /**
+     * Determine if the code snippet must make a groovy scriptr. It is determined by the presence and value of
+     * the {@link #MAKE_SCRIPT} property.
+     * @param codeSnippet The code snippet.
+     * @return {@code true} if the snippet must be created as a groovy script, {@code false} otherwise.
+     */
+    protected boolean makeScript(final CodeSnippet codeSnippet) {
+        final Boolean makeScript = codeSnippet.getProperties().containsKey(MAKE_SCRIPT) ?
+                Boolean.parseBoolean(codeSnippet.getProperties().get(MAKE_SCRIPT)) :
+                false;
+        return makeScript;
+    }
+
+    /**
+     * Get the necessary import to create a groovy script.
+     * @return The well formatted import to create a groovy script.
+     */
+    protected String getScriptImport() {
+        return formatImportLine("org.codehaus.groovy.runtime.InvokerHelper");
+    }
+
+    /**
+     * Get the imports to be added to the source code.
+     * @param codeSnippet The code snippet.
+     */
+    protected boolean hasImports(final CodeSnippet codeSnippet) {
+        final String imports = codeSnippet.getProperties().get(IMPORTS_PROPERTY);
+        return imports != null && !imports.isEmpty();
+    }
+
+    /**
+     * Get the imports for the code snippets. If some lines of the imports don't contain the {@code import} keyword, it
+     * will be added properly.
+     *
+     * @param codeSnippet The code snippet.
+     * @return A well formatted string containing all imports.
+     */
+    protected String getImports(final CodeSnippet codeSnippet) throws IOException {
+        final StringJoiner imports = new StringJoiner("\n");
+
+        try (final StringReader stringReader = new StringReader(codeSnippet.getProperties().get(IMPORTS_PROPERTY));
+             final BufferedReader reader = new DefaultCharsetReader(stringReader)) {
+
+            reader.lines()
+                    .filter(line -> !line.trim().isEmpty())
+                    .forEach(line -> imports.add(formatImportLine(line)));
+        }
+
+        return imports.toString();
+    }
+
+    /**
+     * Format an import line by make sure it starts with the {@code import} keyword.
+     * @param importLine The import line to format.
+     * @return A well formatted import line.
+     */
+    protected String formatImportLine(final String importLine) {
+        final String importLineBeginning = "import ";
+
+        String formattedImportLine;
+
+        if(importLine.startsWith(importLineBeginning)) {
+            formattedImportLine = importLine;
+        } else {
+            formattedImportLine = importLineBeginning.concat(importLine);
+        }
+
+        return formattedImportLine;
+    }
+
+    /**
+     * Get the definition of the class.
+     * @param codeSnippet The code snippet.
+     */
+    protected String getStartClassDefinition(final CodeSnippet codeSnippet) {
+        final StringBuilder startClassDefinition = new StringBuilder("class ")
+                                                    .append(determineClassName(codeSnippet));
+
+        if(makeScript(codeSnippet)) {
+            startClassDefinition.append(" extends Script");
+        }
+
+        startClassDefinition.append(" {");
+
+        return startClassDefinition.toString();
+    }
+
+    /**
+     * Determine the class name of the code snippet. It looks inside the code snippet's properties and check the value
+     * of the {@link #CLASS_NAME_PROPERTY} property. If {@code null} or empty, {@code Snippet} will be returned.
+     * @param codeSnippet The code snippet.
+     * @return The class name of the code snippet.
+     */
+    protected String determineClassName(final CodeSnippet codeSnippet) {
+        String className = codeSnippet.getProperties().get(CLASS_NAME_PROPERTY);
+        if(className == null || className.isEmpty()) className = "Snippet";
+        return className;
+    }
+
+    /**
+     * Determine if the code snippet must be wrapped inside a method runner. It is determined by the presence and value of
+     * the {@link #WRAP_IN_METHOD_RUNNER} property.
+     * @param codeSnippet The code snippet.
+     * @return {@code true} if the snippet must be wrapped in main, {@code false} otherwise.
+     */
+    protected boolean mustBeWrappedInMethodRunner(final CodeSnippet codeSnippet) {
+        final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_METHOD_RUNNER) ?
+                Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_METHOD_RUNNER)) :
+                false;
+        return wrapInMain;
+    }
+
+    /**
+     * Get the start of the declaration of the main method.
+     * @return The start of the main method.
+     */
+    protected String getStartMainMethod(final CodeSnippet codeSnippet) {
+        if(makeScript(codeSnippet)) return "def run() {";
+        else return "def static main(String ... args) {";
+    }
+
+    /**
+     * Get the end of the declaration of the main method.
+     * @return The end of the main method.
+     */
+    protected String getEndMainMethod() {
+        return "}";
+    }
+
+    /**
+     * Get the end of the definition of the class.
+     * @param codeSnippet The code snippet.
+     */
+    protected String getEndClassDefinition(final CodeSnippet codeSnippet) {
+        return "}";
     }
 }

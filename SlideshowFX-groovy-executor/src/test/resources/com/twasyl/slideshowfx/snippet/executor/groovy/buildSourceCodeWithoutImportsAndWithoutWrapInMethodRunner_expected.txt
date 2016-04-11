@@ -1,0 +1,5 @@
+class TestGroovy {
+def static main(String ... args) {
+	println("Hello")
+}
+}

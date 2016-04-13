@@ -1,4 +1,4 @@
-package com.twasyl.slideshowfx.snippet.executor.java;
+package com.twasyl.slideshowfx.snippet.executor.kotlin;
 
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor;
@@ -20,49 +20,49 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * An implementation of {@link com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor} that allows to execute
- * Java code snippets.
- * This implementation is identified with the code {@code JAVA}.
+ * An implementation of {@link AbstractSnippetExecutor} that allows to execute
+ * Kotlin code snippets.
+ * This implementation is identified with the code {@code KOTLIN}.
  *
  * @author Thierry Wasyczenko
  * @version 1.0
  * @since SlideshowFX 1.0.0
  */
-public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExecutorOptions> {
-    private static final Logger LOGGER = Logger.getLogger(JavaSnippetExecutor.class.getName());
+public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippetExecutorOptions> {
+    private static final Logger LOGGER = Logger.getLogger(KotlinSnippetExecutor.class.getName());
 
-    private static final String JAVA_HOME_PROPERTY_SUFFIX = ".home";
+    private static final String KOTLIN_HOME_PROPERTY_SUFFIX = ".home";
     protected static final String WRAP_IN_MAIN_PROPERTY = "wrapInMain";
     protected static final String IMPORTS_PROPERTY = "imports";
-    protected static final String CLASS_NAME_PROPERTY = "class";
+    protected static final String PACKAGE_NAME_PROPERTY = "class";
 
-    public JavaSnippetExecutor() {
-        super("JAVA", "Java", "language-java");
-        this.setOptions(new JavaSnippetExecutorOptions());
+    public KotlinSnippetExecutor() {
+        super("KOTLIN", "Kotlin", "language-kotlin");
+        this.setOptions(new KotlinSnippetExecutorOptions());
 
-        final String javaHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(JAVA_HOME_PROPERTY_SUFFIX));
-        if(javaHome != null) {
+        final String kotlinHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(KOTLIN_HOME_PROPERTY_SUFFIX));
+        if(kotlinHome != null) {
             try {
-                this.getOptions().setJavaHome(new File(javaHome));
+                this.getOptions().setKotlinHome(new File(kotlinHome));
             } catch (FileNotFoundException e) {
-                LOGGER.log(Level.SEVERE, "Can not set the JAVA_HOME", e);
+                LOGGER.log(Level.SEVERE, "Can not set the KOTLIN_HOME", e);
             }
         }
     }
 
     @Override
     public Parent getUI(final CodeSnippet codeSnippet) {
-        final TextField classTextField = new TextField();
-        classTextField.setPromptText("Class name");
-        classTextField.setPrefColumnCount(10);
-        classTextField.setTooltip(new Tooltip("The class name of this code snippet"));
-        classTextField.textProperty().addListener((textValue, oldText, newText) -> {
-            if(newText == null || newText.isEmpty()) codeSnippet.putProperty(CLASS_NAME_PROPERTY, null);
-            else codeSnippet.putProperty(CLASS_NAME_PROPERTY, newText);
+        final TextField packageTextField = new TextField();
+        packageTextField.setPromptText("Package name");
+        packageTextField.setPrefColumnCount(10);
+        packageTextField.setTooltip(new Tooltip("The package name of this code snippet"));
+        packageTextField.textProperty().addListener((textValue, oldText, newText) -> {
+            if(newText == null || newText.isEmpty()) codeSnippet.putProperty(PACKAGE_NAME_PROPERTY, null);
+            else codeSnippet.putProperty(PACKAGE_NAME_PROPERTY, newText);
         });
 
         final CheckBox wrapInMain = new CheckBox("Wrap code snippet in main");
-        wrapInMain.setTooltip(new Tooltip("Wrap the provided code snippet in a Java main method"));
+        wrapInMain.setTooltip(new Tooltip("Wrap the provided code snippet in a Kotlin main method"));
         wrapInMain.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {
             if(newSelected != null) codeSnippet.putProperty(WRAP_IN_MAIN_PROPERTY, newSelected.toString());
         });
@@ -78,38 +78,38 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
         });
 
         final VBox ui = new VBox(5);
-        ui.getChildren().addAll(classTextField, wrapInMain, imports);
+        ui.getChildren().addAll(packageTextField, wrapInMain, imports);
 
         return ui;
     }
 
     @Override
     public Node getConfigurationUI() {
-        this.newOptions = new JavaSnippetExecutorOptions();
+        this.newOptions = new KotlinSnippetExecutorOptions();
         try {
-            this.newOptions.setJavaHome(this.getOptions().getJavaHome());
+            this.newOptions.setKotlinHome(this.getOptions().getKotlinHome());
         } catch (FileNotFoundException | NullPointerException e) {
-            LOGGER.log(Level.FINE, "Can not duplicate JAVA_HOME", e);
+            LOGGER.log(Level.FINE, "Can not duplicate KOTLIN_HOME", e);
         }
 
         final Label label = new Label(this.getLanguage().concat(":"));
 
-        final TextField javaHomeField = new TextField();
-        javaHomeField.textProperty().bindBidirectional(this.newOptions.javaHomeProperty(), new FileStringConverter());
-        javaHomeField.setPrefColumnCount(20);
+        final TextField kotlinHomeField = new TextField();
+        kotlinHomeField.textProperty().bindBidirectional(this.newOptions.kotlinHomeProperty(), new FileStringConverter());
+        kotlinHomeField.setPrefColumnCount(20);
 
         final Button browse = new Button("...");
         browse.setOnAction(event -> {
             final DirectoryChooser chooser = new DirectoryChooser();
             final File sdkHomeDir = chooser.showDialog(null);
             if (sdkHomeDir != null) {
-                javaHomeField.setText(sdkHomeDir.getAbsolutePath());
+                kotlinHomeField.setText(sdkHomeDir.getAbsolutePath());
             }
 
         });
 
         final HBox box = new HBox(5);
-        box.getChildren().addAll(label, javaHomeField, browse);
+        box.getChildren().addAll(label, kotlinHomeField, browse);
 
         return box;
     }
@@ -119,9 +119,9 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
         if(this.getNewOptions() != null) {
             this.setOptions(this.getNewOptions());
 
-            if(this.getOptions().getJavaHome() != null) {
-                GlobalConfiguration.setProperty(this.getConfigurationBaseName().concat(JAVA_HOME_PROPERTY_SUFFIX),
-                        this.getOptions().getJavaHome().getAbsolutePath().replaceAll("\\\\", "/"));
+            if(this.getOptions().getKotlinHome() != null) {
+                GlobalConfiguration.setProperty(this.getConfigurationBaseName().concat(KOTLIN_HOME_PROPERTY_SUFFIX),
+                        this.getOptions().getKotlinHome().getAbsolutePath().replaceAll("\\\\", "/"));
             }
         }
     }
@@ -139,10 +139,12 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
                 consoleOutput.add("ERROR: ".concat(e.getMessage()));
             }
 
-            // Compile the Java class
-            final File javacExecutable = new File(this.getOptions().getJavaHome(), "bin/javac");
+            // Compile the Kotlin class
+            final String jarFile = "Snippet.jar";
+            final File koltincExecutable = new File(this.getOptions().getKotlinHome(), "bin/kotlinc");
 
-            final String[] compilationCommand = {javacExecutable.getAbsolutePath(), codeFile.getName()};
+            final String[] compilationCommand = {koltincExecutable.getAbsolutePath(), codeFile.getName(),
+            "-include-runtime", "-d", jarFile};
 
             Process process = null;
             try {
@@ -170,11 +172,11 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
 
             codeFile.delete();
 
-            // Execute the class only if the compilation was successful
+            // Execute the Kotlin class only if the compilation was successful
             if(process != null && process.exitValue() == 0) {
 
-                final File javaExecutable = new File(this.getOptions().getJavaHome(), "bin/java");
-                final String[] executionCommand = {javaExecutable.getAbsolutePath(), determineClassName(codeSnippet)};
+                final File kotlinExecutable = new File(this.getOptions().getKotlinHome(), "bin/kotlin");
+                final String[] executionCommand = {kotlinExecutable.getAbsolutePath(), jarFile};
 
                 try {
                     process = new ProcessBuilder()
@@ -199,7 +201,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
                     }
                 }
 
-                final File classFile = new File(this.getTemporaryDirectory(), determineClassName(codeSnippet));
+                final File classFile = new File(this.getTemporaryDirectory(), jarFile);
                 classFile.delete();
             }
         });
@@ -214,7 +216,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
      * @return The file created and containing the source code.
      */
     protected File createSourceCodeFile(final CodeSnippet codeSnippet) throws IOException {
-        final File codeFile = new File(this.getTemporaryDirectory(), determineClassName(codeSnippet).concat(".java"));
+        final File codeFile = new File(this.getTemporaryDirectory(), "Snippet.kt");
         try (final FileWriter codeFileWriter = new FileWriter(codeFile)) {
             codeFileWriter.write(buildSourceCode(codeSnippet));
             codeFileWriter.flush();
@@ -233,30 +235,67 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
     protected String buildSourceCode(final CodeSnippet codeSnippet) throws IOException {
         final StringBuilder sourceCode = new StringBuilder();
 
+        if(hasPackage(codeSnippet)) {
+            sourceCode.append(getPackage(codeSnippet)).append("\n\n");
+        }
+
         if(hasImports(codeSnippet)) {
             sourceCode.append(getImports(codeSnippet)).append("\n\n");
         }
 
-        sourceCode.append(getStartClassDefinition(codeSnippet)).append("\n");
-
         if(mustBeWrappedInMain(codeSnippet)) {
-            sourceCode.append("\t").append(getStartMainMethod()).append("\n")
+            sourceCode.append(getStartMainMethod()).append("\n")
                     .append(codeSnippet.getCode())
-                    .append("\n\t").append(getEndMainMethod());
+                    .append("\n").append(getEndMainMethod());
         } else {
             sourceCode.append(codeSnippet.getCode());
         }
-
-        sourceCode.append("\n").append(getEndClassDefinition(codeSnippet));
 
         return sourceCode.toString();
     }
 
     /**
-     * Check if the imports have been defined for the given code snippet. In order to determine it, the {@link #IMPORTS_PROPERTY}
-     * property.
+     * Check if a package name has been specified.
      * @param codeSnippet The code snippet.
-     * @return {@code true} if imports have been defined, {@code false} otherwise.
+     * @return {@code true} if a package name has been defined, {@code false} otherwise.
+     */
+    protected boolean hasPackage(final CodeSnippet codeSnippet) {
+        final String packageName = codeSnippet.getProperties().get(PACKAGE_NAME_PROPERTY);
+        return packageName != null && !packageName.isEmpty();
+    }
+
+    /**
+     * Get the package for the code snippet, defined by the {@link #PACKAGE_NAME_PROPERTY} property.
+     *
+     * @param codeSnippet The code snippet.
+     * @return The value of the package property.
+     */
+    protected String getPackage(final CodeSnippet codeSnippet) {
+        return formatPackageName(codeSnippet.getProperties().get(PACKAGE_NAME_PROPERTY));
+    }
+
+    /**
+     * Formats the package name to include the {@code package} keyword to it if necessary.
+     * @param packageName The name of the package to format.
+     * @return A well formatted package name.
+     */
+    protected String formatPackageName(final String packageName) {
+        final String packageLineBeginning = "package ";
+
+        String formattedPackageLine;
+
+        if(packageName.startsWith(packageLineBeginning)) {
+            formattedPackageLine = packageName;
+        } else {
+            formattedPackageLine = packageLineBeginning.concat(packageName);
+        }
+
+        return formattedPackageLine;
+    }
+
+    /**
+     * Get the imports to be added to the source code.
+     * @param codeSnippet The code snippet.
      */
     protected boolean hasImports(final CodeSnippet codeSnippet) {
         final String imports = codeSnippet.getProperties().get(IMPORTS_PROPERTY);
@@ -291,8 +330,6 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
      */
     protected String formatImportLine(final String importLine) {
         final String importLineBeginning = "import ";
-        final String importLineEnding = ";";
-
         String formattedImportLine;
 
         if(importLine.startsWith(importLineBeginning)) {
@@ -301,31 +338,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
             formattedImportLine = importLineBeginning.concat(importLine);
         }
 
-        if(!importLine.endsWith(importLineEnding)) {
-            formattedImportLine = formattedImportLine.concat(importLineEnding);
-        }
-
         return formattedImportLine;
-    }
-
-    /**
-     * Get the definition of the class.
-     * @param codeSnippet The code snippet.
-     */
-    protected String getStartClassDefinition(final CodeSnippet codeSnippet) {
-        return "public class ".concat(determineClassName(codeSnippet)).concat(" {");
-    }
-
-    /**
-     * Determine the class name of the code snippet. It looks inside the code snippet's properties and check the value
-     * of the {@link #CLASS_NAME_PROPERTY} property. If {@code null} or empty, {@code Snippet} will be returned.
-     * @param codeSnippet The code snippet.
-     * @return The class name of the code snippet.
-     */
-    protected String determineClassName(final CodeSnippet codeSnippet) {
-        String className = codeSnippet.getProperties().get(CLASS_NAME_PROPERTY);
-        if(className == null || className.isEmpty()) className = "Snippet";
-        return className;
     }
 
     /**
@@ -346,7 +359,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
      * @return The start of the main method.
      */
     protected String getStartMainMethod() {
-        return "public static void main(String ... args) {";
+        return "fun main(args: Array<String>) {";
     }
 
     /**
@@ -354,14 +367,6 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
      * @return The end of the main method.
      */
     protected String getEndMainMethod() {
-        return "}";
-    }
-
-    /**
-     * Get the end of the definition of the class.
-     * @param codeSnippet The code snippet.
-     */
-    protected String getEndClassDefinition(final CodeSnippet codeSnippet) {
         return "}";
     }
 }

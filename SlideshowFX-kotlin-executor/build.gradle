@@ -1,0 +1,24 @@
+description = 'Snippet executor allowing to execute some Kotlin inside a SlideshowFX presentation'
+version = '1.0.0'
+
+dependencies {
+    compile project(':SlideshowFX-snippet-executor')
+    compile configurations.felix
+
+    testCompile configurations.junit
+}
+
+jar {
+    manifest {
+        attributes('Manifest-Version': '1.0',
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'SlideshowFX Kotlin executor',
+                'Bundle-SymbolicName': 'com.twasyl.slideshowfx.snippet.executor.kotlin',
+                'Bundle-Description': 'Allow to execute Kotlin code inside a presentation',
+                'Bundle-Version': '1.0.0',
+                'Bundle-Activator': 'com.twasyl.slideshowfx.snippet.executor.kotlin.activator.KotlinSnippetExecutorActivator',
+                'Bundle-Vendor': 'Thierry Wasylczenko',
+                'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.kotlin,com.twasyl.slideshowfx.snippet.executor.kotlin.activator',
+                'Import-Package': 'org.osgi.framework')
+    }
+}

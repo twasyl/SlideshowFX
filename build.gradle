@@ -252,6 +252,7 @@ task installSnippetExecutorPlugins(dependsOn : [':SlideshowFX-go-executor:jar',
                                                 ':SlideshowFX-groovy-executor:jar',
                                                 ':SlideshowFX-java-executor:jar',
                                                 ':SlideshowFX-javascript-executor:jar',
+                                                ':SlideshowFX-kotlin-executor:jar',
                                                 ':SlideshowFX-scala-executor:jar']) << {
     copy {
         from project(':SlideshowFX-go-executor').jar.archivePath
@@ -259,6 +260,7 @@ task installSnippetExecutorPlugins(dependsOn : [':SlideshowFX-go-executor:jar',
         from project(':SlideshowFX-groovy-executor').jar.archivePath
         from project(':SlideshowFX-java-executor').jar.archivePath
         from project(':SlideshowFX-javascript-executor').jar.archivePath
+        from project(':SlideshowFX-kotlin-executor').jar.archivePath
         from project(':SlideshowFX-scala-executor').jar.archivePath
 
         into pluginsFolder
@@ -271,7 +273,7 @@ task installAllPlugins(dependsOn: [ ':installMarkupPlugins', ':installContentExt
 
 task packageSlideshowFX(dependsOn : [':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar', ':SlideshowFX-textile:jar',
                                      ':SlideshowFX-code-extension:jar', ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar', ':SlideshowFX-quiz-extension:jar', ':SlideshowFX-quote-extension:jar', ':SlideshowFX-sequence-diagram-extension:jar', ':SlideshowFX-snippet-extension:jar',
-                                     ':SlideshowFX-go-executor:jar', ':SlideshowFX-golo-executor:jar', ':SlideshowFX-groovy-executor:jar', ':SlideshowFX-java-executor:jar', ':SlideshowFX-javascript-executor:jar',
+                                     ':SlideshowFX-go-executor:jar', ':SlideshowFX-golo-executor:jar', ':SlideshowFX-groovy-executor:jar', ':SlideshowFX-java-executor:jar', ':SlideshowFX-javascript-executor:jar', ':SlideshowFX-kotlin-executor:jar', ':SlideshowFX-scala-executor:jar',
                                      ':SlideshowFX-app:jar',
                                      'asciidoctor']) {
 
@@ -316,6 +318,8 @@ task packageSlideshowFX(dependsOn : [':SlideshowFX-asciidoctor:jar', ':Slideshow
             from project(':SlideshowFX-groovy-executor').jar.archivePath
             from project(':SlideshowFX-java-executor').jar.archivePath
             from project(':SlideshowFX-javascript-executor').jar.archivePath
+            from project(':SlideshowFX-kotlin-executor').jar.archivePath
+            from project(':SlideshowFX-scala-executor').jar.archivePath
 
             into new File(pluginsFolder, "executors")
         }
@@ -389,7 +393,9 @@ task publishAllSnippetExecutor(dependsOn : [':SlideshowFX-go-executor:bintrayUpl
                                             ':SlideshowFX-golo-executor:bintrayUpload',
                                             ':SlideshowFX-groovy-executor:bintrayUpload',
                                             ':SlideshowFX-java-executor:bintrayUpload',
-                                            ':SlideshowFX-javascript-executor:bintrayUpload']) << {
+                                            ':SlideshowFX-javascript-executor:bintrayUpload',
+                                            ':SlideshowFX-kotlin-executor:bintrayUpload',
+                                            ':SlideshowFX-scala-executor:bintrayUpload']) << {
 }
 
 task publishAllToBintray (dependsOn : ['publishAllMarkup',

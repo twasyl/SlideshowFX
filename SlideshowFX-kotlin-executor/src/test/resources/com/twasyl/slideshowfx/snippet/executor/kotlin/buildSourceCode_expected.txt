@@ -1,0 +1,8 @@
+package SlideshowFX
+
+import mypackage
+import mysecondpackage
+
+fun main(args: Array<String>) {
+println("Hello")
+}

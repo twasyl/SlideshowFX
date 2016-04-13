@@ -1,7 +1,7 @@
-package com.twasyl.slideshowfx.snippet.executor.go.activator;
+package com.twasyl.slideshowfx.snippet.executor.golo.activator;
 
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
-import com.twasyl.slideshowfx.snippet.executor.go.GoloSnippetExecutor;
+import com.twasyl.slideshowfx.snippet.executor.golo.GoloSnippetExecutor;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 

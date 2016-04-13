@@ -1,4 +1,4 @@
-package com.twasyl.slideshowfx.snippet.executor.go;
+package com.twasyl.slideshowfx.snippet.executor.golo;
 
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.twasyl.slideshowfx.snippet.executor.go.GoloSnippetExecutor.*;
+import static com.twasyl.slideshowfx.snippet.executor.golo.GoloSnippetExecutor.*;
 import static org.junit.Assert.*;
 
 /**

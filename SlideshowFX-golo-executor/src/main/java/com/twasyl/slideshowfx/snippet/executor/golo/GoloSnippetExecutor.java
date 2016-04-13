@@ -1,4 +1,4 @@
-package com.twasyl.slideshowfx.snippet.executor.go;
+package com.twasyl.slideshowfx.snippet.executor.golo;
 
 import com.sun.javafx.PlatformUtil;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;

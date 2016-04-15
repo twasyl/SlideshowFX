@@ -442,7 +442,7 @@ public class SlideshowFXController implements Initializable {
      * @param event The source of the event
      */
     @FXML private void displayAbout(ActionEvent event) {
-        new AboutStage(SlideshowFX.getStage()).show();
+        new AboutStage().show();
     }
 
     /**

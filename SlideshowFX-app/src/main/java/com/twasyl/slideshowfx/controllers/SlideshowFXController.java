@@ -5,13 +5,14 @@ import com.leapmotion.leap.Listener;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.concurrent.*;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
-import com.twasyl.slideshowfx.controls.LogsStage;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.Tour;
-import com.twasyl.slideshowfx.controls.about.AboutStage;
 import com.twasyl.slideshowfx.controls.notification.NotificationCenter;
 import com.twasyl.slideshowfx.controls.slideshow.Context;
 import com.twasyl.slideshowfx.controls.slideshow.SlideshowStage;
+import com.twasyl.slideshowfx.controls.stages.AboutStage;
+import com.twasyl.slideshowfx.controls.stages.HelpStage;
+import com.twasyl.slideshowfx.controls.stages.LogsStage;
 import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.Presentations;
@@ -66,7 +67,10 @@ import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.stage.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.File;
@@ -462,17 +466,15 @@ public class SlideshowFXController implements Initializable {
      * @param event The source event.
      */
     @FXML private void displayLogs(final ActionEvent event) {
-        try {
-            final Parent root = FXMLLoader.load(ResourceHelper.getURL("/com/twasyl/slideshowfx/fxml/Logs.fxml"));
+        new LogsStage().show();
+    }
 
-            final Scene scene = new Scene(root);
-
-            final LogsStage stage = new LogsStage();
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not display the logs viewer", e);
-        }
+    /**
+     * Displays the help stage.
+     * @param event THe source event.
+     */
+    @FXML private void displayHelp(final ActionEvent event) {
+        new HelpStage().show();
     }
 
     /**

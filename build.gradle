@@ -179,6 +179,7 @@ asciidoctor {
             setanchors: '',
             sectlinks: '',
             linkcss: false,
+            'asciidoctor-source': new File(project(':SlideshowFX-app').projectDir, 'src/main/resources/com/twasyl/slideshowfx/documentation').absolutePath,
             'javafx-version': '8 update 51',
             'jdk-version': '8 update 51',
             'gradle-version': "${wrapper.gradleVersion}",

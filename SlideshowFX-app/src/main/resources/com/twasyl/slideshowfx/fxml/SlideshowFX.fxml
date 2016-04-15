@@ -241,6 +241,7 @@
                 </Menu>
                 <Menu text="?" fx:id="helpMenu">
                     <MenuItem text="Take a tour" onAction="#takeTour" />
+                    <MenuItem text="Help" onAction="#displayHelp" />
                     <MenuItem text="Display logs" onAction="#displayLogs" />
                     <MenuItem text="About" onAction="#displayAbout" />
                 </Menu>

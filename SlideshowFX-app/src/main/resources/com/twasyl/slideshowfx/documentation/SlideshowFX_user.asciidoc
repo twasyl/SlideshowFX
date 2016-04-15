@@ -1,0 +1,21 @@
+= SlideshowFX user documentation
+:numbered:
+:icons:
+
+== Introduction
+
+SlideshowFX is an application allowing you to create HTML5 based presentation in a very common manner. Nowadays we all use PowerPoint, Keynote and their friends but with evolution of web technologies, new perspectives are now possible. Indeed there is a lot of HTML5/JavaScript based framework, like http://lab.hakim.se/reveal-js/[reveal.js] or https://github.com/bartaz/impress.js/[impress.js], that allow you to create beautiful presentations to keep your audience active. It brings you a lot of freedom like adding a YouTube video right inside your presentation, playing music, automatically syntax highlighting code example and more. But to do such presentations you have to know HTML, CSS and JavaScript programming languages.
+
+SlideshowFX lets programming languages to developers and presentations' creation to end users. This means that you will be able to create your presentations without knowing HTML, even if it is recommended to have the basics.
+
+But SlideshowFX isn't just another simple presentation engine. It brings much more for you:
+
+- A chat is provided so your audience can send you questions using their smartphones and you will answer them whenever you want ;
+- A quiz creator so your audience can answer your quiz using their smartphones and you see results live ;
+- Present using your hands by changing slides with two fingers, have a "laser" pointer by using one finger. It's cool isn't it? All of this brought to you by LeapMotion.
+- Save your presentations on Dropbox or Google Drive ;
+- Insert code snippets that can be executed directly from the presentation and console's output is displayed in the slide.
+
+== User guide
+
+TO BE WRITTEN

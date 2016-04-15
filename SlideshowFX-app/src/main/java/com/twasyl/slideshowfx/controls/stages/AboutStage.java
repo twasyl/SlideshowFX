@@ -1,5 +1,6 @@
-package com.twasyl.slideshowfx.controls.about;
+package com.twasyl.slideshowfx.controls.stages;
 
+import com.twasyl.slideshowfx.controls.about.AboutPanel;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;

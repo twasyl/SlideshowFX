@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.web.WebView?>
+<?import java.lang.Double?>
+<?import java.net.URL?>
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.HelpViewController">
+    <stylesheets>
+        <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
+    </stylesheets>
+
+    <fx:define>
+        <Double fx:id="BROWSER_WIDTH" fx:value="800" />
+        <Double fx:id="BROWSER_HEIGHT" fx:value="700" />
+    </fx:define>
+
+    <TabPane>
+        <tabs>
+            <Tab closable="false" text="User">
+                <WebView fx:id="userDocumentationBrowser" prefWidth="$BROWSER_WIDTH" prefHeight="$BROWSER_HEIGHT"/>
+            </Tab>
+            <Tab closable="false" text="Developer">
+                <WebView fx:id="developerDocumentationBrowser" prefWidth="$BROWSER_WIDTH" prefHeight="$BROWSER_HEIGHT"/>
+            </Tab>
+        </tabs>
+    </TabPane>
+
+</StackPane>
+

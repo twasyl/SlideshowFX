@@ -87,7 +87,7 @@ public class SlideshowFXTest {
     public void takeScreenShot(final String screenshotName) throws InterruptedException {
         File file = new File(testResultsDir, screenshotName + ".png");
 
-        capture.capturePrimaryScreenToFile(file);
+        //capture.capturePrimaryScreenToFile(file);
         assertTrue(file.exists());
     }
 

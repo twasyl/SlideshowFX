@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.controls.stages;
 
+import com.twasyl.slideshowfx.controllers.LogsController;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 
 /**
@@ -9,7 +10,7 @@ import com.twasyl.slideshowfx.utils.ResourceHelper;
  * @since SlideshowFX 1.0.0
  * @version 1.0
  */
-public class LogsStage extends CustomSlideshowFXStage {
+public class LogsStage extends CustomSlideshowFXStage<LogsController> {
 
     public LogsStage() {
         super("Logs", ResourceHelper.getURL("/com/twasyl/slideshowfx/fxml/Logs.fxml"));

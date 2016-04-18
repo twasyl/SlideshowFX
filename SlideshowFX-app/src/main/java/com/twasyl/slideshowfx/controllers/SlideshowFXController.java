@@ -13,6 +13,7 @@ import com.twasyl.slideshowfx.controls.slideshow.SlideshowStage;
 import com.twasyl.slideshowfx.controls.stages.AboutStage;
 import com.twasyl.slideshowfx.controls.stages.HelpStage;
 import com.twasyl.slideshowfx.controls.stages.LogsStage;
+import com.twasyl.slideshowfx.controls.stages.TemplateBuilderStage;
 import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.Presentations;
@@ -57,20 +58,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.*;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.File;
@@ -722,8 +719,8 @@ public class SlideshowFXController implements Initializable {
     /* All instance methods */
 
     /**
-     * Open the dataFile. If the name ends with <code>.sfx</code> the file is considered as a presentation,
-     * if it ends with <code>.sfxt</code> it is considered as a template.
+     * Open the dataFile. If the name ends with {@code .sfx} the file is considered as a presentation,
+     * if it ends with {@code .sfx} it is considered as a template.
      *
      * @param dataFile the file corresponding to either a template or a presentation.
      * @throws java.lang.IllegalArgumentException If the file is null.
@@ -794,34 +791,7 @@ public class SlideshowFXController implements Initializable {
      * @param engine the engine used for the template builder that will be created.
      */
     private void showTemplateBuilder(final TemplateEngine engine) {
-        try {
-            final FXMLLoader loader = new FXMLLoader(ResourceHelper.getURL("/com/twasyl/slideshowfx/fxml/TemplateBuilder.fxml"));
-            final Parent root = loader.load();
-
-            final TemplateBuilderController controller = loader.getController();
-            controller.setTemplateEngine(engine);
-
-            final Scene scene = new Scene(root);
-
-            final Stage stage = new Stage();
-            stage.initOwner(SlideshowFX.getStage());
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(scene);
-            stage.setTitle("Template builder");
-            stage.getIcons().addAll(
-                    new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/16.png")),
-                    new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/32.png")),
-                    new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/64.png")),
-                    new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/128.png")),
-                    new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/256.png")),
-                    new Image(ResourceHelper.getInputStream("/com/twasyl/slideshowfx/images/appicons/512.png")));
-
-            stage.show();
-
-            controller.setStage(stage);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not load the template builder", e);
-        }
+        new TemplateBuilderStage(engine).show();
     }
 
     /**

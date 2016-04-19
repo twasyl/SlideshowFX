@@ -21,7 +21,7 @@ public class RemoteFileTest {
     public void toStringWithOnlyName() {
         final RemoteFile parent = new RemoteFile("parent");
 
-        assertEquals(parent.toString(), "/parent");
+        assertEquals("/parent", parent.toString());
     }
 
     /**
@@ -42,16 +42,14 @@ public class RemoteFileTest {
         final RemoteFile parent = new RemoteFile("parent");
         final RemoteFile child = new RemoteFile(parent, "child");
 
-        assertEquals(child.toString(), "/parent/child");
+        assertEquals("/parent/child", child.toString());
     }
 
-    /**
-     * Ensure the {@link RemoteFile#isEmpty()} returns {@code false} when the RemoteFile is parent of another instance.
-     */
-    @Test public void isNotEmptyForParent() {
-        final RemoteFile parent = new RemoteFile("parent");
+    @Test public void toStringWithParentWithNullName() {
+        final RemoteFile parent = new RemoteFile(null);
+        final RemoteFile child = new RemoteFile(parent, "child");
 
-        assertFalse(parent.isEmpty());
+        assertEquals("/child", child.toString());
     }
 
     /**
@@ -60,6 +58,16 @@ public class RemoteFileTest {
     @Test public void toStringForRoot() {
         final  RemoteFile root = new RemoteFile(null);
 
-        assertEquals(root.toString(), "/");
+        assertEquals("/", root.toString());
+    }
+
+    /**
+     * Ensure the {@link RemoteFile#isEmpty()} returns {@code false} when the RemoteFile is parent of another instance.
+     */
+    @Test public void isNotEmptyForParent() {
+        final RemoteFile parent = new RemoteFile("parent");
+        final RemoteFile child = new RemoteFile(parent, "child");
+
+        assertFalse(parent.isEmpty());
     }
 }

@@ -3,6 +3,7 @@ package com.twasyl.slideshowfx.controls.stages;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -20,15 +21,31 @@ import java.util.logging.Logger;
  * @since SlideshowFX 1.0.0
  * @version 1.0
  */
-public class CustomSlideshowFXStage extends Stage {
+public class CustomSlideshowFXStage<T extends Initializable> extends Stage {
     private static Logger LOGGER = Logger.getLogger(CustomSlideshowFXStage.class.getName());
+    private T controller;
 
     /**
      * Creates a default customized stage with a provided title.
      * @param title The title of the stage.
      */
     public CustomSlideshowFXStage(final String title) {
+        this(title, null);
+    }
+
+    /**
+     * Creates a default customized stage with the given title as well as the FXML identified by it's URL.
+     * @param title The title of the stage.
+     * @param fxml The FXML to load.
+     */
+    public CustomSlideshowFXStage(final String title, final URL fxml) {
         super(StageStyle.DECORATED);
+
+        this.setDefaultProperties(title);
+        this.loadAndSetScene(fxml);
+    }
+
+    private void setDefaultProperties(final String title) {
         this.initOwner(SlideshowFX.getStage());
         this.setTitle(title);
 
@@ -42,19 +59,28 @@ public class CustomSlideshowFXStage extends Stage {
     }
 
     /**
-     * Creates a default customized stage with the given title as well as the FXML identified by it's URL.
-     * @param title The title of the stage.
+     * Loads the given FXML, create a {@link Scene} and set it to this stage.
      * @param fxml The FXML to load.
      */
-    public CustomSlideshowFXStage(final String title, final URL fxml) {
-        this(title);
+    public void loadAndSetScene(final URL fxml) {
+        if(fxml != null) {
+            final FXMLLoader loader = new FXMLLoader(fxml);
+            try {
+                final Parent root = loader.load();
+                this.controller = loader.getController();
 
-        try {
-            final Parent root = FXMLLoader.load(fxml);
-            final Scene scene = new Scene(root);
-            this.setScene(scene);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not load the desired FXML", e);
+                final Scene scene = new Scene(root);
+                this.setScene(scene);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Can not load the desired FXML", e);
+            }
         }
+    }
+    /**
+     * Get the controller that has been loaded with the FXML.
+     * @return The controller of the specified FXML or {@code null} if no FXML has been loaded yet.
+     */
+    public T getController() {
+        return controller;
     }
 }

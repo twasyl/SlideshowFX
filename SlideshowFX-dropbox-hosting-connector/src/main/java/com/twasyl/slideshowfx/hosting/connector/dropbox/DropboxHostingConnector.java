@@ -1,6 +1,8 @@
 package com.twasyl.slideshowfx.hosting.connector.dropbox;
 
 import com.dropbox.core.*;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.*;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.hosting.connector.AbstractHostingConnector;
@@ -18,14 +20,16 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.twasyl.slideshowfx.engine.presentation.PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION;
 
 /**
  * This connector allows to interact with Dropbox.
@@ -149,19 +153,25 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
         // Listening for the div containing the access code to be displayed
         browser.getEngine().getLoadWorker().stateProperty().addListener((stateValue, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
-                final Element element = browser.getEngine().getDocument().getElementById("auth-code");
-                if (element != null) {
-                    try {
-                        final DbxAuthFinish authenticationFinish = authentication.finish(element.getTextContent());
-                        this.accessToken = authenticationFinish.accessToken;
-                    } catch (DbxException e) {
-                        LOGGER.log(Level.SEVERE, "Can not finish authentication", e);
-                        this.accessToken = null;
-                    } finally {
-                        if(this.accessToken != null) {
-                            GlobalConfiguration.setProperty(getConfigurationBaseName().concat(ACCESS_TOKEN_PROPERTY_SUFFIX), this.accessToken);
+                final Element authCode = browser.getEngine().getDocument().getElementById("auth-code");
+
+                if (authCode != null && authCode.hasChildNodes()) {
+                    final NamedNodeMap attributes = authCode.getFirstChild().getAttributes();
+                    String dataToken = null;
+
+                    if (attributes != null && (dataToken = attributes.getNamedItem("data-token").getTextContent()) != null) {
+                        try {
+                            final DbxAuthFinish authenticationFinish = authentication.finish(dataToken);
+                            this.accessToken = authenticationFinish.getAccessToken();
+                        } catch (DbxException e) {
+                            LOGGER.log(Level.SEVERE, "Can not finish authentication", e);
+                            this.accessToken = null;
+                        } finally {
+                            if (this.accessToken != null) {
+                                GlobalConfiguration.setProperty(getConfigurationBaseName().concat(ACCESS_TOKEN_PROPERTY_SUFFIX), this.accessToken);
+                            }
+                            stage.close();
                         }
-                        stage.close();
                     }
                 }
 
@@ -181,9 +191,9 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
     public boolean checkAccessToken() {
         boolean valid = false;
 
-        final DbxClient client = new DbxClient(this.dropboxConfiguration, this.accessToken);
+        final DbxClientV2 client = new DbxClientV2(this.dropboxConfiguration, this.accessToken);
         try {
-            client.getAccountInfo();
+            client.users().getCurrentAccount();
             valid = true;
         } catch (DbxException e) {
             LOGGER.log(Level.WARNING, "Can not determine if access token is valid", e);
@@ -203,43 +213,38 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
         if(!engine.getArchive().exists()) throw new FileNotFoundException("The archive to upload does not exist");
 
         if(this.isAuthenticated()) {
-            final DbxClient client = new DbxClient(this.dropboxConfiguration, this.accessToken);
+            final String computedName = folder.toString().concat("/".concat(engine.getArchive().getName()));
+            final DbxClientV2 client = new DbxClientV2(this.dropboxConfiguration, this.accessToken);
 
-            DbxWriteMode writeMode = null;
+            WriteMode writeMode;
             final StringBuilder fileName = new StringBuilder();
+
+            final UploadBuilder uploader = client.files().uploadBuilder(computedName);
 
             if(overwrite) {
                 try {
-                    final DbxEntry entry = client.getMetadata(folder.toString().concat("/".concat(engine.getArchive().getName())));
-                    fileName.append(engine.getArchive().getName());
+                    final Metadata metadata = client.files().getMetadata(computedName);
 
                     // Ensure the file has been found.
-                    if(entry != null) {
-                        writeMode = DbxWriteMode.update(((DbxEntry.File) entry).rev);
+                    if(metadata != null) {
+                        writeMode = WriteMode.OVERWRITE;
+                        uploader.withAutorename(true);
                     } else {
-                        writeMode = DbxWriteMode.add();
+                        writeMode = WriteMode.ADD;
                     }
                 } catch (DbxException e) {
                     LOGGER.log(Level.SEVERE, "Can not get file metadata");
-                    writeMode = writeMode.add();
+                    writeMode = WriteMode.ADD;
                 }
             } else {
-                writeMode = DbxWriteMode.add();
-                if(this.fileExists(engine, folder)) {
-                    fileName.append(engine.getArchive().getName())
-                            .append(String.format(" %1$tF %1$tT", Calendar.getInstance()))
-                            .append(".").append(engine.getArchiveExtension());
-                } else {
-                    fileName.append(engine.getArchive().getName());
-                }
+                writeMode = WriteMode.ADD;
+                uploader.withAutorename(this.fileExists(engine, folder));
             }
 
+            uploader.withMode(writeMode);
+
             try(final InputStream archiveStream = new FileInputStream(engine.getArchive())) {
-                client.uploadFile(
-                        new RemoteFile(folder, fileName.toString()).toString(),
-                        writeMode,
-                        engine.getArchive().length(),
-                        archiveStream);
+                uploader.start().uploadAndFinish(archiveStream);
             } catch (DbxException | IOException e) {
                 LOGGER.log(Level.SEVERE, "Error while trying to upload the presentation", e);
             }
@@ -254,15 +259,15 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
         if(file == null) throw new NullPointerException("The file to download can not be null");
         if(!destination.isDirectory()) throw new IllegalArgumentException("The destination is not a folder");
 
-        File result = null;
+        File result;
 
         if(this.isAuthenticated()) {
             result = new File(destination, file.getName());
 
             try(final OutputStream out = new FileOutputStream(result)) {
-                final DbxClient client = new DbxClient(this.dropboxConfiguration, this.accessToken);
+                final DbxClientV2 client = new DbxClientV2(this.dropboxConfiguration, this.accessToken);
 
-                client.getFile(file.toString(), null, out);
+                client.files().download(file.toString()).download(out);
             } catch (IOException | DbxException e) {
                 LOGGER.log(Level.SEVERE, "Can not download the file", e);
                 result = null;
@@ -282,27 +287,26 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
         final List<RemoteFile> folders = new ArrayList<>();
 
         if(this.isAuthenticated()) {
-            final DbxClient client = new DbxClient(this.dropboxConfiguration, this.accessToken);
-            final DbxEntry.WithChildren listing;
+            final DbxClientV2 client = new DbxClientV2(this.dropboxConfiguration, this.accessToken);
+            final ListFolderResult listing;
 
             try {
-                listing = client.getMetadataWithChildren(parent.toString());
-                listing.children
+                listing = client.files().listFolderBuilder(parent.isRoot() ? "" : parent.toString())
+                                        .withRecursive(false)
+                                        .withIncludeDeleted(false)
+                                        .start();
+                listing.getEntries()
                         .stream()
                         .filter(entry -> {
                             if(includeFolders && includePresentations) {
-                                return entry.isFolder() || (entry.isFile() && entry.name.endsWith(PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION));
+                                return isFolder(entry) || (isFile(entry) && isNameEndingWithSuffix(entry, DEFAULT_DOTTED_ARCHIVE_EXTENSION));
                             } else if(includeFolders && !includePresentations) {
-                                return entry.isFolder();
+                                return isFolder(entry);
                             } else if(!includeFolders && includePresentations) {
-                                return entry.isFolder() && entry.name.endsWith(PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION);
+                                return isFolder(entry) && isNameEndingWithSuffix(entry, DEFAULT_DOTTED_ARCHIVE_EXTENSION);
                             } else return false;
                         })
-                        .forEach(entry ->
-                            folders.add(new RemoteFile(parent, entry.name)
-                                            .setFile(entry.isFile())
-                                            .setFolder(entry.isFolder()))
-                        );
+                        .forEach(entry ->  folders.add(this.createRemoteFile(entry, parent)));
             } catch (DbxException e) {
                 LOGGER.log(Level.SEVERE, "Error while retrieving the folders", e);
             }
@@ -313,31 +317,86 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
         return folders;
     }
 
+    /**
+     * Creates an instance of {@link RemoteFile} from a given {@link Metadata} and a given parent.
+     * @param metadata The metadata to create the remote file for.
+     * @param parent The optional parent of the file.
+     * @return A well created {@link RemoteFile} instance.
+     */
+    protected RemoteFile createRemoteFile(final Metadata metadata, final RemoteFile parent) {
+        final RemoteFile file = new RemoteFile(parent, metadata.getName());
+        if(isFile(metadata)) {
+            file.setFile(true);
+            file.setFolder(false);
+        } else {
+            file.setFile(false);
+            file.setFolder(true);
+        }
+
+        return file;
+    }
+
     @Override
     public boolean fileExists(PresentationEngine engine, RemoteFile destination) throws HostingConnectorException {
         if(engine == null) throw new NullPointerException("The engine can not be null");
         if(engine.getArchive() == null) throw new NullPointerException("The archive file can not be null");
         if(destination == null) throw new NullPointerException("The destination can not be null");
 
-        boolean exist = true;
+        boolean exist;
 
         if(this.isAuthenticated()) {
-            final DbxClient client = new DbxClient(this.dropboxConfiguration, this.accessToken);
-            final DbxEntry.WithChildren listing;
+            final DbxClientV2 client = new DbxClientV2(this.dropboxConfiguration, this.accessToken);
+            final RemoteFile remotePresentation = new RemoteFile(destination, engine.getArchive().getName());
 
             try {
-                listing = client.getMetadataWithChildren(destination.toString());
-                exist = listing.children
-                        .stream()
-                        .filter(entry -> entry.isFile() && engine.getArchive().getName().equals(entry.name))
-                        .count() > 0;
+                client.files().getMetadata(remotePresentation.toString());
+                exist = true;
             } catch (DbxException e) {
-                LOGGER.log(Level.SEVERE, "Error while retrieving the folders", e);
+                LOGGER.log(Level.FINE, "The presentation hasn't been found remotely", e);
+                exist = false;
             }
         } else {
             throw new HostingConnectorException(HostingConnectorException.NOT_AUTHENTICATED);
         }
 
         return exist;
+    }
+
+    /**
+     * Check if a given metadata is considered as a folder or not.
+     * @param metadata The metadata to check.
+     * @return {@code true} if the metadata is a folder, {@code false} otherwise.
+     */
+    protected boolean isFolder(final Metadata metadata) {
+        return metadata instanceof FolderMetadata;
+    }
+
+    /**
+     * Check if a given metadata is considered as a file or not.
+     * @param metadata The metadata to check.
+     * @return {@code true} if the metadata is a file, {@code false} otherwise.
+     */
+    protected boolean isFile(final Metadata metadata) {
+        return metadata instanceof FileMetadata;
+    }
+
+    /**
+     * Check if the name of a metada is ending with a given suffix.
+     * @param metadata The metadata to check the name for.
+     * @param suffix The suffix expected at the end of the metadata's name.
+     * @return {@code true} if the metadata is ending with the suffix, {@code false} otherwise.
+     */
+    protected boolean isNameEndingWithSuffix(final Metadata metadata, final String suffix) {
+        return metadata.getName().endsWith(suffix);
+    }
+
+    /**
+     * Check if the name of the metadata is equal to another name. The check is case sensitive.
+     * @param metadata The metadata to check the name.
+     * @param name The expected name to be considered equal.
+     * @return {@code true} if the names are equal, {@code false} otherwise.
+     */
+    protected boolean isNameEqual(final Metadata metadata, final String name) {
+        return metadata.getName().equals(name);
     }
 }

@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.hosting.connector.io;
 
 import java.io.Serializable;
+import java.util.StringJoiner;
 
 /**
  * Represents a file that is hosted remotely on the service.
@@ -62,7 +63,7 @@ public class RemoteFile implements Serializable {
      * {@code null}.
      * @return {@code true} if the folder is the root on the service, {@code false} otherwise.
      */
-    public boolean isRoot() { return this.name == null; }
+    public boolean isRoot() { return this.parent == null; }
 
     /**
      * Indicates if this file is considered as a regular file on the hosting service. If {@link #setFile(boolean)} hasn't
@@ -100,11 +101,20 @@ public class RemoteFile implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder("");
+        final StringBuilder builder = new StringBuilder();
 
-        if(this.parent != null) builder.append(this.parent.toString());
+        if(this.isRoot()) {
+            builder.append("/");
+        } else {
+            final String parentString = this.parent.toString();
+            builder.append(parentString);
 
-        builder.append("/").append(this.isRoot() ? "" : this.name);
+            if(!parentString.endsWith("/")) {
+                builder.append("/");
+            }
+        }
+
+        if(this.name != null) builder.append(this.name);
 
         return builder.toString();
     }

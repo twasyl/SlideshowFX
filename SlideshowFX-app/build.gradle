@@ -23,11 +23,8 @@ dependencies {
     compile configurations.vertx
     compile configurations.zxing
 
-    testCompile configurations.bytebuddy
     testCompile configurations.junit
     testCompile configurations.mockito
-    testCompile configurations.testfx
-    testCompile configurations.vertxunit
 }
 
 jar {

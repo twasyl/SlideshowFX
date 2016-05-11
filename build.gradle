@@ -54,7 +54,7 @@ allprojects {
     dependencies {
         asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.4'
         drive 'com.google.apis:google-api-services-drive:v2-rev213-1.21.0'
-        dropbox 'com.dropbox.core:dropbox-core-sdk:2.0.1'
+        dropbox 'com.dropbox.core:dropbox-core-sdk:2.0.3'
         felix 'org.apache.felix:org.apache.felix.framework:5.4.0'
         fontawesomefx 'de.jensd:fontawesomefx-fontawesome:4.5.0'
         freemarker 'org.freemarker:freemarker:2.3.23'

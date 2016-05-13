@@ -23,7 +23,7 @@ public abstract class AbstractEngine<T extends IConfiguration> implements IEngin
 
     /**
      * Creates an instance of the engine and set the archiveExtension all archive files of this engine must have.
-     * For example, the archiveExtension for presentations' archives is <code>sfx</code> and for template's <code>sfxt</code>.
+     * For example, the archiveExtension for presentations' archives is {@code sfx} and for template's <code>sfxt</code>.
      *
      * @param archiveExtension The archiveExtension for each archive files of this engine.
      * @param configurationFilename The name of the configuration file, depending the implementation.

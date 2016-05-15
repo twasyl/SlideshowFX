@@ -13,16 +13,20 @@ import org.eclipse.mylyn.wikitext.textile.core.TextileLanguage;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class implements the Textile syntax.
- * This markup language is identified byt the code <code>TEXTILE</code> which is returned by {@link com.twasyl.slideshowfx.markup.IMarkup#getCode()}.
+ * This markup language is identified byt the code {@code TEXTILE} which is returned by {@link com.twasyl.slideshowfx.markup.IMarkup#getCode()}.
  *
  * @author Thierry Wasylczenko
  * @since SlideshowFX 1.0.0
  * @version 1.0
  */
 public class TextileMarkup extends AbstractMarkup {
+    private static final Logger LOGGER = Logger.getLogger(TextileMarkup.class.getName());
+
     // The generation strategy generates IDs using the current timestamp
     final IdGenerationStrategy idGenerationStrategy = new IdGenerationStrategy() {
         @Override
@@ -48,36 +52,38 @@ public class TextileMarkup extends AbstractMarkup {
         }
     };
 
-    public TextileMarkup() { super("TEXTILE", "Textile", "ace/mode/textile"); }
+    public TextileMarkup() {
+        super("TEXTILE", "Textile", "ace/mode/textile");
+        idGenerator.setGenerationStrategy(idGenerationStrategy);
+    }
 
     /**
-     * This methods convert the given <code>markupString</code> to HTML.
+     * This methods convert the given {@code >markupString} to HTML.
      * This method assumes the given String is in the correct textile format.
      *
      * @param markupString The string written in the markup syntax to convert as HTML.
      * @return the HTML representation of the textile string.
-     * @throws IllegalArgumentException If <code>markupString</code> is null, this exception is thrown.
+     * @throws IllegalArgumentException If {@code >markupString} is null, this exception is thrown.
      */
     @Override
     public String convertAsHtml(String markupString) throws IllegalArgumentException {
         if(markupString == null) throw new IllegalArgumentException("Can not convert " + getName() + " to HTML : the String is null");
-        final StringWriter writer = new StringWriter();
 
-        idGenerator.setGenerationStrategy(idGenerationStrategy);
+        String result = null;
 
-        final DocumentBuilder builder = new HtmlDocumentBuilder(writer);
+        try(final StringWriter writer  = new StringWriter()) {
+            final DocumentBuilder builder = new HtmlDocumentBuilder(writer);
+            final MarkupParser parser = new MarkupParser(language, builder);
 
-        final MarkupParser parser = new MarkupParser(language, builder);
+            parser.parse(markupString, false);
+            builder.flush();
+            writer.flush();
 
-        parser.parse(markupString, false);
-
-        writer.flush();
-        try {
-            writer.close();
+            result = writer.toString();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Error while converting to textile");
         }
 
-        return writer.toString();
+        return result;
     }
 }

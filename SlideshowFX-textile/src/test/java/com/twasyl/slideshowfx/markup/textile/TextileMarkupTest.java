@@ -23,25 +23,25 @@ public class TextileMarkupTest {
     }
 
     @Test public void generateH1() {
-        final String result = markup.convertAsHtml("# A title");
+        final String result = markup.convertAsHtml("h1. A title");
 
-        assertEquals("<h1>A title</h1>", result);
+        assertEquals("<h1 id=\"Atitle\">A title</h1>", result);
     }
 
     @Test public void generateH2() {
-        final String result = markup.convertAsHtml("## A title");
+        final String result = markup.convertAsHtml("h2. A title");
 
-        assertEquals("<h2>A title</h2>", result);
+        assertEquals("<h2 id=\"Atitle\">A title</h2>", result);
     }
 
     @Test public void generateInlineCode() {
-        final String result = markup.convertAsHtml("`public class Java { }`");
+        final String result = markup.convertAsHtml("@public class Java { }@");
 
         assertEquals("<p><code>public class Java { }</code></p>", result);
     }
 
     @Test public void generateCodeBloc() {
-        final String result = markup.convertAsHtml("    final String s;");
+        final String result = markup.convertAsHtml("bc. final String s;");
 
         assertEquals("<pre><code>final String s;\n</code></pre>", result);
     }
@@ -49,12 +49,12 @@ public class TextileMarkupTest {
     @Test public void generateStrong() {
         final String result = markup.convertAsHtml("*Strong text*");
 
-        assertEquals("<p><em>Strong text</em></p>", result);
+        assertEquals("<p><strong>Strong text</strong></p>", result);
     }
 
     @Test public void generateUnorderedList() {
         final String result = markup.convertAsHtml("* One\n* Two");
 
-        assertEquals("<ul>\n<li>One</li>\n<li>Two</li>\n</ul>", result);
+        assertEquals("<ul><li>One</li><li>Two</li></ul>", result);
     }
 }

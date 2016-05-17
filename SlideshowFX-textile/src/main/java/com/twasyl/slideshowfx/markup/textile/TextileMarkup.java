@@ -27,43 +27,17 @@ import java.util.logging.Logger;
 public class TextileMarkup extends AbstractMarkup {
     private static final Logger LOGGER = Logger.getLogger(TextileMarkup.class.getName());
 
-    // The generation strategy generates IDs using the current timestamp
-    final IdGenerationStrategy idGenerationStrategy = new IdGenerationStrategy() {
-        @Override
-        public String generateId(String s) {
-            return System.currentTimeMillis() + "";
-        }
-    };
-
-    final IdGenerator idGenerator = new IdGenerator();
-
-    final TextileContentState contentState = new TextileContentState() {
-        @Override
-        public IdGenerator getIdGenerator() {
-            return idGenerator;
-        }
-    };
-
-    // Override the language to return the created contentState used for the ID generation
-    final MarkupLanguage language = new TextileLanguage() {
-        @Override
-        protected ContentState createState() {
-            return contentState;
-        }
-    };
-
     public TextileMarkup() {
         super("TEXTILE", "Textile", "ace/mode/textile");
-        idGenerator.setGenerationStrategy(idGenerationStrategy);
     }
 
     /**
-     * This methods convert the given {@code >markupString} to HTML.
+     * This methods convert the given {@code markupString} to HTML.
      * This method assumes the given String is in the correct textile format.
      *
      * @param markupString The string written in the markup syntax to convert as HTML.
      * @return the HTML representation of the textile string.
-     * @throws IllegalArgumentException If {@code >markupString} is null, this exception is thrown.
+     * @throws IllegalArgumentException If {@code markupString} is null, this exception is thrown.
      */
     @Override
     public String convertAsHtml(String markupString) throws IllegalArgumentException {
@@ -73,7 +47,7 @@ public class TextileMarkup extends AbstractMarkup {
 
         try(final StringWriter writer  = new StringWriter()) {
             final DocumentBuilder builder = new HtmlDocumentBuilder(writer);
-            final MarkupParser parser = new MarkupParser(language, builder);
+            final MarkupParser parser = new MarkupParser(new TextileLanguage(), builder);
 
             parser.parse(markupString, false);
             builder.flush();

@@ -51,7 +51,8 @@
     -fx-border-style: solid;
 }
 
-.menu-bar .menu:showing, .context-menu .menu:showing {
+.menu-bar .menu:showing,
+.context-menu .menu:showing {
     -fx-background-color: app-color-menu-in-use;
 }
 
@@ -59,6 +60,19 @@
     -fx-border-style: solid none none none;
     -fx-border-width: 1.5px 0 0 0;
     -fx-border-color: app-color-menu-in-use;
+}
+
+.menu-bar .menu:showing .menu {
+    -fx-border-style: none;
+    -fx-border-width: 0;
+}
+
+.menu-bar .menu:showing .menu:hover {
+    -fx-background-color: app-color-menu-in-use;
+}
+
+.menu-bar .menu:showing .menu:hover:disabled {
+    -fx-background-color: transparent;
 }
 
 .menu-bar, .menu-button .menu .menu-item {
@@ -75,11 +89,13 @@
     -fx-border-style: dotted;
 }
 
-.context-menu .menu, .context-menu .menu-item {
+.context-menu .menu,
+.context-menu .menu-item {
     -fx-border-style: none;
 }
 
-.context-menu .menu .menu-item:hover, .context-menu .menu:hover {
+.context-menu .menu .menu-item:hover,
+.context-menu .menu:hover {
     -fx-background-color: app-color-menu-in-use;
 }
 
@@ -98,6 +114,11 @@
 
 .menu-item:hover {
     -fx-background-color: app-color-menu-in-use;
+}
+
+.menu:hover:disabled,
+.menu-item:hover:disabled {
+    -fx-background-color: transparent;
 }
 
 .tool-bar {

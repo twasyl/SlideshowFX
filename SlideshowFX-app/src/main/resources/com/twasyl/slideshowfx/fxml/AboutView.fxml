@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.Background?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.Double?>
 <StackPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.AboutViewController"
-           alignment="CENTER" prefWidth="${backgroundImage.fitWidth}" prefHeight="${backgroundImage.fitHeight}"
+           alignment="TOP_CENTER"
            onMouseClicked="#exitByClick">
 
     <background><Background fx:constant="EMPTY" /></background>
+
+    <fx:define>
+        <Double fx:id="VIEWPORT_HEIGHT" fx:value="230" />
+        <Double fx:id="VIEWPORT_WIDTH" fx:value="480" />
+    </fx:define>
 
     <ImageView>
         <image>
@@ -18,10 +24,22 @@
         </image>
     </ImageView>
 
-    <VBox spacing="10" translateX="25" translateY="150">
-        <Label fx:id="slideshowFXVersion" style="-fx-text-fill: white;" />
-        <Label fx:id="javaVersion" style="-fx-text-fill: white;" />
-    </VBox>
+    <ScrollPane prefWidth="${VIEWPORT_WIDTH}" maxWidth="${VIEWPORT_WIDTH}" minWidth="${VIEWPORT_WIDTH}"
+                prefHeight="${VIEWPORT_HEIGHT}" maxHeight="${VIEWPORT_HEIGHT}" minHeight="${VIEWPORT_HEIGHT}"
+                prefViewportWidth="${VIEWPORT_WIDTH}" minViewportWidth="${VIEWPORT_WIDTH}"
+                prefViewportHeight="${VIEWPORT_HEIGHT}" minViewportHeight="${VIEWPORT_HEIGHT}"
+                fitToHeight="true"
+                translateY="125">
+        <background><Background fx:constant="EMPTY" /></background>
 
+        <VBox spacing="10">
+            <background><Background fx:constant="EMPTY" /></background>
+            <padding>
+                <Insets left="10" />
+            </padding>
+            <Label fx:id="slideshowFXVersion" style="-fx-text-fill: black;" />
+            <Label fx:id="javaVersion" style="-fx-text-fill: black;" />
+        </VBox>
+    </ScrollPane>
 </StackPane>
 

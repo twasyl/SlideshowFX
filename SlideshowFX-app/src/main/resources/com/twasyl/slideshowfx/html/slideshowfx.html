@@ -162,14 +162,15 @@
             .custom-button {
                 height: 30px;
                 border-radius: 8px;
-                border: 2px solid #00196E;
-                color: #00196E;
+                border: 2px solid gray;
+                color: gray;
                 background-color: #EFEFEF;
+                cursor: pointer;
             }
 
-            .blue-background {
-                background: #00196E;
-                color: white;
+            .header-background {
+                background: whitesmoke;
+                color: gray;
             }
 
             .width-to-container {
@@ -197,7 +198,7 @@
                 z-index: 2;
             }
 
-            #header div:first-child, #header div:nth-child(2) {
+            #header div:first-child {
                 float: left;
                 padding: 10 px;
                 margin-left: 5px;
@@ -218,10 +219,12 @@
                 border-bottom-width: 0;
             }
 
-            #menu i.active {
+            #menu i.active,
+            #menu i:hover {
                 border-bottom-style: solid;
                 border-bottom-width: 5px;
                 padding-bottom: 12px;
+                cursor: pointer;
             }
 
             /* CONTENT STYLE */
@@ -337,9 +340,8 @@
     </head>
     <body>
         <div id="#page">
-            <div id="header" class="blue-background">
+            <div id="header" class="header-background">
                 <div><img src="/slideshowfx/images/logo.svg" height="64" /></div>
-                <div><p style="padding-left: 20px; font-size: 20px">SlideshowFX</p></div>
                 <div id="menu" class="hide">
                     <i id="chat-container-menu-entry" class="fa fa-comments-o fa-2x fw" onclick="javascript:displayContent('chat-container');"></i>
                     <i id="quiz-container-menu-entry" class="fa fa-question fa-2x fw" onclick="javascript:displayContent('quiz-container');"></i>

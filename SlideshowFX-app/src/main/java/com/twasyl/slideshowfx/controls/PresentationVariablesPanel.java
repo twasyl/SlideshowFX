@@ -5,24 +5,30 @@ import com.twasyl.slideshowfx.utils.beans.Pair;
 import de.jensd.fx.glyphs.GlyphsStack;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
+ * This class represents a panel used to insert and define variables that can be used within a presentation.
+ *
  * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since SlideshowFX 1.0.0
  */
 public class PresentationVariablesPanel extends BorderPane {
 
     private PresentationConfiguration configuration;
-    private final Map<String, String> variables = new HashMap<>();
 
     private final VBox variablesBox = new VBox(5);
     private final ScrollPane variablesScrollPane = new ScrollPane(this.variablesBox);
@@ -72,15 +78,24 @@ public class PresentationVariablesPanel extends BorderPane {
         radioButton.setSelected(true);
         radioButton.setUserData(variable);
 
+        final EventHandler<KeyEvent> addVariableByKeyboard = event -> {
+            if (event.isShortcutDown() && KeyCode.ENTER.equals(event.getCode())) {
+                event.consume();
+                this.addVariable(null, null);
+            }
+        };
+
         final TextField variableName = new TextField();
         variableName.setPromptText("Variable's name");
         variableName.setPrefColumnCount(10);
         variableName.textProperty().bindBidirectional(variable.keyProperty());
+        variableName.setOnKeyPressed(addVariableByKeyboard);
 
         final TextField variableValue = new TextField();
         variableValue.setPromptText("Variable's value");
         variableValue.setPrefColumnCount(15);
         variableValue.textProperty().bindBidirectional(variable.valueProperty());
+        variableValue.setOnKeyPressed(addVariableByKeyboard);
 
         final FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE);
         icon.setGlyphSize(20);
@@ -114,7 +129,10 @@ public class PresentationVariablesPanel extends BorderPane {
             final Pair<String, String> variable = (Pair<String, String>) selection.getUserData();
 
             if(variable.getKey() == null || variable.getKey().trim().isEmpty()) return null;
-            else return variable;
+            else {
+                this.normalizeVariable(variable);
+                return variable;
+            }
         }
         else return null;
     }
@@ -134,6 +152,18 @@ public class PresentationVariablesPanel extends BorderPane {
                 .filter(data -> data.getKey() != null && !data.getKey().trim().isEmpty())
                 .collect(Collectors.toList()));
 
+        variables.forEach(this::normalizeVariable);
+
         return variables;
+    }
+
+    /**
+     * Normalize a variable, meaning that if it's value is {@code null} set it to an empty {@link String}.
+     * @param variable The variable to normalize.
+     */
+    private void normalizeVariable(final Pair<String, String> variable) {
+        if(variable.getValue() == null) {
+            variable.setValue("");
+        }
     }
 }

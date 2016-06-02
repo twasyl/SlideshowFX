@@ -52,7 +52,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *  This class is the controller of the <code>PresentationView.fxml</code> file. It defines all actions possible inside the view
+ *  This class is the controller of the {@code PresentationView.fxml} file. It defines all actions possible inside the view
  *  represented by the FXML.
  *  
  *  @author Thierry Wasyczenko

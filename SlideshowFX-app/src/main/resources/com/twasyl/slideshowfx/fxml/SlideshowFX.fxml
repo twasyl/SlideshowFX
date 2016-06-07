@@ -300,16 +300,27 @@
                     </items>
                 </ComboBox>
 
-                <TextField prefColumnCount="3" promptText="Port" fx:id="serverPort" onKeyPressed="#startServerByKeyPressed" />
+                <TextField prefColumnCount="3" promptText="Port" fx:id="serverPort" onKeyPressed="#startServerByKeyPressed">
+                    <tooltip>
+                        <Tooltip text="Server port" />
+                    </tooltip>
+                </TextField>
 
                 <FontAwesomeIconView glyphName="TWITTER" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
 
-                <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" onKeyPressed="#startServerByKeyPressed" />
+                <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag" onKeyPressed="#startServerByKeyPressed">
+                    <tooltip>
+                        <Tooltip text="Twitter hashtag" />
+                    </tooltip>
+                </TextField>
 
                 <Button onAction="#startServerByButton" fx:id="startServerButton" styleClass="image">
                     <graphic>
                         <FontAwesomeIconView glyphName="PLAY" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: green" />
                     </graphic>
+                    <tooltip>
+                        <Tooltip text="Start the server" />
+                    </tooltip>
                 </Button>
             </ToolBar>
         </VBox>

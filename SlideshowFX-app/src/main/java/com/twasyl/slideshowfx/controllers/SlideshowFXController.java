@@ -958,6 +958,7 @@ public class SlideshowFXController implements Initializable {
      */
     private void startServer() {
         FontAwesomeIconView icon;
+        final Tooltip tooltip = new Tooltip();
 
         if (SlideshowFXServer.getSingleton() != null) {
             SlideshowFXServer.getSingleton().stop();
@@ -965,6 +966,8 @@ public class SlideshowFXController implements Initializable {
             icon = new FontAwesomeIconView(FontAwesomeIcon.PLAY);
             icon.setGlyphSize(20);
             icon.setGlyphStyle("-fx-fill: green");
+
+            tooltip.setText("Start the server");
         } else {
             String ip = this.serverIpAddress.getValue();
             if (ip == null || ip.isEmpty()) {
@@ -993,9 +996,12 @@ public class SlideshowFXController implements Initializable {
             icon = new FontAwesomeIconView(FontAwesomeIcon.POWER_OFF);
             icon.setGlyphSize(20);
             icon.setGlyphStyle("-fx-fill: app-color-orange");
+
+            tooltip.setText("Stop the server");
         }
 
         this.startServerButton.setGraphic(icon);
+        this.startServerButton.setTooltip(tooltip);
         this.serverIpAddress.setDisable(!this.serverIpAddress.isDisable());
         this.serverPort.setDisable(!this.serverPort.isDisable());
     }

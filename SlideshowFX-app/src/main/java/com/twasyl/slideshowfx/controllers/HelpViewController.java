@@ -68,10 +68,9 @@ public class HelpViewController implements Initializable {
                 .backend("html5")
                 .linkCss(false)
                 .experimental(true)
-                .tableOfContents(true)
                 .tableOfContents(Placement.LEFT)
                 .styleSheetName("slideshowfx.css")
-                .stylesDir(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/documentation"))
+                .stylesDir(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/documentation/css"))
                 .imagesDir(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/documentation/images"))
                 .noFooter(true)
                 .get();

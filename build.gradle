@@ -269,6 +269,7 @@ task installAllPlugins(dependsOn: [ ':installMarkupPlugins', ':installContentExt
 task packageSlideshowFX(dependsOn : [':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar', ':SlideshowFX-textile:jar',
                                      ':SlideshowFX-code-extension:jar', ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar', ':SlideshowFX-quiz-extension:jar', ':SlideshowFX-quote-extension:jar', ':SlideshowFX-sequence-diagram-extension:jar', ':SlideshowFX-snippet-extension:jar',
                                      ':SlideshowFX-go-executor:jar', ':SlideshowFX-golo-executor:jar', ':SlideshowFX-groovy-executor:jar', ':SlideshowFX-java-executor:jar', ':SlideshowFX-javascript-executor:jar', ':SlideshowFX-kotlin-executor:jar', ':SlideshowFX-scala-executor:jar',
+                                     'SlideshowFX-drive-hosting-connector:jar', 'SlideshowFX-dropbox-hosting-connector:jar',
                                      ':SlideshowFX-app:jar',
                                      'asciidoctor']) {
 
@@ -317,6 +318,13 @@ task packageSlideshowFX(dependsOn : [':SlideshowFX-asciidoctor:jar', ':Slideshow
             from project(':SlideshowFX-scala-executor').jar.archivePath
 
             into new File(pluginsFolder, "executors")
+        }
+
+        copy {
+            from project(':SlideshowFX-drive-hosting-connector').jar.archivePath
+            from project(':SlideshowFX-dropbox-hosting-connector').jar.archivePath
+
+            into new File(pluginsFolder, "hostingConnectors")
         }
 
         copy {

@@ -267,13 +267,15 @@ task installAllPlugins(dependsOn: [ ':installMarkupPlugins', ':installContentExt
 }
 
 task packageSlideshowFX(dependsOn : [':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar', ':SlideshowFX-textile:jar',
-                                     ':SlideshowFX-code-extension:jar', ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar', ':SlideshowFX-quiz-extension:jar', ':SlideshowFX-quote-extension:jar', ':SlideshowFX-sequence-diagram-extension:jar', ':SlideshowFX-snippet-extension:jar',
+                                     ':SlideshowFX-alert-extension:jar', ':SlideshowFX-code-extension:jar', ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar', ':SlideshowFX-quiz-extension:jar', ':SlideshowFX-quote-extension:jar', ':SlideshowFX-sequence-diagram-extension:jar', ':SlideshowFX-snippet-extension:jar',
                                      ':SlideshowFX-go-executor:jar', ':SlideshowFX-golo-executor:jar', ':SlideshowFX-groovy-executor:jar', ':SlideshowFX-java-executor:jar', ':SlideshowFX-javascript-executor:jar', ':SlideshowFX-kotlin-executor:jar', ':SlideshowFX-scala-executor:jar',
                                      'SlideshowFX-drive-hosting-connector:jar', 'SlideshowFX-dropbox-hosting-connector:jar',
                                      ':SlideshowFX-app:jar',
                                      'asciidoctor']) {
 
-    def destinationFolder = new File(buildDir, "/distributions/$applicationName-$applicationVersion")
+    def distributionsFolder = new File(buildDir, "distributions")
+    def destinationFolder = new File(distributionsFolder, "$applicationName-$applicationVersion")
+    def packagingFolder = new File(distributionsFolder, "packaging")
     def pluginsFolder = new File(destinationFolder, "plugins")
     def docFolder = new File(destinationFolder, "docs")
     def tmpFolder = new File(destinationFolder, "tmp")
@@ -282,7 +284,7 @@ task packageSlideshowFX(dependsOn : [':SlideshowFX-asciidoctor:jar', ':Slideshow
     ant.importBuild "${projectDir.absolutePath}/src/main/resources/javafx/javafx.xml"
     ant.classpath = "${jdk}/lib/ant-javafx.jar"
 
-    ant.deployOutDir = "${buildDir.absolutePath}/distributions/packaging"
+    ant.deployOutDir = "$packagingFolder.absolutePath"
     ant.deployResourcesDir = tmpFolder.absolutePath
 
     doFirst {
@@ -353,6 +355,9 @@ task packageSlideshowFX(dependsOn : [':SlideshowFX-asciidoctor:jar', ':Slideshow
         if(PlatformUtil.isMac()) {
             println "Create package for the OSX platform"
             deployOSX.execute()
+        } else if(PlatformUtil.isWindows()) {
+            println "Create package the Windows platform"
+            deployWindows.execute()
         } else {
             println "Create package an unknown platform"
             deployUnknown.execute()
@@ -360,15 +365,15 @@ task packageSlideshowFX(dependsOn : [':SlideshowFX-asciidoctor:jar', ':Slideshow
 
         // Clean
         copy {
-            from(fileTree(dir: new File(ant.deployOutDir, "bundles")))
-            into(destinationFolder)
+            from(fileTree(dir: new File(ant.deployOutDir, "bundles/$applicationName")))
+            into(new File(destinationFolder, "$applicationName"))
         }
     }
 
     doLast {
-        delete { ant.deployOutDir }
-        delete { tmpFolder }
-        delete {asciidoctor.outputDir }
+        packagingFolder.deleteDir()
+        tmpFolder.deleteDir()
+        asciidoctor.outputDir.deleteDir()
     }
 }
 

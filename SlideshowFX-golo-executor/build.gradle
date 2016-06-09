@@ -15,7 +15,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX golo executor',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.snippet.executor.golo',
                 'Bundle-Description': 'Allow to execute Golo code inside a presentation',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.snippet.executor.golo.activator.GoloSnippetExecutorActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.golo,com.twasyl.slideshowfx.snippet.executor.golo.activator',

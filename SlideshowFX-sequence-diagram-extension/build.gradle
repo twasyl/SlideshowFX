@@ -14,7 +14,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX sequence diagram extension',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.sequence.diagram',
                 'Bundle-Description': 'Support for inserting sequence diagrams in presentations',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.sequence.diagram.activator.SequenceDiagramContentExtensionActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.content.extension.sequence.diagram,com.twasyl.slideshowfx.content.extension.sequence.diagram.activator,com.twasyl.slideshowfx.content.extension.sequence.diagram.controllers',

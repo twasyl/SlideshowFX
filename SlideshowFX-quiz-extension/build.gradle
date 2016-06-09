@@ -15,7 +15,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX quiz extension',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.quiz',
                 'Bundle-Description': 'Support for inserting quiz in slides',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.quiz.activator.QuizContentExtensionActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.content.extension.quiz.controllers,com.twasyl.slideshowfx.content.extension.quiz,com.twasyl.slideshowfx.content.extension.quiz.activator',

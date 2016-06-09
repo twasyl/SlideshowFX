@@ -13,7 +13,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX alert extension',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.alert',
                 'Bundle-Description': 'Support for inserting alert in slides',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.alert.activator.AlertContentExtensionActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.content.extension.alert.controllers,com.twasyl.slideshowfx.content.extension.alert,com.twasyl.slideshowfx.content.extension.alert.activator',

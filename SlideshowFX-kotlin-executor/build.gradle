@@ -15,7 +15,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX Kotlin executor',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.snippet.executor.kotlin',
                 'Bundle-Description': 'Allow to execute Kotlin code inside a presentation',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.snippet.executor.kotlin.activator.KotlinSnippetExecutorActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.kotlin,com.twasyl.slideshowfx.snippet.executor.kotlin.activator',

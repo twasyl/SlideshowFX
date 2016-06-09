@@ -14,7 +14,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX quote extension',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.quote',
                 'Bundle-Description': 'Support for inserting quote in slides',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.quote.activator.QuoteContentExtensionActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.content.extension.quote.controllers,com.twasyl.slideshowfx.content.extension.quote,com.twasyl.slideshowfx.content.extension.quote.activator',

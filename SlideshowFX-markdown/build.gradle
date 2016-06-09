@@ -21,7 +21,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX markdown support',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.markdown',
                 'Bundle-Description': 'Support markdown for defining slide\'s content',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.markup.markdown.activator.MarkdownActivator',
                 'Bundle-ClassPath': configurations.markdown.resolve().collect { artifact -> artifact.name }.join(',').concat(',.'),
                 'Bundle-Vendor': 'Thierry Wasylczenko',

@@ -15,7 +15,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX Go executor',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.snippet.executor.go',
                 'Bundle-Description': 'Allow to execute Go code inside a presentation',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.snippet.executor.go.activator.GoSnippetExecutorActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.go,com.twasyl.slideshowfx.snippet.executor.go.activator',

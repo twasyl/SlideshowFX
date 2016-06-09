@@ -13,7 +13,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX JavaScript executor',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.snippet.executor.javascript',
                 'Bundle-Description': 'Allow to execute JavaScript code inside a presentation',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.snippet.executor.javascript.activator.JavaScriptSnippetExecutorActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.javascript,com.twasyl.slideshowfx.snippet.executor.javascript.activator',

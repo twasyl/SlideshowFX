@@ -17,7 +17,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX code extension',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.code',
                 'Bundle-Description': 'Support for inserting code in slides',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.code.activator.CodeContentExtensionActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.content.extension.code,com.twasyl.slideshowfx.content.extension.code.controllers,com.twasyl.slideshowfx.content.extension.code.activator',

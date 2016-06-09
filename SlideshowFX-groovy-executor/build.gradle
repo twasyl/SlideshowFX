@@ -15,7 +15,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX Groovy executor',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.snippet.executor.groovy',
                 'Bundle-Description': 'Allow to execute Groovy code inside a presentation',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.snippet.executor.groovy.activator.GroovySnippetExecutorActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.groovy,com.twasyl.slideshowfx.snippet.executor.groovy.activator',

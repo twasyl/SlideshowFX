@@ -20,7 +20,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX asciidoctor support',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.asciidoctor',
                 'Bundle-Description': 'Support asciidoctor for defining slide\'s content',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.markup.asciidoctor.activator.AsciidoctorActivator',
                 'Bundle-ClassPath': configurations.asciidoctorj.resolve().collect { artifact -> artifact.name }.join(',').concat(',.'),
                 'Bundle-Vendor': 'Thierry Wasylczenko',

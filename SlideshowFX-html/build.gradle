@@ -16,7 +16,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX HTML support',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.html',
                 'Bundle-Description':'Support HTML for defining slide\'s content',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.markup.html.activator.HtmlActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.markup.html,com.twasyl.slideshowfx.markup.html.activator',

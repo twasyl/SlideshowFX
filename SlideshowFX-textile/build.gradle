@@ -20,7 +20,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX Textile support',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.markup.textile',
                 'Bundle-Description': 'Support Textile for defining slide\'s content',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.markup.textile.activator.TextileActivator',
                 'Bundle-ClassPath': configurations.wikitext.resolve().collect { artifact -> artifact.name }.join(',').concat(',.'),
                 'Bundle-Vendor': 'Thierry Wasylczenko',

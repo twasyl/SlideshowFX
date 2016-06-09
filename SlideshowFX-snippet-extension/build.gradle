@@ -15,7 +15,7 @@ jar {
                 'Bundle-Name': 'SlideshowFX snippet extension',
                 'Bundle-SymbolicName': 'com.twasyl.slideshowfx.content.extension.snippet',
                 'Bundle-Description': 'Support for inserting code snippets in presentations',
-                'Bundle-Version': '1.0.0',
+                'Bundle-Version': "$project.version",
                 'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.snippet.activator.SnippetContentExtensionActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.content.extension.snippet.controls,com.twasyl.slideshowfx.content.extension.snippet.controllers,com.twasyl.slideshowfx.content.extension.snippet,com.twasyl.slideshowfx.content.extension.snippet.activator',

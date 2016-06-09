@@ -1,5 +1,5 @@
 description = 'Extension allowing to insert alerts inside a SlideshowFX presentation'
-version = '1.0.0'
+version = '1.0'
 
 dependencies {
     compile project(':SlideshowFX-content-extension')

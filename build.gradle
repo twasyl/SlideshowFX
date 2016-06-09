@@ -16,7 +16,7 @@ buildscript {
 
 ext {
     applicationName = 'SlideshowFX'
-    applicationVersion = '1.0.0'
+    applicationVersion = '1.0'
 
     allLibs = new File(rootDir, '/lib')
     jdk = System.env.'JAVA_HOME'

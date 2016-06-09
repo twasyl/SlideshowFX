@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasyczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippetExecutorOptions> {
 

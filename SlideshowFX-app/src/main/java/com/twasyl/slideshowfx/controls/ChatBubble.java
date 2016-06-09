@@ -24,7 +24,7 @@ import static com.twasyl.slideshowfx.server.service.AbstractSlideshowFXService.*
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class ChatBubble extends VBox {
 

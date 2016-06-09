@@ -11,7 +11,7 @@ import javafx.scene.Parent;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public interface ISnippetExecutor<T extends ISnippetExecutorOptions> extends IPlugin<T>, IConfigurable<T> {
 

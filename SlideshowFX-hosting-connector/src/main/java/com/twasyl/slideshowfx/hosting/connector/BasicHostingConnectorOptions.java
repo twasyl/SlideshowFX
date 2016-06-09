@@ -9,7 +9,7 @@ import javafx.beans.property.StringProperty;
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class BasicHostingConnectorOptions implements IHostingConnectorOptions {
     private final StringProperty consumerKey = new SimpleStringProperty();

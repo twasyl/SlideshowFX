@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * This class tests the {@link EventBus} class.
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @version 1.0.0
  */
 public class EventBusTest {

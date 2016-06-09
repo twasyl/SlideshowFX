@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 /**
  * Tests the class {@link ListFilesFileVisitor}
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @version 1.0.0
  */
 public class ListFilesFileVisitorTest {

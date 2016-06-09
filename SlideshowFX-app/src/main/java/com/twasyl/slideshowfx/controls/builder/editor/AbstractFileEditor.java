@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public abstract class AbstractFileEditor<T extends Node> extends Tab implements IFileEditor<T> {
 

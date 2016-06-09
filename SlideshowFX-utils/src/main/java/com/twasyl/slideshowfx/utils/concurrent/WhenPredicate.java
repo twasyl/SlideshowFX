@@ -11,7 +11,7 @@ import java.util.List;
  * add a listener on properties of a {@link javafx.concurrent.Task} that match a criterion.
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class WhenPredicate {
 

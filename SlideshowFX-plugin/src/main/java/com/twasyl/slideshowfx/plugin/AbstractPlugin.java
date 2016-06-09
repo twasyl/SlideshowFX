@@ -4,7 +4,7 @@ package com.twasyl.slideshowfx.plugin;
  * A basic implementation of a {@link IPlugin}.
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class AbstractPlugin<T extends IPluginOptions> implements IPlugin<T> {
     private String name;

@@ -11,7 +11,7 @@ import static javafx.stage.Modality.APPLICATION_MODAL;
  * An implementation of the {@link CustomSlideshowFXStage} displaying the template builder.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @version 1.0
  */
 public class TemplateBuilderStage extends CustomSlideshowFXStage<TemplateBuilderController> {

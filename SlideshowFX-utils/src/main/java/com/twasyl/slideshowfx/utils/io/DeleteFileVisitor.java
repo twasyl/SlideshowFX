@@ -17,7 +17,7 @@ import java.nio.file.attribute.BasicFileAttributes;
  * </ul>
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class DeleteFileVisitor extends SimpleFileVisitor<Path> {
     @Override

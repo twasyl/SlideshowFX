@@ -5,7 +5,7 @@ import javafx.scene.input.KeyEvent;
 /**
  * Provides utilities method for managing key events.
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class KeyEventUtils {
 

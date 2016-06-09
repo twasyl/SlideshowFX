@@ -11,7 +11,7 @@ import javafx.scene.text.Text;
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class SnippetExecutorListCell extends ListCell<ISnippetExecutor> {
 

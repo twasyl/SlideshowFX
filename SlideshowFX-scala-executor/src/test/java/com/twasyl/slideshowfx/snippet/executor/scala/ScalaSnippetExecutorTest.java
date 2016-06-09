@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the class {@link ScalaSnippetExecutor}.
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class ScalaSnippetExecutorTest {
 

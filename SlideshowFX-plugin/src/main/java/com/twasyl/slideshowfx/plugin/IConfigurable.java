@@ -6,7 +6,7 @@ import javafx.scene.Node;
  * Defines the base interface that makes a plugin configurable.
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public interface IConfigurable<T extends IPluginOptions> {
 

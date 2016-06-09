@@ -13,7 +13,7 @@ import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @see SlideshowStage
  * @see SlideshowPane
  * @see InformationPane

@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  *
  *  @author Thierry Wasylczenko
  *  @version 1.0
- *  @since SlideshowFX 1.0.0
+ *  @since SlideshowFX 1.0
  */
 public abstract class AbstractHostingConnector<T extends IHostingConnectorOptions> extends AbstractPlugin<T> implements IHostingConnector<T> {
     private static final Logger LOGGER = Logger.getLogger(AbstractHostingConnector.class.getName());

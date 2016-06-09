@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class AlertContentExtension extends AbstractContentExtension {
     private static final Logger LOGGER = Logger.getLogger(AlertContentExtension.class.getName());

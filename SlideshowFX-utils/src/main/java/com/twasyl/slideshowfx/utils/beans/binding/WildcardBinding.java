@@ -9,7 +9,7 @@ import javafx.beans.binding.StringBinding;
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class WildcardBinding extends StringBinding {
 

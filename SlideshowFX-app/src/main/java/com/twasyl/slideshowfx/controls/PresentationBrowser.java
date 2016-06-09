@@ -37,7 +37,7 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public final class PresentationBrowser extends StackPane {
     private static final Logger LOGGER = Logger.getLogger(PresentationBrowser.class.getName());

@@ -9,7 +9,7 @@ import com.twasyl.slideshowfx.plugin.IPlugin;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public interface IMarkup extends IPlugin {
     /**

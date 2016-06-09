@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class TwitterService extends AbstractSlideshowFXService {
     private static final Logger LOGGER = Logger.getLogger(TwitterService.class.getName());

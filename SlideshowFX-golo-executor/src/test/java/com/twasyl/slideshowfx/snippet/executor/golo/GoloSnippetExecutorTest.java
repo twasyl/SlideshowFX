@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
  * Tests the class {@link GoloSnippetExecutor}.
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class GoloSnippetExecutorTest {
 

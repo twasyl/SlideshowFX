@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public interface IHostingConnector<T extends IHostingConnectorOptions> extends IPlugin<T>, IConfigurable<T> {
 

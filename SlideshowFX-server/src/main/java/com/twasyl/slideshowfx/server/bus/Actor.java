@@ -3,7 +3,7 @@ package com.twasyl.slideshowfx.server.bus;
 /**
  * Defines an actor that can be register in the {@link EventBus}.
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @version 1.0
  */
 public interface Actor {

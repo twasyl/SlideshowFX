@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class OptionsViewController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(OptionsViewController.class.getName());

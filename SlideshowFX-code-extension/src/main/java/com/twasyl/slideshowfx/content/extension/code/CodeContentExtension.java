@@ -24,7 +24,7 @@ import static java.util.regex.Pattern.MULTILINE;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class CodeContentExtension extends AbstractContentExtension {
     private static final Logger LOGGER = Logger.getLogger(CodeContentExtension.class.getName());

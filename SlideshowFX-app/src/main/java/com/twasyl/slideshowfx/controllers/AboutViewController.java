@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  * Controller class of the {@code AboutView.fxml} view.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @version 1.0
  */
 public class AboutViewController implements Initializable {

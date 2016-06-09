@@ -12,7 +12,7 @@ import java.time.LocalTime;
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public abstract class SlideshowFXTask<V> extends Task<V> {
     private ReadOnlyObjectProperty<LocalTime> statusChangedTime = new SimpleObjectProperty<>();

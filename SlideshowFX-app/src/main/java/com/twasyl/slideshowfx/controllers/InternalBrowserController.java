@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
  * The controller class for the internal browser view.
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class InternalBrowserController implements Initializable {
 

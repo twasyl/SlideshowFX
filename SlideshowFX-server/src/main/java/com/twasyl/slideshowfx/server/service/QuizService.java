@@ -32,7 +32,7 @@ import static com.twasyl.slideshowfx.server.service.IServicesCode.*;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class QuizService extends AbstractSlideshowFXService {
     private static final Logger LOGGER = Logger.getLogger(QuizService.class.getName());

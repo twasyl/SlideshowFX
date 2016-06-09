@@ -20,7 +20,7 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class ACEFileEditor extends AbstractFileEditor<WebView> {
 

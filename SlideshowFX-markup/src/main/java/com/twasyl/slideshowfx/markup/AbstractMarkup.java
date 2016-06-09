@@ -9,7 +9,7 @@ import com.twasyl.slideshowfx.plugin.AbstractPlugin;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public abstract class AbstractMarkup extends AbstractPlugin implements IMarkup {
     protected String code;

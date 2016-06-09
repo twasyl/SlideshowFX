@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
  * This class tests the {@link com.twasyl.slideshowfx.utils.beans.binding.FilenameBinding} class.
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class FilenameBindingTest {
 

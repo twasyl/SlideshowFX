@@ -4,7 +4,7 @@ package com.twasyl.slideshowfx.engine.template.configuration;
  *
  * @author Thierry Wayslczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class SlideElementTemplate {
     private int id;

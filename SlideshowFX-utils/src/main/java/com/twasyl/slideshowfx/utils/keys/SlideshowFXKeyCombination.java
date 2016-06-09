@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * {@link PlatformUtil#isLinux()}.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class SlideshowFXKeyCombination extends KeyCombination {
     public static final Logger LOGGER = Logger.getLogger(SlideshowFXKeyCombination.class.getName());

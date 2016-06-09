@@ -10,7 +10,7 @@ import javafx.concurrent.Worker;
  * singleton. To get the instance call {@link TaskDAO#getInstance()}.
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class TaskDAO {
     private static final TaskDAO singleton = new TaskDAO();

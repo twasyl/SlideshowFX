@@ -15,7 +15,7 @@ import javafx.scene.layout.Region;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class QuizPanel extends Region {
 

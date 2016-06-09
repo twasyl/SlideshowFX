@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasyczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutorOptions> {
     private static final Logger LOGGER = Logger.getLogger(GoSnippetExecutor.class.getName());

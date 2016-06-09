@@ -15,7 +15,7 @@ import java.util.logging.StreamHandler;
  * Each time a new log message is received by this implementation, a change event is raised on the property {@code latestLog}.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @version 1.0
  */
 public class SlideshowFXHandler extends StreamHandler {

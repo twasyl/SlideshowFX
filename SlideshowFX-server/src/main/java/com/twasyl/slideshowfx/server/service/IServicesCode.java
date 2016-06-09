@@ -5,7 +5,7 @@ package com.twasyl.slideshowfx.server.service;
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public interface IServicesCode {
     /**

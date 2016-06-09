@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class TemplateConfiguration implements IConfiguration {
     private static final Logger LOGGER = Logger.getLogger(TemplateConfiguration.class.getName());

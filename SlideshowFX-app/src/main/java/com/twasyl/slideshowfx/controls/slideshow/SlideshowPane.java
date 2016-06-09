@@ -43,7 +43,7 @@ import static com.twasyl.slideshowfx.server.service.QuizService.SERVICE_QUIZ_ON_
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class SlideshowPane extends StackPane implements Actor {
     private static final Logger LOGGER = Logger.getLogger(SlideshowPane.class.getName());

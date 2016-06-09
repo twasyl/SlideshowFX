@@ -26,7 +26,7 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
  * content in the editor as well as getting it.
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class SlideContentEditor extends BorderPane {
     private static final Logger LOGGER = Logger.getLogger(SlideContentEditor.class.getName());

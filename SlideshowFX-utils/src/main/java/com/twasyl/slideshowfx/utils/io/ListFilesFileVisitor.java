@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * An implementation of {@link SimpleFileVisitor} that lists all paths within a directory.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @version 1.0.0
  */
 public class ListFilesFileVisitor extends SimpleFileVisitor<Path> {

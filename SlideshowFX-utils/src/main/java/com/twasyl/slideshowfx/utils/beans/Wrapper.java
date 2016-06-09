@@ -5,7 +5,7 @@ package com.twasyl.slideshowfx.utils.beans;
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class Wrapper<T> {
     private T value;

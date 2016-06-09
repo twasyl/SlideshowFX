@@ -12,7 +12,7 @@ import static com.twasyl.slideshowfx.server.service.IServicesCode.RESPONSE_CODE_
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class PresenterChatService extends AbstractSlideshowFXService {
 

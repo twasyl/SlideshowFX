@@ -91,7 +91,7 @@ import java.util.stream.Stream;
  *  
  *  @author Thierry Wasyczenko
  *  @version 1.0
- *  @since SlideshowFX 1.0.0
+ *  @since SlideshowFX 1.0
  */
 public class SlideshowFXController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXController.class.getName());

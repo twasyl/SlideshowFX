@@ -36,7 +36,7 @@ import static com.twasyl.slideshowfx.engine.presentation.PresentationEngine.DEFA
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class DropboxHostingConnector extends AbstractHostingConnector<BasicHostingConnectorOptions> {
     private static final Logger LOGGER = Logger.getLogger(DropboxHostingConnector.class.getName());

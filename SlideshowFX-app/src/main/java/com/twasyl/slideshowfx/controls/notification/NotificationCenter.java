@@ -32,7 +32,7 @@ import java.util.HashSet;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class NotificationCenter extends StackPane {
 

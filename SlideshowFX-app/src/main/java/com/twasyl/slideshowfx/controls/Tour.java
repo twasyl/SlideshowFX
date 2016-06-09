@@ -39,7 +39,7 @@ import javafx.util.Duration;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class Tour extends StackPane {
 

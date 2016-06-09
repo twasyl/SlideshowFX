@@ -8,7 +8,7 @@ import java.util.StringJoiner;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class RemoteFile implements Serializable {
 

@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 /**
  * A custom implementation of the {@link Stage} class. It predefines the icons of the stage as well as the owner of it.
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @version 1.0
  */
 public class CustomSlideshowFXStage<T extends Initializable> extends Stage {

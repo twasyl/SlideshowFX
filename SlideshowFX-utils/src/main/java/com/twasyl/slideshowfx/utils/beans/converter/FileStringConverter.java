@@ -9,7 +9,7 @@ import java.io.File;
  * If the file is {@code null} an empty String is returned by this binding.
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class FileStringConverter extends StringConverter<File> {
 

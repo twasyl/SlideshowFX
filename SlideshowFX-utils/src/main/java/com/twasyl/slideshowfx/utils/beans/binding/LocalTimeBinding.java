@@ -12,7 +12,7 @@ import java.time.format.FormatStyle;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class LocalTimeBinding extends StringBinding {
 

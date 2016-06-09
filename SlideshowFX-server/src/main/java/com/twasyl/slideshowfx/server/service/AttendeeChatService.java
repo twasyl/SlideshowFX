@@ -31,7 +31,7 @@ import static com.twasyl.slideshowfx.server.service.IServicesCode.*;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class AttendeeChatService extends AbstractSlideshowFXService {
     private static final Logger LOGGER = Logger.getLogger(AttendeeChatService.class.getName());
@@ -62,7 +62,7 @@ public class AttendeeChatService extends AbstractSlideshowFXService {
         router.get(FONT_AWESOME_PREFIX.concat("*")).handler(routingContext -> {
             final String file = routingContext.request().path().substring(FONT_AWESOME_PREFIX.length());
 
-            try (final InputStream in = ResourceHelper.getInputStream("/com/twasyl/slideshowfx/webapp/font-awesome/4.5.0/".concat(file))) {
+            try (final InputStream in = ResourceHelper.getInputStream("/com/twasyl/slideshowfx/webapp/font-awesome/4.6.3/".concat(file))) {
 
                 byte[] imageBuffer = new byte[1028];
                 int numberOfBytesRead;

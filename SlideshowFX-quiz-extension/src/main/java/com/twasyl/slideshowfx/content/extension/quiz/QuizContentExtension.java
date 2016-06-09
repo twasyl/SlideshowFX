@@ -24,7 +24,7 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class QuizContentExtension extends AbstractContentExtension {
     private static final Logger LOGGER = Logger.getLogger(QuizContentExtension.class.getName());
@@ -40,7 +40,7 @@ public class QuizContentExtension extends AbstractContentExtension {
         final String baseURL = "quiz/";
 
         // Add URL
-        this.putResource(ResourceType.CSS_FILE, baseURL.concat("font-awesome-4.5.0/css/font-awesome.min.css"));
+        this.putResource(ResourceType.CSS_FILE, baseURL.concat("font-awesome-4.6.3/css/font-awesome.min.css"));
     }
 
     @Override

@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * Controller class for the {@code Logs.fxml} file.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @since 1.0
  */
 public class LogsController implements Initializable {

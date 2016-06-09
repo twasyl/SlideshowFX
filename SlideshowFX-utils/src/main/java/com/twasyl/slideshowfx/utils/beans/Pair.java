@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
  * that the key and the value are {@link javafx.beans.property.Property properties}.
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class Pair<K, V> {
     private final ObjectProperty<K> key = new SimpleObjectProperty<>();

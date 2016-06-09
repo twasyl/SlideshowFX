@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * In order to share events, {@link Actor actors} must register to end points.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @version 1.0.0
  */
 public class EventBus {

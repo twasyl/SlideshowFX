@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * This markup language is identified byt the code <code>ASCIIDOCTOR</code> which is returned by {@link com.twasyl.slideshowfx.markup.IMarkup#getCode()}.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @version 1.0
  */
 public class AsciidoctorMarkup extends AbstractMarkup {

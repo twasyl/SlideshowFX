@@ -12,7 +12,7 @@ import javafx.concurrent.Task;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class TaskStatusGlyphNameBinding extends StringBinding {
 

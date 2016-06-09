@@ -11,7 +11,7 @@ import javafx.stage.StageStyle;
  * An implementation of {@link Stage} that displays information about the application.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @version 1.0.0
  */
 public class AboutStage extends CustomSlideshowFXStage<AboutViewController> {

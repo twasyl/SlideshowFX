@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class ReloadPresentationViewTask extends SlideshowFXTask<Void> {
     private static final Logger LOGGER = Logger.getLogger(ReloadPresentationViewTask.class.getName());

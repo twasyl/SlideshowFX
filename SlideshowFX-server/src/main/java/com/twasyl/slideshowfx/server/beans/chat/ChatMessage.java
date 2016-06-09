@@ -13,7 +13,7 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class ChatMessage {
     private static final Logger LOGGER = Logger.getLogger(ChatMessage.class.getName());

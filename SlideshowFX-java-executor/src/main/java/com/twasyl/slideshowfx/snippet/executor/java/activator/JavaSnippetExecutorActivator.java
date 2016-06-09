@@ -12,7 +12,7 @@ import java.util.Hashtable;
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class JavaSnippetExecutorActivator implements BundleActivator {
     @Override

@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * Set of utility methods for the Jav Date/Time API.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  * @version 1.0
  */
 public class DateTimeUtils {

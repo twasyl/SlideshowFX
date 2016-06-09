@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
  * This class tests the {@link LocalTimeBinding} class.
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class LocalTimeBindingTest {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);

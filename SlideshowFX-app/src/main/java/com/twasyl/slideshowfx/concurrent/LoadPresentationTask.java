@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class LoadPresentationTask extends SlideshowFXTask<PresentationEngine> {
     private static final Logger LOGGER = Logger.getLogger(LoadPresentationTask.class.getName());

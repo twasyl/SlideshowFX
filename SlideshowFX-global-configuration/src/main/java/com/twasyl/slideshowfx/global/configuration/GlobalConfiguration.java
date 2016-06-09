@@ -17,7 +17,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class GlobalConfiguration {
     private static final Logger LOGGER = Logger.getLogger(GlobalConfiguration.class.getName());

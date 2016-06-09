@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * This class tests the {@link WildcardBinding} class.
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class WildcardBindingTest {
     /**

@@ -15,7 +15,7 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class Base64TemplateElement extends AbstractTemplateElement<String> {
     private static final Logger LOGGER = Logger.getLogger(Base64TemplateElement.class.getName());

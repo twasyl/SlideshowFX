@@ -4,7 +4,7 @@ package com.twasyl.slideshowfx.content.extension.code.enums;
  * This enumeration represents languages that are supported for the Code content extension.
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public enum SupportedLanguage {
     ACTION_SCRIPT("ActionScript", "actionscript"),

@@ -8,7 +8,7 @@ import com.twasyl.slideshowfx.utils.beans.Pair;
  *
  * @author Thierry Wasylczenko
  * @version 1.0.0
- * @since SlideshowFX 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class HostingConnectorException extends Exception {
     public static final short UNKNOWN_ERROR = 1;

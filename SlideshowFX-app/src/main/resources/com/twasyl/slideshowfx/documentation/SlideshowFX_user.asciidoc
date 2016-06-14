@@ -96,9 +96,18 @@ You can also start the slideshow mode from the current slide by clicking on the 
 
 When you have entered the slideshow mode and want to exit it, press kbd:[Escape] and you will return to the editor, on the slide left during the slideshow mode.
 
+=== Options
+
+SlideshowFX provides some options that can be changed using the *Options* menu and it's *Options* item.
+
 === Embeded server
 
-SlideshowFX embeds a server that allows the audience to chat with the presenter and to answer quizs started by this same presenter.
+SlideshowFX embeds a server that allows the audience to chat with the presenter and to answer quizs started by this same presenter. You are able to:
+
+* Enable or disable an automatic save of your work at a given interval ;
+* Define the interval (in minutes) of saving automatically your work ;
+* Enable or disable the temporary files SlideshowFX creates ;
+* Define the max age (in days) of temporary files to be deleted. Files older of than this age will be removed when SlideshowFX closes if the parameter is enabled.
 
 ==== Starting the server
 

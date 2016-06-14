@@ -413,5 +413,5 @@ task publishAllToBintray (dependsOn : ['publishAllMarkup',
 }
 
 wrapper {
-    gradleVersion = '2.13'
+    gradleVersion = '2.14'
 }

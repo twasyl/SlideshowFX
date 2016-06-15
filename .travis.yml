@@ -12,4 +12,5 @@ sudo: required
 install: true
 
 script:
+ - chmod +x ./gradlew
  - ./gradlew assemble

@@ -9,6 +9,8 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 
@@ -63,6 +65,12 @@ public class SlideContentEditor extends BorderPane {
                 else if(KeyEventUtils.isShortcutSequence("V", event)) {
                     SlideContentEditor.this.appendContentEditorValue(Clipboard.getSystemClipboard().getString());
                 }
+            }
+        });
+
+        this.registerEvent(ScrollEvent.SCROLL, event -> {
+            if(event.isShortcutDown()) {
+                this.browser.getEngine().executeScript(String.format("changeFontSize(%1$s);", event.getDeltaY()));
             }
         });
 

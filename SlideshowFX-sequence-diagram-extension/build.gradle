@@ -18,6 +18,8 @@ jar {
                 'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.sequence.diagram.activator.SequenceDiagramContentExtensionActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.content.extension.sequence.diagram,com.twasyl.slideshowfx.content.extension.sequence.diagram.activator,com.twasyl.slideshowfx.content.extension.sequence.diagram.controllers',
-                'Import-Package': 'org.osgi.framework')
+                'Import-Package': 'org.osgi.framework',
+                'Setup-Wizard-Label': 'Sequence diagram',
+                'Setup-Wizard-Icon-Name': 'SHARE_ALT_SQUARE')
     }
 }

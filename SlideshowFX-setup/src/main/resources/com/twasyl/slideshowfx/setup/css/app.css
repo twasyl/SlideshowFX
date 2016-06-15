@@ -1,0 +1,7 @@
+.root {
+    -app-color-dark-green: #449d44;
+    -app-color-light-green: #5cb85c;
+}
+.plugin-button:selected {
+     -fx-background-color: linear-gradient(from 50% 0% to 50% 100%, -app-color-dark-green 0%, -app-color-light-green 100%);
+}

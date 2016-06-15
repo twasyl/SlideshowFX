@@ -1,0 +1,98 @@
+import com.sun.javafx.PlatformUtil
+
+version '1.0'
+
+dependencies {
+    compile project(':SlideshowFX-global-configuration')
+    compile project(':SlideshowFX-utils')
+    compile configurations.fontawesomefx
+
+    testCompile configurations.junit
+}
+
+jar {
+    manifest {
+        attributes("Implementation-Title": "SlideshowFX-setup",
+                "Implementation-Version": version,
+                "Implementation-Vendor": "Thierry Wasylczenko",
+                "Main-Class": "com.twasyl.slideshowfx.setup.app.SlideshowFXSetup",
+                "JavaFX-Version": "8.0+",
+                "Class-Path": configurations.compile.collect { it.getName() }.join(' '))
+    }
+}
+
+task javafx(dependsOn: [ 'jar', ':SlideshowFX-app:javafx',  ':asciidoctor' ] + markupJarDependencies + contentExtensionJarDependencies +
+                         hostingConnectorJarDependencies + snippetExecutorJarDependencies) << {
+    def javafxFolder = new File(buildDir, 'javafx')
+    def resourcesFolder = new File(buildDir, "resources")
+
+    // Create the JavaFX bundle
+    ant.importBuild "${rootDir.absolutePath}/src/main/resources/javafx/${project.name}.xml"
+    ant.classpath = "${jdk}/lib/ant-javafx.jar"
+
+    ant.deployOutDir = javafxFolder.absolutePath
+    ant.deployResourcesDir = resourcesFolder.absolutePath
+
+    // Copy the application artifact
+    copy {
+        from fileTree(dir: sfxAppArtifactFile)
+        into "${resourcesFolder.absolutePath}/package/${sfxAppArtifactName}"
+    }
+
+    def pluginsFolder = "${resourcesFolder.absolutePath}/package/plugins"
+
+    // Copy the plugins
+    copy {
+        from (markupJars)
+        into "${pluginsFolder}/markups"
+    }
+    copy {
+        from (contentExtensionJars)
+        into "${pluginsFolder}/extensions"
+    }
+    copy {
+        from (snippetExecutorJars)
+        into "${pluginsFolder}/executors"
+    }
+    copy {
+        from (hostingConnectorJars)
+        into "${pluginsFolder}/hostingConnectors"
+    }
+
+    // Documentation
+    copy {
+        from("${rootProject.tasks.asciidoctor.outputDir}/html5") {
+            include '*'
+        }
+        into "${resourcesFolder.absolutePath}/package/documentations/html"
+    }
+    copy {
+        from("${rootProject.tasks.asciidoctor.outputDir}/pdf") {
+            include '*.pdf'
+        }
+        into "${resourcesFolder.absolutePath}/package/documentations/pdf"
+    }
+
+    // Copy libs
+    copy {
+        from project(':SlideshowFX-global-configuration').jar.archivePath
+        from project(':SlideshowFX-utils').jar.archivePath
+        from project.jar.archivePath
+        from configurations.fontawesomefx
+
+        into(resourcesFolder)
+    }
+
+    if(PlatformUtil.isMac()) {
+        println "Create ${project.name} package for the OSX platform"
+        deployOSX.execute()
+    } else if(PlatformUtil.isWindows()) {
+        println "Create ${project.name} package for the Windows platform"
+        deployWindows.execute()
+    } else {
+        println "Create ${project.name} package an unknown platform"
+        deployUnknown.execute()
+    }
+
+    resourcesFolder.deleteDir()
+}

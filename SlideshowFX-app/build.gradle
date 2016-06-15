@@ -1,3 +1,5 @@
+import com.sun.javafx.PlatformUtil
+
 version = '1.0'
 
 dependencies {
@@ -42,4 +44,38 @@ jar {
 test {
     workingDir = rootDir
     jvmArgs "-DtestResultsDir=${testResultsDir.absolutePath}"
+}
+
+task javafx(dependsOn: [ 'jar' ]) << {
+    def javafxFolder = new File(buildDir, 'javafx')
+    def resourcesFolder = new File(buildDir, "resources")
+
+    // Create the JavaFX bundle
+    ant.importBuild "${rootDir.absolutePath}/src/main/resources/javafx/${project.name}.xml"
+    ant.classpath = "${jdk}/lib/ant-javafx.jar"
+
+    ant.deployOutDir = javafxFolder.absolutePath
+    ant.deployResourcesDir = resourcesFolder.absolutePath
+
+    // Copy libs
+    copy {
+        from project.configurations.compile
+        from(fileTree(dir: "${rootDir.absolutePath}/lib", include: "Leap/", exclude: "**/LeapJava.jar"))
+        from project.jar.archivePath
+
+        into(resourcesFolder)
+    }
+
+    if(PlatformUtil.isMac()) {
+        println "Create ${project.name} package for the OSX platform"
+        deployOSX.execute()
+    } else if(PlatformUtil.isWindows()) {
+        println "Create ${project.name} package for the Windows platform"
+        deployWindows.execute()
+    } else {
+        println "Create ${project.name} package an unknown platform"
+        deployUnknown.execute()
+    }
+
+    resourcesFolder.deleteDir()
 }

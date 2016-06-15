@@ -29,5 +29,5 @@ p. As SlideshowFX is a still young project, you will need to build it manually i
 p. Then in order to build the application:
 
 * Open a command line in the repository folder ;
-* Execute the command @gradlew packageSlideshowFX@ and wait for it to finish successfully ;
-* Go in @REPOSITORY_HOME/build/distributions/@ in order to have the SlideshowFX binaries.
+* Execute the command @gradlew build -x test@ and wait for it to finish successfully ;
+* Go in @REPOSITORY_HOME/build/distributions/@ in order to archive containing the SlideshowFX installer

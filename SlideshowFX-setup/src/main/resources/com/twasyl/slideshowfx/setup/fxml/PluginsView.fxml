@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.Double?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.setup.controllers.PluginsViewController"
+      spacing="20">
+
+    <fx:define>
+        <Double fx:id="GRID_SPACING" fx:value="5" />
+        <Double fx:id="TITLED_PANE_WIDTH" fx:value="480" />
+    </fx:define>
+
+    <TitledPane expanded="true" collapsible="true"
+                prefWidth="${TITLED_PANE_WIDTH}" minWidth="${TITLED_PANE_WIDTH}" maxWidth="${TITLED_PANE_WIDTH}">
+        <graphic>
+            <CheckBox text="Markups" fx:id="installAllMarkupPlugins" onAction="#actionOnInstallAllMarkupPlugins">
+                <tooltip><Tooltip text="Install all markup plugins" /></tooltip>
+            </CheckBox>
+        </graphic>
+
+        <GridPane fx:id="markupPlugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" />
+    </TitledPane>
+
+    <TitledPane expanded="false" collapsible="true"
+                prefWidth="${TITLED_PANE_WIDTH}" minWidth="${TITLED_PANE_WIDTH}" maxWidth="${TITLED_PANE_WIDTH}">
+        <graphic>
+            <CheckBox text="Content extensions" fx:id="installAllContentExtensionPlugins"
+                      onAction="#actionOnInstallAllContentExtensionPlugins">
+                <tooltip><Tooltip text="Install all content extensions plugins" /></tooltip>
+            </CheckBox>
+        </graphic>
+
+        <GridPane fx:id="contentExtensionPlugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" />
+    </TitledPane>
+
+    <TitledPane expanded="false" collapsible="true"
+                prefWidth="${TITLED_PANE_WIDTH}" minWidth="${TITLED_PANE_WIDTH}" maxWidth="${TITLED_PANE_WIDTH}">
+        <graphic>
+            <CheckBox text="Snippet executors" fx:id="installAllSnippetExecutorPlugins"
+                      onAction="#actionOnInstallAllSnippetExecutorPlugins">
+                <tooltip><Tooltip text="Install all snippet executors plugins" /></tooltip>
+            </CheckBox>
+        </graphic>
+
+        <GridPane fx:id="snippetExecutorPlugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" />
+    </TitledPane>
+
+    <TitledPane expanded="false" collapsible="true"
+                prefWidth="${TITLED_PANE_WIDTH}" minWidth="${TITLED_PANE_WIDTH}" maxWidth="${TITLED_PANE_WIDTH}">
+        <graphic>
+            <CheckBox text="Hosting connectors" fx:id="installAllHostingConnectorPlugins"
+                      onAction="#actionOnInstallAllHostingConnectorPlugins">
+                <tooltip><Tooltip text="Install all hosting connectors plugins" /></tooltip>
+            </CheckBox>
+        </graphic>
+
+        <GridPane fx:id="hostingConnectorsPlugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" />
+    </TitledPane>
+</VBox>
+

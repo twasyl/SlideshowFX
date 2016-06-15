@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import java.lang.Double?>
+<?import java.net.URL?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.setup.controllers.SetupViewController"
+            fx:id="root" prefWidth="800" prefHeight="500">
+
+    <fx:define>
+        <Double fx:id="WINDOW_HEIGHT" fx:value="500" />
+        <Double fx:id="WINDOW_WIDTH" fx:value="800" />
+        <Double fx:id="LEFT_PANE_WIDTH" fx:value="300" />
+        <Double fx:id="BUTTON_BAR_ACTION_WIDTH" fx:value="80" />
+
+        <Button fx:id="cancel" text="Cancel" prefWidth="$BUTTON_BAR_ACTION_WIDTH" onAction="#cancelSetup" />
+        <Button fx:id="previous" text="Previous" prefWidth="$BUTTON_BAR_ACTION_WIDTH" onAction="#previousStep" visible="false" />
+        <Button fx:id="next" text="Next" prefWidth="$BUTTON_BAR_ACTION_WIDTH" onAction="#nextStep" />
+        <Button fx:id="finish" text="Finish" prefWidth="$BUTTON_BAR_ACTION_WIDTH" onAction="#finishSetup" visible="false" />
+
+        <FXCollections fx:id="buttonBarActions" fx:factory="observableArrayList">
+            <fx:reference source="cancel" />
+            <fx:reference source="previous" />
+            <fx:reference source="next" />
+            <fx:reference source="finish" />
+        </FXCollections>
+    </fx:define>
+
+    <stylesheets>
+        <URL value="@/com/twasyl/slideshowfx/setup/css/app.css" />
+    </stylesheets>
+
+    <padding>
+        <Insets top="10" bottom="10" left="10" right="10" />
+    </padding>
+
+    <left>
+        <VBox spacing="20" prefHeight="${WINDOW_HEIGHT}" minHeight="${WINDOW_HEIGHT}" maxHeight="${WINDOW_HEIGHT}"
+                           prefWidth="${LEFT_PANE_WIDTH}" minWidth="${LEFT_PANE_WIDTH}" maxWidth="${LEFT_PANE_WIDTH}"
+                            style="-fx-background-color: lightgray" alignment="TOP_CENTER">
+            <ImageView>
+                <image>
+                    <Image url="@/com/twasyl/slideshowfx/setup/images/appLogo.png" preserveRatio="true" smooth="true"
+                           requestedWidth="256" />
+                </image>
+            </ImageView>
+            <VBox spacing="20" fx:id="stepsContainer">
+                <padding>
+                    <Insets top="10" bottom="10" left="10" right="10" />
+                </padding>
+            </VBox>
+        </VBox>
+    </left>
+
+    <center>
+        <ScrollPane fx:id="content" style="-fx-background-color:transparent;"
+                    prefWidth="500" maxWidth="500" minWidth="500"
+                    prefHeight="${WINDOW_HEIGHT}" minHeight="${WINDOW_HEIGHT}" maxHeight="${WINDOW_HEIGHT}" />
+    </center>
+
+    <bottom>
+        <HBox fx:id="buttonBar" spacing="5" alignment="BASELINE_RIGHT" />
+    </bottom>
+</BorderPane>
+

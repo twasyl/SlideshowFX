@@ -18,6 +18,8 @@ jar {
                 'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.link.activator.LinkContentExtensionActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.content.extension.link.controllers,com.twasyl.slideshowfx.content.extension.link,com.twasyl.slideshowfx.content.extension.link.activator',
-                'Import-Package': 'org.osgi.framework')
+                'Import-Package': 'org.osgi.framework',
+                'Setup-Wizard-Label': 'Link',
+                'Setup-Wizard-Icon-Name': 'LINK')
     }
 }

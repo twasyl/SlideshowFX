@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.*?>
+<HBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.setup.controllers.WelcomeViewController"
+      spacing="20">
+
+    <TextFlow maxWidth="490">
+        <Text text="Welcome to the installation of " />
+        <Text fx:id="applicationName" />
+        <Text text=" " />
+        <Text fx:id="applicationVersion" />
+        <Text text=".&#10;&#10;" />
+        <Text text="This wizard will guide you through the installation steps." />
+    </TextFlow>
+</HBox>
+

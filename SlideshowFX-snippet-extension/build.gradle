@@ -19,6 +19,8 @@ jar {
                 'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.snippet.activator.SnippetContentExtensionActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.content.extension.snippet.controls,com.twasyl.slideshowfx.content.extension.snippet.controllers,com.twasyl.slideshowfx.content.extension.snippet,com.twasyl.slideshowfx.content.extension.snippet.activator',
-                'Import-Package': 'org.osgi.framework')
+                'Import-Package': 'org.osgi.framework',
+                'Setup-Wizard-Label': 'Executable code snippet',
+                'Setup-Wizard-Icon-Name': 'TERMINAL')
     }
 }

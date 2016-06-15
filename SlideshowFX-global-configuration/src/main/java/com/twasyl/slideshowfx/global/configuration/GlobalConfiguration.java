@@ -105,6 +105,22 @@ public class GlobalConfiguration {
     }
 
     /**
+     * Creates the plugins directory represented by the {@link #PLUGINS_DIRECTORY} variable if it doesn't
+     * already exist.
+     * If parents directories don't exist, this method will not create them and the directory will not be created.
+     * @return {@code true} if the plugins directory has been created by this method, {@code false} otherwise.
+     */
+    public synchronized static boolean createPluginsDirectory() {
+        boolean created = false;
+
+        if(!PLUGINS_DIRECTORY.exists()) {
+            created = PLUGINS_DIRECTORY.mkdir();
+        }
+
+        return created;
+    }
+
+    /**
      * Creates the configuration file of the application, represented by the {@link #CONFIG_FILE}
      * variable if it doesn't already exist.
      * @return {@code true} if the configuration file has been created by this method, {@code false} otherwise.

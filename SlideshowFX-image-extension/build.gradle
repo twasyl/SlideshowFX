@@ -19,6 +19,8 @@ jar {
                 'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.image.activator.ImageContentExtensionActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.content.extension.image.controllers,com.twasyl.slideshowfx.content.extension.image,com.twasyl.slideshowfx.content.extension.image.activator',
-                'Import-Package': 'org.osgi.framework')
+                'Import-Package': 'org.osgi.framework',
+                'Setup-Wizard-Label': 'Image',
+                'Setup-Wizard-Icon-Name': 'PICTURE_ALT')
     }
 }

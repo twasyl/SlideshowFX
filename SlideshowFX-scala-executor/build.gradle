@@ -19,6 +19,7 @@ jar {
                 'Bundle-Activator': 'com.twasyl.slideshowfx.snippet.executor.scala.activator.ScalaSnippetExecutorActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.scala,com.twasyl.slideshowfx.snippet.executor.scala.activator',
-                'Import-Package': 'org.osgi.framework')
+                'Import-Package': 'org.osgi.framework',
+                'Setup-Wizard-Label': 'Scala')
     }
 }

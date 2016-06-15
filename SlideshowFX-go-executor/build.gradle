@@ -19,6 +19,7 @@ jar {
                 'Bundle-Activator': 'com.twasyl.slideshowfx.snippet.executor.go.activator.GoSnippetExecutorActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.go,com.twasyl.slideshowfx.snippet.executor.go.activator',
-                'Import-Package': 'org.osgi.framework')
+                'Import-Package': 'org.osgi.framework',
+                'Setup-Wizard-Label': 'Go')
     }
 }

@@ -19,6 +19,7 @@ jar {
                 'Bundle-Activator': 'com.twasyl.slideshowfx.snippet.executor.java.activator.JavaSnippetExecutorActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.java,com.twasyl.slideshowfx.snippet.executor.java.activator',
-                'Import-Package': 'org.osgi.framework')
+                'Import-Package': 'org.osgi.framework',
+                'Setup-Wizard-Label': 'Java')
     }
 }

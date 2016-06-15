@@ -19,6 +19,7 @@ jar {
                 'Bundle-Activator': 'com.twasyl.slideshowfx.snippet.executor.kotlin.activator.KotlinSnippetExecutorActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.kotlin,com.twasyl.slideshowfx.snippet.executor.kotlin.activator',
-                'Import-Package': 'org.osgi.framework')
+                'Import-Package': 'org.osgi.framework',
+                'Setup-Wizard-Label': 'Kotlin')
     }
 }

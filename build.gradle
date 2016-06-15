@@ -14,17 +14,6 @@ buildscript {
     }
 }
 
-ext {
-    applicationName = 'SlideshowFX'
-    applicationVersion = '1.0'
-
-    allLibs = new File(rootDir, '/lib')
-    jdk = System.env.'JAVA_HOME'
-
-    pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
-    felixCacheFolder = new File(System.getProperty("user.home"), '.SlideshowFX/felix-cache')
-}
-
 allprojects {
 
     repositories {
@@ -59,11 +48,11 @@ allprojects {
         fontawesomefx 'de.jensd:fontawesomefx-fontawesome:4.6.1-2'
         freemarker 'org.freemarker:freemarker:2.3.23'
         jsoup 'org.jsoup:jsoup:1.9.2'
-        leapmotion fileTree(dir: allLibs, include: 'Leap/*')
+        leapmotion fileTree(dir: "${rootDir.absolutePath}/lib/Leap", include: '*/**')
         markdown 'com.github.rjeschke:txtmark:0.13'
         twitter4j 'org.twitter4j:twitter4j-core:4.0.4', 'org.twitter4j:twitter4j-stream:4.0.4'
         vertx 'io.vertx:vertx-core:3.3.0', 'io.vertx:vertx-web:3.3.0'
-        wikitext fileTree(dir: new File(allLibs, 'WikiText'), include: '*.jar')
+        wikitext fileTree(dir: "${rootDir.absolutePath}/lib/WikiText", include: '*.jar')
         zxing 'com.google.zxing:core:3.2.1', 'com.google.zxing:javase:3.2.1'
 
         junit 'junit:junit:4.12'
@@ -158,7 +147,86 @@ subprojects {
     }
 }
 
+ext {
+    applicationName = 'SlideshowFX'
+    applicationVersion = '1.0'
+
+    allLibs = new File(rootDir, '/lib')
+    jdk = System.env.'JAVA_HOME'
+
+    pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
+    felixCacheFolder = new File(System.getProperty("user.home"), '.SlideshowFX/felix-cache')
+
+    markupJars = [ project(':SlideshowFX-asciidoctor').jar, project(':SlideshowFX-html').jar,
+                   project(':SlideshowFX-markdown').jar, project(':SlideshowFX-textile').jar  ]
+
+    markupJarDependencies = [ ':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar',
+                                  ':SlideshowFX-textile:jar' ]
+
+    markupBintrayUploadDependencies = [ ':SlideshowFX-asciidoctor:bintrayUpload', ':SlideshowFX-html:bintrayUpload',
+                                        ':SlideshowFX-markdown:bintrayUpload', ':SlideshowFX-textile:bintrayUpload' ]
+
+    contentExtensionJars = [ project(':SlideshowFX-alert-extension').jar, project(':SlideshowFX-code-extension').jar,
+                             project(':SlideshowFX-image-extension').jar, project(':SlideshowFX-link-extension').jar,
+                             project(':SlideshowFX-quiz-extension').jar, project(':SlideshowFX-quote-extension').jar,
+                             project(':SlideshowFX-sequence-diagram-extension').jar,
+                             project(':SlideshowFX-snippet-extension').jar ]
+
+    contentExtensionJarDependencies = [ ':SlideshowFX-alert-extension:jar', ':SlideshowFX-code-extension:jar',
+                                            ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar',
+                                            ':SlideshowFX-quiz-extension:jar', ':SlideshowFX-quote-extension:jar',
+                                            ':SlideshowFX-sequence-diagram-extension:jar',
+                                            ':SlideshowFX-snippet-extension:jar' ]
+
+    contentExtensionBintrayUploadDependencies = [ ':SlideshowFX-alert-extension:bintrayUpload',
+                                                  ':SlideshowFX-code-extension:bintrayUpload',
+                                                  ':SlideshowFX-image-extension:bintrayUpload',
+                                                  ':SlideshowFX-link-extension:bintrayUpload',
+                                                  ':SlideshowFX-quiz-extension:bintrayUpload',
+                                                  ':SlideshowFX-quote-extension:bintrayUpload',
+                                                  ':SlideshowFX-sequence-diagram-extension:bintrayUpload',
+                                                  ':SlideshowFX-snippet-extension:bintrayUpload' ]
+
+    hostingConnectorJars = [ project(':SlideshowFX-dropbox-hosting-connector').jar,
+                             project(':SlideshowFX-drive-hosting-connector').jar ]
+
+    hostingConnectorJarDependencies = [ ':SlideshowFX-dropbox-hosting-connector:jar',
+                                             ':SlideshowFX-drive-hosting-connector:jar' ]
+
+    hostingConnectorBintrayUploadDependencies = [ ':SlideshowFX-dropbox-hosting-connector:bintrayUpload',
+                                        ':SlideshowFX-drive-hosting-connector:bintrayUpload' ]
+
+    snippetExecutorJars = [ project(':SlideshowFX-go-executor').jar, project(':SlideshowFX-golo-executor').jar,
+                            project(':SlideshowFX-groovy-executor').jar, project(':SlideshowFX-java-executor').jar,
+                            project(':SlideshowFX-javascript-executor').jar, project(':SlideshowFX-kotlin-executor').jar,
+                            project(':SlideshowFX-scala-executor').jar ]
+
+    snippetExecutorJarDependencies = [ ':SlideshowFX-go-executor:jar', ':SlideshowFX-golo-executor:jar',
+                                            ':SlideshowFX-groovy-executor:jar', ':SlideshowFX-java-executor:jar',
+                                            ':SlideshowFX-javascript-executor:jar', ':SlideshowFX-kotlin-executor:jar',
+                                            ':SlideshowFX-scala-executor:jar' ]
+
+    snippetExecutorBintrayUploadDependencies = [ ':SlideshowFX-go-executor:bintrayUpload',
+                                                 ':SlideshowFX-golo-executor:bintrayUpload',
+                                                 ':SlideshowFX-groovy-executor:bintrayUpload',
+                                                 ':SlideshowFX-java-executor:bintrayUpload',
+                                                 ':SlideshowFX-javascript-executor:bintrayUpload',
+                                                 ':SlideshowFX-kotlin-executor:bintrayUpload',
+                                                 ':SlideshowFX-scala-executor:bintrayUpload' ]
+
+    artifactsBundleDependencies = [ ':SlideshowFX-setup:javafx' ]
+
+    sfxAppArtifactName = "SlideshowFX" + (PlatformUtil.isMac() ? ".app" : "")
+    sfxAppArtifactFile = "${project(':SlideshowFX-app').buildDir.absolutePath}/javafx/bundles/${sfxAppArtifactName}"
+
+    sfxSetupArtifactName = "SlideshowFXSetup" + (PlatformUtil.isMac() ? ".app" : "")
+    sfxSetupArtifactFile = "${project(':SlideshowFX-setup').buildDir.absolutePath}/javafx/bundles/${sfxSetupArtifactName}"
+}
+
 apply plugin: 'org.asciidoctor.convert'
+apply plugin: 'distribution'
+
+version = '1.0'
 
 asciidoctorj {
     version = '1.5.4'
@@ -173,6 +241,7 @@ asciidoctor {
             setanchors: '',
             sectlinks: '',
             linkcss: false,
+            'slideshowfx_version': '1.0',
             'asciidoctor-source': new File(project(':SlideshowFX-app').projectDir, 'src/main/resources/com/twasyl/slideshowfx/documentation').absolutePath,
             'javafx-version': '8 update 92',
             'jdk-version': '8 update 92',
@@ -194,69 +263,35 @@ asciidoctor {
     ]
 }
 
-task installMarkupPlugins(dependsOn: [':SlideshowFX-asciidoctor:jar',
-                                      ':SlideshowFX-html:jar',
-                                      ':SlideshowFX-markdown:jar',
-                                      ':SlideshowFX-textile:jar']) << {
+task installMarkupPlugins(dependsOn: markupJarDependencies) << {
 
 	copy {
-		from project(':SlideshowFX-asciidoctor').jar.archivePath
-        from project(':SlideshowFX-html').jar.archivePath
-        from project(':SlideshowFX-markdown').jar.archivePath
-        from project(':SlideshowFX-textile').jar.archivePath
+		from (markupJars)
 
 		into pluginsFolder
 	}
 }
 
-task installContentExtensionPlugins(dependsOn: [':SlideshowFX-alert-extension:jar',
-                                               ':SlideshowFX-code-extension:jar',
-                                               ':SlideshowFX-image-extension:jar',
-                                               ':SlideshowFX-link-extension:jar',
-                                               ':SlideshowFX-quiz-extension:jar',
-                                               ':SlideshowFX-quote-extension:jar',
-                                               ':SlideshowFX-sequence-diagram-extension:jar',
-                                               ':SlideshowFX-snippet-extension:jar']) << {
+task installContentExtensionPlugins(dependsOn: contentExtensionJarDependencies) << {
 
     copy {
-        from project(':SlideshowFX-alert-extension').jar.archivePath
-        from project(':SlideshowFX-code-extension').jar.archivePath
-        from project(':SlideshowFX-image-extension').jar.archivePath
-        from project(':SlideshowFX-link-extension').jar.archivePath
-        from project(':SlideshowFX-quiz-extension').jar.archivePath
-        from project(':SlideshowFX-quote-extension').jar.archivePath
-        from project(':SlideshowFX-sequence-diagram-extension').jar.archivePath
-        from project(':SlideshowFX-snippet-extension').jar.archivePath
+        from (contentExtensionJars)
 
         into pluginsFolder
     }
 }
 
-task installHostingConnectorPlugins(dependsOn : [':SlideshowFX-dropbox-hosting-connector:jar',
-                                         ':SlideshowFX-drive-hosting-connector:jar']) << {
+task installHostingConnectorPlugins(dependsOn : hostingConnectorJarDependencies) << {
     copy {
-        from project(':SlideshowFX-dropbox-hosting-connector').jar.archivePath
-        from project(':SlideshowFX-drive-hosting-connector').jar.archivePath
+        from (hostingConnectorJars)
 
         into pluginsFolder
     }
 }
 
-task installSnippetExecutorPlugins(dependsOn : [':SlideshowFX-go-executor:jar',
-                                                ':SlideshowFX-golo-executor:jar',
-                                                ':SlideshowFX-groovy-executor:jar',
-                                                ':SlideshowFX-java-executor:jar',
-                                                ':SlideshowFX-javascript-executor:jar',
-                                                ':SlideshowFX-kotlin-executor:jar',
-                                                ':SlideshowFX-scala-executor:jar']) << {
+task installSnippetExecutorPlugins(dependsOn : snippetExecutorJarDependencies) << {
     copy {
-        from project(':SlideshowFX-go-executor').jar.archivePath
-        from project(':SlideshowFX-golo-executor').jar.archivePath
-        from project(':SlideshowFX-groovy-executor').jar.archivePath
-        from project(':SlideshowFX-java-executor').jar.archivePath
-        from project(':SlideshowFX-javascript-executor').jar.archivePath
-        from project(':SlideshowFX-kotlin-executor').jar.archivePath
-        from project(':SlideshowFX-scala-executor').jar.archivePath
+        from (snippetExecutorJars)
 
         into pluginsFolder
     }
@@ -266,151 +301,47 @@ task installAllPlugins(dependsOn: [ ':installMarkupPlugins', ':installContentExt
         ':installHostingConnectorPlugins', ':installSnippetExecutorPlugins']) << {
 }
 
-task packageSlideshowFX(dependsOn : [':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar', ':SlideshowFX-textile:jar',
-                                     ':SlideshowFX-alert-extension:jar', ':SlideshowFX-code-extension:jar', ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar', ':SlideshowFX-quiz-extension:jar', ':SlideshowFX-quote-extension:jar', ':SlideshowFX-sequence-diagram-extension:jar', ':SlideshowFX-snippet-extension:jar',
-                                     ':SlideshowFX-go-executor:jar', ':SlideshowFX-golo-executor:jar', ':SlideshowFX-groovy-executor:jar', ':SlideshowFX-java-executor:jar', ':SlideshowFX-javascript-executor:jar', ':SlideshowFX-kotlin-executor:jar', ':SlideshowFX-scala-executor:jar',
-                                     'SlideshowFX-drive-hosting-connector:jar', 'SlideshowFX-dropbox-hosting-connector:jar',
-                                     ':SlideshowFX-app:jar',
-                                     'asciidoctor']) {
-
-    def distributionsFolder = new File(buildDir, "distributions")
-    def destinationFolder = new File(distributionsFolder, "$applicationName-$applicationVersion")
-    def packagingFolder = new File(distributionsFolder, "packaging")
-    def pluginsFolder = new File(destinationFolder, "plugins")
-    def docFolder = new File(destinationFolder, "docs")
-    def tmpFolder = new File(destinationFolder, "tmp")
-
-    // Create the JavaFX bundle
-    ant.importBuild "${projectDir.absolutePath}/src/main/resources/javafx/javafx.xml"
-    ant.classpath = "${jdk}/lib/ant-javafx.jar"
-
-    ant.deployOutDir = "$packagingFolder.absolutePath"
-    ant.deployResourcesDir = tmpFolder.absolutePath
-
-    doFirst {
-        copy {
-            from project(':SlideshowFX-asciidoctor').jar.archivePath
-            from project(':SlideshowFX-html').jar.archivePath
-            from project(':SlideshowFX-markdown').jar.archivePath
-            from project(':SlideshowFX-textile').jar.archivePath
-
-            into new File(pluginsFolder, "markups")
-        }
-
-        copy {
-            from project(':SlideshowFX-alert-extension').jar.archivePath
-            from project(':SlideshowFX-code-extension').jar.archivePath
-            from project(':SlideshowFX-image-extension').jar.archivePath
-            from project(':SlideshowFX-link-extension').jar.archivePath
-            from project(':SlideshowFX-quiz-extension').jar.archivePath
-            from project(':SlideshowFX-quote-extension').jar.archivePath
-            from project(':SlideshowFX-sequence-diagram-extension').jar.archivePath
-            from project(':SlideshowFX-snippet-extension').jar.archivePath
-
-            into new File(pluginsFolder, "extensions")
-        }
-
-        copy {
-            from project(':SlideshowFX-go-executor').jar.archivePath
-            from project(':SlideshowFX-golo-executor').jar.archivePath
-            from project(':SlideshowFX-groovy-executor').jar.archivePath
-            from project(':SlideshowFX-java-executor').jar.archivePath
-            from project(':SlideshowFX-javascript-executor').jar.archivePath
-            from project(':SlideshowFX-kotlin-executor').jar.archivePath
-            from project(':SlideshowFX-scala-executor').jar.archivePath
-
-            into new File(pluginsFolder, "executors")
-        }
-
-        copy {
-            from project(':SlideshowFX-drive-hosting-connector').jar.archivePath
-            from project(':SlideshowFX-dropbox-hosting-connector').jar.archivePath
-
-            into new File(pluginsFolder, "hostingConnectors")
-        }
-
-        copy {
-            from("${asciidoctor.outputDir}/html5") {
-                include '*'
-            }
-            into("${docFolder.absolutePath}/html")
-        }
-
-        copy {
-            from("${asciidoctor.outputDir}/pdf") {
-                include '*.pdf'
-            }
-            into("${docFolder.absolutePath}/pdf")
-        }
-
-        // Copying libs
-        copy {
-            from project(':SlideshowFX-app').configurations.compile
-            from(fileTree(dir: allLibs, include: "Leap/", exclude: "**/LeapJava.jar"))
-            from project('SlideshowFX-app').jar.archivePath
-
-            into(tmpFolder)
-        }
-
-        if(PlatformUtil.isMac()) {
-            println "Create package for the OSX platform"
-            deployOSX.execute()
-        } else if(PlatformUtil.isWindows()) {
-            println "Create package the Windows platform"
-            deployWindows.execute()
-        } else {
-            println "Create package an unknown platform"
-            deployUnknown.execute()
-        }
-
-        // Clean
-        copy {
-            from(fileTree(dir: new File(ant.deployOutDir, "bundles/$applicationName")))
-            into(new File(destinationFolder, "$applicationName"))
-        }
-    }
-
-    doLast {
-        packagingFolder.deleteDir()
-        tmpFolder.deleteDir()
-        asciidoctor.outputDir.deleteDir()
-    }
+task publishAllMarkup(dependsOn : markupBintrayUploadDependencies ) << {
 }
 
-task publishAllMarkup(dependsOn : [':SlideshowFX-asciidoctor:bintrayUpload',
-                                   ':SlideshowFX-html:bintrayUpload',
-                                   ':SlideshowFX-markdown:bintrayUpload',
-                                   ':SlideshowFX-textile:bintrayUpload'] ) << {
-}
-
-task publishAllContentExtension(dependsOn: [':SlideshowFX-alert-extension:bintrayUpload',
-                                            ':SlideshowFX-code-extension:bintrayUpload',
-                                            ':SlideshowFX-image-extension:bintrayUpload',
-                                            ':SlideshowFX-link-extension:bintrayUpload',
-                                            ':SlideshowFX-quiz-extension:bintrayUpload',
-                                            ':SlideshowFX-quote-extension:bintrayUpload',
-                                            ':SlideshowFX-sequence-diagram-extension:bintrayUpload',
-                                            ':SlideshowFX-snippet-extension:bintrayUpload']) << {
+task publishAllContentExtension(dependsOn: contentExtensionBintrayUploadDependencies) << {
 
                                                 }
-task publishAllHostingConnector(dependsOn : [':SlideshowFX-dropbox-hosting-connector:bintrayUpload',
-                                             ':SlideshowFX-drive-hosting-connector:bintrayUpload']) << {
+task publishAllHostingConnector(dependsOn : hostingConnectorBintrayUploadDependencies) << {
 }
 
-task publishAllSnippetExecutor(dependsOn : [':SlideshowFX-go-executor:bintrayUpload',
-                                            ':SlideshowFX-golo-executor:bintrayUpload',
-                                            ':SlideshowFX-groovy-executor:bintrayUpload',
-                                            ':SlideshowFX-java-executor:bintrayUpload',
-                                            ':SlideshowFX-javascript-executor:bintrayUpload',
-                                            ':SlideshowFX-kotlin-executor:bintrayUpload',
-                                            ':SlideshowFX-scala-executor:bintrayUpload']) << {
+task publishAllSnippetExecutor(dependsOn : snippetExecutorBintrayUploadDependencies) << {
 }
 
-task publishAllToBintray (dependsOn : ['publishAllMarkup',
-                                       'publishAllContentExtension',
-                                       'publishAllHostingConnector',
+task publishAllToBintray (dependsOn : ['publishAllMarkup', 'publishAllContentExtension', 'publishAllHostingConnector',
                                        'publishAllSnippetExecutor']) << {
 }
+
+distributions {
+    main {
+        baseName = "SlideshowFX"
+        contents {
+            // Documentation
+            into('documentations/html') {
+                from("${asciidoctor.outputDir}/html5") {
+                    include '*'
+                }
+            }
+            into('documentations/pdf') {
+                from("${asciidoctor.outputDir}/pdf") {
+                    include '*.pdf'
+                }
+            }
+
+            into (sfxSetupArtifactName) {
+                from fileTree(dir: sfxSetupArtifactFile)
+            }
+        }
+    }
+}
+
+tasks.distZip.dependsOn = artifactsBundleDependencies
+tasks.distTar.dependsOn = artifactsBundleDependencies
 
 wrapper {
     gradleVersion = '2.14.1'

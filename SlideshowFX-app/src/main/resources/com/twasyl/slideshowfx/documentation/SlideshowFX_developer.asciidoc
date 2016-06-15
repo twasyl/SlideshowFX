@@ -1,5 +1,4 @@
 = SlideshowFX developer documentation
-:linkcss:
 :numbered:
 :icons:
 

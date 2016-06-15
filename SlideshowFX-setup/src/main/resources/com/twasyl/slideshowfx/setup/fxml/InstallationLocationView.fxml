@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.setup.controllers.InstallationLocationViewController"
+      spacing="20">
+
+    <Text text="Choose the location where the application will be installed.&#10;&#10;A folder containing the application will automatically be created in the chosen location.&#10;&#10;You must have the privileges to write inside the provided location."
+        wrappingWidth="490"/>
+
+    <HBox spacing="5" alignment="BASELINE_LEFT">
+        <Label text="Installation location:" />
+        <TextField fx:id="location" prefColumnCount="20" onDragOver="#dragOverLocation" onDragDropped="#dragDropOnLocation" />
+        <Button text="..." onAction="#chooseDestination" />
+    </HBox>
+</VBox>
+

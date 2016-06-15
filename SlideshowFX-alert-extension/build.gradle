@@ -17,6 +17,8 @@ jar {
                 'Bundle-Activator': 'com.twasyl.slideshowfx.content.extension.alert.activator.AlertContentExtensionActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.content.extension.alert.controllers,com.twasyl.slideshowfx.content.extension.alert,com.twasyl.slideshowfx.content.extension.alert.activator',
-                'Import-Package': 'org.osgi.framework')
+                'Import-Package': 'org.osgi.framework',
+                'Setup-Wizard-Label': 'Alert',
+                'Setup-Wizard-Icon-Name': 'EXCLAMATION_TRIANGLE')
     }
 }

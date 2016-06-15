@@ -20,6 +20,7 @@ jar {
                 'Bundle-Activator': 'com.twasyl.slideshowfx.markup.html.activator.HtmlActivator',
                 'Bundle-Vendor': 'Thierry Wasylczenko',
                 'Export-Package': 'com.twasyl.slideshowfx.markup.html,com.twasyl.slideshowfx.markup.html.activator',
-                'Import-Package': 'org.osgi.framework')
+                'Import-Package': 'org.osgi.framework',
+                'Setup-Wizard-Label': 'HTML')
     }
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import java.lang.Double?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.setup.controllers.LicenseViewController"
+      spacing="5">
+
+    <fx:define>
+        <Double fx:id="MAX_ELEMENTS_WIDTH" fx:value="490" />
+        <Double fx:id="MAX_ELEMENTS_HEIGHT" fx:value="400" />
+
+        <RadioButton fx:id="acceptAgreement" text="I accept the licence" selected="false" />
+        <RadioButton fx:id="declineAgreement" text="I don't accept the licence" selected="true" />
+
+        <ToggleGroup fx:id="licenceAgreementGroup">
+            <toggles>
+                <fx:reference source="acceptAgreement" />
+                <fx:reference source="declineAgreement" />
+            </toggles>
+        </ToggleGroup>
+    </fx:define>
+
+    <Text text="Please read and accept the terms the following licence:" disable="true" wrappingWidth="${MAX_ELEMENTS_WIDTH}"/>
+
+    <TextArea fx:id="licence" wrapText="true" editable="false" focusTraversable="false"
+              prefWidth="${MAX_ELEMENTS_WIDTH}" minWidth="${MAX_ELEMENTS_WIDTH}" maxWidth="${MAX_ELEMENTS_WIDTH}"
+              prefHeight="${MAX_ELEMENTS_HEIGHT}" minHeight="${MAX_ELEMENTS_HEIGHT}" maxHeight="${MAX_ELEMENTS_HEIGHT}" />
+
+    <fx:reference source="acceptAgreement" />
+
+    <fx:reference source="declineAgreement" />
+</VBox>
+

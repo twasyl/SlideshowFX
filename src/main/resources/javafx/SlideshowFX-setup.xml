@@ -1,0 +1,99 @@
+<project name="JavaFXApplication"
+         xmlns:fx="javafx:com.sun.javafx.tools.ant">
+
+    <target name="deployOSX">
+        <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+                 uri="javafx:com.sun.javafx.tools.ant"
+                 classpath=".:${classpath}"/>
+
+        <fx:deploy nativeBundles="image" outdir="${deployOutDir}" outfile="SlideshowFXSetup">
+            <fx:application name="SlideshowFXSetup"
+                            mainClass="com.twasyl.slideshowfx.setup.app.SlideshowFXSetup"
+                            fallbackClass="com.javafx.main.NoJavaFXFallback">
+            </fx:application>
+
+            <fx:info title="SlideshowFX" vendor="Thierry Wasylczenko"
+                     copyright="Copyright SlideshowFX" license="Apache 2 license">
+            </fx:info>
+
+            <fx:platform javafx="8.0+" j2se="8.0">
+                <fx:jvmarg value="-Xms512m" />
+                <fx:jvmarg value="-Xmx2048m" />
+                <fx:jvmarg value="-Dfile.encoding=UTF-8" />
+                <fx:jvmarg value="-Dsetup.plugins.directory=./package/plugins" />
+                <fx:jvmarg value="-Dsetup.documentations.directory=./package/documentations" />
+                <fx:jvmarg value="-Dsetup.application.artifact=./package/SlideshowFX.app" />
+                <fx:jvmarg value="-Dsetup.application.name=SlideshowFX" />
+                <fx:jvmarg value="-Dsetup.application.version=1.0" />
+            </fx:platform>
+
+            <fx:resources>
+                <fx:fileset dir="${deployResourcesDir}" />
+            </fx:resources>
+        </fx:deploy>
+    </target>
+
+    <target name="deployWindows">
+        <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+                 uri="javafx:com.sun.javafx.tools.ant"
+                 classpath=".:${classpath}"/>
+
+        <fx:deploy nativeBundles="all" outdir="${deployOutDir}" outfile="SlideshowFXSetup">
+            <fx:application name="SlideshowFXSetup"
+                            mainClass="com.twasyl.slideshowfx.setup.app.SlideshowFXSetup"
+                            fallbackClass="com.javafx.main.NoJavaFXFallback">
+            </fx:application>
+
+            <fx:info title="SlideshowFX" vendor="Thierry Wasylczenko"
+                     copyright="Copyright SlideshowFX" license="Apache 2 license">
+            </fx:info>
+
+            <fx:platform javafx="8.0+" j2se="8.0">
+                <fx:jvmarg value="-Xms512m" />
+                <fx:jvmarg value="-Xmx2048m" />
+                <fx:jvmarg value="-Dfile.encoding=UTF-8" />
+                <fx:jvmarg value="-Dsetup.plugins.directory=./package/plugins" />
+                <fx:jvmarg value="-Dsetup.documentations.directory=./package/documentations" />
+                <fx:jvmarg value="-Dsetup.application.artifact=./package/SlideshowFX" />
+                <fx:jvmarg value="-Dsetup.application.name=SlideshowFX" />
+                <fx:jvmarg value="-Dsetup.application.version=1.0" />
+            </fx:platform>
+
+            <fx:resources>
+                <fx:fileset dir="${deployResourcesDir}" />
+            </fx:resources>
+        </fx:deploy>
+    </target>
+
+    <target name="deployUnknown">
+        <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+                 uri="javafx:com.sun.javafx.tools.ant"
+                 classpath=".:${classpath}"/>
+
+        <fx:deploy nativeBundles="all" outdir="${deployOutDir}" outfile="SlideshowFXSetup">
+            <fx:application name="SlideshowFXSetup"
+                            mainClass="com.twasyl.slideshowfx.setup.app.SlideshowFXSetup"
+                            fallbackClass="com.javafx.main.NoJavaFXFallback">
+            </fx:application>
+
+            <fx:info title="SlideshowFX" vendor="Thierry Wasylczenko"
+                     copyright="Copyright SlideshowFX" license="Apache 2 license">
+            </fx:info>
+
+            <fx:platform javafx="8.0+" j2se="8.0">
+                <fx:jvmarg value="-Xms512m" />
+                <fx:jvmarg value="-Xmx2048m" />
+                <fx:jvmarg value="-Dfile.encoding=UTF-8" />
+                <fx:jvmarg value="-Dsetup.plugins.directory=./package/plugins" />
+                <fx:jvmarg value="-Dsetup.documentations.directory=./package/documentations" />
+                <fx:jvmarg value="-Dsetup.application.artifact=./package/lideshowFX" />
+                <fx:jvmarg value="-Dsetup.application.name=SlideshowFX" />
+                <fx:jvmarg value="-Dsetup.application.version=1.0" />
+            </fx:platform>
+
+            <fx:resources>
+                <fx:fileset dir="${deployResourcesDir}" />
+            </fx:resources>
+        </fx:deploy>
+    </target>
+</project>

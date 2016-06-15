@@ -2,6 +2,7 @@ version = '1.0'
 
 dependencies {
     compile project(':SlideshowFX-markup')
+    compile project(':SlideshowFX-ui-controls')
     compile project(':SlideshowFX-utils')
 
     compile configurations.fontawesomefx

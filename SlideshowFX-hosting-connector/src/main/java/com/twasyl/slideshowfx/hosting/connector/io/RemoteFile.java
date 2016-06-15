@@ -1,7 +1,6 @@
 package com.twasyl.slideshowfx.hosting.connector.io;
 
 import java.io.Serializable;
-import java.util.StringJoiner;
 
 /**
  * Represents a file that is hosted remotely on the service.

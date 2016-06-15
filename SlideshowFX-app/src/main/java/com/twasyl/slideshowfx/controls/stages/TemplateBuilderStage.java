@@ -3,7 +3,6 @@ package com.twasyl.slideshowfx.controls.stages;
 import com.twasyl.slideshowfx.controllers.TemplateBuilderController;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
-import javafx.stage.Modality;
 
 import static javafx.stage.Modality.APPLICATION_MODAL;
 

@@ -6,12 +6,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.twasyl.slideshowfx.snippet.executor.scala.ScalaSnippetExecutor.CLASS_NAME_PROPERTY;
-import static com.twasyl.slideshowfx.snippet.executor.scala.ScalaSnippetExecutor.IMPORTS_PROPERTY;
-import static com.twasyl.slideshowfx.snippet.executor.scala.ScalaSnippetExecutor.WRAP_IN_MAIN_PROPERTY;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static com.twasyl.slideshowfx.snippet.executor.scala.ScalaSnippetExecutor.*;
+import static org.junit.Assert.*;
 
 /**
  * Tests the class {@link ScalaSnippetExecutor}.

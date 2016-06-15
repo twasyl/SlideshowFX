@@ -1,12 +1,11 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.logs.SlideshowFXHandler;
+import com.twasyl.slideshowfx.ui.controls.ZoomTextArea;
 import javafx.beans.property.adapter.ReadOnlyJavaBeanStringProperty;
 import javafx.beans.property.adapter.ReadOnlyJavaBeanStringPropertyBuilder;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TextArea;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -25,7 +24,7 @@ public class LogsController implements Initializable {
 
     private SlideshowFXHandler handler;
 
-    @FXML private TextArea logsArea;
+    @FXML private ZoomTextArea logsArea;
 
     private void refreshLogs() {
         if(handler != null) {

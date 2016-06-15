@@ -3,6 +3,7 @@ version = '1.0'
 dependencies {
     compile project(':SlideshowFX-global-configuration')
     compile project(':SlideshowFX-plugin')
+    compile project(':SlideshowFX-ui-controls')
     compile project(':SlideshowFX-utils')
 
     compile configurations.vertx

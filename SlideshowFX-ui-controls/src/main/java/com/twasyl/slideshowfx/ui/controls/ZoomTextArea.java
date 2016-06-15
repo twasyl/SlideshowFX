@@ -1,4 +1,4 @@
-package com.twasyl.slideshowfx.controls;
+package com.twasyl.slideshowfx.ui.controls;
 
 import javafx.scene.control.TextArea;
 import javafx.scene.input.ScrollEvent;

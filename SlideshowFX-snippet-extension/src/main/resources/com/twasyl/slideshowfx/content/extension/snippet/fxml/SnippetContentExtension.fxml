@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.twasyl.slideshowfx.ui.controls.ZoomTextArea?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.content.extension.snippet.controllers.SnippetContentExtensionController">
@@ -31,7 +31,7 @@
     </left>
 
     <center>
-        <TextArea fx:id="code" prefColumnCount="50" prefRowCount="20" />
+        <ZoomTextArea fx:id="code" prefColumnCount="50" prefRowCount="20" />
     </center>
 </BorderPane>
 

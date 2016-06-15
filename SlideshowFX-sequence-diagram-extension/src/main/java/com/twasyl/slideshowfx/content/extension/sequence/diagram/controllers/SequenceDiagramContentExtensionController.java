@@ -1,9 +1,9 @@
 package com.twasyl.slideshowfx.content.extension.sequence.diagram.controllers;
 
+import com.twasyl.slideshowfx.ui.controls.ZoomTextArea;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.control.TextArea;
 
 import java.awt.*;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class SequenceDiagramContentExtensionController implements Initializable 
     private static final Logger LOGGER = Logger.getLogger(SequenceDiagramContentExtensionController.class.getName());
 
     @FXML private Hyperlink jumlyLink;
-    @FXML private TextArea sequence;
+    @FXML private ZoomTextArea sequence;
 
     public String getSequenceDiagramText() {
         return this.sequence.getText();

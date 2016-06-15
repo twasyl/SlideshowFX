@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.twasyl.slideshowfx.ui.controls.ZoomTextArea?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.TextFlow?>
 <VBox xmlns:fx="http://javafx.com/fxml"
@@ -16,8 +16,8 @@
 
     <Label text="Sequence diagram text:" />
 
-    <TextArea fx:id="sequence"
-              prefColumnCount="40" prefRowCount="20"
-              wrapText="true" />
+    <ZoomTextArea fx:id="sequence"
+                  prefColumnCount="40" prefRowCount="20"
+                  wrapText="true" />
 </VBox>
 

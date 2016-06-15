@@ -5,6 +5,7 @@ include 'SlideshowFX-logs'
 include 'SlideshowFX-osgi'
 include 'SlideshowFX-plugin'
 include ':SlideshowFX-server'
+include 'SlideshowFX-ui-controls'
 include 'SlideshowFX-utils'
 
 include 'SlideshowFX-markup'

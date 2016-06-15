@@ -1,11 +1,11 @@
 package com.twasyl.slideshowfx.content.extension.code.controllers;
 
 import com.twasyl.slideshowfx.content.extension.code.enums.SupportedLanguage;
+import com.twasyl.slideshowfx.ui.controls.ZoomTextArea;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextArea;
 import javafx.util.StringConverter;
 
 import java.net.URL;
@@ -20,7 +20,7 @@ import java.util.ResourceBundle;
 public class CodeContentExtensionController implements Initializable {
 
     @FXML private ChoiceBox<SupportedLanguage> language;
-    @FXML private TextArea code;
+    @FXML private ZoomTextArea code;
     @FXML private CheckBox showingLineNumbers;
 
     /**

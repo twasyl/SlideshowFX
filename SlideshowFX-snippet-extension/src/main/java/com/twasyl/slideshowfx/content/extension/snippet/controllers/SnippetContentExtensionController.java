@@ -4,6 +4,7 @@ import com.twasyl.slideshowfx.content.extension.snippet.controls.SnippetExecutor
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
+import com.twasyl.slideshowfx.ui.controls.ZoomTextArea;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -24,7 +25,7 @@ public class SnippetContentExtensionController implements Initializable {
 
     @FXML private ScrollPane advancedOptions;
     @FXML private ComboBox<ISnippetExecutor> language;
-    @FXML private TextArea code;
+    @FXML private ZoomTextArea code;
 
     private final CodeSnippet codeSnippet = new CodeSnippet();
 
@@ -76,7 +77,7 @@ public class SnippetContentExtensionController implements Initializable {
             }
         });
 
-        // Each time the code in the TextArea changes, reflect it to the CodeSnippet
+        // Each time the code in the ZoomTextArea changes, reflect it to the CodeSnippet
         this.code.textProperty().addListener((textValue, oldText, newText) -> {
             if(newText == null || newText.isEmpty()) this.codeSnippet.setCode(null);
             else this.codeSnippet.setCode(newText);

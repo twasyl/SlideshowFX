@@ -1,7 +1,6 @@
 package com.twasyl.slideshowfx.app;
 
 import com.sun.javafx.PlatformUtil;
-import com.sun.javafx.application.LauncherImpl;
 import com.twasyl.slideshowfx.controllers.SlideshowFXController;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.TextArea?>
+<?import com.twasyl.slideshowfx.ui.controls.ZoomTextArea?>
 <?import javafx.scene.layout.BorderPane?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
@@ -16,6 +16,6 @@
     </fx:define>
 
     <center>
-        <TextArea fx:id="logsArea" editable="false" prefRowCount="20" prefColumnCount="100" />
+        <ZoomTextArea fx:id="logsArea" editable="false" prefRowCount="20" prefColumnCount="100" />
     </center>
 </BorderPane>

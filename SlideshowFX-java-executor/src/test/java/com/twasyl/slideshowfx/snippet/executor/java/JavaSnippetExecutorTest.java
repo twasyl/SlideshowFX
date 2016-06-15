@@ -6,9 +6,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.twasyl.slideshowfx.snippet.executor.java.JavaSnippetExecutor.CLASS_NAME_PROPERTY;
-import static com.twasyl.slideshowfx.snippet.executor.java.JavaSnippetExecutor.IMPORTS_PROPERTY;
-import static com.twasyl.slideshowfx.snippet.executor.java.JavaSnippetExecutor.WRAP_IN_MAIN_PROPERTY;
+import static com.twasyl.slideshowfx.snippet.executor.java.JavaSnippetExecutor.*;
 import static org.junit.Assert.*;
 
 /**

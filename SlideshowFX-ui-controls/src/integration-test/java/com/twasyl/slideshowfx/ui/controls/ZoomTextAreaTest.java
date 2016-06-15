@@ -1,6 +1,5 @@
 package com.twasyl.slideshowfx.ui.controls;
 
-import com.twasyl.slideshowfx.controls.ZoomTextArea;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;

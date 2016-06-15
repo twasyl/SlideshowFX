@@ -82,7 +82,9 @@ Given the plugins you have installed, you can define the content of an element o
 * Textile
 * asciidoctor
 
-In order to define the content of an element, double-click on it in the slide and the text area on the right will be filled with the content of the element you double-clicked. You can now edit it's value and either click the *Define* button or press kbd:[Ctrl+Enter] in order to define the new content for the element.
+In order to define the content of an element, double-click on it in the slide and the text area on the right will be filled with the content of the element you double-clicked. You can now edit it's value and either click the *Define* button or press kbd:[Ctrl+Enter] on Windows or kbd:[Cmd+Enter] on OSX in order to define the new content for the element.
+
+You can zoom in and out inside the text area by using kbd:[Ctrl+Mouse wheel] on Windows and kbd:[Cmd+Mouse wheel] on OSX shortcuts. 
 
 === Slideshow mode
 

@@ -225,6 +225,7 @@
                     <fx:reference source="enterSlideshowFromCurrentSlideMode" />
                     <SeparatorMenuItem />
                     <MenuItem text="Internal browser" onAction="#displayInternalBrowser" />
+                    <MenuItem fx:id="openWebApplicationMenuItem" text="Open web application" onAction="#displayWebApplication" disable="true" />
                 </Menu>
                 <Menu text="Options" fx:id="optionsMenu">
                     <MenuItem text="Install plugin" onAction="#installPlugin" />

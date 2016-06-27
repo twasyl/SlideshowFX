@@ -62,7 +62,7 @@ allprojects {
         leapmotion fileTree(dir: allLibs, include: 'Leap/*')
         markdown 'com.github.rjeschke:txtmark:0.13'
         twitter4j 'org.twitter4j:twitter4j-core:4.0.4', 'org.twitter4j:twitter4j-stream:4.0.4'
-        vertx 'io.vertx:vertx-core:3.2.1', 'io.vertx:vertx-web:3.2.1'
+        vertx 'io.vertx:vertx-core:3.3.0', 'io.vertx:vertx-web:3.3.0'
         wikitext fileTree(dir: new File(allLibs, 'WikiText'), include: '*.jar')
         zxing 'com.google.zxing:core:3.2.1', 'com.google.zxing:javase:3.2.1'
 

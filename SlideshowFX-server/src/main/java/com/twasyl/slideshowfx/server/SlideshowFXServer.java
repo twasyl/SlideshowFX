@@ -179,6 +179,8 @@ public class SlideshowFXServer {
         this.httpServer = null;
         this.router = null;
         this.websockets.clear();
+
+        singleton = null;
     }
 
     /**

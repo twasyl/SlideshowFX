@@ -160,6 +160,7 @@ public class SlideshowFXController implements Initializable {
     /* Main application menu elements */
     @FXML private Menu uploadersMenu;
     @FXML private Menu downloadersMenu;
+    @FXML private MenuItem openWebApplicationMenuItem;
 
     /* Notification center */
     @FXML private NotificationCenter taskInProgress;
@@ -265,6 +266,7 @@ public class SlideshowFXController implements Initializable {
     public void closeAllPresentations(final boolean waitToFinish) {
         PlatformHelper.run(() -> {
             this.openedPresentationsTabPane.getTabs()
+                    .filtered(tab -> tab.getUserData() != null && tab.getUserData() instanceof PresentationViewController)
                     .forEach(tab -> {
                         final PresentationEngine presentation = ((PresentationViewController) tab.getUserData()).getPresentation();
                         this.closePresentation(presentation, waitToFinish);
@@ -455,6 +457,18 @@ public class SlideshowFXController implements Initializable {
             this.openedPresentationsTabPane.getSelectionModel().select(tab);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Can not open internal browser", e);
+        }
+    }
+
+    @FXML private void displayWebApplication(final ActionEvent event) {
+        try {
+            final Parent root = FXMLLoader.load(ResourceHelper.getURL("/com/twasyl/slideshowfx/fxml/SlideshowFXWebApplication.fxml"));
+            final Tab tab = new Tab("Web application", root);
+
+            this.openedPresentationsTabPane.getTabs().addAll(tab);
+            this.openedPresentationsTabPane.getSelectionModel().select(tab);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Can not open web application", e);
         }
     }
 
@@ -1004,6 +1018,7 @@ public class SlideshowFXController implements Initializable {
         this.startServerButton.setTooltip(tooltip);
         this.serverIpAddress.setDisable(!this.serverIpAddress.isDisable());
         this.serverPort.setDisable(!this.serverPort.isDisable());
+        this.openWebApplicationMenuItem.setDisable(SlideshowFXServer.getSingleton() == null);
     }
 
     /**

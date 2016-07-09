@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
+import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -28,6 +29,7 @@ import static java.util.regex.Pattern.MULTILINE;
  */
 public class CodeContentExtension extends AbstractContentExtension {
     private static final Logger LOGGER = Logger.getLogger(CodeContentExtension.class.getName());
+    protected static final String LINE_NUMBERS_CSS_CLASS = "line-numbers";
 
     protected CodeContentExtensionController controller;
 
@@ -79,31 +81,28 @@ public class CodeContentExtension extends AbstractContentExtension {
     @Override
     public String buildDefaultContentString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append("<pre class=\"")
-                .append(this.controller.getLanguage().getCssClass());
-
-        if(this.controller.isShowingLineNumbers()) {
-            builder.append(" line-numbers");
-        }
-
-        builder.append("\"><code class=\"")
-                .append(this.controller.getLanguage().getCssClass())
-                .append("\">")
+        builder.append("<pre").append(this.buildDefaultCssClass()).append("><code").append(this.buildDefaultCssClass())
+                .append(">")
                 .append(this.controller.getCode())
                 .append("</code></pre>");
 
         return builder.toString();
     }
 
+    protected String buildDefaultCssClass() {
+        final String prefix = " class=\"";
+        final String suffix = "\"";
+        final StringJoiner cssClass = new StringJoiner(" ", prefix, suffix);
+
+        if(this.controller.getLanguage() != null) cssClass.add(this.controller.getLanguage().getCssClass());
+
+        if(this.controller.isShowingLineNumbers()) cssClass.add(LINE_NUMBERS_CSS_CLASS);
+
+        return cssClass.length() == (prefix + suffix).length() ? "" : cssClass.toString();
+    }
+
     private String buildTextileContentString() {
-        final StringBuilder builder = new StringBuilder("bc(")
-                .append(this.controller.getLanguage().getCssClass());
-
-        if(this.controller.isShowingLineNumbers()) {
-            builder.append(" line-numbers");
-        }
-
-        builder.append(")")
+        final StringBuilder builder = new StringBuilder("bc").append(this.buildTextileCssClass())
                .append(codeContainsBlankLines(this.controller.getCode()) ? ".." : ".")
                .append(" ")
                .append(this.controller.getCode());
@@ -111,7 +110,17 @@ public class CodeContentExtension extends AbstractContentExtension {
         return builder.toString();
     }
 
-    private boolean codeContainsBlankLines(final String code) {
+    protected String buildTextileCssClass() {
+        final StringJoiner cssClass = new StringJoiner(" ", "(", ")");
+
+        if(this.controller.getLanguage() != null) cssClass.add(this.controller.getLanguage().getCssClass());
+
+        if(this.controller.isShowingLineNumbers()) cssClass.add(LINE_NUMBERS_CSS_CLASS);
+
+        return cssClass.length() == 2 ? "" : cssClass.toString();
+    }
+
+    protected boolean codeContainsBlankLines(final String code) {
         final Pattern pattern = Pattern.compile("^\\s*$", MULTILINE);
         final Matcher matcher = pattern.matcher(code);
 

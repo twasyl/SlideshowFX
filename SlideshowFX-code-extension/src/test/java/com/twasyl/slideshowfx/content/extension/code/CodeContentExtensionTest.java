@@ -107,4 +107,12 @@ public class CodeContentExtensionTest {
 
         assertTrue(content.startsWith("bc(" + JAVA.getCssClass() + "). "));
     }
+
+    @Test
+    public void textileWithoutLanguageAndDontShowLines() {
+        extension.controller = mockController("private String s;", false, null);
+        final String content = extension.buildContentString(textileMarkup);
+
+        assertTrue(content.startsWith("bc. "));
+    }
 }

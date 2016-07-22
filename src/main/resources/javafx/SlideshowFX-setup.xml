@@ -24,7 +24,7 @@
                 <fx:jvmarg value="-Dsetup.documentations.directory=./package/documentations" />
                 <fx:jvmarg value="-Dsetup.application.artifact=./package/SlideshowFX.app" />
                 <fx:jvmarg value="-Dsetup.application.name=SlideshowFX" />
-                <fx:jvmarg value="-Dsetup.application.version=1.0" />
+                <fx:jvmarg value="-Dsetup.application.version=${applicationVersion}" />
             </fx:platform>
 
             <fx:resources>
@@ -56,7 +56,7 @@
                 <fx:jvmarg value="-Dsetup.documentations.directory=./package/documentations" />
                 <fx:jvmarg value="-Dsetup.application.artifact=./package/SlideshowFX" />
                 <fx:jvmarg value="-Dsetup.application.name=SlideshowFX" />
-                <fx:jvmarg value="-Dsetup.application.version=1.0" />
+                <fx:jvmarg value="-Dsetup.application.version=${applicationVersion}" />
             </fx:platform>
 
             <fx:resources>
@@ -88,7 +88,7 @@
                 <fx:jvmarg value="-Dsetup.documentations.directory=./package/documentations" />
                 <fx:jvmarg value="-Dsetup.application.artifact=./package/lideshowFX" />
                 <fx:jvmarg value="-Dsetup.application.name=SlideshowFX" />
-                <fx:jvmarg value="-Dsetup.application.version=1.0" />
+                <fx:jvmarg value="-Dsetup.application.version=${applicationVersion}" />
             </fx:platform>
 
             <fx:resources>

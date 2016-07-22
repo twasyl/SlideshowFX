@@ -29,6 +29,7 @@ task javafx(dependsOn: [ 'jar', ':SlideshowFX-app:javafx',  ':asciidoctor' ] + m
     // Create the JavaFX bundle
     ant.importBuild "${rootDir.absolutePath}/src/main/resources/javafx/${project.name}.xml"
     ant.classpath = "${jdk}/lib/ant-javafx.jar"
+    ant.applicationVersion = project(':SlideshowFX-app').version
 
     ant.deployOutDir = javafxFolder.absolutePath
     ant.deployResourcesDir = resourcesFolder.absolutePath

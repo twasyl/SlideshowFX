@@ -148,9 +148,6 @@ subprojects {
 }
 
 ext {
-    applicationName = 'SlideshowFX'
-    applicationVersion = '1.0'
-
     allLibs = new File(rootDir, '/lib')
     jdk = System.env.'JAVA_HOME'
 
@@ -226,7 +223,7 @@ ext {
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'distribution'
 
-version = '1.0'
+version = '1.0-SNAPSHOT'
 
 asciidoctorj {
     version = '1.5.4'

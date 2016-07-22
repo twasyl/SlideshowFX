@@ -1,5 +1,5 @@
 description = 'Extension allowing to insert sequence diagrams inside a SlideshowFX presentation'
-version = '1.0'
+version = '1.0-SNAPSHOT'
 
 dependencies {
     compile project(':SlideshowFX-content-extension')

@@ -43,7 +43,7 @@ allprojects {
     dependencies {
         asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.4.1'
         drive 'com.google.apis:google-api-services-drive:v2-rev219-1.22.0'
-        dropbox 'com.dropbox.core:dropbox-core-sdk:2.0.3'
+        dropbox 'com.dropbox.core:dropbox-core-sdk:2.0.6'
         felix 'org.apache.felix:org.apache.felix.framework:5.4.0'
         fontawesomefx 'de.jensd:fontawesomefx-fontawesome:4.6.1-2'
         freemarker 'org.freemarker:freemarker:2.3.23'
@@ -51,7 +51,7 @@ allprojects {
         leapmotion fileTree(dir: "${rootDir.absolutePath}/lib/Leap", include: '*/**')
         markdown 'com.github.rjeschke:txtmark:0.13'
         twitter4j 'org.twitter4j:twitter4j-core:4.0.4', 'org.twitter4j:twitter4j-stream:4.0.4'
-        vertx 'io.vertx:vertx-core:3.3.0', 'io.vertx:vertx-web:3.3.0'
+        vertx 'io.vertx:vertx-core:3.3.2', 'io.vertx:vertx-web:3.3.2'
         wikitext fileTree(dir: "${rootDir.absolutePath}/lib/WikiText", include: '*.jar')
         zxing 'com.google.zxing:core:3.2.1', 'com.google.zxing:javase:3.2.1'
 
@@ -249,8 +249,8 @@ asciidoctor {
             'fontawesomefx-version' : "${configurations.fontawesomefx.dependencies[0].version}",
             'jsoup-version': "${configurations.jsoup.dependencies[0].version}",
             'leapmotion-sdk-version': '2.3.1.31549',
-            'wikitext-core-version': '2.7.0.N20151015-1452',
-            'wikitext-textile-core-version': '2.7.0.N20151009-1723',
+            'wikitext-core-version': '2.10.0.N20160630-1705',
+            'wikitext-textile-core-version': '2.10.0.N20160630-1705',
             'twitter4j-version': "${configurations.twitter4j.dependencies[0].version}",
             'txtmark-version': "${configurations.markdown.dependencies[0].version}",
             'vertx-version': "${configurations.vertx.dependencies[0].version}",

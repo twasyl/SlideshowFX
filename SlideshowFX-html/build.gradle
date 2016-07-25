@@ -1,5 +1,5 @@
 description = 'Extension allowing to define slide\'s content using the HTML syntax'
-version = '2.0'
+version = '1.0'
 
 dependencies {
     compile project(':SlideshowFX-markup')

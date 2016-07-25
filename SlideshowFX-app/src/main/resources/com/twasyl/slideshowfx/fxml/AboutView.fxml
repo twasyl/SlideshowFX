@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.Double?>
+<?import java.net.URL?>
 <StackPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.AboutViewController"
            alignment="TOP_CENTER"
-           onMouseClicked="#exitByClick">
+           onMouseClicked="#exitByClick"
+           style="-fx-background-fill: transparent">
+
+    <stylesheets>
+        <URL value="@/com/twasyl/slideshowfx/css/about-stage.css" />
+    </stylesheets>
 
     <background><Background fx:constant="EMPTY" /></background>
 
@@ -24,22 +30,38 @@
         </image>
     </ImageView>
 
-    <ScrollPane prefWidth="${VIEWPORT_WIDTH}" maxWidth="${VIEWPORT_WIDTH}" minWidth="${VIEWPORT_WIDTH}"
-                prefHeight="${VIEWPORT_HEIGHT}" maxHeight="${VIEWPORT_HEIGHT}" minHeight="${VIEWPORT_HEIGHT}"
-                prefViewportWidth="${VIEWPORT_WIDTH}" minViewportWidth="${VIEWPORT_WIDTH}"
-                prefViewportHeight="${VIEWPORT_HEIGHT}" minViewportHeight="${VIEWPORT_HEIGHT}"
-                fitToHeight="true"
-                translateY="125">
+    <TabPane prefWidth="${VIEWPORT_WIDTH}" maxWidth="${VIEWPORT_WIDTH}" minWidth="${VIEWPORT_WIDTH}"
+             prefHeight="${VIEWPORT_HEIGHT}" maxHeight="${VIEWPORT_HEIGHT}" minHeight="${VIEWPORT_HEIGHT}"
+             translateY="125">
         <background><Background fx:constant="EMPTY" /></background>
 
-        <VBox spacing="10">
-            <background><Background fx:constant="EMPTY" /></background>
-            <padding>
-                <Insets left="10" />
-            </padding>
-            <Label fx:id="slideshowFXVersion" style="-fx-text-fill: black;" />
-            <Label fx:id="javaVersion" style="-fx-text-fill: black;" />
-        </VBox>
-    </ScrollPane>
+        <Tab text="Application" closable="false">
+            <VBox spacing="10">
+                <background><Background fx:constant="EMPTY" /></background>
+                <padding>
+                    <Insets left="10" top="10" />
+                </padding>
+                <Label fx:id="slideshowFXVersion" style="-fx-text-fill: black;" />
+                <Label fx:id="javaVersion" style="-fx-text-fill: black;" />
+            </VBox>
+        </Tab>
+
+        <Tab text="Plugins" closable="false">
+            <TableView fx:id="plugins">
+                <columns>
+                    <TableColumn text="Name" prefWidth="395">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="name" />
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn text="Version" prefWidth="65">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="version" />
+                        </cellValueFactory>
+                    </TableColumn>
+                </columns>
+            </TableView>
+        </Tab>
+    </TabPane>
 </StackPane>
 

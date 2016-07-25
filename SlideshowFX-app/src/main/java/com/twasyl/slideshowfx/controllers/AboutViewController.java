@@ -1,10 +1,17 @@
 package com.twasyl.slideshowfx.controllers;
 
+import com.twasyl.slideshowfx.content.extension.IContentExtension;
+import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
+import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.plugin.InstalledPlugin;
+import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
 
@@ -32,6 +39,7 @@ public class AboutViewController implements Initializable {
     @FXML private Parent root;
     @FXML private Label slideshowFXVersion;
     @FXML private Label javaVersion;
+    @FXML private TableView<InstalledPlugin> plugins;
 
     @FXML
     public void exitByClick(final MouseEvent event) {
@@ -43,10 +51,18 @@ public class AboutViewController implements Initializable {
         this.root.getScene().getWindow().fireEvent(closeEvent);
     }
 
+    protected void populatePluginsTable() {
+        this.plugins.getItems().addAll(OSGiManager.getInstalledPlugins(IMarkup.class));
+        this.plugins.getItems().addAll(OSGiManager.getInstalledPlugins(IContentExtension.class));
+        this.plugins.getItems().addAll(OSGiManager.getInstalledPlugins(ISnippetExecutor.class));
+        this.plugins.getItems().addAll(OSGiManager.getInstalledPlugins(IHostingConnector.class));
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.slideshowFXVersion.setText(String.format("SlideshowFX version: %1$s", getApplicationVersion()));
         this.javaVersion.setText(String.format("Java version: %1$s", System.getProperty("java.version")));
+        this.populatePluginsTable();
     }
 
     /**

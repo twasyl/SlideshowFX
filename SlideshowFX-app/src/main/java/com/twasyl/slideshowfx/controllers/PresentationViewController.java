@@ -325,7 +325,7 @@ public class PresentationViewController implements Initializable {
 
                     contentExtension.getResources()
                             .stream()
-                            .forEach(resource -> this.presentationEngine.addCustomResource(resource));
+                            .forEach(this.presentationEngine::addCustomResource);
                 }
             }
         });

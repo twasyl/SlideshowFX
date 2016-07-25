@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.content.extension;
 
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.plugin.IPlugin;
 import de.jensd.fx.glyphs.GlyphIcons;
 import javafx.scene.layout.Pane;
 
@@ -17,7 +18,7 @@ import java.util.Set;
  * @version 1.0
  * @since SlideshowFX 1.0
  */
-public interface IContentExtension {
+public interface IContentExtension extends IPlugin {
 
     /**
      * Get the code of this content extension. The code represents a unique ID between all content extensions in order

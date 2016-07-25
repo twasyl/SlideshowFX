@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.content.extension;
 
+import com.twasyl.slideshowfx.plugin.AbstractPlugin;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import de.jensd.fx.glyphs.GlyphIcons;
 
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0
  */
-public abstract class AbstractContentExtension implements IContentExtension {
+public abstract class AbstractContentExtension extends AbstractPlugin implements IContentExtension{
     private static final Logger LOGGER = Logger.getLogger(AbstractContentExtension.class.getName());
 
     protected final String code;
@@ -39,6 +40,8 @@ public abstract class AbstractContentExtension implements IContentExtension {
      * @throws java.lang.IllegalArgumentException If the code is empty.
      */
     protected AbstractContentExtension(String code, URL resourcesArchive, GlyphIcons icon, String toolTip, String title) {
+        super(code);
+
         if(code == null) throw new NullPointerException("The code of the content extension is null");
         if(code.trim().isEmpty()) throw new IllegalArgumentException("The code of the content extension can not be empty");
 

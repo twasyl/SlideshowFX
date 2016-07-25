@@ -2,6 +2,8 @@ package com.twasyl.slideshowfx.osgi;
 
 import com.twasyl.slideshowfx.engine.presentation.Presentations;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.plugin.IPlugin;
+import com.twasyl.slideshowfx.plugin.InstalledPlugin;
 import org.osgi.framework.*;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
@@ -14,6 +16,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * This class manages all OSGi bundles: from installation to uninstallation. It also starts the OSGi container as well
@@ -176,10 +179,37 @@ public class OSGiManager {
 
             references.stream().forEach(ref -> services.add(osgiFramework.getBundleContext().getService(ref)));
         } catch (InvalidSyntaxException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Can not list all installed service of type " + serviceType.getName());
         }
 
         return services;
+    }
+
+    /**
+     * Get the list of {@link InstalledPlugin} of the given type.
+     * @param pluginType The type of the plugin to list.
+     * @param <T> The type of the plugins.
+     * @return The list containing all installed plugins of the desired type.
+     */
+    public static <T extends IPlugin> List<InstalledPlugin> getInstalledPlugins(Class<T> pluginType) {
+        final List<InstalledPlugin> installedPlugins = new ArrayList<>();
+
+        try {
+            final Collection<ServiceReference<T>> services =
+                    osgiFramework.getBundleContext().getServiceReferences(pluginType, "(objectClass=" + pluginType.getName() + ")");
+            installedPlugins.addAll(
+                    services.stream()
+                        .map(service -> {
+                            final Bundle bundle = service.getBundle();
+                            return new InstalledPlugin(bundle.getHeaders().get("Bundle-Name"), bundle.getVersion().toString());
+                        })
+                            .sorted((plugin1, plugin2) -> plugin1.getName().compareTo(plugin2.getName()))
+                        .collect(Collectors.toList()));
+        } catch (InvalidSyntaxException e) {
+            LOGGER.log(Level.WARNING, "Can not list all installed plugin of type " + pluginType.getName());
+        }
+
+        return installedPlugins;
     }
 
     public static final String PRESENTATION_FOLDER = "presentation.folder";

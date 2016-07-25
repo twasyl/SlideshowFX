@@ -1,5 +1,5 @@
 description = 'Hosting connector allowing to open and save presentations from and to Dropbox'
-version = '1.0-SNAPSHOT'
+version = '1.0'
 
 dependencies {
     compile project(':SlideshowFX-global-configuration')

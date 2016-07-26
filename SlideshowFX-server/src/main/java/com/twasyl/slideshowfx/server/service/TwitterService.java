@@ -8,8 +8,6 @@ import io.vertx.core.json.JsonObject;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.scene.Scene;
 import javafx.scene.web.WebView;
@@ -19,6 +17,7 @@ import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+import twitter4j.util.function.Consumer;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,18 +48,13 @@ public class TwitterService extends AbstractSlideshowFXService {
                 .setOAuthConsumerSecret("winWDhMbeJZ4m66gABqpohkclLDixnyeOINuVtPWs")
                 .build();
 
-        if(hashtag != null && !hashtag.isEmpty()) {
-            this.connect();
-            this.accessToken.addListener((value, oldValue, newValue) -> {
-                if (newValue != null) {
-                    FilterQuery query = new FilterQuery();
-                    query.track(new String[]{hashtag});
+        this.accessToken.addListener((value, oldValue, newValue) -> {
+            this.launchTwitter();
+        });
 
-                    this.twitterStream = new TwitterStreamFactory(this.twitterConfiguration).getInstance(this.accessToken.get());
-                    this.twitterStream.addListener(this.buildTwitterStreamListener());
-                    this.twitterStream.filter(query);
-                }
-            });
+        if(hashtag != null && !hashtag.isEmpty()) {
+            if(this.accessToken.get() == null) this.connect();
+            else this.launchTwitter();
         }
     }
 
@@ -74,13 +68,19 @@ public class TwitterService extends AbstractSlideshowFXService {
 
         if(this.twitterStream != null) {
             try {
-                this.twitterStream.shutdown();
+                new Thread(() -> {
+                    this.twitterStream.shutdown();
+                }).start();
             } catch(Exception e) {
                 LOGGER.log(Level.SEVERE, "Can not stop the Twitter stream", e);
             }
         }
     }
 
+    /**
+     * Connect to the Twitter service by asking the user to log in. Once the connection is successful, the {@link #accessToken}
+     * is udpated.
+     */
     private void connect() {
         this.twitter = TwitterFactory.getSingleton();
 
@@ -92,7 +92,7 @@ public class TwitterService extends AbstractSlideshowFXService {
         }
 
         try {
-            this.requestToken.set(twitter.getOAuthRequestToken());
+            this.requestToken.set(this.twitter.getOAuthRequestToken());
             final String authUrl = this.requestToken.get().getAuthorizationURL();
 
             Platform.runLater(() -> {
@@ -103,22 +103,19 @@ public class TwitterService extends AbstractSlideshowFXService {
 
                 twitterBrowser.getEngine().load(authUrl);
 
-                twitterBrowser.getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State state2) {
-                        if (state2 == Worker.State.SUCCEEDED) {
-                            if (twitterBrowser.getEngine().getDocument().getDocumentURI().equals("https://api.twitter.com/oauth/authorize")) {
-                                String pinCode = twitterBrowser.getEngine().getDocument().getElementsByTagName("kbd").item(0).getTextContent();
+                twitterBrowser.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
+                    if (newState == Worker.State.SUCCEEDED) {
+                        if (twitterBrowser.getEngine().getDocument().getDocumentURI().equals("https://api.twitter.com/oauth/authorize")) {
+                            String pinCode = twitterBrowser.getEngine().getDocument().getElementsByTagName("kbd").item(0).getTextContent();
 
-                                try {
-                                    TwitterService.this.accessToken.set(twitter.getOAuthAccessToken(requestToken.get(), pinCode));
-                                    twitter.verifyCredentials();
-                                } catch (TwitterException e) {
-                                    e.printStackTrace();
-                                }
-
-                                stage.close();
+                            try {
+                                TwitterService.this.accessToken.set(twitter.getOAuthAccessToken(requestToken.get(), pinCode));
+                                twitter.verifyCredentials();
+                            } catch (TwitterException e) {
+                                LOGGER.log(Level.SEVERE, "Error while connecting to Twitter", e);
                             }
+
+                            stage.close();
                         }
                     }
                 });
@@ -128,52 +125,43 @@ public class TwitterService extends AbstractSlideshowFXService {
             });
         } catch (TwitterException | IllegalStateException e) {
             LOGGER.fine("Seems to be already connected to Twitter");
+            try {
+                this.accessToken.set(this.twitter.getOAuthAccessToken());
+            } catch (TwitterException e1) {
+                LOGGER.log(Level.SEVERE, "Can not connect to Twitter", e1);
+            }
         }
     }
 
-    private StatusListener buildTwitterStreamListener() {
-        final StatusListener listener = new StatusListener() {
-            @Override
-            public void onStatus(Status status) {
-                final ChatMessage chatMessage = new ChatMessage();
-                chatMessage.setId(System.currentTimeMillis() + "");
-                chatMessage.setSource(ChatMessageSource.TWITTER);
-                chatMessage.setStatus(ChatMessageStatus.NEW);
-                chatMessage.setAuthor("@" + status.getUser().getScreenName());
-                chatMessage.setContent(status.getText());
+    /**
+     * Start the {@link TwitterStream}.
+     */
+    private void launchTwitter() {
+        if(this.accessToken.get() != null) {
+            final FilterQuery query = new FilterQuery();
+            query.track(new String[]{SlideshowFXServer.getSingleton().getTwitterHashtag()});
 
-                final JsonObject jsonTweet = chatMessage.toJSON();
+            this.twitterStream = new TwitterStreamFactory(this.twitterConfiguration).getInstance(this.accessToken.get());
+            this.twitterStream.onStatus(this.buildTwitterStatusConsumer());
+            this.twitterStream.filter(query);
+        }
+    }
 
-                TwitterService.this.vertx.eventBus().publish(SERVICE_CHAT_ATTENDEE_MESSAGE_ADD, jsonTweet);
-                TwitterService.this.vertx.eventBus().publish(SERVICE_CHAT_PRESENTER_MESSAGE_ADD, jsonTweet);
-            }
+    private Consumer<Status> buildTwitterStatusConsumer() {
+        final Consumer<Status> statusConsumer = status -> {
+            final ChatMessage chatMessage = new ChatMessage();
+            chatMessage.setId(System.currentTimeMillis() + "");
+            chatMessage.setSource(ChatMessageSource.TWITTER);
+            chatMessage.setStatus(ChatMessageStatus.NEW);
+            chatMessage.setAuthor("@" + status.getUser().getScreenName());
+            chatMessage.setContent(status.getText());
 
-            @Override
-            public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
+            final JsonObject jsonTweet = chatMessage.toJSON();
 
-            }
-
-            @Override
-            public void onTrackLimitationNotice(int i) {
-
-            }
-
-            @Override
-            public void onScrubGeo(long l, long l1) {
-
-            }
-
-            @Override
-            public void onStallWarning(StallWarning stallWarning) {
-
-            }
-
-            @Override
-            public void onException(Exception e) {
-                e.printStackTrace();
-            }
+            TwitterService.this.vertx.eventBus().publish(SERVICE_CHAT_ATTENDEE_MESSAGE_ADD, jsonTweet);
+            TwitterService.this.vertx.eventBus().publish(SERVICE_CHAT_PRESENTER_MESSAGE_ADD, jsonTweet);
         };
 
-        return listener;
+        return statusConsumer;
     }
 }

@@ -1018,6 +1018,7 @@ public class SlideshowFXController implements Initializable {
         this.startServerButton.setTooltip(tooltip);
         this.serverIpAddress.setDisable(!this.serverIpAddress.isDisable());
         this.serverPort.setDisable(!this.serverPort.isDisable());
+        this.twitterHashtag.setDisable(!this.twitterHashtag.isDisable());
         this.openWebApplicationMenuItem.setDisable(SlideshowFXServer.getSingleton() == null);
     }
 

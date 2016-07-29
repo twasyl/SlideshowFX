@@ -1,4 +1,4 @@
-version '1.0.0'
+version '1.0'
 
 dependencies {
     compile project(':SlideshowFX-engines')
@@ -7,3 +7,5 @@ dependencies {
 
     testCompile configurations.junit
 }
+
+tasks.bintrayUpload.enabled = false

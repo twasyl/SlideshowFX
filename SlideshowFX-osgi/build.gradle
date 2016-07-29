@@ -6,3 +6,5 @@ dependencies {
 
     compile configurations.felix
 }
+
+tasks.bintrayUpload.enabled = false

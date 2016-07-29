@@ -8,3 +8,5 @@ dependencies {
 
     compile configurations.vertx
 }
+
+tasks.bintrayUpload.enabled = false

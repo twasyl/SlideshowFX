@@ -97,3 +97,5 @@ task javafx(dependsOn: [ 'jar', ':SlideshowFX-app:javafx',  ':asciidoctor' ] + m
 
     resourcesFolder.deleteDir()
 }
+
+tasks.bintrayUpload.enabled = false

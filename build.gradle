@@ -3,14 +3,14 @@ import com.sun.javafx.PlatformUtil
 buildscript {
 
     repositories {
-        jcenter()
         mavenCentral()
+        jcenter()
     }
 
     dependencies {
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
         classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
     }
 }
 
@@ -58,13 +58,41 @@ allprojects {
         junit 'junit:junit:4.12'
         mockito 'org.mockito:mockito-core:1.10.19'
     }
+
+    apply plugin: 'com.jfrog.bintray'
+
+    bintray {
+        user =  project.findProperty('bintray_user_name') ?: System.getenv('BINTRAY_USER_NAME')
+        key = project.findProperty('bintray_api_key') ?: System.getenv('BINTRAY_API_KEY')
+        configurations = ['archives']
+
+        pkg {
+            repo = 'SlideshowFX'
+            name = project.name
+            websiteUrl = 'https://slideshowfx.github.io'
+            issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
+            vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
+
+            desc = project.description
+
+            licenses = ['Apache-2.0']
+
+            githubRepo = 'twasyl/SlideshowFX'
+
+            version {
+                name = '1.0'
+                desc = project.description
+                released = new Date()
+                vcsTag = project.version;
+            }
+        }
+    }
 }
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'findbugs'
     apply plugin: 'jacoco'
-    apply plugin: 'com.jfrog.bintray'
 
     group = "com.twasyl.slideshowfx"
 
@@ -120,29 +148,6 @@ subprojects {
             xml.enabled = false
             csv.enabled = false
             html.enabled = true
-        }
-    }
-
-    bintray {
-        user =  project.findProperty('bintray_user_name') ?: System.getenv('BINTRAY_USER_NAME')
-        key = project.findProperty('bintray_api_key') ?: System.getenv('BINTRAY_API_KEY')
-        configurations = ['archives']
-
-        pkg {
-            repo = 'SlideshowFX'
-            name = project.name
-            websiteUrl = 'https://slideshowfx.github.io'
-            issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
-            vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
-
-            desc = project.description
-
-            licenses = ['Apache-2.0']
-
-            version {
-                name = project.version
-                desc = project.description
-            }
         }
     }
 }
@@ -316,7 +321,7 @@ task publishAllToBintray (dependsOn : ['publishAllMarkup', 'publishAllContentExt
 
 distributions {
     main {
-        baseName = "SlideshowFX"
+        baseName = "SlideshowFX_" + (PlatformUtil.isWindows() ? 'windows' : PlatformUtil.isMac() ? 'osx' : 'independent')
         contents {
             // Documentation
             into('documentations/html') {
@@ -338,8 +343,33 @@ distributions {
 }
 
 tasks.distZip.dependsOn = artifactsBundleDependencies
-tasks.distTar.dependsOn = artifactsBundleDependencies
+tasks.distTar.enabled = false
 
 wrapper {
     gradleVersion = '2.14.1'
+}
+
+bintray {
+    configurations = ['archives']
+
+    pkg {
+        repo = 'SlideshowFX'
+        name = 'packaging'
+        websiteUrl = 'https://slideshowfx.github.io'
+        issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
+        vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
+
+        desc = project.description
+
+        licenses = ['Apache-2.0']
+
+        githubRepo = 'twasyl/SlideshowFX'
+
+        version {
+            name = '1.0'
+            desc = project.description
+            released = new Date()
+            vcsTag = "v${project.version}"
+        }
+    }
 }

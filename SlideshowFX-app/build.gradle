@@ -79,3 +79,5 @@ task javafx(dependsOn: [ 'jar' ]) << {
 
     resourcesFolder.deleteDir()
 }
+
+tasks.bintrayUpload.enabled = false

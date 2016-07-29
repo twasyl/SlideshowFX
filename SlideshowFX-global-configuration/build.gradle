@@ -3,3 +3,5 @@ version = '1.0-SNAPSHOT'
 dependencies {
     compile project(":SlideshowFX-logs")
 }
+
+tasks.bintrayUpload.enabled = false

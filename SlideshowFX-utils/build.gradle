@@ -12,3 +12,5 @@ dependencies {
 test {
     jvmArgs "-DtestResultsDir=${testResultsDir.absolutePath}"
 }
+
+tasks.bintrayUpload.enabled = false

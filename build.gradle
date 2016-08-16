@@ -321,7 +321,7 @@ task publishAllToBintray (dependsOn : ['publishAllMarkup', 'publishAllContentExt
 
 distributions {
     main {
-        baseName = "SlideshowFX_" + (PlatformUtil.isWindows() ? 'windows' : PlatformUtil.isMac() ? 'osx' : 'independent')
+        baseName = "SlideshowFX-" + (PlatformUtil.isWindows() ? 'windows' : PlatformUtil.isMac() ? 'osx' : 'independent')
         contents {
             // Documentation
             into('documentations/html') {
@@ -346,7 +346,7 @@ tasks.distZip.dependsOn = artifactsBundleDependencies
 tasks.distTar.enabled = false
 
 wrapper {
-    gradleVersion = '2.14.1'
+    gradleVersion = '3.0'
 }
 
 bintray {

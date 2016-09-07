@@ -58,13 +58,33 @@ allprojects {
         junit 'junit:junit:4.12'
         mockito 'org.mockito:mockito-core:1.10.19'
     }
+
+    apply plugin: 'com.jfrog.bintray'
+
+    bintray {
+        user =  project.findProperty('bintray_user_name') ?: System.getenv('BINTRAY_USER_NAME')
+        key = project.findProperty('bintray_api_key') ?: System.getenv('BINTRAY_API_KEY')
+
+        pkg {
+            repo = 'SlideshowFX'
+            name = project.name
+            websiteUrl = 'https://slideshowfx.github.io'
+            issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
+            vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
+
+            desc = project.description
+
+            licenses = ['Apache-2.0']
+
+            githubRepo = 'twasyl/SlideshowFX'
+        }
+    }
 }
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'findbugs'
     apply plugin: 'jacoco'
-    apply plugin: 'com.jfrog.bintray'
 
     group = "com.twasyl.slideshowfx"
 
@@ -120,33 +140,6 @@ subprojects {
             xml.enabled = false
             csv.enabled = false
             html.enabled = true
-        }
-    }
-
-    bintray {
-        user =  project.findProperty('bintray_user_name') ?: System.getenv('BINTRAY_USER_NAME')
-        key = project.findProperty('bintray_api_key') ?: System.getenv('BINTRAY_API_KEY')
-        configurations = ['archives']
-
-        pkg {
-            repo = 'SlideshowFX'
-            name = project.name
-            websiteUrl = 'https://slideshowfx.github.io'
-            issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
-            vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
-
-            desc = project.description
-
-            licenses = ['Apache-2.0']
-
-            githubRepo = 'twasyl/SlideshowFX'
-
-            version {
-                name = '1.0'
-                desc = project.description
-                released = new Date()
-                vcsTag = project.version;
-            }
         }
     }
 }
@@ -239,9 +232,12 @@ ext {
 
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'distribution'
-apply plugin: 'com.jfrog.bintray'
 
-version = '1.0-SNAPSHOT'
+version = '1.0-DEV'
+
+wrapper {
+    gradleVersion = '3.0'
+}
 
 asciidoctorj {
     version = '1.5.4'
@@ -358,14 +354,7 @@ distributions {
 tasks.distZip.dependsOn = artifactsBundleDependencies
 tasks.distTar.enabled = false
 
-wrapper {
-    gradleVersion = '3.0'
-}
-
 bintray {
-    user =  project.findProperty('bintray_user_name') ?: System.getenv('BINTRAY_USER_NAME')
-    key = project.findProperty('bintray_api_key') ?: System.getenv('BINTRAY_API_KEY')
-
     filesSpec {
         from tasks.distZip.archivePath
         into '.'
@@ -373,20 +362,8 @@ bintray {
     }
 
     pkg {
-        repo = 'SlideshowFX'
-        name = 'packaging'
-        websiteUrl = 'https://slideshowfx.github.io'
-        issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
-        vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
-
-        desc = project.description
-
-        licenses = ['Apache-2.0']
-
-        githubRepo = 'twasyl/SlideshowFX'
-
         version {
-            name = '1.0'
+            name = project.version
             desc = project.description
             released = new Date()
             vcsTag = "v${project.version}"

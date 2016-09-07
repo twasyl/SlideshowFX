@@ -1,5 +1,5 @@
 description = 'Extension allowing to insert quizs inside a SlideshowFX presentation'
-version = '1.0'
+version = '1.0-DEV'
 
 dependencies {
     compile project(':SlideshowFX-app')
@@ -22,5 +22,19 @@ jar {
                 'Import-Package': 'org.osgi.framework',
                 'Setup-Wizard-Label': 'Quiz',
                 'Setup-Wizard-Icon-Name': 'QUESTION')
+    }
+}
+
+bintray {
+
+    configurations = ['archives']
+
+    pkg {
+        version {
+            name = project.version
+            desc = project.description
+            released = new Date()
+            vcsTag = "v${project.version}"
+        }
     }
 }

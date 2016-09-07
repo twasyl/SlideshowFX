@@ -1,5 +1,5 @@
 description = 'Extension allowing to define slide\'s content using the textile syntax'
-version = '1.0'
+version = '1.0-DEV'
 
 dependencies {
     compile project(':SlideshowFX-markup')
@@ -27,5 +27,19 @@ jar {
                 'Export-Package': 'com.twasyl.slideshowfx.markup.textile,com.twasyl.slideshowfx.markup.textile.activator',
                 'Import-Package': 'org.osgi.framework',
                 'Setup-Wizard-Label': 'Textile')
+    }
+}
+
+bintray {
+
+    configurations = ['archives']
+
+    pkg {
+        version {
+            name = project.version
+            desc = project.description
+            released = new Date()
+            vcsTag = "v${project.version}"
+        }
     }
 }

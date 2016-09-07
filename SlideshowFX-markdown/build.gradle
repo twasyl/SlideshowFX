@@ -1,5 +1,5 @@
 description = 'Extension allowing to define slide\'s content using the mardown syntax'
-version = '1.0'
+version = '1.0-DEV'
 
 dependencies {
     compile project(':SlideshowFX-markup')
@@ -28,5 +28,19 @@ jar {
                 'Export-Package': 'com.twasyl.slideshowfx.markup.markdown,com.twasyl.slideshowfx.markup.markdown.activator',
                 'Import-Package': 'org.osgi.framework',
                 'Setup-Wizard-Label': 'Markdown')
+    }
+}
+
+bintray {
+
+    configurations = ['archives']
+
+    pkg {
+        version {
+            name = project.version
+            desc = project.description
+            released = new Date()
+            vcsTag = "v${project.version}"
+        }
     }
 }

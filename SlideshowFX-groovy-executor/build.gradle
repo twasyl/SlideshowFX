@@ -1,5 +1,5 @@
 description = 'Snippet executor allowing to execute some groovy inside a SlideshowFX presentation'
-version = '1.0'
+version = '1.0-DEV'
 
 dependencies {
     compile project(':SlideshowFX-snippet-executor')
@@ -21,5 +21,19 @@ jar {
                 'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.groovy,com.twasyl.slideshowfx.snippet.executor.groovy.activator',
                 'Import-Package': 'org.osgi.framework',
                 'Setup-Wizard-Label': 'Groovy')
+    }
+}
+
+bintray {
+
+    configurations = ['archives']
+
+    pkg {
+        version {
+            name = project.version
+            desc = project.description
+            released = new Date()
+            vcsTag = "v${project.version}"
+        }
     }
 }

@@ -1,5 +1,5 @@
 description = 'Extension allowing to insert executable code snippets inside a SlideshowFX presentation'
-version = '1.0'
+version = '1.0-DEV'
 
 dependencies {
     compile project(':SlideshowFX-content-extension')
@@ -22,5 +22,19 @@ jar {
                 'Import-Package': 'org.osgi.framework',
                 'Setup-Wizard-Label': 'Executable code snippet',
                 'Setup-Wizard-Icon-Name': 'TERMINAL')
+    }
+}
+
+bintray {
+
+    configurations = ['archives']
+
+    pkg {
+        version {
+            name = project.version
+            desc = project.description
+            released = new Date()
+            vcsTag = "v${project.version}"
+        }
     }
 }

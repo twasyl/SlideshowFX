@@ -1,6 +1,6 @@
 import com.sun.javafx.PlatformUtil
 
-version = '1.0-SNAPSHOT'
+version = '1.0-DEV'
 
 dependencies {
     compile project(':SlideshowFX-engines')

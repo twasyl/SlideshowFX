@@ -1,5 +1,5 @@
 description = 'Snippet executor allowing to define slide\'s content using the asciidoctor syntax'
-version = '1.0'
+version = '1.0-DEV'
 
 dependencies {
     compile project(':SlideshowFX-markup')
@@ -27,5 +27,19 @@ jar {
                 'Export-Package': 'com.twasyl.slideshowfx.markup.asciidoctor,com.twasyl.slideshowfx.markup.asciidoctor.activator',
                 'Import-Package': 'org.osgi.framework',
                 'Setup-Wizard-Label': 'Asciidoctor')
+    }
+}
+
+bintray {
+
+    configurations = ['archives']
+
+    pkg {
+        version {
+            name = project.version
+            desc = project.description
+            released = new Date()
+            vcsTag = "v${project.version}"
+        }
     }
 }

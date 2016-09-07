@@ -1,5 +1,5 @@
 description = 'Snippet executor allowing to execute some Kotlin inside a SlideshowFX presentation'
-version = '1.0'
+version = '1.0-DEV'
 
 dependencies {
     compile project(':SlideshowFX-snippet-executor')
@@ -21,5 +21,19 @@ jar {
                 'Export-Package': 'com.twasyl.slideshowfx.snippet.executor.kotlin,com.twasyl.slideshowfx.snippet.executor.kotlin.activator',
                 'Import-Package': 'org.osgi.framework',
                 'Setup-Wizard-Label': 'Kotlin')
+    }
+}
+
+bintray {
+
+    configurations = ['archives']
+
+    pkg {
+        version {
+            name = project.version
+            desc = project.description
+            released = new Date()
+            vcsTag = "v${project.version}"
+        }
     }
 }

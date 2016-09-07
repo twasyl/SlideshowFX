@@ -30,6 +30,7 @@ before_build:
 
 build_script:
   - gradlew.bat build bintrayUpload -x test
+  - gradlew.bat --stop
 
 artifacts:
   - path: build/distributions/SlideshowFX-*.zip

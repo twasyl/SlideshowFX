@@ -1,5 +1,5 @@
 description = 'Extension allowing to insert alerts inside a SlideshowFX presentation'
-version = '1.0'
+version = '1.0-DEV'
 
 dependencies {
     compile project(':SlideshowFX-content-extension')
@@ -20,5 +20,19 @@ jar {
                 'Import-Package': 'org.osgi.framework',
                 'Setup-Wizard-Label': 'Alert',
                 'Setup-Wizard-Icon-Name': 'EXCLAMATION_TRIANGLE')
+    }
+}
+
+bintray {
+
+    configurations = ['archives']
+
+    pkg {
+        version {
+            name = project.version
+            desc = project.description
+            released = new Date()
+            vcsTag = "v${project.version}"
+        }
     }
 }

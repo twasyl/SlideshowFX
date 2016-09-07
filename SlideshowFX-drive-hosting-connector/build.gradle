@@ -1,5 +1,5 @@
 description = 'Hosting connector allowing to open and save presentations from and to google drive'
-version = '1.0'
+version = '1.0-DEV'
 
 dependencies {
     compile project(':SlideshowFX-global-configuration')
@@ -27,5 +27,19 @@ jar {
                 'Export-Package': 'com.twasyl.slideshowfx.hosting.connector.drive,com.twasyl.slideshowfx.hosting.connector.drive.activator',
                 'Import-Package': 'org.osgi.framework',
                 'Setup-Wizard-Label': 'Google Drive')
+    }
+}
+
+bintray {
+
+    configurations = ['archives']
+
+    pkg {
+        version {
+            name = project.version
+            desc = project.description
+            released = new Date()
+            vcsTag = "v${project.version}"
+        }
     }
 }

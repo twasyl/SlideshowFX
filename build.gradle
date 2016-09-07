@@ -362,6 +362,18 @@ bintray {
     }
 
     pkg {
+        repo = 'SlideshowFX'
+        name = project.name
+        websiteUrl = 'https://slideshowfx.github.io'
+        issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
+        vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
+
+        desc = project.description
+
+        licenses = ['Apache-2.0']
+
+        githubRepo = 'twasyl/SlideshowFX'
+
         version {
             name = project.version
             desc = project.description

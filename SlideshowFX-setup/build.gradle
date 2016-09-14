@@ -1,6 +1,6 @@
 import com.sun.javafx.PlatformUtil
 
-version = '1.0-DEV'
+version = '1.0'
 
 dependencies {
     compile project(':SlideshowFX-global-configuration')

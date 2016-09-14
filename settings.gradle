@@ -1,3 +1,5 @@
+rootProject.name = 'SlideshowFX'
+
 include 'SlideshowFX-app'
 include 'SlideshowFX-engines'
 include 'SlideshowFX-global-configuration'

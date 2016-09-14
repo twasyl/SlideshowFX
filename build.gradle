@@ -77,6 +77,7 @@ allprojects {
             licenses = ['Apache-2.0']
 
             githubRepo = 'twasyl/SlideshowFX'
+            githubReleaseNotesFile = 'CHANGELOG.textile'
         }
     }
 }
@@ -233,7 +234,7 @@ ext {
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'distribution'
 
-version = '1.0-DEV'
+version = '1.0'
 
 wrapper {
     gradleVersion = '3.0'

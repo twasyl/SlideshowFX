@@ -1,5 +1,5 @@
 description = 'Extension allowing to insert executable code snippets inside a SlideshowFX presentation'
-version = '1.0-DEV'
+version = '1.0'
 
 dependencies {
     compile project(':SlideshowFX-content-extension')

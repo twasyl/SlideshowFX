@@ -25,6 +25,7 @@ install: true
 script:
   - chmod +x ./gradlew
   - ./gradlew build bintrayUpload -x test
+  - ./gradlew --stop
 
 cache:
   directories:

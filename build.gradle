@@ -234,7 +234,7 @@ ext {
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'distribution'
 
-version = '1.0'
+version = 'NEXT-VERSION'
 
 wrapper {
     gradleVersion = '3.0'

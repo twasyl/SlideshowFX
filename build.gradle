@@ -242,7 +242,7 @@ apply plugin: 'distribution'
 version = 'NEXT-VERSION'
 
 wrapper {
-    gradleVersion = '3.0'
+    gradleVersion = '3.1'
 }
 
 asciidoctorj {

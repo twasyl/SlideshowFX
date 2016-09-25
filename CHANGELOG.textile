@@ -4,6 +4,38 @@ p. Changes to the SlideshowFX software are listed by version within this documen
 
 h2. Versions
 
+h3(#1_0). "Version @@NEXT-VERSION":#NEXT_VERSION
+
+h4. New and noteworthy
+
+* Box hosting connector allowing to interact with box ("#8":https://github.com/twasyl/SlideshowFX/issues/8)
+
+h4. Included plugins within the packaging
+
+|_. Plugin |_. Version |
+| SlideshowFX-alert-extension | 1.0 |
+| SlideshowFX-asciidoctor | 1.0 |
+| SlideshowFX-box-hosting-connector | 1.0 |
+| SlideshowFX-code-extension | 1.0 |
+| SlideshowFX-drive-hosting-connector | 1.0 |
+| SlideshowFX-dropbox-hosting-connector | 1.0 |
+| SlideshowFX-go-executor | 1.0 |
+| SlideshowFX-golo-executor | 1.0 |
+| SlideshowFX-groovy-executor | 1.0 |
+| SlideshowFX-html | 1.0 |
+| SlideshowFX-image-extension | 1.0 |
+| SlideshowFX-java-executor | 1.0 |
+| SlideshowFX-javascript-executor | 1.0 |
+| SlideshowFX-kotlin-executor | 1.0 |
+| SlideshowFX-link-extension | 1.0 |
+| SlideshowFX-markdown | 1.0 |
+| SlideshowFX-quiz-extension | 1.0 |
+| SlideshowFX-quote-extension | 1.0 |
+| SlideshowFX-scala-executor | 1.0 |
+| SlideshowFX-sequence-diagram-extension | 1.0 |
+| SlideshowFX-snippet-extension | 1.0 |
+| SlideshowFX-textile | 1.0 |
+
 h3(#1_0). "Version 1.0":#1_0
 
 p. This is the first version of SlideshowFX.

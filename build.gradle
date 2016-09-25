@@ -23,6 +23,7 @@ allprojects {
 
     configurations {
         asciidoctorj
+        box
         drive
         dropbox
         felix
@@ -42,6 +43,7 @@ allprojects {
 
     dependencies {
         asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.4.1'
+        box 'com.box:box-java-sdk:2.1.1'
         drive 'com.google.apis:google-api-services-drive:v2-rev219-1.22.0'
         dropbox 'com.dropbox.core:dropbox-core-sdk:2.0.6'
         felix 'org.apache.felix:org.apache.felix.framework:5.4.0'
@@ -182,14 +184,17 @@ ext {
                                                   ':SlideshowFX-sequence-diagram-extension:bintrayUpload',
                                                   ':SlideshowFX-snippet-extension:bintrayUpload' ]
 
-    hostingConnectorJars = [ project(':SlideshowFX-dropbox-hosting-connector').jar,
+    hostingConnectorJars = [ project(':SlideshowFX-box-hosting-connector').jar,
+                             project(':SlideshowFX-dropbox-hosting-connector').jar,
                              project(':SlideshowFX-drive-hosting-connector').jar ]
 
-    hostingConnectorJarDependencies = [ ':SlideshowFX-dropbox-hosting-connector:jar',
-                                             ':SlideshowFX-drive-hosting-connector:jar' ]
+    hostingConnectorJarDependencies = [ ':SlideshowFX-box-hosting-connector:jar',
+                                        ':SlideshowFX-dropbox-hosting-connector:jar',
+                                        ':SlideshowFX-drive-hosting-connector:jar' ]
 
-    hostingConnectorBintrayUploadDependencies = [ ':SlideshowFX-dropbox-hosting-connector:bintrayUpload',
-                                        ':SlideshowFX-drive-hosting-connector:bintrayUpload' ]
+    hostingConnectorBintrayUploadDependencies = [ ':SlideshowFX-box-hosting-connector:bintrayUpload',
+                                                  ':SlideshowFX-dropbox-hosting-connector:bintrayUpload',
+                                                  ':SlideshowFX-drive-hosting-connector:bintrayUpload' ]
 
     snippetExecutorJars = [ project(':SlideshowFX-go-executor').jar, project(':SlideshowFX-golo-executor').jar,
                             project(':SlideshowFX-groovy-executor').jar, project(':SlideshowFX-java-executor').jar,

@@ -1,0 +1,45 @@
+description = 'Hosting connector allowing to open and save presentations from and to Box'
+version = '1.0'
+
+dependencies {
+    compile project(':SlideshowFX-global-configuration')
+    compile project(':SlideshowFX-hosting-connector')
+
+    compile configurations.felix
+    compile configurations.box
+}
+
+jar {
+    from(configurations.box.resolve().collect()) {
+        include '*'
+    }
+
+    manifest {
+        attributes('Manifest-Version': '1.0',
+                'Bundle-ManifestVersion': '2',
+                'Bundle-Name': 'SlideshowFX Box hosting connector',
+                'Bundle-SymbolicName': 'com.twasyl.slideshowfx.hosting.connector.box',
+                'Bundle-Description': 'Support for connecting to Box',
+                'Bundle-Version': version,
+                'Bundle-Activator': 'com.twasyl.slideshowfx.hosting.connector.box.activator.BoxHostingConnectorActivator',
+                'Bundle-ClassPath': configurations.box.resolve().collect { artifact -> artifact.name }.join(',').concat(',.'),
+                'Bundle-Vendor': 'Thierry Wasylczenko',
+                'Export-Package': 'com.twasyl.slideshowfx.hosting.connector.box,com.twasyl.slideshowfx.hosting.connector.box.activator',
+                'Import-Package': 'org.osgi.framework',
+                'Setup-Wizard-Label': 'Box')
+    }
+}
+
+bintray {
+
+    configurations = ['archives']
+
+    pkg {
+        version {
+            name = project.version
+            desc = project.description
+            released = new Date()
+            vcsTag = "v${project.version}"
+        }
+    }
+}

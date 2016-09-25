@@ -83,6 +83,7 @@ SlideshowFX contains the following modules:
 - *SlideshowFX-sequence-diagram-extension* which defines the implementation of SlideshowFX-content-extension to insert sequence diagrams in slides ;
 - *SlideshowFX-snippet-extension* which defines the implementation of SlideshowFX-content-extension to insert executable code snippet in slides ;
 - *SlideshowFX-hosting-connector* which defines the base classes for creating an OSGi module for connecting to a file hosting service ;
+- *SlideshowFX-box-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Box ;
 - *SlideshowFX-dropbox-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Dropbox ;
 - *SlideshowFX-drive-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Google Drive ;
 - *SlideshowFX-snippet-executor* which defines the base classes for creating an OSGi module for executing code snippet in a presentation ;

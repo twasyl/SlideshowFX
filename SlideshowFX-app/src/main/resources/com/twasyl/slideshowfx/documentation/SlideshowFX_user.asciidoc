@@ -22,7 +22,7 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 - A chat is provided so your audience can send you questions using their smartphones and you will answer them whenever you want ;
 - A quiz creator so your audience can answer your quiz using their smartphones and you see results live ;
 - Present using your hands by changing slides with two fingers, have a "laser" pointer by using one finger. It's cool isn't it? All of this brought to you by LeapMotion.
-- Save your presentations on Dropbox or Google Drive ;
+- Save your presentations on Box, Dropbox or Google Drive ;
 - Insert code snippets that can be executed directly from the presentation and console's output is displayed in the slide.
 
 == User guide

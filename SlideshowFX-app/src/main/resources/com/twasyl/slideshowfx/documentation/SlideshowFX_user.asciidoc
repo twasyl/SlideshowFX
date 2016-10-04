@@ -152,9 +152,16 @@ Plugins are represented by files having the **.jar* extension.
 
 ==== Install plugins
 
-In order to install a plugin, go to the *Options* menu and then click on the *Install plugin* item. Then choose the plugin you want to install and validate.
+In order to install a plugin, go to the *?* menu and then click on the *Plugin center* item. In the plugin center, you can use the *Install plugin* button or drag plugin files on it to install new plugins.
+The new plugins should them appear in the list of plugins and should be selected. Once you click on the *OK* button, the plugins will be installed.
 
-It is recommended to restart SlideshowFX in order to take the plugin in consideration properly.
+It is recommended to restart SlideshowFX in order to take the plugins in consideration properly.
+
+==== Remove plugins
+
+In order to remove a plugin, go to the *?* menu and then click on the *Plugin center* item. Un-check all plugins in the list you want to remove and click on the *OK* button.
+
+It is recommended to restart SlideshowFX in order to take the plugins' removal in consideration properly.
 
 ==== Markup plugins
 

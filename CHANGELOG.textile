@@ -9,6 +9,7 @@ h3(#1_0). "Version @@NEXT-VERSION":#NEXT_VERSION
 h4. New and noteworthy
 
 * Box hosting connector allowing to interact with box ("#8":https://github.com/twasyl/SlideshowFX/issues/8)
+* Introduce the plugin center allowing to install and remove plugins ("#9":https://github.com/twasyl/SlideshowFX/issues/9)
 
 h4. Included plugins within the packaging
 

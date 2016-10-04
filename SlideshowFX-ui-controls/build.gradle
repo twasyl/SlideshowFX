@@ -1,3 +1,7 @@
-version = '1.0'
+version = '@@NEXT-VERSION@@'
+
+dependencies {
+    compile configurations.fontawesomefx
+}
 
 tasks.bintrayUpload.enabled = false

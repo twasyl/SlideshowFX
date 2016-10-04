@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.Double?>
+<?import javafx.geometry.Insets?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.PluginCenterController"
+      spacing="20" alignment="CENTER">
+
+    <fx:define>
+        <Double fx:id="GRID_SPACING" fx:value="5" />
+        <Double fx:id="PADDING" fx:value="10" />
+        <Double fx:id="TILE_PANE_HEIGHT" fx:value="450" />
+        <Double fx:id="TILE_PANE_WIDTH" fx:value="450" />
+    </fx:define>
+
+    <padding>
+        <Insets top="$PADDING" right="$PADDING" bottom="$PADDING" left="$PADDING" />
+    </padding>
+
+    <Button fx:id="installPlugin" text="Install plugin" onAction="#choosePlugin"
+            onDragOver="#dragFilesOverPluginButton"
+            onDragDropped="#dropFileOverPluginButton" />
+
+    <ScrollPane prefHeight="$TILE_PANE_HEIGHT" minHeight="$TILE_PANE_HEIGHT" maxHeight="$TILE_PANE_HEIGHT"
+                prefWidth="$TILE_PANE_WIDTH" minWidth="$TILE_PANE_WIDTH" maxWidth="$TILE_PANE_WIDTH">
+        <TilePane fx:id="plugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" prefColumns="5" />
+    </ScrollPane>
+</VBox>

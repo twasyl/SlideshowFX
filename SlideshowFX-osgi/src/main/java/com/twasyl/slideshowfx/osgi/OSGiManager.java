@@ -11,6 +11,8 @@ import org.osgi.framework.launch.FrameworkFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
@@ -23,7 +25,7 @@ import java.util.stream.Collectors;
  * as it can stop it properly.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.0
  */
 public class OSGiManager {
@@ -126,7 +128,7 @@ public class OSGiManager {
      *
      * @param bundleFile The bundleFile to deploy.
      * @throws IllegalArgumentException If the bundleFile is not a directory.
-     * @throws java.io.FileNotFoundException If the bundleFile is not found.
+     * @throws FileNotFoundException If the bundleFile is not found.
      * @throws NullPointerException If the bundleFile is null.
      * @return The installed service.
      */
@@ -162,6 +164,41 @@ public class OSGiManager {
         }
 
         return service;
+    }
+
+    /**
+     * Uninstall a bundle from the OSGi container. If the bundle file is found in the OSGi container, then it is
+     * uninstalled and the bundle file is marked for being deleted at the application's shutdown.
+     * @param bundleFile The bundle to uninstall.
+     * @throws FileNotFoundException If the bundle file doesn't exist.
+     * @throws BundleException If an error occurred while trying to remove the bundle.
+     */
+    public static void uninstallBundle(final File bundleFile) throws FileNotFoundException, BundleException {
+        if(bundleFile == null) throw new NullPointerException("The bundleFile to deploy is null");
+        if(!bundleFile.exists()) throw new FileNotFoundException("The bundleFile does not exist");
+        if(!bundleFile.isFile()) throw new IllegalArgumentException("The bundleFile has to be a file");
+
+        final Bundle[] installedBundles = osgiFramework.getBundleContext().getBundles();
+        boolean continueSearching = true;
+        int index = 0;
+
+        while(continueSearching && index < installedBundles.length) {
+            final Bundle installedBundle = installedBundles[index++];
+            final File installedBundleFile;
+
+            try {
+                installedBundleFile = new File(new URL(installedBundle.getLocation()).getFile());
+
+                continueSearching = !bundleFile.equals(installedBundleFile);
+
+                if(!continueSearching) {
+                    installedBundle.uninstall();
+                    installedBundleFile.deleteOnExit();
+                }
+            } catch (MalformedURLException e) {
+                LOGGER.log(Level.FINE, "Can not create the URL of the bundle: " + bundleFile.getName(), e);
+            }
+        }
     }
 
     /**

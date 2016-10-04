@@ -276,7 +276,7 @@ asciidoctor {
             'vertx-version': "${configurations.vertx.dependencies[0].version}",
             'zxing-core-version': "${configurations.zxing.dependencies[0].version}",
             'zxing-jse-version': "${configurations.zxing.dependencies[1].version}",
-            'ace-version': '1.2.3'
+            'ace-version': '1.2.5'
     ]
 }
 

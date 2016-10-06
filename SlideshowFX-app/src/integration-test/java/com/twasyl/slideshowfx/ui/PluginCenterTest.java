@@ -1,6 +1,5 @@
 package com.twasyl.slideshowfx.ui;
 
-import com.twasyl.slideshowfx.osgi.OSGiManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

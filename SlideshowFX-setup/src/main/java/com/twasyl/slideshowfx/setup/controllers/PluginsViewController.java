@@ -1,19 +1,23 @@
 package com.twasyl.slideshowfx.setup.controllers;
 
-import com.twasyl.slideshowfx.setup.controls.PluginButton;
-import com.twasyl.slideshowfx.utils.beans.Wrapper;
+import com.twasyl.slideshowfx.ui.controls.PluginFileButton;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.TitledPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.TilePane;
 
 import java.io.*;
 import java.net.URL;
@@ -33,28 +37,25 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @since SlideshowFX 1.0
- * @version 1.0
+ * @version 1.1
  */
 public class PluginsViewController implements Initializable {
-
-    public class Plugin {
-        public File file;
-        public String label;
-        public String description;
-        public Node icon;
-    }
-
     private static final Logger LOGGER = Logger.getLogger(PluginsViewController.class.getName());
+
+    protected static final PseudoClass INVALID_STATE = PseudoClass.getPseudoClass("invalid");
 
     protected final String MARKUP_PLUGINS_DIRECTORY_NAME = "markups";
     protected final String SNIPPET_EXECUTORS_PLUGINS_DIRECTORY_NAME = "executors";
     protected final String CONTENT_EXTENSION_PLUGINS_DIRECTORY_NAME = "extensions";
     protected final String HOSTING_CONNECTOR_PLUGINS_DIRECTORY_NAME = "hostingConnectors";
 
-    @FXML private GridPane markupPlugins;
-    @FXML private GridPane contentExtensionPlugins;
-    @FXML private GridPane snippetExecutorPlugins;
-    @FXML private GridPane hostingConnectorsPlugins;
+    @FXML private TitledPane markupPluginsContainer;
+    @FXML private FontAwesomeIconView markupErrorSign;
+
+    @FXML private TilePane markupPlugins;
+    @FXML private TilePane contentExtensionPlugins;
+    @FXML private TilePane snippetExecutorPlugins;
+    @FXML private TilePane hostingConnectorsPlugins;
 
     @FXML private CheckBox installAllMarkupPlugins;
     @FXML private CheckBox installAllContentExtensionPlugins;
@@ -63,6 +64,7 @@ public class PluginsViewController implements Initializable {
 
     private final ObjectProperty<File> pluginsDirectory = new SimpleObjectProperty<>();
     private final List<File> pluginsToInstall = new ArrayList<>();
+    private final IntegerProperty numberOfSelectedMarkup = new SimpleIntegerProperty();
 
     /**
      * Get the list of the plugins the user has chosen to install. Each {@link File} corresponds to the plugin file.
@@ -83,6 +85,12 @@ public class PluginsViewController implements Initializable {
         return this;
     }
 
+    /**
+     * Return the number of markup plugins that are selected in the view.
+     * @return The property indicating the number of markup plugins selected in the view.
+     */
+    public IntegerProperty numberOfSelectedMarkup() { return this.numberOfSelectedMarkup; }
+
     @FXML private void actionOnInstallAllMarkupPlugins(final ActionEvent event) {
         this.actionOnInstallAllPlugins(this.installAllMarkupPlugins.isSelected(), this.markupPlugins);
     }
@@ -101,98 +109,106 @@ public class PluginsViewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.numberOfSelectedMarkup.addListener((value, oldNumber, newNumber) -> {
+            if(newNumber.intValue() == 0) this.makeMarkupPluginsContainerInvalid();
+            else this.makeMarkupPluginsContainerValid();
+        });
+
+        this.makeMarkupPluginsContainerInvalid();
+
         this.pluginsDirectory.addListener((dirValue, newDir, oldDir) -> {
-            fillMarkupPluginsView();
+            this.numberOfSelectedMarkup.bind(fillMarkupPluginsView());
             fillContentExtensionPluginsView();
             fillSnippetExecutorPluginsView();
             fillHostingConnectorPluginsView();
         });
     }
 
+    protected final void makeMarkupPluginsContainerInvalid() {
+        this.markupPluginsContainer.pseudoClassStateChanged(INVALID_STATE, true);
+        this.markupPluginsContainer.setTooltip(new Tooltip("At least one markup plugin must be selected"));
+        this.markupErrorSign.setVisible(true);
+    }
+
+    protected final void makeMarkupPluginsContainerValid() {
+        this.markupPluginsContainer.pseudoClassStateChanged(INVALID_STATE, false);
+        this.markupPluginsContainer.setTooltip(null);
+        this.markupErrorSign.setVisible(false);
+    }
+
     /**
      * Fill the {@link Node} that will list the available markup plugins.
-     * @see #fillPluginsView(String, GridPane, CheckBox)
+     * @see #fillPluginsView(String, TilePane, CheckBox)
+     * @return An {@link IntegerProperty} indicating the number of selected markup plugins in the view.
      */
-    protected final void fillMarkupPluginsView() {
-        this.fillPluginsView(MARKUP_PLUGINS_DIRECTORY_NAME, this.markupPlugins, this.installAllMarkupPlugins);
+    protected final IntegerProperty fillMarkupPluginsView() {
+        return this.fillPluginsView(MARKUP_PLUGINS_DIRECTORY_NAME, this.markupPlugins, this.installAllMarkupPlugins);
     }
 
     /**
      * Fill the {@link Node} that will list the available content extension plugins.
-     * @see #fillPluginsView(String, GridPane, CheckBox)
+     * @see #fillPluginsView(String, TilePane, CheckBox)
+     * @return An {@link IntegerProperty} indicating the number of selected content extension plugins in the view.
      */
-    protected final void fillContentExtensionPluginsView() {
-        this.fillPluginsView(CONTENT_EXTENSION_PLUGINS_DIRECTORY_NAME, this.contentExtensionPlugins, this.installAllContentExtensionPlugins);
+    protected final IntegerProperty fillContentExtensionPluginsView() {
+        return this.fillPluginsView(CONTENT_EXTENSION_PLUGINS_DIRECTORY_NAME, this.contentExtensionPlugins, this.installAllContentExtensionPlugins);
     }
 
     /**
      * Fill the {@link Node} that will list the available snippet executor plugins.
-     * @see #fillPluginsView(String, GridPane, CheckBox)
+     * @see #fillPluginsView(String, TilePane, CheckBox)
+     * @return An {@link IntegerProperty} indicating the number of selected snippet executor plugins in the view.
      */
-    protected final void fillSnippetExecutorPluginsView() {
-        this.fillPluginsView(SNIPPET_EXECUTORS_PLUGINS_DIRECTORY_NAME, this.snippetExecutorPlugins, this.installAllSnippetExecutorPlugins);
+    protected final IntegerProperty fillSnippetExecutorPluginsView() {
+        return this.fillPluginsView(SNIPPET_EXECUTORS_PLUGINS_DIRECTORY_NAME, this.snippetExecutorPlugins, this.installAllSnippetExecutorPlugins);
     }
 
     /**
      * Fill the {@link Node} that will list the available hosting connector plugins.
-     * @see #fillPluginsView(String, GridPane, CheckBox)
+     * @see #fillPluginsView(String, TilePane, CheckBox)
+     * @return An {@link IntegerProperty} indicating the number of selected hosting connector plugins in the view.
      */
-    protected final void fillHostingConnectorPluginsView() {
-        this.fillPluginsView(HOSTING_CONNECTOR_PLUGINS_DIRECTORY_NAME, this.hostingConnectorsPlugins, this.installAllHostingConnectorPlugins);
+    protected final IntegerProperty fillHostingConnectorPluginsView() {
+        return this.fillPluginsView(HOSTING_CONNECTOR_PLUGINS_DIRECTORY_NAME, this.hostingConnectorsPlugins, this.installAllHostingConnectorPlugins);
     }
 
     /**
      * Fill the given {@code view} with the plugins contained within the {@code specializedPluginsDirectoryName}.
-     * @param specializedPluginsDirectoryName The name of direcotry containing the plugins to list.
+     * @param specializedPluginsDirectoryName The name of directory containing the plugins to list.
      * @param view The view to be filled.
      * @param installAllPluginsBox The checkbox allowing to select/unselect all plugins in the {@code view}.
+     * @return An {@link IntegerProperty} indicating the number of selected plugins in the view.
      */
-    protected final void fillPluginsView(final String specializedPluginsDirectoryName, final GridPane view, final CheckBox installAllPluginsBox) {
+    protected final IntegerProperty fillPluginsView(final String specializedPluginsDirectoryName, final TilePane view, final CheckBox installAllPluginsBox) {
+        final IntegerProperty numberOfSelectedPlugins = new SimpleIntegerProperty(0);
         final File specializedPluginsDir = new File(this.pluginsDirectory.get(), specializedPluginsDirectoryName);
 
         view.getChildren().clear();
 
-        final Wrapper<Integer> column = new Wrapper<>(0);
-        final Wrapper<Integer> row = new Wrapper<>(0);
-
         Arrays.stream(specializedPluginsDir.listFiles())
                 .filter(file -> file.getName().endsWith(".jar"))
-                .map(file -> buildPlugin(file))
-                .sorted((plugin1, plugin2) -> plugin1.label.compareTo(plugin2.label))
-                .forEach(plugin -> {
-                    final PluginButton button = new PluginButton(plugin);
+                .map(file -> new PluginFileButton(file))
+                .sorted((button1, button2) -> button1.getLabel().compareTo(button2.getLabel()))
+                .forEach(button -> {
                     button.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {
-                        if(newSelected) this.pluginsToInstall.add(plugin.file);
-                        else this.pluginsToInstall.remove(plugin.file);
+                        if(newSelected) {
+                            this.pluginsToInstall.add(button.getFile());
+                            numberOfSelectedPlugins.set(numberOfSelectedPlugins.get() + 1);
+                        }
+                        else {
+                            this.pluginsToInstall.remove(button.getFile());
+                            if(numberOfSelectedPlugins.get() > 0) {
+                                numberOfSelectedPlugins.set(numberOfSelectedPlugins.get() - 1);
+                            }
+                        }
 
                         this.manageCheckBoxStateForPlugins(view, installAllPluginsBox);
                     });
 
-                    view.add(button, column.getValue() % 5, row.getValue());
-
-                    column.setValue(column.getValue() + 1);
-
-                    if(column.getValue() % 5 == 0 && column.getValue() >= 5) {
-                        row.setValue(row.getValue() + 1);
-                    }
+                    view.getChildren().add(button);
                 });
-    }
 
-    /**
-     * Create an instance of {@link Plugin} corresponding to the given {@code pluginFile}.
-     * @param pluginFile The file of the plugin.
-     * @return The created plugin.
-     */
-    protected final Plugin buildPlugin(final File pluginFile) {
-        final Attributes manifestAttributes = this.getManifestAttributes(pluginFile);
-
-        final Plugin plugin = new Plugin();
-        plugin.file = pluginFile;
-        plugin.label = this.getManifestAttributeValue(manifestAttributes, "Setup-Wizard-Label", pluginFile.getName());
-        plugin.description = this.getManifestAttributeValue(manifestAttributes, "Bundle-Description", "");
-        plugin.icon = this.buildIconNode(pluginFile, manifestAttributes);
-
-        return plugin;
+        return numberOfSelectedPlugins;
     }
 
     /**
@@ -292,10 +308,10 @@ public class PluginsViewController implements Initializable {
      * @param view The view determining of the box should be checked or not.
      * @param box The box to check or not.
      */
-    protected final void manageCheckBoxStateForPlugins(final GridPane view, final CheckBox box) {
+    protected final void manageCheckBoxStateForPlugins(final TilePane view, final CheckBox box) {
         final Node unselectedNode = view.getChildren()
                 .stream()
-                .filter(node -> node instanceof PluginButton && !((PluginButton) node).isSelected())
+                .filter(node -> node instanceof PluginFileButton && !((PluginFileButton) node).isSelected())
                 .findFirst()
                 .orElse(null);
 
@@ -307,11 +323,11 @@ public class PluginsViewController implements Initializable {
      * @param install Indicates if the plugins should be installed or not.
      * @param view The view to update.
      */
-    protected final void actionOnInstallAllPlugins(final boolean install, final GridPane view) {
+    protected final void actionOnInstallAllPlugins(final boolean install, final TilePane view) {
         view.getChildren()
                 .stream()
-                .filter(node -> node instanceof PluginButton)
-                .map(node -> (PluginButton) node)
+                .filter(node -> node instanceof PluginFileButton)
+                .map(node -> (PluginFileButton) node)
                 .forEach(plugin -> plugin.setSelected(install));
     }
 }

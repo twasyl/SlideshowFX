@@ -1,7 +1,34 @@
 .root {
     -app-color-dark-green: #449d44;
     -app-color-light-green: #5cb85c;
+
+    -app-color-dark-red: #a82525;
+    -app-color-light-red: #d63939;
 }
-.plugin-button:selected {
+.plugin-file-button:selected {
      -fx-background-color: linear-gradient(from 50% 0% to 50% 100%, -app-color-dark-green 0%, -app-color-light-green 100%);
+}
+
+.titled-pane:invalid > .title {
+    -fx-background-color: linear-gradient(from 50% 0% to 50% 100%, -app-color-light-red 0%, -app-color-dark-red 100%);
+}
+
+.titled-pane:invalid > .title .text,
+.titled-pane:invalid > .title .check-box {
+    -fx-text-fill: white;
+}
+
+.titled-pane:invalid .title .text.error {
+    -fx-font-size: 10px;
+    -fx-text-fill: white;
+    -fx-fill: -fx-text-fill;
+    -fx-color: -fx-text-fill;
+}
+
+.titled-pane:invalid > .title > .arrow-button .arrow {
+    -fx-background-color: white;
+}
+
+.titled-pane:invalid > .content {
+    -fx-border-color: -app-color-dark-red;
 }

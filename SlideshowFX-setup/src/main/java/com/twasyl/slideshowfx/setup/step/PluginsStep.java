@@ -5,6 +5,7 @@ import com.twasyl.slideshowfx.setup.controllers.PluginsViewController;
 import com.twasyl.slideshowfx.setup.exceptions.SetupStepException;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 import com.twasyl.slideshowfx.utils.io.IOUtils;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXMLLoader;
 
 import java.io.File;
@@ -47,9 +48,10 @@ public class PluginsStep extends AbstractSetupStep {
 
             ((PluginsViewController) this.controller).setPluginsDirectory(pluginsDirectory);
 
-            this.validProperty().set(true);
+            final BooleanBinding markupSelected = ((PluginsViewController) this.controller).numberOfSelectedMarkup().greaterThan(0);
+            this.validProperty().bind(markupSelected);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Can not initialize the plugin step", e);
         }
     }
 

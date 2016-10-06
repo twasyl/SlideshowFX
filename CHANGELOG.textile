@@ -11,6 +11,7 @@ h4. New and noteworthy
 * Box hosting connector allowing to interact with box ("#8":https://github.com/twasyl/SlideshowFX/issues/8)
 * Introduce the plugin center allowing to install and remove plugins ("#9":https://github.com/twasyl/SlideshowFX/issues/9)
 * Uses ACE 1.2.5 in the slide content editor
+* Improve the setup in order to make the selection of at least one markup plugin mandatory ("#11":https://github.com/twasyl/SlideshowFX/issues/11)
 
 h4. Bug fixes
 

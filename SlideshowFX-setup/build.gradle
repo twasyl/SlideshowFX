@@ -4,6 +4,7 @@ version = '1.0'
 
 dependencies {
     compile project(':SlideshowFX-global-configuration')
+    compile project(':SlideshowFX-ui-controls')
     compile project(':SlideshowFX-utils')
     compile configurations.fontawesomefx
 
@@ -77,6 +78,7 @@ task javafx(dependsOn: [ 'jar', ':SlideshowFX-app:javafx',  ':asciidoctor' ] + m
     // Copy libs
     copy {
         from project(':SlideshowFX-global-configuration').jar.archivePath
+        from project(':SlideshowFX-ui-controls').jar.archivePath
         from project(':SlideshowFX-utils').jar.archivePath
         from project.jar.archivePath
         from configurations.fontawesomefx

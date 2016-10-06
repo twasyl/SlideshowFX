@@ -33,16 +33,19 @@ public class PluginFileButton extends ToggleButton {
 
     private static final double BUTTON_SIZE = 80;
 
-    private File pluginFile;
+    private final File pluginFile;
+    private final String label;
+    private final String version;
+    private final String description;
 
     public PluginFileButton(final File pluginFile) {
         this.pluginFile = pluginFile;
         final Attributes manifestAttributes = this.getManifestAttributes();
 
         final Node icon = this.buildIconNode(manifestAttributes);
-        final String label = this.getManifestAttributeValue(manifestAttributes, "Setup-Wizard-Label", this.pluginFile.getName());
-        final String version = this.getManifestAttributeValue(manifestAttributes, "Bundle-Version", "");
-        final String description = this.getManifestAttributeValue(manifestAttributes, "Bundle-Description", "");
+        this.label = this.getManifestAttributeValue(manifestAttributes, "Setup-Wizard-Label", this.pluginFile.getName());
+        this.version = this.getManifestAttributeValue(manifestAttributes, "Bundle-Version", "");
+        this.description = this.getManifestAttributeValue(manifestAttributes, "Bundle-Description", "");
 
         this.setPrefSize(BUTTON_SIZE, BUTTON_SIZE);
         this.setMinSize(BUTTON_SIZE, BUTTON_SIZE);
@@ -56,18 +59,10 @@ public class PluginFileButton extends ToggleButton {
         if(icon != null) {
             graphics.getChildren().add(icon);
         } else {
-            final Text labelElement = new Text(label);
-            labelElement.getStyleClass().add("text");
-            labelElement.setWrappingWidth(75);
-            labelElement.setTextAlignment(TextAlignment.CENTER);
-            graphics.getChildren().add(labelElement);
+            graphics.getChildren().add(getLabelNode());
         }
 
-        final Text versionElement = new Text(version);
-        versionElement.getStyleClass().add("text");
-        versionElement.setWrappingWidth(75);
-        versionElement.setTextAlignment(TextAlignment.CENTER);
-        graphics.getChildren().add(versionElement);
+        graphics.getChildren().add(getVersionNode());
 
         this.setGraphic(graphics);
 
@@ -90,9 +85,37 @@ public class PluginFileButton extends ToggleButton {
         });
     }
 
+    protected Text getVersionNode() {
+        final Text versionElement = new Text(this.version);
+        versionElement.getStyleClass().add("text");
+        versionElement.setWrappingWidth(75);
+        versionElement.setTextAlignment(TextAlignment.CENTER);
+
+        return versionElement;
+    }
+
+    protected Text getLabelNode() {
+        final Text labelElement = new Text(this.label);
+        labelElement.getStyleClass().add("text");
+        labelElement.setWrappingWidth(75);
+        labelElement.setTextAlignment(TextAlignment.CENTER);
+
+        return labelElement;
+    }
+
+    /**
+     * Get the file associated to this button.
+     * @return The file associated to this button.
+     */
     public File getFile() {
         return this.pluginFile;
     }
+
+    /**
+     * Get the label of this plugin.
+     * @return The label of this plugin.
+     */
+    public String getLabel() { return this.label; }
 
     /**
      * Get the attributes contained in the {@code MANIFEST.MF} of the plugin.

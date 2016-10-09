@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.Double?>
@@ -11,15 +12,19 @@
         <Double fx:id="TITLED_PANE_WIDTH" fx:value="480" />
     </fx:define>
 
-    <TitledPane expanded="true" collapsible="true"
+    <TitledPane fx:id="markupPluginsContainer" expanded="true" collapsible="true"
                 prefWidth="${TITLED_PANE_WIDTH}" minWidth="${TITLED_PANE_WIDTH}" maxWidth="${TITLED_PANE_WIDTH}">
         <graphic>
-            <CheckBox text="Markups" fx:id="installAllMarkupPlugins" onAction="#actionOnInstallAllMarkupPlugins">
-                <tooltip><Tooltip text="Install all markup plugins" /></tooltip>
-            </CheckBox>
+            <HBox spacing="5" alignment="BASELINE_LEFT">
+                <CheckBox text="Markups" fx:id="installAllMarkupPlugins" onAction="#actionOnInstallAllMarkupPlugins">
+                    <tooltip><Tooltip text="Install all markup plugins" /></tooltip>
+                </CheckBox>
+                <FontAwesomeIconView fx:id="markupErrorSign" glyphName="EXCLAMATION_TRIANGLE" glyphSize="12"
+                                     glyphStyle="-fx-fill: white" />
+            </HBox>
         </graphic>
 
-        <GridPane fx:id="markupPlugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" />
+        <TilePane fx:id="markupPlugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" />
     </TitledPane>
 
     <TitledPane expanded="false" collapsible="true"
@@ -31,7 +36,7 @@
             </CheckBox>
         </graphic>
 
-        <GridPane fx:id="contentExtensionPlugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" />
+        <TilePane fx:id="contentExtensionPlugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" />
     </TitledPane>
 
     <TitledPane expanded="false" collapsible="true"
@@ -43,7 +48,7 @@
             </CheckBox>
         </graphic>
 
-        <GridPane fx:id="snippetExecutorPlugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" />
+        <TilePane fx:id="snippetExecutorPlugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" />
     </TitledPane>
 
     <TitledPane expanded="false" collapsible="true"
@@ -55,7 +60,7 @@
             </CheckBox>
         </graphic>
 
-        <GridPane fx:id="hostingConnectorsPlugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" />
+        <TilePane fx:id="hostingConnectorsPlugins" hgap="${GRID_SPACING}" vgap="${GRID_SPACING}" />
     </TitledPane>
 </VBox>
 

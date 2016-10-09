@@ -28,6 +28,7 @@ include 'SlideshowFX-sequence-diagram-extension'
 include 'SlideshowFX-snippet-extension'
 
 include 'SlideshowFX-hosting-connector'
+include 'SlideshowFX-box-hosting-connector'
 include 'SlideshowFX-dropbox-hosting-connector'
 include 'SlideshowFX-drive-hosting-connector'
 

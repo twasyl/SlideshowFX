@@ -4,7 +4,6 @@ import com.leapmotion.leap.Controller;
 import com.leapmotion.leap.Listener;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.concurrent.*;
-import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.Tour;
 import com.twasyl.slideshowfx.controls.notification.NotificationCenter;
@@ -25,7 +24,6 @@ import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
-import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.server.service.AttendeeChatService;
@@ -83,14 +81,13 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 /**
  *  This class is the controller of the {@code Slideshow.fxml} file. It defines all actions possible inside the view
  *  represented by the FXML.
  *  
  *  @author Thierry Wasyczenko
- *  @version 1.0
+ *  @version 1.1
  *  @since SlideshowFX 1.0
  */
 public class SlideshowFXController implements Initializable {
@@ -174,7 +171,7 @@ public class SlideshowFXController implements Initializable {
 
     /**
      * Loads a SlideshowFX template. This method displays an open dialog which only allows to open template files (with
-     * .sfxt archiveExtension) and then call the {@link #openTemplateOrPresentation(java.io.File)} method.
+     * .sfxt archiveExtension) and then call the {@link #openTemplateOrPresentation(File)} method.
      *
      * @param event the event that triggered the call.
      */
@@ -196,7 +193,7 @@ public class SlideshowFXController implements Initializable {
 
     /**
      * Open a SlideshowFX presentation. This method displays an open dialog which only allows to open presentation files
-     * (with the .sfx archiveExtension) and then call {@link #openTemplateOrPresentation(java.io.File)} method.
+     * (with the .sfx archiveExtension) and then call {@link #openTemplateOrPresentation(File)} method.
      *
      * @param event the event that triggered the call.
      */
@@ -482,15 +479,45 @@ public class SlideshowFXController implements Initializable {
 
     /**
      * Displays the help stage.
-     * @param event THe source event.
+     * @param event The source event.
      */
     @FXML private void displayHelp(final ActionEvent event) {
         new HelpStage().show();
     }
 
     /**
+     * Displays the plugin center.
+     * @param event The source event.
+     */
+    @FXML private void displayPluginCenter(final ActionEvent event) {
+        FXMLLoader loader = new FXMLLoader(ResourceHelper.getURL("/com/twasyl/slideshowfx/fxml/PluginCenter.fxml"));
+        try {
+            final Parent root = loader.load();
+            final PluginCenterController controller = loader.getController();
+
+            final ButtonType response = DialogHelper.showCancellableDialog("Plugin center", root);
+
+            if(response.equals(ButtonType.OK)) {
+                controller.validatePluginsConfiguration();
+
+                this.openedPresentationsTabPane.getTabs()
+                        .stream()
+                        .filter(tab -> tab.getUserData() != null && tab.getUserData() instanceof PresentationViewController)
+                        .forEach(tab -> {
+                            ((PresentationViewController) tab.getUserData()).refreshMarkupSyntax();
+                            ((PresentationViewController) tab.getUserData()).refreshContentExtensions();
+                        });
+
+                this.refreshHostingConnectors();
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Can not open plugin center view", e);
+        }
+    }
+
+    /**
      * Copy the slide, update the menu of available slides and reload the presentation.
-     * The copy is delegated to {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#duplicateSlide(Slide)}.
+     * The copy is delegated to {@link PresentationEngine#duplicateSlide(Slide)}.
      *
      * @param event
      */
@@ -511,7 +538,7 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
-     * Delete a slide from the presentation. The deletion is delegated to {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#deleteSlide(String)}.
+     * Delete a slide from the presentation. The deletion is delegated to {@link PresentationEngine#deleteSlide(String)}.
      *
      * @param event
      */
@@ -555,7 +582,7 @@ public class SlideshowFXController implements Initializable {
 
     /**
      * Saves a copy of the existing presentation. A save dialog is displayed to the user.
-     * The saving is delegated to {@link #savePresentation(java.io.File, boolean)}.
+     * The saving is delegated to {@link #savePresentation(File, boolean)}.
      *
      * @param event
      */
@@ -678,39 +705,6 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
-     * This method shows an open dialog that allows to install plugin.
-     *
-     * @param event
-     */
-
-    @FXML
-    private void installPlugin(ActionEvent event) {
-        FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PLUGIN_FILES);
-        File bundleFile = chooser.showOpenDialog(null);
-
-        if(bundleFile != null) {
-            Object service = null;
-            try {
-                service = OSGiManager.deployBundle(bundleFile);
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Can not deploy the plugin", e);
-            }
-
-            if(service != null) {
-                final Stream<Tab> stream = this.openedPresentationsTabPane.getTabs()
-                        .stream()
-                        .filter(tab -> tab.getUserData() != null && tab.getUserData() instanceof PresentationViewController);
-                if(service instanceof IMarkup) {
-                    stream.forEach(tab -> ((PresentationViewController) tab.getUserData()).refreshMarkupSyntax());
-                } else if(service instanceof IContentExtension) {
-                    stream.forEach(tab -> ((PresentationViewController) tab.getUserData()).refreshContentExtensions());
-                }
-            }
-        }
-    }
-
-    /**
      * This method shows a dialog for options of SlideshowFX.
      * @param event
      */
@@ -737,9 +731,9 @@ public class SlideshowFXController implements Initializable {
      * if it ends with {@code .sfx} it is considered as a template.
      *
      * @param dataFile the file corresponding to either a template or a presentation.
-     * @throws java.lang.IllegalArgumentException If the file is null.
-     * @throws java.io.FileNotFoundException      If dataFile does not exist.
-     * @throws java.lang.IllegalAccessException   If the file can not be accessed.
+     * @throws IllegalArgumentException If the file is null.
+     * @throws FileNotFoundException      If dataFile does not exist.
+     * @throws IllegalAccessException   If the file can not be accessed.
      */
     public void openTemplateOrPresentation(final File dataFile) throws IllegalArgumentException, IllegalAccessException, FileNotFoundException {
         if (dataFile == null) throw new IllegalArgumentException("The dataFile can not be null");
@@ -902,7 +896,7 @@ public class SlideshowFXController implements Initializable {
     /**
      * Save the current opened presentation to the given {@param archiveFile}. The process for
      * saving the presentation is only started if the given {@param archiveFile} is not {@code null}. If the process is
-     * started, a {@link com.twasyl.slideshowfx.concurrent.SavePresentationTask} is started with the current presentation
+     * started, a {@link SavePresentationTask} is started with the current presentation
      * and {@code archiveFile}.
      * @param archiveFile The file to save the presentation in.
      * @param waitToFinish Indicates if the method should wait before exiting.
@@ -1020,6 +1014,23 @@ public class SlideshowFXController implements Initializable {
         this.serverPort.setDisable(!this.serverPort.isDisable());
         this.twitterHashtag.setDisable(!this.twitterHashtag.isDisable());
         this.openWebApplicationMenuItem.setDisable(SlideshowFXServer.getSingleton() == null);
+    }
+
+    /**
+     * Refresh the {@link IHostingConnector hosting connectors} items in the UI. The items for downloading and
+     * uploading presentations will be updated.
+     */
+    private void refreshHostingConnectors() {
+        this.downloadersMenu.getItems().clear();
+        this.uploadersMenu.getItems().clear();
+
+        OSGiManager.getInstalledServices(IHostingConnector.class)
+                .stream()
+                .sorted((hostingConnector1, hostingConnector2) -> hostingConnector1.getName().compareTo(hostingConnector2.getName()))
+                .forEach(hostingConnector -> {
+                    createUploaderMenuItem(hostingConnector);
+                    createDownloaderMenuItem(hostingConnector);
+                });
     }
 
     /**
@@ -1237,14 +1248,7 @@ public class SlideshowFXController implements Initializable {
 
         this.whenNoDocumentOpened.forEach(disableElementLambda);
 
-        // Create the entries in the Upload & Download menus
-        OSGiManager.getInstalledServices(IHostingConnector.class)
-                .stream()
-                .sorted((hostingConnector1, hostingConnector2) -> hostingConnector1.getName().compareTo(hostingConnector2.getName()))
-                .forEach(hostingConnector -> {
-                    createUploaderMenuItem(hostingConnector);
-                    createDownloaderMenuItem(hostingConnector);
-                });
+        refreshHostingConnectors();
 
         this.openedPresentationsTabPane.getSelectionModel().selectedItemProperty().addListener((value, oldSelection, newSelection) -> {
             if(newSelection != null) {

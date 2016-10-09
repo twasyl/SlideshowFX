@@ -7,8 +7,6 @@ import com.twasyl.slideshowfx.utils.keys.KeyEventUtils;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
@@ -25,8 +23,9 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
 /**
  * This control allows to define the content for a slide. It provides helper methods for inserting the current slide
  * content in the editor as well as getting it.
+ *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.0
  */
 public class SlideContentEditor extends BorderPane {
@@ -41,29 +40,6 @@ public class SlideContentEditor extends BorderPane {
             final boolean isShortcutDown = event.isShortcutDown();
             if(isShortcutDown) {
                 if(KeyEventUtils.isShortcutSequence("A", event)) SlideContentEditor.this.selectAll();
-
-                else if(KeyEventUtils.isShortcutSequence("C", event)) {
-                    final String selection = SlideContentEditor.this.getSelectedContentEditorValue();
-                    if (selection != null) {
-                        final ClipboardContent content = new ClipboardContent();
-                        content.putString(selection);
-                        Clipboard.getSystemClipboard().setContent(content);
-                    }
-                }
-
-                else if(KeyEventUtils.isShortcutSequence("X",  event)) {
-                    final String selection = SlideContentEditor.this.getSelectedContentEditorValue();
-                    if (selection != null) {
-                        final ClipboardContent content = new ClipboardContent();
-                        content.putString(selection);
-                        Clipboard.getSystemClipboard().setContent(content);
-                        SlideContentEditor.this.removeSelection();
-                    }
-                }
-
-                else if(KeyEventUtils.isShortcutSequence("V", event)) {
-                    SlideContentEditor.this.appendContentEditorValue(Clipboard.getSystemClipboard().getString());
-                }
             }
         });
 

@@ -10,9 +10,11 @@ import com.twasyl.slideshowfx.setup.app.SlideshowFXSetup;
 public class SlideshowFXSetupTest extends SlideshowFXSetup {
 
     public static void main(String[] args) {
-        System.setProperty("setup.plugins.directory", "./build/distributions/SlideshowFX-1.0/plugins");
-        System.setProperty("setup.documentations.directory", "./build/distributions/SlideshowFX-1.0/documentations");
-        System.setProperty("setup.application.artifact", "./build/distributions/SlideshowFX-1.0/SlideshowFX.app");
+        final String baseDir = "./build/distributions/SlideshowFX-NEXT-VERSION/SlideshowFXSetup.app/Contents/Java/package";
+
+        System.setProperty("setup.plugins.directory", baseDir + "/plugins");
+        System.setProperty("setup.documentations.directory", baseDir + "/documentations");
+        System.setProperty("setup.application.artifact", baseDir + "SlideshowFX.app");
         System.setProperty("setup.application.name", "SlideshowFX");
         System.setProperty("setup.application.version", "1.0");
         launch(args);

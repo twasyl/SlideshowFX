@@ -36,3 +36,5 @@ bintray {
         }
     }
 }
+
+tasks.bintrayUpload.enabled = alertContentExtensionBintrayUploadEnabled

@@ -1,5 +1,7 @@
 package com.twasyl.slideshowfx.plugin;
 
+import java.util.Objects;
+
 /**
  * A representation of an installed plugin. It is composed by a name and version.
  *
@@ -21,6 +23,20 @@ public class InstalledPlugin extends AbstractPlugin {
      */
     public String getVersion() {
         return version;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InstalledPlugin that = (InstalledPlugin) o;
+
+        return Objects.equals(this.getName(), that.getName()) && Objects.equals(this.version, that.version);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), version);
     }
 
     @Override

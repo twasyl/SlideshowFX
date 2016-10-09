@@ -44,3 +44,5 @@ bintray {
         }
     }
 }
+
+tasks.bintrayUpload.enabled = markdownMarkupBintrayUploadEnabled

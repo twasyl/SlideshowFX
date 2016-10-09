@@ -34,6 +34,9 @@
     app-color-orange: #FF8000;
     -fx-background-color: app-color-background;
     -fx-text-fill: app-color-text-fill;
+
+    -app-color-dark-green: #449d44;
+    -app-color-light-green: #5cb85c;
 }
 
 .text-area, .text-area .content, .text-field {
@@ -462,4 +465,25 @@
 
 .messages-box .label, .messages-box .text, .messages-box .hyperlink {
     -fx-text-fill: app-color-orange;
+}
+
+.plugin-file-button .tooltip {
+    -fx-text-fill: app-color-text-fill;
+}
+
+.plugin-file-button, .plugin-file-button .text {
+     -fx-fill: app-color-text-fill;
+     -fx-color: -fx-fill;
+     -fx-text-fill: -fx-fill;
+}
+
+.plugin-file-button:selected .text {
+    -fx-fill: black;
+    -fx-color: -fx-fill;
+    -fx-text-fill: -fx-fill;
+}
+
+.plugin-file-button:selected {
+     -fx-background-color: linear-gradient(from 50% 0% to 50% 100%, -app-color-dark-green 0%, -app-color-light-green 100%);
+     -fx-text-fill: black;
 }

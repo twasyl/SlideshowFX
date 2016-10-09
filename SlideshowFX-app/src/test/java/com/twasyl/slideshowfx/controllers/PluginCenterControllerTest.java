@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX @@NEXT-VERSION@@
+ * @since SlideshowFX 1.1
  */
 public class PluginCenterControllerTest {
 

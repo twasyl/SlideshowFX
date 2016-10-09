@@ -34,7 +34,7 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.PL
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX @@NEXT-VERSION@@
+ * @since SlideshowFX 1.1
  */
 public class PluginCenterController implements Initializable {
 

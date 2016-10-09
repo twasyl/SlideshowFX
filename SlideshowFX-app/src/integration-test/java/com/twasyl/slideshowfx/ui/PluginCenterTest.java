@@ -11,7 +11,7 @@ import javafx.stage.Stage;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX @@NEXT-VERSION@@
+ * @since SlideshowFX 1.1
  */
 public class PluginCenterTest extends Application {
 

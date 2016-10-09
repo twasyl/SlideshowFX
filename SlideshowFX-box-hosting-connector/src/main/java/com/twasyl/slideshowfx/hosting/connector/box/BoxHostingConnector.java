@@ -32,7 +32,7 @@ import static com.twasyl.slideshowfx.engine.presentation.PresentationEngine.DEFA
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX @@NEXT-VERSION@@
+ * @since SlideshowFX 1.1
  */
 public class BoxHostingConnector extends AbstractHostingConnector<BasicHostingConnectorOptions> {
     private static final Logger LOGGER = Logger.getLogger(BoxHostingConnector.class.getName());

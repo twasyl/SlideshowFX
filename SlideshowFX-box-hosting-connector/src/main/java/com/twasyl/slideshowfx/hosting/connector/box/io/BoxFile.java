@@ -10,7 +10,7 @@ import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
  *
  * @author Thierry Wasylcznko
  * @version 1.0
- * @since SlideshowFX @@NEXT-VERSION@@
+ * @since SlideshowFX 1.1
  */
 public class BoxFile extends RemoteFile {
 

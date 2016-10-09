@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @version 1.0
- * @since SlideshowFX @@NEXT-VERSION@@
+ * @since SlideshowFX 1.1
  */
 public class PluginFileButton extends ToggleButton {
     private static Logger LOGGER = Logger.getLogger(PluginFileButton.class.getName());

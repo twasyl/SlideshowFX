@@ -151,6 +151,32 @@ ext {
     allLibs = new File(rootDir, '/lib')
     jdk = System.env.'JAVA_HOME'
 
+    asciidoctorMarkupBintrayUploadEnabled = false
+    htmlMarkupBintrayUploadEnabled = false
+    markdownMarkupBintrayUploadEnabled = false
+    textileMarkupBintrayUploadEnabled = false
+
+    boxHostingConnectorBintrayUploadEnabled = true
+    driveHostingConnectorBintrayUploadEnabled = false
+    dropboxHostingConnectorBintrayUploadEnabled = false;
+
+    alertContentExtensionBintrayUploadEnabled = false
+    codeContentExtensionBintrayUploadEnabled = false
+    imageContentExtensionBintrayUploadEnabled = false
+    linkContentExtensionBintrayUploadEnabled = false
+    quizContentExtensionBintrayUploadEnabled = false
+    quoteContentExtensionBintrayUploadEnabled = false
+
+    goSnippetExecutorBintrayUploadEnabled = false
+    goloSnippetExecutorBintrayUploadEnabled = false
+    groovySnippetExecutorBintrayUploadEnabled = false
+    javaSnippetExecutorBintrayUploadEnabled = false
+    javascriptSnippetExecutorBintrayUploadEnabled = false
+    kotlinSnippetExecutorBintrayUploadEnabled = false
+    scalaSnippetExecutorBintrayUploadEnabled = false
+    sequenceDiagramContentExtensionBintrayUploadEnabled = false
+    snippetContentExtensionBintrayUploadEnabled = false
+
     pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
     felixCacheFolder = new File(System.getProperty("user.home"), '.SlideshowFX/felix-cache')
 

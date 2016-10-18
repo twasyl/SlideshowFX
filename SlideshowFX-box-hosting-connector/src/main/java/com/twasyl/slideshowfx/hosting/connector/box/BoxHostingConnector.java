@@ -31,7 +31,7 @@ import static com.twasyl.slideshowfx.engine.presentation.PresentationEngine.DEFA
  * This connector allows to interact with Box.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.1
  */
 public class BoxHostingConnector extends AbstractHostingConnector<BasicHostingConnectorOptions> {
@@ -189,30 +189,6 @@ public class BoxHostingConnector extends AbstractHostingConnector<BasicHostingCo
         stage.showAndWait();
 
         if(!this.isAuthenticated()) throw new HostingConnectorException(HostingConnectorException.AUTHENTICATION_FAILURE);
-    }
-
-    /**
-     * Get all parameters present in the query string of the given {@link URI}.
-     * @param uri The URI to extract the parameters from.
-     * @return A map containing the parameters present in the query string of the URI.
-     */
-    protected Map<String, String> getURIParameters(final URI uri) {
-        final Map<String, String> parameters = new HashMap<>();
-        final String query = uri.getQuery();
-
-        if(query != null && !query.isEmpty()) {
-            final String[] queryParameters = query.split("&");
-
-            for(String parameter : queryParameters) {
-                final int equalSign = parameter.indexOf('=');
-                final String name = equalSign == -1 ? parameter : parameter.substring(0, equalSign);
-                final String value = equalSign == -1 ? null : parameter.substring(equalSign + 1);
-
-                parameters.put(name, value);
-            }
-        }
-
-        return parameters;
     }
 
     /**

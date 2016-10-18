@@ -9,7 +9,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import java.io.FileNotFoundException;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,7 +20,7 @@ import java.util.logging.Logger;
  * The base class for implementing an {@link IHostingConnector}.
  *
  *  @author Thierry Wasylczenko
- *  @version 1.0
+ *  @version 1.1
  *  @since SlideshowFX 1.0
  */
 public abstract class AbstractHostingConnector<T extends IHostingConnectorOptions> extends AbstractPlugin<T> implements IHostingConnector<T> {
@@ -119,7 +122,7 @@ public abstract class AbstractHostingConnector<T extends IHostingConnectorOption
 
         /**
          * Because the default implementation of a CellFactory calls the toString() method of the value, another
-         * implementation is created in order to simply display the {@link com.twasyl.slideshowfx.hosting.connector.io.RemoteFile#getName()}.
+         * implementation is created in order to simply display the {@link RemoteFile#getName()}.
          */
         treeView.setCellFactory(targetTreeView -> {
             final TreeCell<RemoteFile> cell = new TreeCell<RemoteFile>() {
@@ -169,5 +172,29 @@ public abstract class AbstractHostingConnector<T extends IHostingConnectorOption
         });
 
         return item;
+    }
+
+    /**
+     * Get all parameters present in the query string of the given {@link URI}.
+     * @param uri The URI to extract the parameters from.
+     * @return A map containing the parameters present in the query string of the URI.
+     */
+    protected Map<String, String> getURIParameters(final URI uri) {
+        final Map<String, String> parameters = new HashMap<>();
+        final String query = uri.getQuery();
+
+        if(query != null && !query.isEmpty()) {
+            final String[] queryParameters = query.split("&");
+
+            for(String parameter : queryParameters) {
+                final int equalSign = parameter.indexOf('=');
+                final String name = equalSign == -1 ? parameter : parameter.substring(0, equalSign);
+                final String value = equalSign == -1 ? null : parameter.substring(equalSign + 1);
+
+                parameters.put(name, value);
+            }
+        }
+
+        return parameters;
     }
 }

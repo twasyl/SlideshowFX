@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.hosting.connector.drive;
 
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
@@ -13,7 +14,6 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.FileList;
-import com.google.api.services.drive.model.ParentReference;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.hosting.connector.AbstractHostingConnector;
@@ -21,7 +21,6 @@ import com.twasyl.slideshowfx.hosting.connector.BasicHostingConnectorOptions;
 import com.twasyl.slideshowfx.hosting.connector.drive.io.GoogleFile;
 import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
-import javafx.concurrent.Worker;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -31,13 +30,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.w3c.dom.html.HTMLInputElement;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,14 +42,15 @@ import java.util.logging.Logger;
  * This connector allows to interact with Google Drive.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.0
  */
 public class DriveHostingConnector extends AbstractHostingConnector<BasicHostingConnectorOptions> {
     private static final Logger LOGGER = Logger.getLogger(DriveHostingConnector.class.getName());
     private static final String SLIDESHOWFX_MIME_TYPE = "application/slideshowfx";
+    private static final String APPLICATION_NAME = "SlideshowFX";
 
-    private GoogleCredential credential;
+    private Credential credential;
 
     public DriveHostingConnector() {
         super("googledrive", "Google Drive", new GoogleFile());
@@ -146,12 +144,12 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
         }
 
         final HttpTransport httpTransport = new NetHttpTransport();
-        final JsonFactory jsonFactory = new JacksonFactory();
+        final JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
 
         final GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory,
-                this.getOptions().getConsumerKey(),
-                this.getOptions().getConsumerSecret(),
-                Arrays.asList(DriveScopes.DRIVE))
+                    this.getOptions().getConsumerKey(),
+                    this.getOptions().getConsumerSecret(),
+                    Arrays.asList(DriveScopes.DRIVE))
                 .setAccessType("online")
                 .setApprovalPrompt("auto")
                 .build();
@@ -161,31 +159,33 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
         final Stage stage = new Stage();
 
         browser.setPrefSize(500, 500);
-        browser.getEngine().getLoadWorker().stateProperty().addListener((stateValue, oldState, newState) -> {
-            if (newState == Worker.State.SUCCEEDED) {
+        browser.getEngine().locationProperty().addListener((locationProperty, oldLocation, newLocation) -> {
+            if (newLocation != null && newLocation.startsWith(this.getOptions().getRedirectUri())) {
 
-                final HTMLInputElement codeElement = (HTMLInputElement) browser.getEngine().getDocument().getElementById("code");
-                if (codeElement != null) {
-                    final String authorizationCode = codeElement.getValue();
+                try {
+                    final Map<String, String> uriParameters = getURIParameters(new URI(newLocation));
 
-                    try {
-                        final GoogleTokenResponse response = flow.newTokenRequest(authorizationCode.toString())
+                    if(uriParameters.containsKey("code")) {
+                        final String authorizationCode = uriParameters.get("code");
+
+                        final GoogleTokenResponse response = flow.newTokenRequest(authorizationCode)
                                 .setRedirectUri(this.getOptions().getRedirectUri())
                                 .execute();
 
-                        this.credential = new GoogleCredential().setFromTokenResponse(response);
+                        this.credential = flow.createAndStoreCredential(response, this.getOptions().getConsumerKey());
                         this.accessToken = this.credential.getAccessToken();
-                    } catch (IOException e) {
-                        LOGGER.log(Level.WARNING, "Failed to get access token", e);
-                        this.accessToken = null;
-                    } finally {
-                        if(this.accessToken != null) {
-                            GlobalConfiguration.setProperty(getConfigurationBaseName().concat(ACCESS_TOKEN_PROPERTY_SUFFIX),
-                                    this.accessToken);
-                        }
-                        stage.close();
                     }
-
+                } catch (URISyntaxException e) {
+                    LOGGER.log(Level.SEVERE, "Error when parsing the redirect URI", e);
+                } catch (IOException e) {
+                    LOGGER.log(Level.WARNING, "Failed to get access token", e);
+                    this.accessToken = null;
+                } finally {
+                    if(this.accessToken != null) {
+                        GlobalConfiguration.setProperty(getConfigurationBaseName().concat(ACCESS_TOKEN_PROPERTY_SUFFIX),
+                                this.accessToken);
+                    }
+                    stage.close();
                 }
             }
         });
@@ -209,13 +209,14 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
             this.credential.setAccessToken(this.accessToken);
         }
 
-        Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), this.credential)
-                .setApplicationName("SlideshowFX")
+        Drive service = new Drive.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance(), this.credential)
+                .setApplicationName(APPLICATION_NAME)
                 .build();
 
         try {
             service.about()
                     .get()
+                    .setFields("user, storageQuota")
                     .execute();
             valid = true;
         } catch (IOException e) {
@@ -233,63 +234,39 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
     public void upload(PresentationEngine engine, RemoteFile folder, boolean overwrite) throws HostingConnectorException, FileNotFoundException {
         if(this.isAuthenticated()) {
             Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), this.credential)
-                    .setApplicationName("SlideshowFX")
+                    .setApplicationName(APPLICATION_NAME)
                     .build();
 
-            com.google.api.services.drive.model.File body = null;
+            com.google.api.services.drive.model.File body;
 
             if(overwrite) {
-                // Search for the file to get its ID and then delete it.
-                StringBuilder query = new StringBuilder()
-                        .append("mimeType != 'application/vnd.google-apps.folder'")
-                        .append(" and not trashed")
-                        .append(String.format(" and '%1$s' in parents", ((GoogleFile) folder).getId()))
-                        .append(String.format(" and title = '%1$s'", engine.getArchive().getName()));
+                body = getFile(engine, folder);
 
-                try {
-                    FileList files = service.files()
-                            .list()
-                            .setQ(query.toString())
-                            .execute();
-
-                    if(!files.getItems().isEmpty()) {
-                        body = files.getItems().get(0);
+                // We need to delete the file before updating
+                if(body != null) {
+                    try {
+                        service.files().delete(body.getId()).execute();
+                    } catch (IOException e) {
+                        LOGGER.log(Level.WARNING, "Can not delete the existing file remotely", e);
                     }
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "Can not find file to overwrite", e);
                 }
+
+                body = this.buildFile(folder, engine);
             } else {
-                body = new com.google.api.services.drive.model.File();
-                body.setMimeType(SLIDESHOWFX_MIME_TYPE);
-
-                if(folder instanceof GoogleFile) {
-                    final GoogleFile googleFolder = (GoogleFile) folder;
-
-                    final ParentReference parent = new ParentReference();
-                    parent.setId(googleFolder.getId());
-
-                    body.setParents(Arrays.asList(parent));
-                }
+                body = this.buildFile(folder, engine);
 
                 if(this.fileExists(engine, folder)) {
                     final String nameWithoutExtension = engine.getArchive().getName().substring(0, engine.getArchive().getName().lastIndexOf("."));
                     final Calendar calendar = Calendar.getInstance();
 
-                    body.setTitle(String.format("%1$s %2$tF %2$tT.%3$s", nameWithoutExtension, calendar, engine.getArchiveExtension()));
-                } else {
-                    body.setTitle(engine.getArchive().getName());
+                    body.setName(String.format("%1$s %2$tF %2$tT.%3$s", nameWithoutExtension, calendar, engine.getArchiveExtension()));
                 }
             }
 
-            FileContent mediaContent = new FileContent(SLIDESHOWFX_MIME_TYPE, engine.getArchive());
+            final FileContent mediaContent = new FileContent(SLIDESHOWFX_MIME_TYPE, engine.getArchive());
 
             try {
-                if(overwrite)
-                    service.files()
-                            .update(body.getId(), body, mediaContent)
-                            .setNewRevision(true)
-                            .execute();
-                else service.files().insert(body, mediaContent).execute();
+                service.files().create(body, mediaContent).setFields("id").execute();
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not upload presentation to Google Drive", e);
             }
@@ -305,13 +282,13 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
         if(!destination.isDirectory()) throw new IllegalArgumentException("The destination is not a folder");
         if(!(file instanceof GoogleFile)) throw new IllegalArgumentException("The file is not a GoogleFile");
 
-        File result = null;
+        File result;
 
         if(this.isAuthenticated()) {
             result = new File(destination, file.getName());
 
             Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), this.credential)
-                    .setApplicationName("SlideshowFX")
+                    .setApplicationName(APPLICATION_NAME)
                     .build();
 
             try(final OutputStream out = new FileOutputStream(result)) {
@@ -340,7 +317,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
 
         if(this.isAuthenticated()) {
             final Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), this.credential)
-                    .setApplicationName("SlideshowFX")
+                    .setApplicationName(APPLICATION_NAME)
                     .build();
 
             try {
@@ -354,15 +331,15 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
                 query.append("not trashed ")
                         .append("and '").append(((GoogleFile) parent).getId()).append("' in parents");
 
-                FileList files = service.files()
+                final FileList files = service.files()
                         .list()
                         .setQ(query.toString())
                         .execute();
 
                 GoogleFile child;
-                for(com.google.api.services.drive.model.File reference : files.getItems()) {
-                    child = new GoogleFile((GoogleFile) parent, reference.getTitle(), reference.getId());
-                    child.setDownloadUrl(reference.getDownloadUrl());
+                for(com.google.api.services.drive.model.File reference : files.getFiles()) {
+                    child = new GoogleFile((GoogleFile) parent, reference.getName(), reference.getId());
+                    child.setDownloadUrl(reference.getWebContentLink());
                     folders.add(child);
                 }
             } catch (IOException e) {
@@ -382,33 +359,78 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
         if(destination == null) throw new NullPointerException("The destination can not be null");
         if(!(destination instanceof GoogleFile)) throw new IllegalArgumentException("The given destination must be a GoogleFile");
 
-        boolean exist = true;
+        boolean exists;
 
         if(this.isAuthenticated()) {
-            final Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), this.credential)
-                    .setApplicationName("SlideshowFX")
-                    .build();
-
-            try {
-                StringBuilder query = new StringBuilder()
-                        .append("mimeType != 'application/vnd.google-apps.folder'")
-                        .append(" and not trashed")
-                        .append(String.format(" and '%1$s' in parents", ((GoogleFile) destination).getId()))
-                        .append(String.format(" and title = '%1$s'", engine.getArchive().getName()));
-
-                FileList files = service.files()
-                        .list()
-                        .setQ(query.toString())
-                        .execute();
-
-                exist = !files.getItems().isEmpty();
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Can not list files of Google Drive", e);
-            }
+            exists = getFile(engine, destination) != null;
         } else {
             throw new HostingConnectorException(HostingConnectorException.NOT_AUTHENTICATED);
         }
 
-        return exist;
+        return exists;
+    }
+
+    /**
+     * Get the {@link com.google.api.services.drive.model.File file} present remotely in the provided folder.
+     * @param engine The presentation to find remotely.
+     * @param folder The folder in which the search will be performed.
+     * @return The corresponding {@link com.google.api.services.drive.model.File} to the presentation or {@code null} if not found.
+     */
+    protected com.google.api.services.drive.model.File getFile(final PresentationEngine engine, final RemoteFile folder) {
+        if(engine == null) throw new NullPointerException("The engine can not be null");
+        if(engine.getArchive() == null) throw new NullPointerException("The archive file can not be null");
+        if(folder == null) throw new NullPointerException("The folder can not be null");
+        if(!(folder instanceof GoogleFile)) throw new IllegalArgumentException("The given folder must be a GoogleFile");
+
+        com.google.api.services.drive.model.File result = null;
+
+        final Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), this.credential)
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+
+        try {
+            final StringBuilder query = new StringBuilder()
+                    .append("mimeType != 'application/vnd.google-apps.folder'")
+                    .append(" and not trashed")
+                    .append(String.format(" and '%1$s' in parents", ((GoogleFile) folder).getId()))
+                    .append(String.format(" and name = '%1$s'", engine.getArchive().getName()));
+
+            final FileList files = service.files()
+                    .list()
+                    .setFields("nextPageToken, files(id, name)")
+                    .setSpaces("drive")
+                    .setQ(query.toString())
+                    .execute();
+
+            if(!files.getFiles().isEmpty()) {
+                result = files.getFiles().get(0);
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Can not list files of Google Drive", e);
+        }
+
+        return result;
+    }
+
+    /**
+     * Builds an instance of {@link com.google.api.services.drive.model.File} and initialized correctly with SlideshowFX
+     * information.
+     * @param destination The location where the file will be created.
+     * @param engine
+     * @return A well constructed instance of {@link com.google.api.services.drive.model.File}.
+     */
+    protected com.google.api.services.drive.model.File buildFile(RemoteFile destination, PresentationEngine engine) {
+        com.google.api.services.drive.model.File body;
+        body = new com.google.api.services.drive.model.File();
+        body.setMimeType(SLIDESHOWFX_MIME_TYPE);
+
+        if(destination instanceof GoogleFile) {
+            final GoogleFile googleFolder = (GoogleFile) destination;
+
+            body.setParents(Arrays.asList(googleFolder.getId()));
+        }
+
+        body.setName(engine.getArchive().getName());
+        return body;
     }
 }

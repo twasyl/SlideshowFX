@@ -44,7 +44,7 @@ allprojects {
     dependencies {
         asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.4.1'
         box 'com.box:box-java-sdk:2.1.1'
-        drive 'com.google.apis:google-api-services-drive:v2-rev219-1.22.0'
+        drive 'com.google.apis:google-api-services-drive:v3-rev46-1.22.0'
         dropbox 'com.dropbox.core:dropbox-core-sdk:2.0.6'
         felix 'org.apache.felix:org.apache.felix.framework:5.4.0'
         fontawesomefx 'de.jensd:fontawesomefx-fontawesome:4.6.1-2'
@@ -157,8 +157,8 @@ ext {
     textileMarkupBintrayUploadEnabled = false
 
     boxHostingConnectorBintrayUploadEnabled = true
-    driveHostingConnectorBintrayUploadEnabled = false
-    dropboxHostingConnectorBintrayUploadEnabled = false;
+    driveHostingConnectorBintrayUploadEnabled = true
+    dropboxHostingConnectorBintrayUploadEnabled = false
 
     alertContentExtensionBintrayUploadEnabled = false
     codeContentExtensionBintrayUploadEnabled = false
@@ -265,7 +265,7 @@ ext {
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'distribution'
 
-version = '1.1'
+version = 'NEXT-VERSION'
 
 wrapper {
     gradleVersion = '3.1'

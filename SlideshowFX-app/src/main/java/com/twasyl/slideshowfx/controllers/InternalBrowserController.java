@@ -64,7 +64,9 @@ public class InternalBrowserController implements Initializable {
         if(address != null && !address.isEmpty()) {
             final StringBuilder builder = new StringBuilder();
 
-            if(!address.startsWith("http://") && !address.startsWith("https://")) builder.append("http://");
+            if(!address.startsWith("http://") && !address.startsWith("https://") && !address.startsWith("file://")) {
+                builder.append("http://");
+            }
 
             builder.append(address);
 

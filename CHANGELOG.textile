@@ -10,6 +10,7 @@ h4. New and noteworthy
 
 * Google Drive hosting connector is now working correctly with the v3 API ("#12":https://github.com/twasyl/SlideshowFX/issues/12)
 * It is possible to open files in the internal browser
+* Ask for confirmation before deleting a slide
 
 h4. Bug fixes
 

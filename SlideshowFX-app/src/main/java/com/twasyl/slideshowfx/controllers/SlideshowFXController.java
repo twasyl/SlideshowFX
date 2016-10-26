@@ -550,12 +550,16 @@ public class SlideshowFXController implements Initializable {
             final String slideNumberToDelete = view.getCurrentSlideNumber();
 
             if(slideNumberToDelete != null) {
-                final Slide slideBefore = presentation.getConfiguration().getSlideBefore(slideNumberToDelete);
+                final ButtonType answer = DialogHelper.showConfirmationAlert("Delete slide", "Are you sure you want to delete the slide?");
 
-                presentation.deleteSlide(slideNumberToDelete);
+                if(answer == ButtonType.YES) {
+                    final Slide slideBefore = presentation.getConfiguration().getSlideBefore(slideNumberToDelete);
 
-                if(slideBefore == null) this.reloadPresentation(view);
-                else reloadPresentationAndGoToSlide(view, slideBefore.getId());
+                    presentation.deleteSlide(slideNumberToDelete);
+
+                    if (slideBefore == null) this.reloadPresentation(view);
+                    else reloadPresentationAndGoToSlide(view, slideBefore.getId());
+                }
             }
         }
     }

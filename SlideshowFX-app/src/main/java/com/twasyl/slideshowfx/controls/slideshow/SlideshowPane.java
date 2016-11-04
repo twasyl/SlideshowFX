@@ -42,7 +42,7 @@ import static com.twasyl.slideshowfx.server.service.QuizService.SERVICE_QUIZ_ON_
  * A pane that displays a presentation.
  *
  * @author Thierry Wasylczenko
- * @version 1.0.0
+ * @version 1.1
  * @since SlideshowFX 1.0
  */
 public class SlideshowPane extends StackPane implements Actor {
@@ -150,7 +150,7 @@ public class SlideshowPane extends StackPane implements Actor {
     public void executeCodeSnippet(final String snippetExecutorCode, final String base64CodeSnippet, final String consoleOutputId) {
 
         if(snippetExecutorCode != null) {
-            final Optional<ISnippetExecutor> snippetExecutor = OSGiManager.getInstalledServices(ISnippetExecutor.class)
+            final Optional<ISnippetExecutor> snippetExecutor = OSGiManager.getInstance().getInstalledServices(ISnippetExecutor.class)
                     .stream()
                     .filter(executor -> snippetExecutorCode.equals(executor.getCode()))
                     .findFirst();

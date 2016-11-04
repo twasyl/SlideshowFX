@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  * This class is the controller for the {@code com.twasyl.slideshowfx.content.extension.images.fxmlImageContentExtension.fxml}.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.0
  */
 public class ImageContentExtensionController implements Initializable {
@@ -64,11 +64,12 @@ public class ImageContentExtensionController implements Initializable {
 
         if (imageFile != null) {
 
-            File targetFile = new File((File) OSGiManager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER), imageFile.getName());
+            final OSGiManager manager = OSGiManager.getInstance();
+            File targetFile = new File((File) manager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER), imageFile.getName());
 
             if (targetFile.exists()) {
                 // If the file exists, add a timestamp to the source
-                targetFile = new File((File) OSGiManager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER), System.currentTimeMillis() + imageFile.getName());
+                targetFile = new File((File) manager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER), System.currentTimeMillis() + imageFile.getName());
             }
 
             try {
@@ -89,7 +90,7 @@ public class ImageContentExtensionController implements Initializable {
     private List<File> lookupResources() {
         final List<File> images = new ArrayList<>();
 
-        final File resourcesFolder = (File) OSGiManager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER);
+        final File resourcesFolder = (File) OSGiManager.getInstance().getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER);
         final File[] files = resourcesFolder.listFiles(IMAGE_FILTER);
 
         if(files != null) {
@@ -178,7 +179,7 @@ public class ImageContentExtensionController implements Initializable {
 
         final File selection = this.getSelectedFile();
         if(selection != null) {
-            final File workingDir = (File) OSGiManager.getPresentationProperty(OSGiManager.PRESENTATION_FOLDER);
+            final File workingDir = (File) OSGiManager.getInstance().getPresentationProperty(OSGiManager.PRESENTATION_FOLDER);
 
             url = workingDir.toPath().relativize(selection.toPath()).toString().replace(File.separator, "/");
         }

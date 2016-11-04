@@ -52,10 +52,11 @@ public class AboutViewController implements Initializable {
     }
 
     protected void populatePluginsTable() {
-        this.plugins.getItems().addAll(OSGiManager.getInstalledPlugins(IMarkup.class));
-        this.plugins.getItems().addAll(OSGiManager.getInstalledPlugins(IContentExtension.class));
-        this.plugins.getItems().addAll(OSGiManager.getInstalledPlugins(ISnippetExecutor.class));
-        this.plugins.getItems().addAll(OSGiManager.getInstalledPlugins(IHostingConnector.class));
+        OSGiManager manager = OSGiManager.getInstance();
+        this.plugins.getItems().addAll(manager.getInstalledPlugins(IMarkup.class));
+        this.plugins.getItems().addAll(manager.getInstalledPlugins(IContentExtension.class));
+        this.plugins.getItems().addAll(manager.getInstalledPlugins(ISnippetExecutor.class));
+        this.plugins.getItems().addAll(manager.getInstalledPlugins(IHostingConnector.class));
     }
 
     @Override

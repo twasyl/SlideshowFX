@@ -8,7 +8,10 @@ import org.osgi.framework.BundleContext;
 import java.util.Hashtable;
 
 /**
+ * Activator class for the connector that allows to interact with Google Drive.
  * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since SlideshowFX 1.0
  */
 public class DriveHostingConnectorActivator implements BundleActivator {
     private DriveHostingConnector hostingConnector;

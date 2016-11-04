@@ -11,6 +11,7 @@ h4. New and noteworthy
 * Google Drive hosting connector is now working correctly with the v3 API ("#12":https://github.com/twasyl/SlideshowFX/issues/12)
 * It is possible to open files in the internal browser
 * Ask for confirmation before deleting a slide
+* The OSGi manager only starts the most recent plugins ("#15":https://github.com/twasyl/SlideshowFX/issues/15)
 
 h4. Bug fixes
 
@@ -29,7 +30,7 @@ h4. Included plugins within the packaging
 | SlideshowFX-golo-executor | 1.0 |
 | SlideshowFX-groovy-executor | 1.0 |
 | SlideshowFX-html | 1.0 |
-| SlideshowFX-image-extension | 1.0 |
+| SlideshowFX-image-extension | 1.1 |
 | SlideshowFX-java-executor | 1.0 |
 | SlideshowFX-javascript-executor | 1.0 |
 | SlideshowFX-kotlin-executor | 1.0 |
@@ -39,7 +40,7 @@ h4. Included plugins within the packaging
 | SlideshowFX-quote-extension | 1.0 |
 | SlideshowFX-scala-executor | 1.0 |
 | SlideshowFX-sequence-diagram-extension | 1.0 |
-| SlideshowFX-snippet-extension | 1.0 |
+| SlideshowFX-snippet-extension | 1.1 |
 | SlideshowFX-textile | 1.0 |
 
 h3(#1_1). "Version 1.1":#1_1

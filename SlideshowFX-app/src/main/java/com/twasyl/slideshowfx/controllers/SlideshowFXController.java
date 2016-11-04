@@ -87,7 +87,7 @@ import java.util.logging.Logger;
  *  represented by the FXML.
  *  
  *  @author Thierry Wasyczenko
- *  @version 1.1
+ *  @version 1.2
  *  @since SlideshowFX 1.0
  */
 public class SlideshowFXController implements Initializable {
@@ -1028,7 +1028,7 @@ public class SlideshowFXController implements Initializable {
         this.downloadersMenu.getItems().clear();
         this.uploadersMenu.getItems().clear();
 
-        OSGiManager.getInstalledServices(IHostingConnector.class)
+        OSGiManager.getInstance().getInstalledServices(IHostingConnector.class)
                 .stream()
                 .sorted((hostingConnector1, hostingConnector2) -> hostingConnector1.getName().compareTo(hostingConnector2.getName()))
                 .forEach(hostingConnector -> {

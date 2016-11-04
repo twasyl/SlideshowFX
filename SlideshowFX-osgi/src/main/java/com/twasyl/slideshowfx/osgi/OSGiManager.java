@@ -13,36 +13,62 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
+import static org.osgi.framework.Constants.*;
+
 /**
  * This class manages all OSGi bundles: from installation to uninstallation. It also starts the OSGi container as well
  * as it can stop it properly.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class OSGiManager {
     private static final Logger LOGGER = Logger.getLogger(OSGiManager.class.getName());
-    private static Framework osgiFramework;
+    private static OSGiManager singleton = null;
+
+    public static final String PRESENTATION_FOLDER = "presentation.folder";
+    public static final String PRESENTATION_RESOURCES_FOLDER = "presentation.resources.folder";
+
+    protected Framework osgiFramework;
+    protected File pluginsDirectory;
+    protected File osgiCache;
+
+    /**
+     * Default constructor of the class.
+     */
+    protected OSGiManager() {
+        this.pluginsDirectory = GlobalConfiguration.PLUGINS_DIRECTORY;
+        this.osgiCache = new File(System.getProperty("user.home") + "/.SlideshowFX/felix-cache");
+    }
+
+    public static final synchronized OSGiManager getInstance() {
+        if(OSGiManager.singleton == null) {
+            OSGiManager.singleton = new OSGiManager();
+        }
+
+        return OSGiManager.singleton;
+    }
 
     /**
      * Start the OSGi container.
      */
-    public static void start() {
-
-        Map configurationMap = new HashMap<>();
-        // configurationMap.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, IMarkup.class.getPackage().getName() + "; 1.0.0");
-        configurationMap.put(Constants.FRAMEWORK_STORAGE_CLEAN, "true");
-        configurationMap.put("org.osgi.framework.storage.clean", "onFirstInit");
-        configurationMap.put("org.osgi.framework.storage", System.getProperty("user.home") + "/.SlideshowFX/felix-cache");
-        configurationMap.put("org.osgi.framework.bundle.parent", "app");
+    public void start() {
+        final Map configurationMap = new HashMap<>();
+        configurationMap.put(FRAMEWORK_STORAGE_CLEAN, FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
+        configurationMap.put(FRAMEWORK_STORAGE, this.osgiCache.getAbsolutePath().replaceAll("\\\\", "/"));
+        configurationMap.put(FRAMEWORK_BUNDLE_PARENT, FRAMEWORK_BUNDLE_PARENT_APP);
 
         final StringJoiner bootdelegation = new StringJoiner(",");
         bootdelegation.add("com.twasyl.slideshowfx.markup")
@@ -64,67 +90,80 @@ public class OSGiManager {
                       .add("javax.*")
                       .add("javafx.*")
                       .add("com.sun.javafx");
-        configurationMap.put("org.osgi.framework.bootdelegation", bootdelegation.toString());
-        configurationMap.put("felix.auto.deploy.action", "install,start");
+        configurationMap.put(FRAMEWORK_BOOTDELEGATION, bootdelegation.toString());
 
         // Starting OSGi
-        FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
+        final FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
         osgiFramework = frameworkFactory.newFramework(configurationMap);
         try {
             osgiFramework.start();
             LOGGER.fine("OSGI container has bee started successfully");
-        } catch (BundleException e) {
-            LOGGER.log(Level.SEVERE, "Can not start OSGi server");
+        } catch (BundleException | OverlappingFileLockException e) {
+            LOGGER.log(SEVERE, "Can not start OSGi server", e);
+            try {
+                osgiFramework.stop();
+            } catch (BundleException e1) {
+                LOGGER.log(SEVERE, "Can not correctly abort OSGi starting process", e1);
+            } finally {
+                this.osgiFramework = null;
+            }
         }
-
-        // Deploying the OSGi DataServices
-        // osgiFramework.getBundleContext().registerService(DataServices.class.getName(), new DataServices(), new Hashtable<>());
     }
 
     /**
      * Start the OSGi container and deploy all plugins in the plugins' directory.
      */
-    public static void startAndDeploy() {
+    public void startAndDeploy() {
         start();
 
-        // Deploy initially present plugins
-        if(!GlobalConfiguration.PLUGINS_DIRECTORY.exists()) {
-            if(!GlobalConfiguration.PLUGINS_DIRECTORY.mkdirs()) {
-                LOGGER.log(Level.SEVERE, "Can not create plugins directory");
+        if(this.osgiFramework != null) {
+            // Deploy initially present plugins
+            if (!this.pluginsDirectory.exists()) {
+                if (!this.pluginsDirectory.mkdirs()) {
+                    LOGGER.log(SEVERE, "Can not create plugins directory");
+                }
             }
-        }
 
-        if(GlobalConfiguration.PLUGINS_DIRECTORY.exists()) {
-            Arrays.stream(GlobalConfiguration.PLUGINS_DIRECTORY.listFiles((dir, name) -> name.endsWith(".jar")))
-                    .forEach(file -> {
-                        try {
-                            OSGiManager.deployBundle(file);
-                        } catch (IOException e) {
-                            LOGGER.log(Level.WARNING, "Can not deploy bundle", e);
-                        }
-                    });
+            if (this.pluginsDirectory.exists()) {
+                Arrays.stream(this.pluginsDirectory.listFiles((dir, name) -> name.endsWith(".jar")))
+                        .forEach(file -> {
+                            try {
+                                this.deployBundle(file, false);
+                            } catch (IOException e) {
+                                LOGGER.log(WARNING, "Can not deploy bundle", e);
+                            }
+                        });
+
+                Arrays.stream(this.osgiFramework.getBundleContext().getBundles())
+                        .filter(this::isPluginInactive)
+                        .forEach(this::startBundle);
+            }
         }
     }
 
     /**
      * Stop the OSGi container.
      */
-    public static void stop() {
+    public void stop() {
         if(osgiFramework != null) {
             try {
                 osgiFramework.stop();
                 osgiFramework.waitForStop(0);
             } catch (BundleException e) {
-                LOGGER.log(Level.SEVERE, "Can not stop Felix", e);
+                LOGGER.log(SEVERE, "Can not stop Felix", e);
             } catch (InterruptedException e) {
-                LOGGER.log(Level.SEVERE, "Can not wait for stopping Felix", e);
+                LOGGER.log(SEVERE, "Can not wait for stopping Felix", e);
             }
         }
     }
 
     /**
-     * Deploys a bundleFile in the OSGi container. This method copies the given bundleFile to directory of plugins and then deploys it.
+     * Deploys a bundleFile in the OSGi container and start it. This method copies the given bundleFile to directory of
+     * plugins and then deploys it.
      * If the bundle is already in the plugins' directory, it is simply deployed.
+     * If the plugin exists in a more recent version, the given plugin will not be installed.
+     * If the plugin is more recent than an already installed version, the old version is uninstalled and the new one
+     * is installed.
      *
      * @param bundleFile The bundleFile to deploy.
      * @throws IllegalArgumentException If the bundleFile is not a directory.
@@ -132,28 +171,57 @@ public class OSGiManager {
      * @throws NullPointerException If the bundleFile is null.
      * @return The installed service.
      */
-    public static Object deployBundle(File bundleFile) throws IllegalArgumentException, NullPointerException, IOException {
+    public Object deployBundle(File bundleFile) throws IllegalArgumentException, NullPointerException, IOException {
+        return this.deployBundle(bundleFile, true);
+    }
+
+    /**
+     * Deploys a bundleFile in the OSGi container. This method copies the given bundleFile to directory of plugins and then deploys it.
+     * If the bundle is already in the plugins' directory, it is simply deployed.
+     * If the plugin exists in a more recent version, the given plugin will not be installed.
+     * If the plugin is more recent than an already installed version, the old version is uninstalled and the new one
+     * is installed.
+     *
+     * @param bundleFile The bundleFile to deploy.
+     * @param start Indicate if the bundle should be started.
+     * @throws IllegalArgumentException If the bundleFile is not a directory.
+     * @throws FileNotFoundException If the bundleFile is not found.
+     * @throws NullPointerException If the bundleFile is null.
+     * @return The installed service.
+     */
+    protected Object deployBundle(final File bundleFile, final boolean start) throws IllegalArgumentException, NullPointerException, IOException {
         if(bundleFile == null) throw new NullPointerException("The bundleFile to deploy is null");
         if(!bundleFile.exists()) throw new FileNotFoundException("The bundleFile does not exist");
         if(!bundleFile.isFile()) throw new IllegalArgumentException("The bundleFile has to be a file");
 
-        if(!bundleFile.getParentFile().toPath().normalize().equals(GlobalConfiguration.PLUGINS_DIRECTORY.toPath())) {
-            Files.copy(bundleFile.toPath(), GlobalConfiguration.PLUGINS_DIRECTORY.toPath().resolve(bundleFile.getName()), StandardCopyOption.REPLACE_EXISTING);
+        if(!bundleFile.getParentFile().toPath().normalize().equals(this.pluginsDirectory.toPath())) {
+            Files.copy(bundleFile.toPath(), this.pluginsDirectory.toPath().resolve(bundleFile.getName()), StandardCopyOption.REPLACE_EXISTING);
         }
 
         Bundle bundle = null;
         try {
-            bundle = osgiFramework.getBundleContext()
-                    .installBundle(String.format("file:%1$s/%2$s", GlobalConfiguration.PLUGINS_DIRECTORY.getAbsolutePath(), bundleFile.getName()));
+            bundle = this.osgiFramework.getBundleContext()
+                    .installBundle(String.format("file:%1$s/%2$s", this.pluginsDirectory.getAbsolutePath(), bundleFile.getName()));
         } catch (BundleException e) {
-            LOGGER.log(Level.WARNING, "Can not install bundle", e);
+            LOGGER.log(WARNING, "Can not install bundle", e);
         }
 
         if(bundle != null) {
-            try {
-                bundle.start();
-            } catch (BundleException e) {
-                LOGGER.log(Level.WARNING, String.format("Can not install bundle [%1$s]", bundleFile.getName()), e);
+            final boolean isPluginInAnotherVersionInstalled = isPluginInAnotherVersionInstalled(bundle);
+            final boolean isPluginMostRecent = isPluginMostRecent(bundle);
+
+            if(isPluginInAnotherVersionInstalled && isPluginMostRecent) {
+                final Bundle pluginInAnotherVersion = getPluginInAnotherVersion(bundle);
+
+                uninstallBundle(pluginInAnotherVersion);
+                if(start) {
+                    startBundle(bundle);
+                }
+            } else if(!isPluginInAnotherVersionInstalled && !isPluginActive(bundle) && isPluginMostRecent && start) {
+                startBundle(bundle);
+            } else if(isPluginInAnotherVersionInstalled && !isPluginMostRecent) {
+                uninstallBundle(bundle);
+                bundle = null;
             }
         }
 
@@ -167,17 +235,51 @@ public class OSGiManager {
     }
 
     /**
+     * Starts a given bundle. The bundle must already have been installed in the OSGi framework.
+     * @param bundle The bundle to start.
+     */
+    protected void startBundle(Bundle bundle) {
+        try {
+            bundle.start();
+        } catch (BundleException e) {
+            LOGGER.log(WARNING, String.format("Can not install bundle [%1$s] in version [%2$s]", bundle.getSymbolicName(), bundle.getVersion()), e);
+        }
+    }
+
+    /**
+     * Uninstall a bundle from the OSGi container.
+     * @param bundle The bundle to uninstall.
+     */
+    protected void uninstallBundle(Bundle bundle) {
+        if(bundle != null) {
+            try {
+                bundle.uninstall();
+            } catch (BundleException e) {
+                LOGGER.log(WARNING, String.format("Can not uninstall bundle [%1$s] in version [%2$s]", bundle.getSymbolicName(), bundle.getVersion().toString()));
+            }
+
+            try {
+                final File bundleFile = new File(new URL(bundle.getLocation()).getFile());
+                bundleFile.deleteOnExit();
+            } catch (MalformedURLException e) {
+                LOGGER.log(Level.SEVERE, "Can not determine bundle location", e);
+            }
+        }
+    }
+
+    /**
      * Uninstall a bundle from the OSGi container. If the bundle file is found in the OSGi container, then it is
      * uninstalled and the bundle file is marked for being deleted at the application's shutdown.
      * @param bundleFile The bundle to uninstall.
      * @throws FileNotFoundException If the bundle file doesn't exist.
      * @throws BundleException If an error occurred while trying to remove the bundle.
      */
-    public static void uninstallBundle(final File bundleFile) throws FileNotFoundException, BundleException {
+    public void uninstallBundle(final File bundleFile) throws FileNotFoundException, BundleException {
         if(bundleFile == null) throw new NullPointerException("The bundleFile to deploy is null");
         if(!bundleFile.exists()) throw new FileNotFoundException("The bundleFile does not exist");
         if(!bundleFile.isFile()) throw new IllegalArgumentException("The bundleFile has to be a file");
 
+        final Path bundlePath = bundleFile.toPath().toAbsolutePath();
         final Bundle[] installedBundles = osgiFramework.getBundleContext().getBundles();
         boolean continueSearching = true;
         int index = 0;
@@ -189,11 +291,10 @@ public class OSGiManager {
             try {
                 installedBundleFile = new File(new URL(installedBundle.getLocation()).getFile());
 
-                continueSearching = !bundleFile.equals(installedBundleFile);
+                continueSearching = !bundlePath.equals(installedBundleFile.toPath().toAbsolutePath());
 
                 if(!continueSearching) {
-                    installedBundle.uninstall();
-                    installedBundleFile.deleteOnExit();
+                    uninstallBundle(installedBundle);
                 }
             } catch (MalformedURLException e) {
                 LOGGER.log(Level.FINE, "Can not create the URL of the bundle: " + bundleFile.getName(), e);
@@ -207,7 +308,7 @@ public class OSGiManager {
      * @param serviceType The class of service to look for.
      * @return the list of installed services or an empty list if there is no service corresponding to the given class.
      */
-    public static <T> List<T> getInstalledServices(Class<T> serviceType) {
+    public <T> List<T> getInstalledServices(Class<T> serviceType) {
         final List<T> services = new ArrayList<>();
 
         try {
@@ -216,7 +317,7 @@ public class OSGiManager {
 
             references.stream().forEach(ref -> services.add(osgiFramework.getBundleContext().getService(ref)));
         } catch (InvalidSyntaxException e) {
-            LOGGER.log(Level.WARNING, "Can not list all installed service of type " + serviceType.getName());
+            LOGGER.log(WARNING, "Can not list all installed service of type " + serviceType.getName());
         }
 
         return services;
@@ -228,7 +329,7 @@ public class OSGiManager {
      * @param <T> The type of the plugins.
      * @return The list containing all installed plugins of the desired type.
      */
-    public static <T extends IPlugin> List<InstalledPlugin> getInstalledPlugins(Class<T> pluginType) {
+    public <T extends IPlugin> List<InstalledPlugin> getInstalledPlugins(Class<T> pluginType) {
         final List<InstalledPlugin> installedPlugins = new ArrayList<>();
 
         try {
@@ -243,16 +344,32 @@ public class OSGiManager {
                             .sorted((plugin1, plugin2) -> plugin1.getName().compareTo(plugin2.getName()))
                         .collect(Collectors.toList()));
         } catch (InvalidSyntaxException e) {
-            LOGGER.log(Level.WARNING, "Can not list all installed plugin of type " + pluginType.getName());
+            LOGGER.log(WARNING, "Can not list all installed plugin of type " + pluginType.getName());
         }
 
         return installedPlugins;
     }
 
-    public static final String PRESENTATION_FOLDER = "presentation.folder";
-    public static final String PRESENTATION_RESOURCES_FOLDER = "presentation.resources.folder";
+    /**
+     * Get the list of active plugins.
+     * @return The list of active plugins.
+     */
+    public List<File> getActivePlugins() {
+        return Arrays.stream(this.osgiFramework.getBundleContext().getBundles())
+                        .filter(bundle -> !SYSTEM_BUNDLE_LOCATION.equals(bundle.getLocation()))
+                        .map(bundle -> {
+                            try {
+                                return new File(new URL(bundle.getLocation()).getFile());
+                            } catch (MalformedURLException e) {
+                                LOGGER.log(Level.SEVERE, "Can not determine plugin location", e);
+                                return null;
+                            }
+                        })
+                        .filter(file -> file != null)
+                        .collect(Collectors.toList());
+    }
 
-    public static Object getPresentationProperty(String property) {
+    public Object getPresentationProperty(String property) {
         Object value = null;
 
         if(Presentations.getCurrentDisplayedPresentation() != null) {
@@ -265,5 +382,87 @@ public class OSGiManager {
         }
 
         return value;
+    }
+
+    /**
+     * Checks if a given plugin is the most recent compared to installed plugin. If the plugin version is strictly
+     * greater than the first plugin's version found then it is considered as the most recent plugin.
+     * @param plugin The plugin to check.
+     * @return {@code true} if the plugin is the most recent, {@code false} otherwise.
+     */
+    protected boolean isPluginMostRecent(final Bundle plugin) {
+        boolean isMostRecent;
+
+        final Version installedPluginVersion = Arrays.stream(osgiFramework.getBundleContext().getBundles())
+                .filter(installedPlugin -> {
+                    boolean isSameName = installedPlugin.getSymbolicName().equals(plugin.getSymbolicName());
+
+                    return isSameName;
+                })
+                .map(Bundle::getVersion)
+                .findFirst()
+                .orElse(null);
+
+        if(installedPluginVersion != null) {
+            isMostRecent = plugin.getVersion().compareTo(installedPluginVersion) >= 0;
+        } else {
+            isMostRecent = true;
+        }
+
+        return isMostRecent;
+    }
+
+    /**
+     * Checks if a given plugin is already installed in another version in the OSGi framework. The plugin's match is
+     * performed on the {@link Bundle#getSymbolicName() symbolic name} of the plugin.
+     * @param plugin The plugin to check.
+     * @return {@code true} if the plugin is installed in another version, {@code false} otherwise.
+     */
+    protected boolean isPluginInAnotherVersionInstalled(final Bundle plugin) {
+        return Arrays.stream(osgiFramework.getBundleContext().getBundles())
+                .anyMatch(installedPlugin -> {
+                    boolean isSameName = installedPlugin.getSymbolicName().equals(plugin.getSymbolicName());
+                    boolean isNotSameVersion = !installedPlugin.getVersion().equals(plugin.getVersion());
+
+                    return isSameName && isNotSameVersion;
+                });
+    }
+
+    /**
+     * Get the other version of the given plugin. The plugin's match is performed on the
+     * {@link Bundle#getSymbolicName() symbolic name} of the plugin.
+     * @param plugin The plugin to check.
+     * @return The plugin in the other version of the given plugin, {@code null} if not found.
+     */
+    protected Bundle getPluginInAnotherVersion(final Bundle plugin) {
+        return Arrays.stream(osgiFramework.getBundleContext().getBundles())
+                .filter(installedPlugin -> {
+                    boolean isSameName = installedPlugin.getSymbolicName().equals(plugin.getSymbolicName());
+                    boolean isNotSameVersion = !installedPlugin.getVersion().equals(plugin.getVersion());
+
+                    return isSameName && isNotSameVersion;
+                })
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Check if the given plugin is active or not. A plugin is considered active if it's state is equal to {@link Bundle#ACTIVE}
+     * or {@link Bundle#STARTING}.
+     * @param plugin The plugin to check.
+     * @return {@code true} if the plugin is active, {@code false} otherwise.
+     */
+    protected boolean isPluginActive(final Bundle plugin) {
+        return Bundle.ACTIVE == plugin.getState() || Bundle.STARTING == plugin.getState();
+    }
+
+    /**
+     * Check if the given plugin is inactive or not.
+     * @param plugin The plugin to check.
+     * @return {@code true} if the plugin is inactive, {@code false} otherwise.
+     * @see #isPluginActive(Bundle)
+     */
+    protected boolean isPluginInactive(final Bundle plugin) {
+        return !isPluginActive(plugin);
     }
 }

@@ -56,7 +56,7 @@ import java.util.logging.Logger;
  *  represented by the FXML.
  *  
  *  @author Thierry Wasyczenko
- *  @version 1.0
+ *  @version 1.1
  *  @since SlideshowFX 1.0
  */
 public class PresentationViewController implements Initializable {
@@ -241,7 +241,7 @@ public class PresentationViewController implements Initializable {
     public void executeCodeSnippet(final String snippetExecutorCode, final String base64CodeSnippet, final String consoleOutputId) {
 
         if(snippetExecutorCode != null) {
-            final Optional<ISnippetExecutor> snippetExecutor = OSGiManager.getInstalledServices(ISnippetExecutor.class)
+            final Optional<ISnippetExecutor> snippetExecutor = OSGiManager.getInstance().getInstalledServices(ISnippetExecutor.class)
                     .stream()
                     .filter(executor -> snippetExecutorCode.equals(executor.getCode()))
                     .findFirst();
@@ -393,7 +393,7 @@ public class PresentationViewController implements Initializable {
         }
 
         // Creating Buttons for each extension bundle installed
-        OSGiManager.getInstalledServices(IContentExtension.class)
+        OSGiManager.getInstance().getInstalledServices(IContentExtension.class)
                 .stream()
                 .sorted((extension1, extension2) -> extension1.getCode().compareTo(extension2.getCode()))
                 .forEach(extension -> createButtonForContentExtension(extension));
@@ -531,7 +531,7 @@ public class PresentationViewController implements Initializable {
         this.refreshMarkupSyntax();
 
         // Creating buttons for each content extension bundle installed
-        OSGiManager.getInstalledServices(IContentExtension.class)
+        OSGiManager.getInstance().getInstalledServices(IContentExtension.class)
                 .stream()
                 .sorted((contentExtension1, contentExtension2) -> contentExtension1.getCode().compareTo(contentExtension2.getCode()))
                 .forEach(contentExtension -> createButtonForContentExtension(contentExtension));

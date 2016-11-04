@@ -9,13 +9,13 @@ import java.util.Optional;
  * This class allows operations on supported markup syntax. It also has helper methods accessing {@link com.twasyl.slideshowfx.osgi.OSGiManager}.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.0
  */
 public class MarkupManager {
 
     public static List<IMarkup> getInstalledMarkupSyntax() {
-        return OSGiManager.getInstalledServices(IMarkup.class);
+        return OSGiManager.getInstance().getInstalledServices(IMarkup.class);
     }
 
     /**

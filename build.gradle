@@ -265,7 +265,7 @@ ext {
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'distribution'
 
-version = 'NEXT-VERSION'
+version = '1.2'
 
 wrapper {
     gradleVersion = '3.1'
@@ -284,10 +284,10 @@ asciidoctor {
             setanchors: '',
             sectlinks: '',
             linkcss: false,
-            'slideshowfx_version': '1.0',
+            'slideshowfx_version': '1.2',
             'asciidoctor-source': new File(project(':SlideshowFX-app').projectDir, 'src/main/resources/com/twasyl/slideshowfx/documentation').absolutePath,
-            'javafx-version': '8 update 92',
-            'jdk-version': '8 update 92',
+            'javafx-version': '8 update 112',
+            'jdk-version': '8 update 112',
             'gradle-version': "${wrapper.gradleVersion}",
             'asciidoctorj-version': "${configurations.asciidoctorj.dependencies[0].version}",
             'apache-felix-version': "${configurations.felix.dependencies[0].version}",

@@ -24,7 +24,7 @@ install: true
 
 script:
   - chmod +x ./gradlew
-  - ./gradlew build bintrayUpload -x test
+  - ./gradlew build bintrayUpload -x test -x findbugsMain -x findbugsTest -x findbugsIntegrationTest -x jacoco
   - ./gradlew --stop
 
 cache:

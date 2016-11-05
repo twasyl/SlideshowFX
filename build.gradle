@@ -156,13 +156,13 @@ ext {
     markdownMarkupBintrayUploadEnabled = false
     textileMarkupBintrayUploadEnabled = false
 
-    boxHostingConnectorBintrayUploadEnabled = true
-    driveHostingConnectorBintrayUploadEnabled = true
+    boxHostingConnectorBintrayUploadEnabled = false
+    driveHostingConnectorBintrayUploadEnabled = false
     dropboxHostingConnectorBintrayUploadEnabled = false
 
     alertContentExtensionBintrayUploadEnabled = false
     codeContentExtensionBintrayUploadEnabled = false
-    imageContentExtensionBintrayUploadEnabled = true
+    imageContentExtensionBintrayUploadEnabled = false
     linkContentExtensionBintrayUploadEnabled = false
     quizContentExtensionBintrayUploadEnabled = false
     quoteContentExtensionBintrayUploadEnabled = false
@@ -175,7 +175,7 @@ ext {
     kotlinSnippetExecutorBintrayUploadEnabled = false
     scalaSnippetExecutorBintrayUploadEnabled = false
     sequenceDiagramContentExtensionBintrayUploadEnabled = false
-    snippetContentExtensionBintrayUploadEnabled = true
+    snippetContentExtensionBintrayUploadEnabled = false
 
     pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
     felixCacheFolder = new File(System.getProperty("user.home"), '.SlideshowFX/felix-cache')
@@ -265,7 +265,7 @@ ext {
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'distribution'
 
-version = '1.2'
+version = '@@NEXT-VERSION@@'
 
 wrapper {
     gradleVersion = '3.1'
@@ -284,7 +284,7 @@ asciidoctor {
             setanchors: '',
             sectlinks: '',
             linkcss: false,
-            'slideshowfx_version': '1.2',
+            'slideshowfx_version': '@@NEXT-VERSION@@',
             'asciidoctor-source': new File(project(':SlideshowFX-app').projectDir, 'src/main/resources/com/twasyl/slideshowfx/documentation').absolutePath,
             'javafx-version': '8 update 112',
             'jdk-version': '8 update 112',

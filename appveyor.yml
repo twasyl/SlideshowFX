@@ -29,7 +29,7 @@ before_build:
   - SET PATH=%JAVA_HOME%\bin;%PATH%
 
 build_script:
-  - gradlew.bat build bintrayUpload -x test
+  - gradlew.bat build bintrayUpload -x test -x findbugsMain -x findbugsTest -x findbugsIntegrationTest -x jacoco
   - gradlew.bat --stop
 
 artifacts:

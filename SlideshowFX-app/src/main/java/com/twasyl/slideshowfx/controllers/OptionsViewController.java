@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * This class is the controller for the view {@code OptionsView.fxml}.
  *
  * @author Thierry Wasylczenko
- * @version 1.0.0
+ * @version 1.1
  * @since SlideshowFX 1.0
  */
 public class OptionsViewController implements Initializable {
@@ -39,10 +39,11 @@ public class OptionsViewController implements Initializable {
      * This methods saves the options displayed in the view and make them persistent.
      */
     public void saveOptions() {
-        OSGiManager.getInstalledServices(ISnippetExecutor.class)
-                .forEach(snippet -> snippet.saveNewOptions() );
-        OSGiManager.getInstalledServices(IHostingConnector.class)
-                .forEach(hostingConnector -> hostingConnector.saveNewOptions() );
+        final OSGiManager manager = OSGiManager.getInstance();
+        manager.getInstalledServices(ISnippetExecutor.class)
+                .forEach(ISnippetExecutor::saveNewOptions);
+        manager.getInstalledServices(IHostingConnector.class)
+                .forEach(IHostingConnector::saveNewOptions);
 
         this.saveAutoSavingOptions();
         this.saveTemporaryFilesDeletion();
@@ -101,7 +102,7 @@ public class OptionsViewController implements Initializable {
      * Display the configuration UI for each {@link ISnippetExecutor}.
      */
     private void initializeSnippetExecutorUI() {
-        OSGiManager.getInstalledServices(ISnippetExecutor.class)
+        OSGiManager.getInstance().getInstalledServices(ISnippetExecutor.class)
                 .forEach(snippet -> {
                     final Node configurationUI = snippet.getConfigurationUI();
 
@@ -113,7 +114,7 @@ public class OptionsViewController implements Initializable {
      * Displays the configuration UI for each {@link IHostingConnector}
      */
     private void initializeHostingConnectorUI() {
-        OSGiManager.getInstalledServices(IHostingConnector.class)
+        OSGiManager.getInstance().getInstalledServices(IHostingConnector.class)
                 .forEach(hostingConnector -> {
                     final Node configurationUI = hostingConnector.getConfigurationUI();
 

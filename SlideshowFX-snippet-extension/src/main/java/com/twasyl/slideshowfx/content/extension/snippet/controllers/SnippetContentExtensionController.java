@@ -18,7 +18,7 @@ import java.util.ResourceBundle;
  * This class is the controller used by the {@code SnippetContentExtension.fxml} file.
  *
  * @author Thierry Wasylczenko
- * @version 1.0.0
+ * @version 1.1
  * @since SlideshowFX 1.0
  */
 public class SnippetContentExtensionController implements Initializable {
@@ -44,7 +44,7 @@ public class SnippetContentExtensionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        OSGiManager.getInstalledServices(ISnippetExecutor.class)
+        OSGiManager.getInstance().getInstalledServices(ISnippetExecutor.class)
                         .stream()
                         .sorted((snippet1, snippet2) -> snippet1.getCode().compareTo(snippet2.getCode()))
                         .forEach(ref -> this.language.getItems().add(ref));

@@ -29,6 +29,13 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * JavaFX application class to launch SlideshowFX.
+ *
+ * @author Thierry Wasylczenko
+ * @version 1.1
+ * @since SlideshowFX 1.0
+ */
 public class SlideshowFX extends Application {
 
     static {
@@ -120,7 +127,7 @@ public class SlideshowFX extends Application {
 
         // Start the MarkupManager
         LOGGER.info("Starting Felix");
-        OSGiManager.startAndDeploy();
+        OSGiManager.getInstance().startAndDeploy();
 
         // Retrieve the files to open at startup
         final Map<String, String> params = getParameters().getNamed();
@@ -240,14 +247,14 @@ public class SlideshowFX extends Application {
     private void stopOSGIManager() {
         this.stopHostingConnectors();
         LOGGER.info("Stopping the OSGi manager");
-        OSGiManager.stop();
+        OSGiManager.getInstance().stop();
     }
 
     /**
      * Disconnect all hosting connectors if they are running.
      */
     private void stopHostingConnectors() {
-        final List<IHostingConnector> connectors = OSGiManager.getInstalledServices(IHostingConnector.class);
+        final List<IHostingConnector> connectors = OSGiManager.getInstance().getInstalledServices(IHostingConnector.class);
 
         if(!connectors.isEmpty()) {
             LOGGER.info("Disconnecting from all hosting connectors");

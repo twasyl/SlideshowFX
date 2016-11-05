@@ -14,7 +14,7 @@ public class AboutStageTest extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-        OSGiManager.startAndDeploy();
+        OSGiManager.getInstance().startAndDeploy();
     }
 
     @Override

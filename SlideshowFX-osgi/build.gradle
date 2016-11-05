@@ -1,10 +1,13 @@
-version = '1.0'
+version = '1.1'
 
 dependencies {
     compile project(':SlideshowFX-engines')
     compile project(':SlideshowFX-global-configuration')
 
     compile configurations.felix
+
+    testCompile configurations.junit
+    testCompile project(':SlideshowFX-utils')
 }
 
 tasks.bintrayUpload.enabled = false

@@ -87,7 +87,7 @@ import java.util.logging.Logger;
  *  represented by the FXML.
  *  
  *  @author Thierry Wasyczenko
- *  @version 1.1
+ *  @version 1.2
  *  @since SlideshowFX 1.0
  */
 public class SlideshowFXController implements Initializable {
@@ -550,12 +550,16 @@ public class SlideshowFXController implements Initializable {
             final String slideNumberToDelete = view.getCurrentSlideNumber();
 
             if(slideNumberToDelete != null) {
-                final Slide slideBefore = presentation.getConfiguration().getSlideBefore(slideNumberToDelete);
+                final ButtonType answer = DialogHelper.showConfirmationAlert("Delete slide", "Are you sure you want to delete the slide?");
 
-                presentation.deleteSlide(slideNumberToDelete);
+                if(answer == ButtonType.YES) {
+                    final Slide slideBefore = presentation.getConfiguration().getSlideBefore(slideNumberToDelete);
 
-                if(slideBefore == null) this.reloadPresentation(view);
-                else reloadPresentationAndGoToSlide(view, slideBefore.getId());
+                    presentation.deleteSlide(slideNumberToDelete);
+
+                    if (slideBefore == null) this.reloadPresentation(view);
+                    else reloadPresentationAndGoToSlide(view, slideBefore.getId());
+                }
             }
         }
     }
@@ -1024,7 +1028,7 @@ public class SlideshowFXController implements Initializable {
         this.downloadersMenu.getItems().clear();
         this.uploadersMenu.getItems().clear();
 
-        OSGiManager.getInstalledServices(IHostingConnector.class)
+        OSGiManager.getInstance().getInstalledServices(IHostingConnector.class)
                 .stream()
                 .sorted((hostingConnector1, hostingConnector2) -> hostingConnector1.getName().compareTo(hostingConnector2.getName()))
                 .forEach(hostingConnector -> {

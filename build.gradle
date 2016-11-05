@@ -44,9 +44,9 @@ allprojects {
     dependencies {
         asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.4.1'
         box 'com.box:box-java-sdk:2.1.1'
-        drive 'com.google.apis:google-api-services-drive:v2-rev219-1.22.0'
+        drive 'com.google.apis:google-api-services-drive:v3-rev46-1.22.0'
         dropbox 'com.dropbox.core:dropbox-core-sdk:2.0.6'
-        felix 'org.apache.felix:org.apache.felix.framework:5.4.0'
+        felix 'org.apache.felix:org.apache.felix.framework:5.6.1'
         fontawesomefx 'de.jensd:fontawesomefx-fontawesome:4.6.1-2'
         freemarker 'org.freemarker:freemarker:2.3.23'
         jsoup 'org.jsoup:jsoup:1.9.2'
@@ -58,7 +58,7 @@ allprojects {
         zxing 'com.google.zxing:core:3.2.1', 'com.google.zxing:javase:3.2.1'
 
         junit 'junit:junit:4.12'
-        mockito 'org.mockito:mockito-core:1.10.19'
+        mockito 'org.mockito:mockito-core:2.2.10'
     }
 
     apply plugin: 'com.jfrog.bintray'
@@ -157,12 +157,12 @@ ext {
     textileMarkupBintrayUploadEnabled = false
 
     boxHostingConnectorBintrayUploadEnabled = true
-    driveHostingConnectorBintrayUploadEnabled = false
-    dropboxHostingConnectorBintrayUploadEnabled = false;
+    driveHostingConnectorBintrayUploadEnabled = true
+    dropboxHostingConnectorBintrayUploadEnabled = false
 
     alertContentExtensionBintrayUploadEnabled = false
     codeContentExtensionBintrayUploadEnabled = false
-    imageContentExtensionBintrayUploadEnabled = false
+    imageContentExtensionBintrayUploadEnabled = true
     linkContentExtensionBintrayUploadEnabled = false
     quizContentExtensionBintrayUploadEnabled = false
     quoteContentExtensionBintrayUploadEnabled = false
@@ -175,7 +175,7 @@ ext {
     kotlinSnippetExecutorBintrayUploadEnabled = false
     scalaSnippetExecutorBintrayUploadEnabled = false
     sequenceDiagramContentExtensionBintrayUploadEnabled = false
-    snippetContentExtensionBintrayUploadEnabled = false
+    snippetContentExtensionBintrayUploadEnabled = true
 
     pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
     felixCacheFolder = new File(System.getProperty("user.home"), '.SlideshowFX/felix-cache')
@@ -184,7 +184,7 @@ ext {
                    project(':SlideshowFX-markdown').jar, project(':SlideshowFX-textile').jar  ]
 
     markupJarDependencies = [ ':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar',
-                                  ':SlideshowFX-textile:jar' ]
+                              ':SlideshowFX-textile:jar' ]
 
     markupBintrayUploadDependencies = [ ':SlideshowFX-asciidoctor:bintrayUpload', ':SlideshowFX-html:bintrayUpload',
                                         ':SlideshowFX-markdown:bintrayUpload', ':SlideshowFX-textile:bintrayUpload' ]
@@ -196,10 +196,10 @@ ext {
                              project(':SlideshowFX-snippet-extension').jar ]
 
     contentExtensionJarDependencies = [ ':SlideshowFX-alert-extension:jar', ':SlideshowFX-code-extension:jar',
-                                            ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar',
-                                            ':SlideshowFX-quiz-extension:jar', ':SlideshowFX-quote-extension:jar',
-                                            ':SlideshowFX-sequence-diagram-extension:jar',
-                                            ':SlideshowFX-snippet-extension:jar' ]
+                                        ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar',
+                                        ':SlideshowFX-quiz-extension:jar', ':SlideshowFX-quote-extension:jar',
+                                        ':SlideshowFX-sequence-diagram-extension:jar',
+                                        ':SlideshowFX-snippet-extension:jar' ]
 
     contentExtensionBintrayUploadDependencies = [ ':SlideshowFX-alert-extension:bintrayUpload',
                                                   ':SlideshowFX-code-extension:bintrayUpload',
@@ -228,9 +228,9 @@ ext {
                             project(':SlideshowFX-scala-executor').jar ]
 
     snippetExecutorJarDependencies = [ ':SlideshowFX-go-executor:jar', ':SlideshowFX-golo-executor:jar',
-                                            ':SlideshowFX-groovy-executor:jar', ':SlideshowFX-java-executor:jar',
-                                            ':SlideshowFX-javascript-executor:jar', ':SlideshowFX-kotlin-executor:jar',
-                                            ':SlideshowFX-scala-executor:jar' ]
+                                       ':SlideshowFX-groovy-executor:jar', ':SlideshowFX-java-executor:jar',
+                                       ':SlideshowFX-javascript-executor:jar', ':SlideshowFX-kotlin-executor:jar',
+                                       ':SlideshowFX-scala-executor:jar' ]
 
     snippetExecutorBintrayUploadDependencies = [ ':SlideshowFX-go-executor:bintrayUpload',
                                                  ':SlideshowFX-golo-executor:bintrayUpload',
@@ -265,7 +265,7 @@ ext {
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'distribution'
 
-version = '1.1'
+version = '1.2'
 
 wrapper {
     gradleVersion = '3.1'
@@ -284,10 +284,10 @@ asciidoctor {
             setanchors: '',
             sectlinks: '',
             linkcss: false,
-            'slideshowfx_version': '1.0',
+            'slideshowfx_version': '1.2',
             'asciidoctor-source': new File(project(':SlideshowFX-app').projectDir, 'src/main/resources/com/twasyl/slideshowfx/documentation').absolutePath,
-            'javafx-version': '8 update 92',
-            'jdk-version': '8 update 92',
+            'javafx-version': '8 update 112',
+            'jdk-version': '8 update 112',
             'gradle-version': "${wrapper.gradleVersion}",
             'asciidoctorj-version': "${configurations.asciidoctorj.dependencies[0].version}",
             'apache-felix-version': "${configurations.felix.dependencies[0].version}",
@@ -308,11 +308,11 @@ asciidoctor {
 
 task installMarkupPlugins(dependsOn: markupJarDependencies) << {
 
-	copy {
-		from (markupJars)
+    copy {
+        from (markupJars)
 
-		into pluginsFolder
-	}
+        into pluginsFolder
+    }
 }
 
 task installContentExtensionPlugins(dependsOn: contentExtensionJarDependencies) << {
@@ -341,7 +341,7 @@ task installSnippetExecutorPlugins(dependsOn : snippetExecutorJarDependencies) <
 }
 
 task installAllPlugins(dependsOn: [ ':installMarkupPlugins', ':installContentExtensionPlugins',
-        ':installHostingConnectorPlugins', ':installSnippetExecutorPlugins']) << {
+                                    ':installHostingConnectorPlugins', ':installSnippetExecutorPlugins']) << {
 }
 
 task publishAllMarkup(dependsOn : markupBintrayUploadDependencies ) << {
@@ -349,7 +349,7 @@ task publishAllMarkup(dependsOn : markupBintrayUploadDependencies ) << {
 
 task publishAllContentExtension(dependsOn: contentExtensionBintrayUploadDependencies) << {
 
-                                                }
+}
 task publishAllHostingConnector(dependsOn : hostingConnectorBintrayUploadDependencies) << {
 }
 

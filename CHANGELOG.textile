@@ -4,7 +4,47 @@ p. Changes to the SlideshowFX software are listed by version within this documen
 
 h2. Versions
 
-h3(#1_0). "Version 1.1":#1_1
+h3(#1_2). "Version 1.2":#1_2
+
+h4. New and noteworthy
+
+* Google Drive hosting connector is now working correctly with the v3 API ("#12":https://github.com/twasyl/SlideshowFX/issues/12)
+* It is possible to open files in the internal browser
+* Ask for confirmation before deleting a slide
+* The OSGi manager only starts the most recent plugins ("#15":https://github.com/twasyl/SlideshowFX/issues/15)
+* The image extension now supports the markdown markup
+
+h4. Bug fixes
+
+* Correct the setup for the Linux platform which wasn't working ("#14":https://github.com/twasyl/SlideshowFX/pull/14)
+
+h4. Included plugins within the packaging
+
+|_. Plugin |_. Version |
+| SlideshowFX-alert-extension | 1.0 |
+| SlideshowFX-asciidoctor | 1.0 |
+| SlideshowFX-box-hosting-connector | 1.1 |
+| SlideshowFX-code-extension | 1.0 |
+| SlideshowFX-drive-hosting-connector | 1.1 |
+| SlideshowFX-dropbox-hosting-connector | 1.0 |
+| SlideshowFX-go-executor | 1.0 |
+| SlideshowFX-golo-executor | 1.0 |
+| SlideshowFX-groovy-executor | 1.0 |
+| SlideshowFX-html | 1.0 |
+| SlideshowFX-image-extension | 1.1 |
+| SlideshowFX-java-executor | 1.0 |
+| SlideshowFX-javascript-executor | 1.0 |
+| SlideshowFX-kotlin-executor | 1.0 |
+| SlideshowFX-link-extension | 1.0 |
+| SlideshowFX-markdown | 1.0 |
+| SlideshowFX-quiz-extension | 1.0 |
+| SlideshowFX-quote-extension | 1.0 |
+| SlideshowFX-scala-executor | 1.0 |
+| SlideshowFX-sequence-diagram-extension | 1.0 |
+| SlideshowFX-snippet-extension | 1.1 |
+| SlideshowFX-textile | 1.0 |
+
+h3(#1_1). "Version 1.1":#1_1
 
 h4. New and noteworthy
 

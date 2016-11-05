@@ -33,7 +33,7 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.PL
  * Controller of the {@code PluginCenter.fxml} view.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.1
  */
 public class PluginCenterController implements Initializable {
@@ -182,7 +182,7 @@ public class PluginCenterController implements Initializable {
     }
 
     protected void populatePluginsView() {
-        for(File pluginFile : PLUGINS_DIRECTORY.listFiles()) {
+        for(File pluginFile : OSGiManager.getInstance().getActivePlugins()) {
             if(pluginFile.getName().endsWith(".jar")) {
                 final PluginFileButton button = new PluginFileButton(pluginFile);
                 button.setSelected(true);
@@ -203,13 +203,13 @@ public class PluginCenterController implements Initializable {
 
                         if(button.isSelected() && !button.getFile().getParentFile().equals(PLUGINS_DIRECTORY)) {
                             try {
-                                OSGiManager.deployBundle(button.getFile());
+                                OSGiManager.getInstance().deployBundle(button.getFile());
                             } catch (IOException e) {
                                 LOGGER.log(Level.SEVERE, "Can not install plugin: " + button.getFile().getName(), e);
                             }
                         } else if(!button.isSelected() && button.getFile().getParentFile().equals(PLUGINS_DIRECTORY)) {
                             try {
-                                OSGiManager.uninstallBundle(button.getFile());
+                                OSGiManager.getInstance().uninstallBundle(button.getFile());
                             } catch (IOException | BundleException e) {
                                 LOGGER.log(Level.SEVERE, "Can not uninstall plugin: " + button.getFile().getName(), e);
                             }

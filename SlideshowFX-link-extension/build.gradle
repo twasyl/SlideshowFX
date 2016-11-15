@@ -1,9 +1,16 @@
 description = 'Extension allowing to insert links inside a SlideshowFX presentation'
-version = '1.0'
+version = '1.1'
 
 dependencies {
     compile project(':SlideshowFX-content-extension')
     compile configurations.felix
+
+    testCompile configurations.junit
+    testCompile configurations.mockito
+    testCompile project(':SlideshowFX-markup')
+    testCompile project(':SlideshowFX-html')
+    testCompile project(':SlideshowFX-markdown')
+    testCompile project(':SlideshowFX-textile')
 }
 
 jar {

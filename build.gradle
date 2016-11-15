@@ -86,8 +86,6 @@ allprojects {
 
 subprojects {
     apply plugin: 'java'
-    apply plugin: 'findbugs'
-    apply plugin: 'jacoco'
 
     group = "com.twasyl.slideshowfx"
 
@@ -126,25 +124,6 @@ subprojects {
         reports.html.enabled = true
         reports.html.destination = file("${project.reporting.baseDir}/${name}")
     }
-
-    findbugs {
-        ignoreFailures = true
-    }
-
-    findbugsMain {
-        reports {
-            xml.enabled = false
-            html.enabled = true
-        }
-    }
-
-    jacocoTestReport {
-        reports {
-            xml.enabled = false
-            csv.enabled = false
-            html.enabled = true
-        }
-    }
 }
 
 ext {
@@ -161,9 +140,9 @@ ext {
     dropboxHostingConnectorBintrayUploadEnabled = false
 
     alertContentExtensionBintrayUploadEnabled = false
-    codeContentExtensionBintrayUploadEnabled = false
+    codeContentExtensionBintrayUploadEnabled = true
     imageContentExtensionBintrayUploadEnabled = false
-    linkContentExtensionBintrayUploadEnabled = false
+    linkContentExtensionBintrayUploadEnabled = true
     quizContentExtensionBintrayUploadEnabled = false
     quoteContentExtensionBintrayUploadEnabled = false
 
@@ -268,7 +247,7 @@ apply plugin: 'distribution'
 version = '@@NEXT-VERSION@@'
 
 wrapper {
-    gradleVersion = '3.1'
+    gradleVersion = '3.2'
 }
 
 asciidoctorj {

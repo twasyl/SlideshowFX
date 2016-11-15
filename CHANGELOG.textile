@@ -4,6 +4,13 @@ p. Changes to the SlideshowFX software are listed by version within this documen
 
 h2. Versions
 
+h3(#NEXT_VERSION). "Version NEXT_VERSION":#NEXT_VERSION
+
+h4. New and noteworthy
+
+* Code extension now supports the markdown syntax
+* Link extension now supports the markdown syntax
+
 h3(#1_2). "Version 1.2":#1_2
 
 h4. New and noteworthy

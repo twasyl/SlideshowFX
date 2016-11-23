@@ -15,7 +15,7 @@ You can also start a chat with which your attendees can ask you questions that a
 
 Are you a big lover of quizs? If yes you can even create quizs in your presentations that attendees can answer to and results will be displayed live! Cool, isn't it?
 
-And developers aren't forgotten in SlideshowFX! Sometimes you display code snippets right? You would like to see the results right? In SlideshowFX, insert executable code snippets and see the console's output directly in your presentation! Currently you can create "Go":https://golang.org/, "golo":http://golo-lang.org/, "groovy":http://www.groovy-lang.org/, "Java":https://www.oracle.com/java/index.html, JavaScript, "kotlin":https://kotlinlang.org/ and "sacla":http://www.scala-lang.org/.
+And developers aren't forgotten in SlideshowFX! Sometimes you display code snippets right? You would like to see the results right? In SlideshowFX, insert executable code snippets and see the console's output directly in your presentation! Currently you can create "Go":https://golang.org/, "golo":http://golo-lang.org/, "groovy":http://www.groovy-lang.org/, "Java":https://www.oracle.com/java/index.html, JavaScript, "kotlin":https://kotlinlang.org/ and "scala":http://www.scala-lang.org/.
 
 With SlideshowFX, bring your presentation to the next level of interactivity.
 

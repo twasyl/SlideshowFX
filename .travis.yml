@@ -6,6 +6,7 @@ git:
 branches:
  only:
   - master
+  - development
 
 sudo: true
 
@@ -24,7 +25,7 @@ install: true
 
 script:
   - chmod +x ./gradlew
-  - ./gradlew build bintrayUpload -x test -x findbugsMain -x findbugsTest -x findbugsIntegrationTest -x jacoco
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then ./gradlew build bintrayUpload; else ./gradlew build; fi
   - ./gradlew --stop
 
 cache:

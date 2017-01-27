@@ -30,7 +30,6 @@ allprojects {
         fontawesomefx
         freemarker
         jsoup
-        leapmotion
         markdown
         twitter4j
         vertx
@@ -44,21 +43,20 @@ allprojects {
     dependencies {
         asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.4.1'
         box 'com.box:box-java-sdk:2.1.1'
-        drive 'com.google.apis:google-api-services-drive:v3-rev46-1.22.0'
-        dropbox 'com.dropbox.core:dropbox-core-sdk:2.0.6'
+        drive 'com.google.apis:google-api-services-drive:v3-rev55-1.22.0'
+        dropbox 'com.dropbox.core:dropbox-core-sdk:2.1.2'
         felix 'org.apache.felix:org.apache.felix.framework:5.6.1'
         fontawesomefx 'de.jensd:fontawesomefx-fontawesome:4.6.1-2'
-        freemarker 'org.freemarker:freemarker:2.3.23'
-        jsoup 'org.jsoup:jsoup:1.9.2'
-        leapmotion fileTree(dir: "${rootDir.absolutePath}/lib/Leap", include: '*/**')
+        freemarker 'org.freemarker:freemarker:2.3.25-incubating'
+        jsoup 'org.jsoup:jsoup:1.10.2'
         markdown 'com.github.rjeschke:txtmark:0.13'
-        twitter4j 'org.twitter4j:twitter4j-core:4.0.4', 'org.twitter4j:twitter4j-stream:4.0.4'
-        vertx 'io.vertx:vertx-core:3.3.2', 'io.vertx:vertx-web:3.3.2'
+        twitter4j 'org.twitter4j:twitter4j-core:4.0.6', 'org.twitter4j:twitter4j-stream:4.0.6'
+        vertx 'io.vertx:vertx-core:3.3.3', 'io.vertx:vertx-web:3.3.3'
         wikitext fileTree(dir: "${rootDir.absolutePath}/lib/WikiText", include: '*.jar')
-        zxing 'com.google.zxing:core:3.2.1', 'com.google.zxing:javase:3.2.1'
+        zxing 'com.google.zxing:core:3.3.0', 'com.google.zxing:javase:3.3.0'
 
         junit 'junit:junit:4.12'
-        mockito 'org.mockito:mockito-core:2.2.10'
+        mockito 'org.mockito:mockito-core:2.6.8'
     }
 
     apply plugin: 'com.jfrog.bintray'
@@ -86,8 +84,6 @@ allprojects {
 
 subprojects {
     apply plugin: 'java'
-    apply plugin: 'findbugs'
-    apply plugin: 'jacoco'
 
     group = "com.twasyl.slideshowfx"
 
@@ -126,25 +122,6 @@ subprojects {
         reports.html.enabled = true
         reports.html.destination = file("${project.reporting.baseDir}/${name}")
     }
-
-    findbugs {
-        ignoreFailures = true
-    }
-
-    findbugsMain {
-        reports {
-            xml.enabled = false
-            html.enabled = true
-        }
-    }
-
-    jacocoTestReport {
-        reports {
-            xml.enabled = false
-            csv.enabled = false
-            html.enabled = true
-        }
-    }
 }
 
 ext {
@@ -154,16 +131,16 @@ ext {
     asciidoctorMarkupBintrayUploadEnabled = false
     htmlMarkupBintrayUploadEnabled = false
     markdownMarkupBintrayUploadEnabled = false
-    textileMarkupBintrayUploadEnabled = false
+    textileMarkupBintrayUploadEnabled = true
 
-    boxHostingConnectorBintrayUploadEnabled = true
-    driveHostingConnectorBintrayUploadEnabled = true
-    dropboxHostingConnectorBintrayUploadEnabled = false
+    boxHostingConnectorBintrayUploadEnabled = false
+    driveHostingConnectorBintrayUploadEnabled = false
+    dropboxHostingConnectorBintrayUploadEnabled = true
 
-    alertContentExtensionBintrayUploadEnabled = false
-    codeContentExtensionBintrayUploadEnabled = false
+    alertContentExtensionBintrayUploadEnabled = true
+    codeContentExtensionBintrayUploadEnabled = true
     imageContentExtensionBintrayUploadEnabled = true
-    linkContentExtensionBintrayUploadEnabled = false
+    linkContentExtensionBintrayUploadEnabled = true
     quizContentExtensionBintrayUploadEnabled = false
     quoteContentExtensionBintrayUploadEnabled = false
 
@@ -175,7 +152,7 @@ ext {
     kotlinSnippetExecutorBintrayUploadEnabled = false
     scalaSnippetExecutorBintrayUploadEnabled = false
     sequenceDiagramContentExtensionBintrayUploadEnabled = false
-    snippetContentExtensionBintrayUploadEnabled = true
+    snippetContentExtensionBintrayUploadEnabled = false
 
     pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
     felixCacheFolder = new File(System.getProperty("user.home"), '.SlideshowFX/felix-cache')
@@ -265,10 +242,10 @@ ext {
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'distribution'
 
-version = '1.2'
+version = '1.3'
 
 wrapper {
-    gradleVersion = '3.1'
+    gradleVersion = '3.3'
 }
 
 asciidoctorj {
@@ -284,25 +261,24 @@ asciidoctor {
             setanchors: '',
             sectlinks: '',
             linkcss: false,
-            'slideshowfx_version': '1.2',
+            'slideshowfx_version': '1.3',
             'asciidoctor-source': new File(project(':SlideshowFX-app').projectDir, 'src/main/resources/com/twasyl/slideshowfx/documentation').absolutePath,
-            'javafx-version': '8 update 112',
-            'jdk-version': '8 update 112',
+            'javafx-version': '8 update 121',
+            'jdk-version': '8 update 121',
             'gradle-version': "${wrapper.gradleVersion}",
             'asciidoctorj-version': "${configurations.asciidoctorj.dependencies[0].version}",
             'apache-felix-version': "${configurations.felix.dependencies[0].version}",
             'freemarker-version': "${configurations.freemarker.dependencies[0].version}",
             'fontawesomefx-version' : "${configurations.fontawesomefx.dependencies[0].version}",
             'jsoup-version': "${configurations.jsoup.dependencies[0].version}",
-            'leapmotion-sdk-version': '2.3.1.31549',
-            'wikitext-core-version': '2.10.0.N20160630-1705',
-            'wikitext-textile-core-version': '2.10.0.N20160630-1705',
+            'wikitext-core-version': '2.11.0.N20161225-2213',
+            'wikitext-textile-core-version': '2.11.0.N20161028-1624',
             'twitter4j-version': "${configurations.twitter4j.dependencies[0].version}",
             'txtmark-version': "${configurations.markdown.dependencies[0].version}",
             'vertx-version': "${configurations.vertx.dependencies[0].version}",
             'zxing-core-version': "${configurations.zxing.dependencies[0].version}",
             'zxing-jse-version': "${configurations.zxing.dependencies[1].version}",
-            'ace-version': '1.2.5'
+            'ace-version': '1.2.6'
     ]
 }
 

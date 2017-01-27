@@ -185,7 +185,7 @@ public class OSGiManager {
      * @param bundleFile The bundleFile to deploy.
      * @param start Indicate if the bundle should be started.
      * @throws IllegalArgumentException If the bundleFile is not a directory.
-     * @throws java.io.FileNotFoundException If the bundleFile is not found.
+     * @throws FileNotFoundException If the bundleFile is not found.
      * @throws NullPointerException If the bundleFile is null.
      * @return The installed service.
      */

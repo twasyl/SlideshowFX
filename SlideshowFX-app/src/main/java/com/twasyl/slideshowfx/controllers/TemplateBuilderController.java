@@ -30,20 +30,23 @@ import java.util.logging.Logger;
  * Controller class used for the Template Builder.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.0
  */
 public class TemplateBuilderController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(TemplateBuilderController.class.getName());
 
-    @FXML private TemplateTreeView templateContentTreeView;
-    @FXML private TabPane openedFiles;
+    @FXML
+    private TemplateTreeView templateContentTreeView;
+    @FXML
+    private TabPane openedFiles;
 
     private Stage stage;
     private TemplateEngine templateEngine;
 
     /**
      * Get the stage where this TemplateBuilder is in.
+     *
      * @return The stage where this TemplateBuilder is in.
      */
     public Stage getStage() {
@@ -52,6 +55,7 @@ public class TemplateBuilderController implements Initializable {
 
     /**
      * Set the stage where this TemplateBuilder will be in.
+     *
      * @param stage The new stage where the TemplateBuilder will be in.
      */
     public void setStage(Stage stage) {
@@ -63,12 +67,13 @@ public class TemplateBuilderController implements Initializable {
      *
      * @param event The event associated to button clicked to call this method.
      */
-    @FXML private void addFolderToTreeView(ActionEvent event) {
+    @FXML
+    private void addFolderToTreeView(ActionEvent event) {
         final DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Add content");
         final File directory = chooser.showDialog(null);
-        
-        if(directory != null) {
+
+        if (directory != null) {
             this.addContentToTreeView(directory);
         }
     }
@@ -78,12 +83,13 @@ public class TemplateBuilderController implements Initializable {
      *
      * @param event The event associated to button clicked to call this method.
      */
-    @FXML private void addFileToTreeView(ActionEvent event) {
+    @FXML
+    private void addFileToTreeView(ActionEvent event) {
         final FileChooser chooser = new FileChooser();
         chooser.setTitle("Add content");
         final File file = chooser.showOpenDialog(null);
 
-        if(file != null) {
+        if (file != null) {
             this.addContentToTreeView(file);
         }
     }
@@ -94,21 +100,22 @@ public class TemplateBuilderController implements Initializable {
      *
      * @param event The event associated to button clicked to call this method.
      */
-    @FXML private void buildTemplateArchive(ActionEvent event) {
+    @FXML
+    private void buildTemplateArchive(ActionEvent event) {
         File destination = this.templateEngine.getArchive();
 
-        if(destination == null) {
+        if (destination == null) {
             FileChooser chooser = new FileChooser();
             chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.TEMPLATE_FILTER);
             destination = chooser.showSaveDialog(null);
 
             // Manage if the file name doesn't end with the template extension.
-            if(!destination.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)) {
+            if (!destination.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)) {
                 destination = new File(destination.getAbsolutePath().concat(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION));
             }
         }
 
-        if(destination != null) {
+        if (destination != null) {
             this.templateEngine.setArchive(destination);
             try {
                 this.templateEngine.saveArchive();
@@ -123,13 +130,14 @@ public class TemplateBuilderController implements Initializable {
      *
      * @param event The event associated to button clicked to call this method.
      */
-    @FXML private void buildAsTemplateArchive(ActionEvent event) {
+    @FXML
+    private void buildAsTemplateArchive(ActionEvent event) {
 
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.TEMPLATE_FILTER);
         File destination = chooser.showSaveDialog(null);
 
-        if(destination != null) {
+        if (destination != null) {
             this.templateEngine.setArchive(destination);
             try {
                 this.templateEngine.saveArchive();
@@ -141,21 +149,25 @@ public class TemplateBuilderController implements Initializable {
 
     /**
      * Save the current opened file.
+     *
      * @param event The event associated to the click
      */
-    @FXML private void saveCurrentFile(ActionEvent event) {
+    @FXML
+    private void saveCurrentFile(ActionEvent event) {
         IFileEditor currentFile = (IFileEditor) this.openedFiles.getSelectionModel().getSelectedItem();
 
-        if(currentFile != null) {
+        if (currentFile != null) {
             currentFile.saveContent();
         }
     }
 
     /**
      * Save all opened files.
+     *
      * @param event The event associated to the click
      */
-    @FXML private void saveAllFiles(ActionEvent event) {
+    @FXML
+    private void saveAllFiles(ActionEvent event) {
         this.openedFiles.getTabs()
                 .stream()
                 .filter(tab -> tab instanceof IFileEditor)
@@ -168,12 +180,13 @@ public class TemplateBuilderController implements Initializable {
      *
      * @param event The event associated to button clicked to call this method.
      */
-    @FXML private void deleteFromTreeView(ActionEvent event) {
+    @FXML
+    private void deleteFromTreeView(ActionEvent event) {
         ObservableList<TreeItem<File>> selectedItems = this.templateContentTreeView.getSelectionModel().getSelectedItems();
-        if(!selectedItems.isEmpty()) {
+        if (!selectedItems.isEmpty()) {
             final ButtonType answer = DialogHelper.showConfirmationAlert("Delete selection", "Are you sure you want to delete the selection?");
 
-            if(answer == ButtonType.YES) {
+            if (answer == ButtonType.YES) {
                 selectedItems.filtered(item -> item != this.templateContentTreeView.getRoot())
                         .forEach(item -> {
                             try {
@@ -193,20 +206,21 @@ public class TemplateBuilderController implements Initializable {
      *
      * @param event The event associated to button clicked to call this method.
      */
-    @FXML private void createDirectory(ActionEvent event) {
+    @FXML
+    private void createDirectory(ActionEvent event) {
         final TextField field = new TextField();
         field.setPromptText("Directory name");
 
         ButtonType response = DialogHelper.showCancellableDialog("Create a directory", field);
 
-        if(response != null && response == ButtonType.OK) {
-            if(!field.getText().trim().isEmpty()) {
+        if (response != null && response == ButtonType.OK) {
+            if (!field.getText().trim().isEmpty()) {
                 TreeItem<File> parent = this.templateContentTreeView.getSelectionModel().getSelectedItem();
 
-                if(parent == null) parent = this.templateContentTreeView.getRoot();
+                if (parent == null) parent = this.templateContentTreeView.getRoot();
                 else {
                     // Ensure the selected item contain a directory. If it contains a file, the parent is taken.
-                    if(parent.getValue().isFile()) {
+                    if (parent.getValue().isFile()) {
                         parent = parent.getParent();
                     }
                 }
@@ -216,20 +230,20 @@ public class TemplateBuilderController implements Initializable {
                  */
 
                 TreeItem<File> tmpItem;
-                for(String name : field.getText().trim().split("/")) {
+                for (String name : field.getText().trim().split("/")) {
                     final File tmpFile = new File(parent.getValue(), name);
                     tmpItem = new TreeItem<>(tmpFile);
 
-                    if(!tmpFile.exists()) {
+                    if (!tmpFile.exists()) {
                         final boolean result = tmpFile.mkdir();
-                        if(result) {
+                        if (result) {
                             // Avoid duplicates in the tree
                             Optional<TreeItem<File>> sameItem = parent.getChildren()
                                     .stream()
                                     .filter(item -> item.getValue().equals(tmpFile))
                                     .findFirst();
 
-                            if(!sameItem.isPresent()) {
+                            if (!sameItem.isPresent()) {
                                 parent.getChildren().add(tmpItem);
                                 parent = tmpItem;
                             } else {
@@ -252,20 +266,21 @@ public class TemplateBuilderController implements Initializable {
      *
      * @param event The event associated to button clicked to call this method.
      */
-    @FXML private void createFile(ActionEvent event) {
+    @FXML
+    private void createFile(ActionEvent event) {
         final TextField field = new TextField();
         field.setPromptText("File name");
 
         ButtonType response = DialogHelper.showCancellableDialog("Create a file", field);
 
-        if(response != null && response == ButtonType.OK) {
-            if(!field.getText().trim().isEmpty()) {
+        if (response != null && response == ButtonType.OK) {
+            if (!field.getText().trim().isEmpty()) {
                 TreeItem<File> parent = this.templateContentTreeView.getSelectionModel().getSelectedItem();
 
-                if(parent == null) parent = this.templateContentTreeView.getRoot();
+                if (parent == null) parent = this.templateContentTreeView.getRoot();
                 else {
                     // Ensure the selected item contain a directory. If it contains a file, the parent is taken.
-                    if(parent.getValue().isFile()) {
+                    if (parent.getValue().isFile()) {
                         parent = parent.getParent();
                     }
                 }
@@ -291,10 +306,10 @@ public class TemplateBuilderController implements Initializable {
      * @param content The content to add to the TreeView.
      */
     private void addContentToTreeView(File content) {
-        if(content != null && content.exists()) {
+        if (content != null && content.exists()) {
             TreeItem<File> parent = this.templateContentTreeView.getSelectionModel().getSelectedItem();
 
-            if(parent == null || !parent.getValue().isDirectory()) {
+            if (parent == null || !parent.getValue().isDirectory()) {
                 parent = this.templateContentTreeView.getRoot();
             }
 
@@ -304,6 +319,7 @@ public class TemplateBuilderController implements Initializable {
 
     /**
      * Get the template engine used for the builder.
+     *
      * @return The templated builder used for the builder.
      */
     public TemplateEngine getTemplateEngine() {
@@ -319,9 +335,9 @@ public class TemplateBuilderController implements Initializable {
     public void setTemplateEngine(TemplateEngine templateEngine) {
         this.templateEngine = templateEngine;
 
-        if(this.templateEngine != null) {
+        if (this.templateEngine != null) {
 
-            if(this.templateEngine.getWorkingDirectory() == null) {
+            if (this.templateEngine.getWorkingDirectory() == null) {
                 this.templateEngine.setWorkingDirectory(this.templateEngine.generateWorkingDirectory());
             }
 
@@ -332,7 +348,7 @@ public class TemplateBuilderController implements Initializable {
             this.templateContentTreeView.setRoot(root);
 
             final File[] children = this.templateEngine.getWorkingDirectory().listFiles();
-            if(children != null) {
+            if (children != null) {
                 Arrays.stream(children).forEach(child -> this.addContentToTreeView(child));
             }
         }
@@ -342,24 +358,24 @@ public class TemplateBuilderController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Initialize the tree view
         this.templateContentTreeView.setOnItemClick(event -> {
-            if(event.getClickCount() == 2 && event.getButton().equals(MouseButton.PRIMARY)) {
-                if(event.getSource() instanceof FileTreeCell) {
+            if (event.getClickCount() == 2 && event.getButton().equals(MouseButton.PRIMARY)) {
+                if (event.getSource() instanceof FileTreeCell) {
                     File file = ((FileTreeCell) event.getSource()).getItem();
 
-                    if(file.isFile()) {
+                    if (file.isFile()) {
 
                         /**
                          * Check if the file is already opened and select it if it is,
-                          otherwise open it.
+                         otherwise open it.
                          */
-                        Optional<IFileEditor> editor =  this.openedFiles.getTabs()
+                        Optional<IFileEditor> editor = this.openedFiles.getTabs()
                                 .stream()
                                 .filter(tab -> tab instanceof IFileEditor)
                                 .map(tab -> (IFileEditor) tab)
                                 .filter(tab -> tab.getFile().equals(file))
                                 .findFirst();
 
-                        if(editor.isPresent()) {
+                        if (editor.isPresent()) {
                             this.openedFiles.getSelectionModel().select((Tab) editor.get());
                         } else {
 
@@ -367,7 +383,7 @@ public class TemplateBuilderController implements Initializable {
                             IFileEditor fileEditor;
 
                             // The file is the configuration file
-                            if(file.equals(new File(this.templateEngine.getWorkingDirectory(), this.templateEngine.getConfigurationFilename()))) {
+                            if (file.equals(new File(this.templateEngine.getWorkingDirectory(), this.templateEngine.getConfigurationFilename()))) {
                                 fileEditor = new ConfigurationFileEditor(this.templateEngine.getWorkingDirectory().toPath(), file);
                             } else {
                                 /**
@@ -377,17 +393,17 @@ public class TemplateBuilderController implements Initializable {
                                 try {
                                     String mimeType = Files.probeContentType(file.toPath());
 
-                                    if(mimeType != null && mimeType.contains("image")) fileEditor = new ImageFileEditor();
+                                    if (mimeType != null && mimeType.contains("image"))
+                                        fileEditor = new ImageFileEditor();
                                     else fileEditor = new ACEFileEditor();
+
+                                    fileEditor.setWorkingPath(this.templateEngine.getWorkingDirectory().toPath());
+                                    fileEditor.setFile(file);
                                 } catch (IOException e) {
                                     LOGGER.log(Level.WARNING, "An error occurred while truing to determine the MIME type of the file to open", e);
                                     fileEditor = new SimpleFileEditor();
                                 }
                             }
-
-                            fileEditor.setWorkingPath(this.templateEngine.getWorkingDirectory().toPath());
-                            fileEditor.setFile(file);
-                            fileEditor.updateFileContent();
 
                             this.openedFiles.getTabs().add((Tab) fileEditor);
                             this.openedFiles.getSelectionModel().selectLast();

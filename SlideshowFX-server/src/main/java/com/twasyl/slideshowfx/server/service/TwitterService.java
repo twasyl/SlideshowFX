@@ -158,6 +158,7 @@ public class TwitterService extends AbstractSlideshowFXService {
 
             final JsonObject jsonTweet = chatMessage.toJSON();
 
+            System.out.println(jsonTweet.toString());
             TwitterService.this.vertx.eventBus().publish(SERVICE_CHAT_ATTENDEE_MESSAGE_ADD, jsonTweet);
             TwitterService.this.vertx.eventBus().publish(SERVICE_CHAT_PRESENTER_MESSAGE_ADD, jsonTweet);
         };

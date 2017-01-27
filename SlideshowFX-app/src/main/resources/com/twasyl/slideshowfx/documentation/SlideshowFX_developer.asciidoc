@@ -12,7 +12,6 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 - A chat is provided so your audience can send you questions using their smartphones and you will answer them whenever you want ;
 - A quiz creator so your audience can answer your quiz using their smartphones and you see results live ;
-- Present using your hands by changing slides with two fingers, have a "laser" pointer by using one finger. It's cool isn't it? All of this brought to you by LeapMotion.
 - Save your presentations on Dropbox or Google Drive ;
 - Insert code snippets that can be executed directly from the presentation and console's output is displayed in the slide.
 
@@ -35,8 +34,6 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 | freemarker | {freemarker-version} |
 
 | jsoup | {jsoup-version} |
-
-| LeapMotion SDK | {leapmotion-sdk-version} |
 
 | org.eclipse.mylyn.wikitext.core | {wikitext-core-version} | Library used for textile support
 
@@ -125,23 +122,6 @@ In order to build SlideshowFX, you will need to set *JAVA_HOME* to point to your
 ==== Running SlideshowFX in your IDE
 
 If you are contributing to SlideshowFX and developing some features, you probably use an IDE (http://www.jetbrains.com/idea/[IntelliJ IDEA], https://netbeans.org/[NetBeans], http://www.eclipse.org/[eclipse], ...). +
-Because SlideshowFX uses LeapMotion, you have to set up a JVM argument which is 
-[source]
--Djava.library.path=./lib/Leap/<platform>
-
-Values for the platform are:
-
-- *osx*
-- *windows_x86*
-- *windows_x64*
-- *linux_x86*
-- *linux_x64*
-
-If you want SlideshowFX manage and look where LeapMotion native libraries are located, instead of defining the `-Djava.library.path` JVM argument you can define the two following:
-[source]
--Ddynamic.java.library.path=true -Dproject.stage=development
-
-By doing so, SlideshowFX will automatically be looking for the folder `./lib/Leap/<platform>`.
 
 === Templates
 
@@ -307,15 +287,6 @@ The template file is the file that will host all slides, include all JavaScript 
 
 - insert the freemarker token *$\{sfxJavascriptResources\}* inside a *script* code block
 - define an ID for the HTML element that will host all slides
-- insert the following JavaScript function with the right implementation for changing slides using https://www.leapmotion.com/[LeapMotion]
-
-[source,javascript]
-----
-function slideshowFXLeap(keyCode) {
-  // Manage the LEFT and RIGHT key codes for changing slides
-}
-----
-
 - insert the JavaScript function with the right implementation returning the current slide
 
 [source,javascript]
@@ -389,6 +360,7 @@ The configuration of the presentation is wrapped into an JSON configuration file
 ----
 {
   "presentation": {
+    "id": 123456789,
     "custom-resources": [
         {
             "type": "<type>",

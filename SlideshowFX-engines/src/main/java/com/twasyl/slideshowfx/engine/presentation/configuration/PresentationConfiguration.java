@@ -14,6 +14,24 @@ import java.util.logging.Logger;
  * Represents a presentation
  */
 public class PresentationConfiguration implements IConfiguration {
+    public static final String PRESENTATION = "presentation";
+    public static final String PRESENTATION_ID = "id";
+    public static final String PRESENTATION_CUSTOM_RESOURCES = "custom-resources";
+    public static final String CUSTOM_RESOURCE_TYPE = "type";
+    public static final String CUSTOM_RESOURCE_CONTENT = "content";
+    public static final String PRESENTATION_VARIABLES = "variables";
+    public static final String VARIABLE_NAME = "name";
+    public static final String VARIABLE_VALUE = "value";
+    public static final String SLIDES = "slides";
+    public static final String SLIDE_ID = "id";
+    public static final String SLIDE_NUMBER = "number";
+    public static final String SLIDE_TEMPLATE_ID = "template-id";
+    public static final String SLIDE_ELEMENTS = "elements";
+    public static final String SLIDE_ELEMENT_TEMPLATE_ID = "template-id";
+    public static final String SLIDE_ELEMENT_ELEMENT_ID = "element-id";
+    public static final String SLIDE_ELEMENT_ORIGINAL_CONTENT_CODE = "original-content-code";
+    public static final String SLIDE_ELEMENT_ORIGINAL_CONTENT = "original-content";
+    public static final String SLIDE_ELEMENT_HTML_CONTENT = "html-content";
     private static final Logger LOGGER = Logger.getLogger(PresentationConfiguration.class.getName());
     public static final String DEFAULT_PRESENTATION_FILENAME = "presentation.html";
 

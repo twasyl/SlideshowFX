@@ -348,29 +348,4 @@ public final class PresentationBrowser extends StackPane {
                     );
         }
     }
-
-    /**
-     * Go to the next slide of the presentation.
-     */
-    public final void nextSlide() {
-        this.internalBrowser.getEngine().executeScript(
-                    String.format(
-                            "%1$s('%2$s')",
-                            this.getPresentation().getTemplateConfiguration().getLeapMotionMethod(),
-                            "RIGHT"
-                    ));
-    }
-
-    /**
-     * Go to the previous slide of the presentation.
-     */
-    public final void previousSlide() {
-        this.internalBrowser.getEngine().executeScript(
-                    String.format(
-                            "%1$s('%2$s')",
-                            this.getPresentation().getTemplateConfiguration().getLeapMotionMethod(),
-                            "LEFT"
-                    )
-            );
-    }
 }

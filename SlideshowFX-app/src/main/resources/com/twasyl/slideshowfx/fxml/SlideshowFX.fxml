@@ -282,15 +282,6 @@
 
                 <fx:reference source="slideshow" />
 
-                <CheckBox fx:id="leapMotionEnabled" selected="false">
-                    <tooltip>
-                        <Tooltip text="LeapMotion controller" />
-                    </tooltip>
-                    <graphic>
-                        <FontAwesomeIconView glyphName="HAND_ALT_UP" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />
-                    </graphic>
-                </CheckBox>
-
                 <Separator />
 
                 <FontAwesomeIconView glyphName="COMMENTS_ALT" glyphSize="$TOOLBAR_ICON_WIDTH" glyphStyle="-fx-fill: app-color-orange" />

@@ -1,8 +1,8 @@
 package com.twasyl.slideshowfx.content.extension.link.controllers;
 
+import com.twasyl.slideshowfx.ui.controls.ExtendedTextField;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
 
 import java.net.URL;
@@ -13,70 +13,73 @@ import java.util.ResourceBundle;
  * in the UI will be initialized by the content of the {@link Clipboard} if it contains a text having an URL form.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.0
  */
 public class LinkContentExtensionController implements Initializable {
 
-    @FXML private TextField address;
-    @FXML private TextField text;
+    @FXML
+    private ExtendedTextField address;
+    @FXML
+    private ExtendedTextField text;
 
     /**
      * Get the address of the link entered in the UI.
+     *
      * @return The address of the link entered in the UI.
      */
-    public String getAddress() { return this.address.getText(); }
+    public String getAddress() {
+        return this.address.getText();
+    }
 
     /**
      * Get the text of the link inserted in the UI.
+     *
      * @return The text of the link inserted in the UI.
      */
-    public String getText() { return this.text.getText(); }
+    public String getText() {
+        return this.text.getText();
+    }
 
     /**
-     * Get the URL stored in the {@link Clipboard clipboard}. This method uses{@link #doesClipboardContainsURL()} to
-     * determine if the {@link Clipboard clipboard} contains an URL.
-     * @return The URL stored in the {@link Clipboard clipboard} or {@code null} if none.
+     * Get the URL that is present in the system clipboard. This method ensures that if the
+     * {@link Clipboard#hasUrl()} returns {@code true}, then URL is truly an URL.
+     * If the clipboard doesn't contain an URL according both {@link Clipboard#hasUrl()} and
+     * {@link Clipboard#getUrl()}, then the text is checked in order to determine if there is a true
+     * URL as text in the clipboard.
+     *
+     * @return The URL or {@code null} if none.
      */
     private String getClipboardURL() {
-        final String url;
+        boolean hasUrl = Clipboard.getSystemClipboard().hasUrl();
+        String url = null;
 
-        if(doesClipboardContainsURL()) {
-            if(Clipboard.getSystemClipboard().hasUrl()) {
+        if (hasUrl) {
+            if (isTextAnURL(Clipboard.getSystemClipboard().getUrl())) {
                 url = Clipboard.getSystemClipboard().getUrl();
             } else {
+                hasUrl = false;
+            }
+        }
+
+        if (!hasUrl && Clipboard.getSystemClipboard().hasString()) {
+            if (isTextAnURL(Clipboard.getSystemClipboard().getString())) {
                 url = Clipboard.getSystemClipboard().getString();
             }
-        } else {
-            url = null;
         }
 
         return url;
     }
 
     /**
-     * Check if the {@link Clipboard} contains an URL. The check is performed by calling {@link Clipboard#hasUrl()} and
-     * if it returns {@code false} then {@link Clipboard#hasString()} is called to check if the text looks like an URL.
-     * @return {@code true} if the clipboard contains an URL, {@code false} otherwise.
-     */
-    private boolean doesClipboardContainsURL() {
-        boolean containsUrl = Clipboard.getSystemClipboard().hasUrl();
-
-        if(!containsUrl && Clipboard.getSystemClipboard().hasString()) {
-            containsUrl = isTextAnURL(Clipboard.getSystemClipboard().getString());
-        }
-
-        return containsUrl;
-    }
-
-    /**
      * Check if a given text is an URL. The test is case un-sensitive and check is the text starts with one of the
      * following:
      * <ul>
-     *     <li>http://</li>
-     *     <li>https://</li>
-     *     <li>www.</li>
+     * <li>http://</li>
+     * <li>https://</li>
+     * <li>www.</li>
      * </ul>
+     *
      * @param text The text to test.
      * @return {@code true} if the text has an URL form, {@code false} otherwise, including {@code null}.
      */
@@ -84,9 +87,9 @@ public class LinkContentExtensionController implements Initializable {
         final String lowerCasedText = text != null ? text.toLowerCase() : null;
         boolean isURL = lowerCasedText != null && (
                 lowerCasedText.startsWith("http://") ||
-                lowerCasedText.startsWith("https://") ||
-                lowerCasedText.startsWith("www.")
-                );
+                        lowerCasedText.startsWith("https://") ||
+                        lowerCasedText.startsWith("www.")
+        );
         return isURL;
     }
 
@@ -94,6 +97,6 @@ public class LinkContentExtensionController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         final String url = getClipboardURL();
 
-        if(url != null) this.address.setText(url);
+        if (url != null) this.address.setText(url);
     }
 }

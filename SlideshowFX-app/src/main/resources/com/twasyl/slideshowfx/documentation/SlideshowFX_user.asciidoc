@@ -21,7 +21,6 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 - A chat is provided so your audience can send you questions using their smartphones and you will answer them whenever you want ;
 - A quiz creator so your audience can answer your quiz using their smartphones and you see results live ;
-- Present using your hands by changing slides with two fingers, have a "laser" pointer by using one finger. It's cool isn't it? All of this brought to you by LeapMotion.
 - Save your presentations on Box, Dropbox or Google Drive ;
 - Insert code snippets that can be executed directly from the presentation and console's output is displayed in the slide.
 
@@ -242,16 +241,3 @@ A code snippet executor may need some configuration. In order to configure it, g
 In order to insert an executable code snippet inside your presentation, click on the *Insert an executable code snippet* button (icon:terminal[]) over the editing area. In the new window choose the programming language for which you want to insert a code snippet and provide information about the snippet you want to insert: imports, main method, etc. Validate it and the code snippet will be inserted.
 
 On your slide, click on the icon:terminal[] icon to execute the code snippet and see the live result, click on the icon:reload[] icon to display the code snippet again.
-
-==== LeapMotion
-
-SlideshowFX supports LeapMotion in the slideshow mode. In order to enable it, check the *LeapMotion controller* check box (icon:hand-o-up[]) in the tool bar.
-
-When the slideshow mode is enabled, the following gestures are allowed :
-
-* Swipe to the left with the index and major fingers extended to go to the next slide ;
-* Swipe to the right with the index and major fingers extended to go to the previous slide ;
-* Use only your index extended to show a pointer
-* _Tap_ your whole hand against the LeapMotion controller to click on the slide.
-
-NOTE: Sometimes the LeapMotion make the whole application crash for unknown reason. Restart SlideshowFX in that case.

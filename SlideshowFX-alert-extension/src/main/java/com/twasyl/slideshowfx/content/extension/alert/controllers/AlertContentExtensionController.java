@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.content.extension.alert.controllers;
 
+import com.twasyl.slideshowfx.ui.controls.ExtendedTextField;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
@@ -13,13 +14,13 @@ import java.util.ResourceBundle;
 /**
  * This class is the controller used by the {@code AlertContentExtension.fxml} file.
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.0
  */
 public class AlertContentExtensionController implements Initializable {
 
-    @FXML private TextField title;
-    @FXML private TextField text;
+    @FXML private ExtendedTextField title;
+    @FXML private ExtendedTextField text;
     @FXML private ToggleGroup typeGroup;
     @FXML private RadioButton infoRB;
     @FXML private RadioButton successRB;
@@ -27,7 +28,7 @@ public class AlertContentExtensionController implements Initializable {
     @FXML private RadioButton errorRB;
     @FXML private CheckBox allowClickOutside;
     @FXML private CheckBox showCancelButton;
-    @FXML private TextField buttonText;
+    @FXML private ExtendedTextField buttonText;
 
     /**
      * Return the title entered in the UI for this alert.

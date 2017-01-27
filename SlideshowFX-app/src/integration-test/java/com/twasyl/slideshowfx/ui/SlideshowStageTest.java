@@ -20,7 +20,6 @@ public class SlideshowStageTest extends Application {
 
         final Context context = new Context();
         context.setPresentation(presentationEngine);
-        context.setLeapMotionEnabled(false);
         context.setStartAtSlideId("slide-1427809422878");
 
         final SlideshowStage slideshowStage = new SlideshowStage(context);

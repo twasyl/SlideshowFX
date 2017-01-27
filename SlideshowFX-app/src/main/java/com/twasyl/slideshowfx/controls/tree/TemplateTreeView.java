@@ -4,6 +4,7 @@ import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.utils.io.DeleteFileVisitor;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.TreeCell;
@@ -25,16 +26,19 @@ import java.util.logging.Logger;
 /**
  * This class is the TreeView that is used to managed the content of a template archive.
  * Because this TreeView represents the current content of a template archive, methods like
- * {@link #appendContentToTreeView(java.io.File, javafx.scene.control.TreeItem)} or
- * {@link #deleteContentOfTreeView(javafx.scene.control.TreeItem)} also perform operations on the
+ * {@link #appendContentToTreeView(File, TreeItem)} or
+ * {@link #deleteContentOfTreeView(TreeItem)} also perform operations on the
  * filesystem.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.0
  */
 public class TemplateTreeView extends TreeView<File> {
     private final Logger LOGGER = Logger.getLogger(TemplateTreeView.class.getName());
+
+    private static final PseudoClass VALID_DRAG = PseudoClass.getPseudoClass("validDrag");
+    private static final PseudoClass INVALID_DRAG = PseudoClass.getPseudoClass("invalidDrag");
 
     private final ObjectProperty<EventHandler<MouseEvent>> onItemClick = new SimpleObjectProperty<>();
 
@@ -45,10 +49,20 @@ public class TemplateTreeView extends TreeView<File> {
      * @param dragEvent The event associated to the drag
      */
     private EventHandler<DragEvent> onDragOverItem = dragEvent -> {
-        if(dragEvent.getDragboard().hasFiles()) {
+        this.removeCustomPseudoClass((Node) dragEvent.getSource());
+
+        if (dragEvent.getDragboard().hasFiles()) {
             dragEvent.acceptTransferModes(TransferMode.COPY);
-            this.cleanCssClassForDragEvent((Node) dragEvent.getSource());
-            ((Node) dragEvent.getSource()).getStyleClass().add("validDragOver");
+            ((Node) dragEvent.getSource()).pseudoClassStateChanged(VALID_DRAG, true);
+
+            if (dragEvent.getSource() instanceof TreeCell) {
+                final TreeCell cell = (TreeCell) dragEvent.getSource();
+                if (cell != null) {
+                    cell.getTreeItem().setExpanded(true);
+                }
+            }
+        } else {
+            ((Node) dragEvent.getSource()).pseudoClassStateChanged(INVALID_DRAG, true);
         }
 
         dragEvent.consume();
@@ -64,7 +78,7 @@ public class TemplateTreeView extends TreeView<File> {
         Dragboard board = dragEvent.getDragboard();
         boolean dragSuccess = false;
 
-        if(board.hasFiles()) {
+        if (board.hasFiles()) {
             board.getFiles()
                     .stream()
                     .forEach(file -> {
@@ -75,7 +89,7 @@ public class TemplateTreeView extends TreeView<File> {
             dragSuccess = true;
         }
 
-        this.cleanCssClassForDragEvent((Node) dragEvent.getSource());
+        this.removeCustomPseudoClass((Node) dragEvent.getSource());
         dragEvent.setDropCompleted(dragSuccess);
         dragEvent.consume();
     };
@@ -87,9 +101,8 @@ public class TemplateTreeView extends TreeView<File> {
      * @param dragEvent The event associated to the drag
      */
     private EventHandler<DragEvent> onDragDoneItem = dragEvent -> {
-        this.cleanCssClassForDragEvent((Node) dragEvent.getSource());
+        removeCustomPseudoClass((Node) dragEvent.getSource());
     };
-
 
     /**
      * This method is used when the drag exits the TreeView that shows the content of the template's archive.
@@ -98,8 +111,7 @@ public class TemplateTreeView extends TreeView<File> {
      * @param dragEvent The event associated to the drag
      */
     private EventHandler<DragEvent> onDragExitedItem = dragEvent -> {
-        this.cleanCssClassForDragEvent((Node) dragEvent.getSource());
-        ((Node) dragEvent.getSource()).getStyleClass().add("noDragActive");
+        removeCustomPseudoClass((Node) dragEvent.getSource());
     };
 
     private final ObjectProperty<TemplateEngine> engine = new SimpleObjectProperty<>();
@@ -115,15 +127,16 @@ public class TemplateTreeView extends TreeView<File> {
     }
 
     private final void init() {
+        this.getStyleClass().add("template-tree-view");
         this.setOnDragDropped(this.onDragDroppedItem);
-        this.setOnDragOver(this.onDragOverItem);
+        this.setOnDragEntered(this.onDragOverItem);
         this.setOnDragDone(this.onDragDoneItem);
         this.setOnDragExited(this.onDragExitedItem);
 
         this.setCellFactory((TreeView<File> p) -> {
             FileTreeCell cell = new FileTreeCell();
 
-            if(this.getOnItemClick() != null) cell.setOnMouseClicked(this.getOnItemClick());
+            if (this.getOnItemClick() != null) cell.setOnMouseClicked(this.getOnItemClick());
 
             return cell;
         });
@@ -131,28 +144,37 @@ public class TemplateTreeView extends TreeView<File> {
 
     /**
      * Get the event handler that is registered to newly created TreeItem in this TreeView.
+     *
      * @return Get the event handler that is registered to newly created TreeItem in this TreeView.
      */
-    public ObjectProperty<EventHandler<MouseEvent>> onItemClickProperty() { return this.onItemClick; }
+    public ObjectProperty<EventHandler<MouseEvent>> onItemClickProperty() {
+        return this.onItemClick;
+    }
 
     /**
      * Get the event handler that is registered to newly created TreeItem in this TreeView.
+     *
      * @return Get the event handler that is registered to newly created TreeItem in this TreeView.
      */
-    public EventHandler<MouseEvent> getOnItemClick() { return onItemClick.get(); }
+    public EventHandler<MouseEvent> getOnItemClick() {
+        return onItemClick.get();
+    }
 
     /**
      * Set the event handler that is registered to newly created TreeItem in this TreeView.
+     *
      * @param onItemClick the new event that will be added to newly created TreeItems in this TreeView.
      */
-    public void setOnItemClick(EventHandler<MouseEvent> onItemClick) { this.onItemClick.set(onItemClick); }
+    public void setOnItemClick(EventHandler<MouseEvent> onItemClick) {
+        this.onItemClick.set(onItemClick);
+    }
 
     /**
      * This method adds the given file to the parent TreeItem. If the file is a directory,
      * all files included in the directory will be added to the TreeView for a TreeItem corresponding the the current given file.
      * This method also copy the given file to the temporary archive folder.
      *
-     * @param file The content to add to the TreeView.
+     * @param file   The content to add to the TreeView.
      * @param parent The item that is the parent of the content to add.
      */
     public void appendContentToTreeView(File file, TreeItem<File> parent) {
@@ -170,9 +192,13 @@ public class TemplateTreeView extends TreeView<File> {
                 Files.copy(file.toPath(), relativeToParent.toPath());
             }
 
-            parent.setExpanded(true);
+            if (this.getRoot().equals(parent)) {
+                parent.setExpanded(true);
+            } else {
+                parent.setExpanded(false);
+            }
             parent.getChildren().add(treeItem);
-        } catch(IOException e) {
+        } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Can not copy content", e);
         }
     }
@@ -183,14 +209,14 @@ public class TemplateTreeView extends TreeView<File> {
      * Note that this method also removes the file contained in the given item from the file system.
      *
      * @param item The item to remove from this TreeView.
-     * @throws java.lang.NullPointerException If the item is null.
-     * @throws java.io.IOException If an error occured when trying to delete the file corresponding to the item.
+     * @throws NullPointerException If the item is null.
+     * @throws IOException          If an error occured when trying to delete the file corresponding to the item.
      */
     public void deleteContentOfTreeView(TreeItem<File> item) throws NullPointerException, IOException {
-        if(item == null) throw new NullPointerException("The item can not be null");
+        if (item == null) throw new NullPointerException("The item can not be null");
 
-        if(isItemDeletionEnabled(item)) {
-            if(item.getValue().exists()) {
+        if (isItemDeletionEnabled(item)) {
+            if (item.getValue().exists()) {
                 if (item.getValue().isFile()) {
                     Files.delete(item.getValue().toPath());
                 } else {
@@ -209,16 +235,16 @@ public class TemplateTreeView extends TreeView<File> {
      *
      * @param item The item to rename.
      * @param name The new name of this item and file.
-     * @throws java.lang.NullPointerException If the item or the name is null.
-     * @throws java.lang.IllegalArgumentException If the name is empty.
-     * @throws java.io.IOException If an error occured while renaming the file associated to this item.
+     * @throws NullPointerException     If the item or the name is null.
+     * @throws IllegalArgumentException If the name is empty.
+     * @throws IOException              If an error occured while renaming the file associated to this item.
      */
     public void renameContentOfTreeView(TreeItem<File> item, String name) throws NullPointerException, IllegalArgumentException, IOException {
-        if(item == null) throw new NullPointerException("The item can not be null");
-        if(name == null) throw new NullPointerException("The new name can not be null");
-        if(name.isEmpty()) throw new IllegalArgumentException("The new name can not be empty");
+        if (item == null) throw new NullPointerException("The item can not be null");
+        if (name == null) throw new NullPointerException("The new name can not be null");
+        if (name.isEmpty()) throw new IllegalArgumentException("The new name can not be empty");
 
-        if(isItemRenamingAllowed(item)) {
+        if (isItemRenamingAllowed(item)) {
             final Path currentFile = item.getValue().toPath();
             final File newFile = new File(item.getValue().getParent(), name);
 
@@ -236,7 +262,7 @@ public class TemplateTreeView extends TreeView<File> {
     public boolean isItemRenamingAllowed(TreeItem<File> item) {
         boolean canRename = false;
 
-        if(item != this.getRoot()) {
+        if (item != this.getRoot()) {
             final File configurationFile = new File(this.getEngine().getWorkingDirectory(), this.getEngine().getConfigurationFilename());
 
             canRename = !item.getValue().equals(configurationFile);
@@ -254,7 +280,7 @@ public class TemplateTreeView extends TreeView<File> {
     public boolean isItemDeletionEnabled(TreeItem<File> item) {
         boolean canDelete = false;
 
-        if(item != this.getRoot()) {
+        if (item != this.getRoot()) {
             final File configurationFile = new File(this.getEngine().getWorkingDirectory(), this.getEngine().getConfigurationFilename());
 
             canDelete = !item.getValue().equals(configurationFile);
@@ -263,34 +289,51 @@ public class TemplateTreeView extends TreeView<File> {
         return canDelete;
     }
 
-    private void cleanCssClassForDragEvent(Node node) {
-        node.getStyleClass().remove("noDragActive");
-        node.getStyleClass().remove("validDragOver");
-        node.getStyleClass().remove("invalidDragOver");
+    private void removeCustomPseudoClass(Node node) {
+        node.pseudoClassStateChanged(VALID_DRAG, false);
+        node.pseudoClassStateChanged(INVALID_DRAG, false);
     }
 
-    public EventHandler<DragEvent> getOnDragOverItem() { return onDragOverItem; }
+    public EventHandler<DragEvent> getOnDragOverItem() {
+        return onDragOverItem;
+    }
 
-    public EventHandler<DragEvent> getOnDragDroppedItem() { return onDragDroppedItem; }
+    public EventHandler<DragEvent> getOnDragDroppedItem() {
+        return onDragDroppedItem;
+    }
 
-    public EventHandler<DragEvent> getOnDragDoneItem() { return onDragDoneItem; }
+    public EventHandler<DragEvent> getOnDragDoneItem() {
+        return onDragDoneItem;
+    }
 
-    public EventHandler<DragEvent> getOnDragExitedItem() { return onDragExitedItem; }
+    public EventHandler<DragEvent> getOnDragExitedItem() {
+        return onDragExitedItem;
+    }
 
     /**
      * Get the property containing the template engine associated to this TreeView.
+     *
      * @return The property containing the engine.
      */
-    public ObjectProperty<TemplateEngine> engineProperty() { return this.engine; }
+    public ObjectProperty<TemplateEngine> engineProperty() {
+        return this.engine;
+    }
+
     /**
      * Return the template engine associated to this TreeView.
+     *
      * @return the template engine associated to this TreeView.
      */
-    public TemplateEngine getEngine() { return this.engineProperty().get(); }
+    public TemplateEngine getEngine() {
+        return this.engineProperty().get();
+    }
 
     /**
      * Set the template engine associated to this TreeView.
+     *
      * @param engine the new engine associated to this TreeView
      */
-    public void setEngine(TemplateEngine engine) { this.engineProperty().set(engine); }
+    public void setEngine(TemplateEngine engine) {
+        this.engineProperty().set(engine);
+    }
 }

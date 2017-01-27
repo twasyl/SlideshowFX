@@ -1,7 +1,6 @@
 package com.twasyl.slideshowfx.controls.slideshow;
 
 import com.twasyl.slideshowfx.controls.PresentationBrowser;
-import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.utils.ResourceHelper;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -162,38 +161,4 @@ public class InformationPane extends StackPane {
      * @return The browser displaying the current slide of the presentation.
      */
     public PresentationBrowser getCurrentSlideBrowser() { return currentSlideBrowser; }
-
-    /**
-     * Move the presentation to the next slide. The nodes displaying the current and next slides are updated accordingly.
-     */
-    public void nextSlide() {
-        this.currentSlideBrowser.nextSlide();
-
-        final String currentSlideId = this.currentSlideBrowser.getCurrentSlideId();
-        if(currentSlideId != null) {
-            final Slide currentDisplayedSlide = this.context.getPresentation().getConfiguration().getSlideById(currentSlideId);
-            final int slideIndex = this.context.getPresentation().getConfiguration().getSlides().indexOf(currentDisplayedSlide);
-
-            if(slideIndex != -1 && slideIndex < this.context.getPresentation().getConfiguration().getSlides().size() - 1) {
-                this.nextSlideBrowser.slide(this.context.getPresentation().getConfiguration().getSlides().get(slideIndex + 1).getId());
-            }
-        }
-    }
-
-    /**
-     * Move the presentation to the previous slide. The nodes displaying the current and next slides are updated accordingly.
-     */
-    public void previousSlide() {
-        this.currentSlideBrowser.previousSlide();
-
-        final String currentSlideId = this.currentSlideBrowser.getCurrentSlideId();
-        if(currentSlideId != null) {
-            final Slide currentDisplayedSlide = this.context.getPresentation().getConfiguration().getSlideById(currentSlideId);
-            final int slideIndex = this.context.getPresentation().getConfiguration().getSlides().indexOf(currentDisplayedSlide);
-
-            if(slideIndex != -1 && slideIndex > 0) {
-                this.nextSlideBrowser.slide(this.context.getPresentation().getConfiguration().getSlides().get(slideIndex + 1).getId());
-            }
-        }
-    }
 }

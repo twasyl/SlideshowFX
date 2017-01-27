@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
+<?import com.twasyl.slideshowfx.ui.controls.ExtendedTextField?>
 <?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml" style="-fx-padding: 5px;" spacing="5" fx:controller="com.twasyl.slideshowfx.content.extension.link.controllers.LinkContentExtensionController">
+<VBox xmlns:fx="http://javafx.com/fxml" style="-fx-padding: 5px;" spacing="5"
+      fx:controller="com.twasyl.slideshowfx.content.extension.link.controllers.LinkContentExtensionController">
 
-    <HBox spacing="5" alignment="BASELINE_LEFT">
-        <Label text="Address:" />
-        <TextField fx:id="address" prefColumnCount="20" />
-    </HBox>
+    <ExtendedTextField fx:id="address" label="Address" prefColumnCount="20"/>
 
-    <HBox spacing="5" alignment="BASELINE_LEFT">
-        <Label text="Text:" />
-        <TextField fx:id="text" prefColumnCount="20" />
-    </HBox>
+    <ExtendedTextField fx:id="text" label="Text" prefColumnCount="20"/>
 </VBox>
 

@@ -30,6 +30,10 @@ jar {
     }
 }
 
+test {
+    exclude 'com/twasyl/slideshowfx/markup/asciidoctor/**'
+}
+
 bintray {
 
     configurations = ['archives']

@@ -26,7 +26,7 @@ public class ZipUtilsTest {
     public static void beforeClass() {
 
         testResultsDir = new File(System.getProperty("testResultsDir", "build"));
-        resourcesDir = new File("src/test/resources/com/twasyl/slideshowfx/utils/zip");
+        resourcesDir = new File("src/test/resources/com/twasyl/slideshowfx/utils/zip/test.txt").getParentFile();
 
         assertTrue(resourcesDir.exists());
     }
@@ -108,30 +108,5 @@ public class ZipUtilsTest {
         assertTrue(unzippedFile.isFile());
 
         Files.walkFileTree(unzippedFolder.toPath(), new DeleteFileVisitor());
-    }
-
-    @Test public void testListFilesForDirectory() throws IOException {
-
-        final FileVisitor<File> visitor = new SimpleFileVisitor<File>() {
-            @Override
-            public FileVisitResult preVisitDirectory(File dir, BasicFileAttributes attrs) throws IOException {
-                return super.preVisitDirectory(dir, attrs);
-            }
-
-            @Override
-            public FileVisitResult visitFile(File file, BasicFileAttributes attrs) throws IOException {
-                if(!file.isDirectory()) {
-
-                }
-                return super.visitFile(file, attrs);
-            }
-
-
-        };
-
-        final File dir = new File(System.getProperty("user.home"), "Images");
-
-        final DirectoryStream<Path> stream = Files.newDirectoryStream(dir.toPath());
-        stream.forEach(System.out::println);
     }
 }

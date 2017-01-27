@@ -1,8 +1,6 @@
 package com.twasyl.slideshowfx.controls.slideshow;
 
-import com.leapmotion.leap.Controller;
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
-import com.twasyl.slideshowfx.leap.SlideshowFXLeapListener;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -14,8 +12,7 @@ import javafx.stage.StageStyle;
 import java.util.logging.Logger;
 
 /**
- * The stage is defined when the presentation enters in slideshow mode. It defines a stage with the expected behaviour
- * with LeapMotion and interaction with the keyboard. It is necessary to create the stage with a {@link Context}
+ * The stage is defined when the presentation enters in slideshow mode. It is necessary to create the stage with a {@link Context}
  * to properly configure the stage.
  * The stage will take care of the creation of the necessary screens (slideshow and information screens) as well as
  * defining to which event screen will respond (key event and so on).
@@ -28,8 +25,6 @@ public class SlideshowStage {
     private static final Logger LOGGER = Logger.getLogger(SlideshowStage.class.getName());
     private static final String DO_NOT_CONSIDER_EVENT_TEXT = "do_not_consider";
     private Context context;
-    private Controller controller;
-    private SlideshowFXLeapListener listener;
 
     private Runnable onCloseAction = null;
     private Stage slideshowStage, informationStage;
@@ -45,8 +40,6 @@ public class SlideshowStage {
 
         this.initializeSlideshowStage();
         this.initializeInformationStage();
-        this.initializeLeapMotion();
-
         this.initializeKeyEvents();
     }
 
@@ -126,33 +119,6 @@ public class SlideshowStage {
             this.informationStage.setOnCloseRequest(event -> this.informationPane.stop());
             this.informationStage.setOnShowing(event -> this.informationPane.start());
         }
-    }
-
-    /**
-     * Initialize LeapMotion for this stage. It creates a LeapMotion {@link com.leapmotion.leap.Listener} as well as a
-     * {@link Controller} if the {@link Context#isLeapMotionEnabled()} returns {@code true}.
-     */
-    private final void initializeLeapMotion() {
-        if(this.context.isLeapMotionEnabled()) {
-            this.listener = new SlideshowFXLeapListener(this.slideshowPane);
-            this.listener.setTracking(true);
-            this.controller = new Controller();
-        } else {
-            this.listener = null;
-            this.controller = null;
-        }
-
-        this.slideshowStage.setOnShowing(event -> {
-            if (this.context.isLeapMotionEnabled()) {
-                this.controller.addListener(this.listener);
-            }
-        });
-
-        this.slideshowStage.setOnCloseRequest(event -> {
-            if (this.context.isLeapMotionEnabled()) {
-                this.controller.removeListener(this.listener);
-            }
-        });
     }
 
     /**

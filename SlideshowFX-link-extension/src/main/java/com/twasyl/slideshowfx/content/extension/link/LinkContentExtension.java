@@ -18,13 +18,13 @@ import java.util.logging.Logger;
  * This extension supports HTML and Textile markup languages.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1n
  * @since SlideshowFX 1.0
  */
 public class LinkContentExtension extends AbstractContentExtension {
     private static final Logger LOGGER = Logger.getLogger(LinkContentExtension.class.getName());
 
-    private LinkContentExtensionController controller;
+    protected LinkContentExtensionController controller;
 
     public LinkContentExtension() {
         super("LINK", null,
@@ -52,18 +52,19 @@ public class LinkContentExtension extends AbstractContentExtension {
     @Override
     public String buildContentString(IMarkup markup) {
         final StringBuilder builder = new StringBuilder();
+        final boolean addressNotEmpty = this.controller.getAddress() != null && !this.controller.getAddress().trim().isEmpty();
 
-        if(markup == null || "HTML".equals(markup.getCode())) {
-            builder.append(this.buildDefaultContentString());
-        } else if("TEXTILE".equals(markup.getCode())) {
-            builder.append("\"")
-                    .append(this.controller.getText() == null || this.controller.getText().trim().isEmpty() ?
-                            this.controller.getAddress() : this.controller.getText())
-                    .append("\":").append(this.controller.getAddress());
-        } else {
-            builder.append(this.buildDefaultContentString());
+        if (addressNotEmpty) {
+            if (markup == null || "HTML".equals(markup.getCode())) {
+                builder.append(this.buildDefaultContentString());
+            } else if ("TEXTILE".equals(markup.getCode())) {
+                builder.append(this.buildTextileContentString());
+            } else if ("MARKDOWN".equals(markup.getCode())) {
+                builder.append(this.buildMarkdownContentString());
+            } else {
+                builder.append(this.buildDefaultContentString());
+            }
         }
-
         return builder.toString();
     }
 
@@ -73,8 +74,49 @@ public class LinkContentExtension extends AbstractContentExtension {
         final StringBuilder builder = new StringBuilder();
         builder.append("<a href=\"").append(this.controller.getAddress()).append("\">")
                 .append(this.controller.getText() == null || this.controller.getText().trim().isEmpty() ?
-                                this.controller.getAddress() : this.controller.getText())
+                        this.controller.getAddress() : this.controller.getText())
                 .append("</a>");
+
+        return builder.toString();
+    }
+
+    /**
+     * Build the string representing a link in textile.
+     *
+     * @return The built string in the textile markup language.
+     */
+    private String buildTextileContentString() {
+        final StringBuilder builder = new StringBuilder("\"");
+
+        if (this.controller.getText() == null || this.controller.getText().trim().isEmpty()) {
+            builder.append(this.controller.getAddress());
+        } else {
+            builder.append(this.controller.getText());
+        }
+
+        builder.append("\":").append(this.controller.getAddress());
+        return builder.toString();
+    }
+
+    /**
+     * Build the string representing a link in markdown.
+     *
+     * @return The built string in the markdown language.
+     */
+    private String buildMarkdownContentString() {
+        final StringBuilder builder = new StringBuilder();
+
+        final boolean emptyText = this.controller.getText() == null || this.controller.getText().trim().isEmpty();
+
+        if (!emptyText) {
+            builder.append("[").append(this.controller.getText().trim()).append("](");
+        }
+
+        builder.append(this.controller.getAddress());
+
+        if (!emptyText) {
+            builder.append(")");
+        }
 
         return builder.toString();
     }

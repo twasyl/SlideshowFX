@@ -43,6 +43,7 @@
     -fx-background-color: app-color-input-background;
     -fx-text-fill: app-color-text-fill;
     -fx-prompt-text-fill: app-color-prompt-text-fill;
+    -fx-border-radius: 2 2 2 2
 }
 
 .menu-bar .menu-button .menu {
@@ -186,6 +187,8 @@
     -fx-border-width: 1px;
     -fx-border-radius: 3px;
 }
+
+.combo-box:showing .list-cell:hover { -fx-background-color: app-color-menu-in-use; }
 
 .split-menu-button:hover, .combo-box:hover {
     -fx-border-width: 1px;
@@ -351,13 +354,6 @@
     -fx-background-color: app-color-input-background;
 }
 
-.tab-pane .tab-content-area .viewport .text-field {
-    -fx-border-color: derive(app-color-text-fill, 10%);
-    -fx-border-style: solid;
-    -fx-border-width: 1px;
-    -fx-border-radius: 3px;
-}
-
 .tab-pane .tab-content-area .viewport .button {
     -fx-border-color: transparent;
     -fx-background-color: linear-gradient(
@@ -375,6 +371,10 @@
     -fx-background-color: app-color-mouse-over;
     -fx-border-color: app-color-text-fill;
 }
+.list-view  { -fx-background-color: app-color-input-background, app-color-input-background; }
+.list-view:focused  {
+    -fx-background-color: transparent, app-color-input-background, transparent;
+}
 
 .tree-cell:filled, .tree-cell:empty,
 .list-cell:filled, .list-cell:empty {
@@ -382,17 +382,14 @@
     -fx-background-color: app-color-background;
 }
 
-.tree-cell:filled:selected {
+.tree-cell:filled:selected,
+.list-view .list-cell:filled:selected {
     -fx-background-color: app-color-menu-in-use;
 }
 
-.list-cell:filled:hover {
-    -fx-background-color: app-color-menu-in-use;
-}
+.list-cell:filled:hover { -fx-background-color: app-color-menu-in-use; }
 
-.tree-disclosure-node .arrow {
-    -fx-background-color: app-color-text-fill;
-}
+.tree-disclosure-node .arrow { -fx-background-color: app-color-text-fill; }
 
 .split-pane {
     -fx-background-color: app-color-background;
@@ -487,3 +484,7 @@
      -fx-background-color: linear-gradient(from 50% 0% to 50% 100%, -app-color-dark-green 0%, -app-color-light-green 100%);
      -fx-text-fill: black;
 }
+
+.extended-text-field .label .text { -fx-fill: app-color-light-gray; -fx-font-size: 11px; }
+.extended-text-field .label:focused .text { -fx-fill: app-color-orange; }
+.extended-text-field .text-field:error { -fx-background-color: app-color-error, app-color-input-background; }

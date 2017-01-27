@@ -16,6 +16,35 @@ import java.util.logging.Logger;
  * @since SlideshowFX 1.0
  */
 public class TemplateConfiguration implements IConfiguration {
+    public static final String TEMPLATE = "template";
+    public static final String TEMPLATE_NAME = "name";
+    public static final String TEMPLATE_FILE = "file";
+    public static final String JS_OBJECT = "js-object";
+    public static final String TEMPLATE_RESOURCES_DIRECTORY = "resources-directory";
+    public static final String TEMPLATE_DEFAULT_VARIABLES = "default-variables";
+    public static final String TEMPLATE_DEFAULT_VARIABLE_NAME = "name";
+    public static final String TEMPLATE_DEFAULT_VARIABLE_VALUE = "value";
+    public static final String SLIDES = "slides";
+    public static final String SLIDES_CONFIGURATION = "configuration";
+    public static final String SLIDES_TEMPLATE_DIRECTORY = "template-directory";
+    public static final String SLIDES_PRESENTATION_DIRECTORY = "presentation-directory";
+    public static final String SLIDES_THUMBNAIL_DIRECTORY = "thumbnail-directory";
+    public static final String SLIDE_ID_PREFIX = "slide-id-prefix";
+    public static final String SLIDES_CONTAINER = "slides-container";
+    public static final String SLIDES_DEFINITION = "slides-definition";
+    public static final String SLIDE_ID = "id";
+    public static final String SLIDE_NAME = "name";
+    public static final String SLIDE_FILE = "file";
+    public static final String SLIDE_DYNAMIC_IDS = "dynamic-ids";
+    public static final String SLIDE_DYNAMIC_ATTRIBUTES = "dynamic-attributes";
+    public static final String DYNAMIC_ATTRIBUTE = "attribute";
+    public static final String DYNAMIC_ATTRIBUTE_PROMPT_MESSAGE = "prompt-message";
+    public static final String DYNAMIC_ATTRIBUTE_TEMPLATE_EXPRESSION = "template-expression";
+    public static final String SLIDE_ELEMENTS = "elements";
+    public static final String SLIDE_ELEMENT_ID = "id";
+    public static final String SLIDE_ELEMENT_HTML_ID = "html-id";
+    public static final String SLIDE_ELEMENT_DEFAULT_CONTENT = "default-content";
+
     private static final Logger LOGGER = Logger.getLogger(TemplateConfiguration.class.getName());
 
     private String name;
@@ -25,7 +54,6 @@ public class TemplateConfiguration implements IConfiguration {
     private String contentDefinerMethod;
     private String updateCodeSnippetConsoleMethod;
     private String gotoSlideMethod;
-    private String leapMotionMethod;
     private String getCurrentSlideMethod;
     private String jsObject;
     private String sfxServerObject;
@@ -86,9 +114,6 @@ public class TemplateConfiguration implements IConfiguration {
 
     public String getGotoSlideMethod() { return gotoSlideMethod; }
     public void setGotoSlideMethod(String gotoSlideMethod) { this.gotoSlideMethod = gotoSlideMethod; }
-
-    public String getLeapMotionMethod() { return leapMotionMethod; }
-    public void setLeapMotionMethod(String leapMotionMethod) { this.leapMotionMethod = leapMotionMethod; }
 
     public SlideTemplate getSlideTemplate(int slideId) {
         SlideTemplate searchedTemplate = null;

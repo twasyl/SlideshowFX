@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * This extension supports HTML and Textile markup languages.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class ImageContentExtension extends AbstractContentExtension {
@@ -52,15 +52,16 @@ public class ImageContentExtension extends AbstractContentExtension {
     public String buildContentString(IMarkup markup) {
         final StringBuilder builder = new StringBuilder();
 
-        if(markup == null || "HTML".equals(markup.getCode())) {
-            builder.append(this.buildDefaultContentString());
-        } else if("TEXTILE".equals(markup.getCode())) {
-            builder.append("!").append(this.controller.getSelectedFileUrl()).append("!");
-        } else if("MARKDOWN".equals(markup.getCode())) {
-            builder.append("![](").append(this.controller.getSelectedFileUrl()).append(")");
-        }
-        else {
-            builder.append(this.buildDefaultContentString());
+        if (this.controller.getSelectedFile() != null) {
+            if (markup == null || "HTML".equals(markup.getCode())) {
+                builder.append(this.buildDefaultContentString());
+            } else if ("TEXTILE".equals(markup.getCode())) {
+                builder.append("!").append(this.controller.getSelectedFileUrl()).append("!");
+            } else if ("MARKDOWN".equals(markup.getCode())) {
+                builder.append("![](").append(this.controller.getSelectedFileUrl()).append(")");
+            } else {
+                builder.append(this.buildDefaultContentString());
+            }
         }
 
         return builder.toString();

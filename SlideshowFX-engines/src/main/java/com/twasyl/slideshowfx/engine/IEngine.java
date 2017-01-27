@@ -1,8 +1,6 @@
 package com.twasyl.slideshowfx.engine;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Tis interface represents the base for engine used in SlideshowFX.
@@ -43,33 +41,43 @@ public interface IEngine<T extends IConfiguration> {
 
     /**
      * Read the configuration file that is stored in the working directory and named according the engine's implementation.
-     * This method calls {@link #readConfiguration(java.io.File)}.
+     * This method calls {@link #readConfiguration(File)}.
      *
      * @return The configuration read from the default configuration file.
-     * @throws java.lang.NullPointerException If the given file is null.
-     * @throws java.io.IOException If the configuration is not found.
-     * @throws java.lang.IllegalAccessException If the configuration file can not be read.
+     * @throws NullPointerException If the given file is null.
+     * @throws IOException If the configuration is not found.
+     * @throws IllegalAccessException If the configuration file can not be read.
      */
     T readConfiguration() throws NullPointerException, IOException, IllegalAccessException;
 
     /**
-     * Reads the configuration of the engine and store it in a {@link com.twasyl.slideshowfx.engine.IConfiguration} object.
+     * Reads the configuration of the engine and store it in a {@link IConfiguration} object.
      *
      * @param configurationFile The file that contains the configuration.
      * @return The configuration read from the file.
-     * @throws java.lang.NullPointerException If the working directory or the configuration filename is null.
-     * @throws java.lang.IllegalArgumentException If the configuration filename is empty.
-     * @throws java.io.FileNotFoundException If the configuration is not found.
-     * @throws java.lang.IllegalAccessException If the configuration file can not be read.
+     * @throws NullPointerException If the working directory or the configuration filename is null.
+     * @throws IllegalArgumentException If the configuration filename is empty.
+     * @throws FileNotFoundException If the configuration is not found.
+     * @throws IllegalAccessException If the configuration file can not be read.
      */
     T readConfiguration(File configurationFile) throws NullPointerException, IllegalArgumentException, IOException, IllegalAccessException;
 
     /**
-     * Write the configuration in the file that is stored in the working directory and named according the engine's implementation.
-     * This method calls {@link #writeConfiguration(java.io.File)}.
+     * Reads the configuration of the engine and store it in a {@link IConfiguration} object.
      *
-     * @throws java.lang.NullPointerException If the given file is null.
-     * @throws java.io.IOException If the configuration is not found.
+     * @param reader The file that contains the configuration.
+     * @return The configuration read from the reader.
+     * @throws NullPointerException If the reader is {@code null}.
+     * @throws IOException If an error occurs when reading the reader.
+     */
+    T readConfiguration(Reader reader) throws NullPointerException, IOException;
+
+    /**
+     * Write the configuration in the file that is stored in the working directory and named according the engine's implementation.
+     * This method calls {@link #writeConfiguration(File)}.
+     *
+     * @throws NullPointerException If the given file is null.
+     * @throws IOException If the configuration is not found.
      */
     void writeConfiguration() throws NullPointerException, IOException;
 
@@ -81,6 +89,16 @@ public interface IEngine<T extends IConfiguration> {
      * @throws IOException If an error occurs while trying to write the configuration.
      */
     void writeConfiguration(File configurationFile) throws NullPointerException, IOException;
+
+    /**
+     * Writes this engine's configuration into the given instance of {@link Writer}. The {@link Writer}
+     * is not closed at the end of the process.
+     *
+     * @param writer The writer where the configuration will be written.
+     * @throws NullPointerException If the configurationFile is null.
+     * @throws IOException If an error occurs while trying to write the configuration.
+     */
+    void writeConfiguration(final Writer writer) throws NullPointerException, IOException;
 
     /**
      * Generates a working directory for the given engine. The directory is located in the temporary folder of the system
@@ -109,7 +127,7 @@ public interface IEngine<T extends IConfiguration> {
      *
      * @param file The file to determine the relative path for.
      * @return The String representing the relative path from the working directory.
-     * @throws java.lang.NullPointerException If the given file or the working directory is null.
+     * @throws NullPointerException If the given file or the working directory is null.
      */
     String relativizeFromWorkingDirectory(File file) throws NullPointerException;
 
@@ -137,11 +155,11 @@ public interface IEngine<T extends IConfiguration> {
     void setArchive(File file);
 
     /**
-     * This methods load an archive for this engine. This method calls {@link #loadArchive(java.io.File)}
+     * This methods load an archive for this engine. This method calls {@link #loadArchive(File)}
      * with the current archive file.
      * @throws IllegalArgumentException If the archiveExtension of the archive is not valid.
      * @throws NullPointerException If the given file is null.
-     * @throws java.io.IOException If the file is not found.
+     * @throws IOException If the file is not found.
      * @throws IllegalAccessException If the file can not be read.
      */
     void loadArchive() throws IllegalArgumentException, NullPointerException, IOException, IllegalAccessException;
@@ -160,11 +178,11 @@ public interface IEngine<T extends IConfiguration> {
 
     /**
      * Save the content in the archive file. The content is retrieved for the current working directory returned by {#getWorkingDirectory}.
-     * This method calls {@link #saveArchive(java.io.File)} with the
+     * This method calls {@link #saveArchive(File)} with the
      * current archive file.
      *
      * @throws IllegalArgumentException If an error occurred when saving the archive.
-     * @throws java.io.IOException If an error occurred when saving the archive.
+     * @throws IOException If an error occurred when saving the archive.
      */
     void saveArchive() throws IllegalArgumentException, IOException;
 
@@ -174,8 +192,8 @@ public interface IEngine<T extends IConfiguration> {
      * the engine or an exception will be raised. To ensure the archiveExtension is valid, it is tested with the {#getArchiveExtension} method.
      *
      * @param file The file archive where the engine's content will be saved.
-     * @throws java.lang.IllegalArgumentException If the given file has not the correct archiveExtension for this engine.
-     * @throws java.io.IOException If an error occurred when saving the archive.
+     * @throws IllegalArgumentException If the given file has not the correct archiveExtension for this engine.
+     * @throws IOException If an error occurred when saving the archive.
      */
     void saveArchive(File file) throws IllegalArgumentException, IOException;
 }

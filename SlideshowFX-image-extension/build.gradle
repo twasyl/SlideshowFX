@@ -1,5 +1,5 @@
 description = 'Extension allowing to insert images inside a SlideshowFX presentation'
-version = '1.1'
+version = '1.2'
 
 dependencies {
     compile project(':SlideshowFX-content-extension')

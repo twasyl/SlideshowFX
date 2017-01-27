@@ -1,7 +1,5 @@
 package com.twasyl.slideshowfx.controllers;
 
-import com.leapmotion.leap.Controller;
-import com.leapmotion.leap.Listener;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.concurrent.*;
 import com.twasyl.slideshowfx.controls.SlideMenuItem;
@@ -149,7 +147,6 @@ public class SlideshowFXController implements Initializable {
     @FXML private TextField serverPort;
     @FXML private TextField twitterHashtag;
     @FXML private Button startServerButton;
-    @FXML private CheckBox leapMotionEnabled;
 
     /* Main application UI elements */
     @FXML private TabPane openedPresentationsTabPane;
@@ -420,7 +417,6 @@ public class SlideshowFXController implements Initializable {
             .addStep(new Tour.Step("#deleteSlide", "Delete the current slide."))
             .addStep(new Tour.Step("#reloadPresentation", "Reload the current presentation."))
             .addStep(new Tour.Step("#slideshow", "Enter in the presentation mode."))
-            .addStep(new Tour.Step("#leapMotionEnabled", "Enable or disable LeapMotion in the presentation mode. If enabled, you will be able to change slides using your index and middle fingers with a swipe, and show a pointer using your index finder."))
             .addStep(new Tour.Step("#serverIpAddress", "The IP address of the embedded server. If nothing is provided, an automatic IP will be used."))
             .addStep(new Tour.Step("#serverPort", "The port of the embedded server. If nothing is provided, 8080 will be used."))
             .addStep(new Tour.Step("#twitterHashtag", "Look for the given hashtag on Twitter. If left blank, the Twitter service will not be started."))
@@ -803,7 +799,9 @@ public class SlideshowFXController implements Initializable {
      * @param engine the engine used for the template builder that will be created.
      */
     private void showTemplateBuilder(final TemplateEngine engine) {
-        new TemplateBuilderStage(engine).show();
+        final TemplateBuilderStage stage = new TemplateBuilderStage(engine);
+        stage.setMaximized(true);
+        stage.show();
     }
 
     /**
@@ -1171,8 +1169,7 @@ public class SlideshowFXController implements Initializable {
     }
 
     /**
-     * Start the slideshow. This methods determines the current presentation and if the LeapMotion controller should be
-     * enabled or not.
+     * Start the slideshow.
      * If the {@code fromCurrentSlide} parameter is set to {@code true}, the current slide is also determined.
      *
      * @param fromCurrentSlide Indicates if the slideshow must be started from the current slide or not.
@@ -1183,15 +1180,12 @@ public class SlideshowFXController implements Initializable {
         if(view != null) {
             final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
             final String currentSlideId = fromCurrentSlide ? view.getCurrentSlideId() : null;
-            final boolean enabledLeapMotion = !this.leapMotionEnabled.disabledProperty().get()
-                    && this.leapMotionEnabled.selectedProperty().get();
 
             if (presentation.getConfiguration() != null
                     && presentation.getConfiguration().getPresentationFile() != null
                     && presentation.getConfiguration().getPresentationFile().exists()) {
 
                 final Context context = new Context();
-                context.setLeapMotionEnabled(enabledLeapMotion);
                 context.setStartAtSlideId(currentSlideId);
                 context.setPresentation(presentation);
 
@@ -1207,35 +1201,6 @@ public class SlideshowFXController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Create a LeapMotion controller in order to check/uncheck the checkbox enabling the LeapMotion or not.
-        // This allows the checkbox to be in a correct state whether the LeapMotion is connected or not.
-        final Controller leapMotionController = new Controller();
-        leapMotionController.addListener(new Listener() {
-            @Override
-            public void onInit(Controller controller) {
-                if(!controller.isConnected()) {
-                    SlideshowFXController.this.leapMotionEnabled.setDisable(true);
-                } else {
-                    SlideshowFXController.this.leapMotionEnabled.setDisable(false);
-                    SlideshowFXController.this.leapMotionEnabled.setSelected(true);
-                }
-
-            }
-
-            @Override
-            public void onConnect(Controller controller) {
-                SlideshowFXController.this.leapMotionEnabled.setDisable(false);
-                // We don't select the checkbox because even if the LeapMotion becom available, the user may not want
-                // to enable it.
-            }
-
-            @Override
-            public void onDisconnect(Controller controller) {
-                SlideshowFXController.this.leapMotionEnabled.setDisable(true);
-                SlideshowFXController.this.leapMotionEnabled.setSelected(false);
-            }
-        });
-
         // We use reflection to disable all elements present in the list
         final Consumer<Object> disableElementLambda = element -> {
             try {

@@ -34,11 +34,11 @@ public class AlertContentExtension extends AbstractContentExtension {
                 "Insert an alert",
                 "Insert an alert");
 
-        final String baseURL = "sweetalert/0.5.0/";
+        final String baseURL = "sweetalert/1.1.3/";
 
         // Add URL
-        this.putResource(ResourceType.CSS_FILE, baseURL.concat("sweet-alert.css"));
-        this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("sweet-alert.min.js"));
+        this.putResource(ResourceType.CSS_FILE, baseURL.concat("sweetalert.css"));
+        this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("sweetalert.min.js"));
     }
 
     @Override
@@ -75,7 +75,7 @@ public class AlertContentExtension extends AbstractContentExtension {
         builder.append("\t\tswal({\n");
         builder.append("\t\t\ttitle: \"").append(this.controller.getTitle()).append("\"");
 
-        if(this.controller.getText() != null && !this.controller.getText().isEmpty()) {
+        if (this.controller.getText() != null && !this.controller.getText().isEmpty()) {
             builder.append(",\n\t\t\ttext: \"").append(this.controller.getText()).append("\"");
         }
 

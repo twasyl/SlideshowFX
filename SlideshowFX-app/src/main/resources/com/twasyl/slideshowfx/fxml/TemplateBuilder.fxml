@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.twasyl.slideshowfx.controls.builder.labels.*?>
 <?import com.twasyl.slideshowfx.controls.tree.TemplateTreeView?>
 <?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import de.jensd.fx.glyphs.GlyphsStack?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.TemplateBuilderController"
@@ -93,70 +93,6 @@
         <SplitPane>
             <TemplateTreeView fx:id="templateContentTreeView" maxWidth="300" />
             <TabPane fx:id="openedFiles" />
-            <Accordion maxWidth="300">
-                <expandedPane>
-                    <TitledPane text="Template elements" fx:id="templateElements">
-                        <VBox spacing="5">
-                            <ListDragableTemplateElement text="Template container" templateElementName="template" />
-                            <StringDragableTemplateElement text="Template's name" templateElementName="name" />
-                            <FileDragableTemplateElement text="Template's file" templateElementName="file" />
-                            <StringDragableTemplateElement text="JS Object" templateElementName="js-object" />
-                            <DirectoryDragableTemplateElement text="Resources directory" templateElementName="resources-directory" />
-                            <ArrayDragableTemplateElement text="Default variables" templateElementName="default-variables" />
-                            <ListDragableTemplateElement text="Slides" templateElementName="slides" />
-                        </VBox>
-                    </TitledPane>
-                </expandedPane>
-
-                <panes>
-                    <fx:reference source="templateElements" />
-                    <TitledPane text="Default variables">
-                        <VBox spacing="5">
-                            <ListDragableTemplateElement text="Variable's container" />
-                            <StringDragableTemplateElement text="Variable's name" templateElementName="name" />
-                            <Base64DragableTemplateElement text="Variable's value" templateElementName="value" />
-                        </VBox>
-                    </TitledPane>
-                    <TitledPane text="Slides' elements">
-                        <VBox spacing="5">
-                            <ListDragableTemplateElement text="Slides' configuration" templateElementName="configuration" />
-                            <ArrayDragableTemplateElement text="Slides definition" templateElementName="slides-definition" />
-                        </VBox>
-                    </TitledPane>
-                    <TitledPane text="Slide's elements">
-                        <VBox spacing="5">
-                            <ListDragableTemplateElement text="Slide container" />
-                            <IntegerDragableTemplateElement text="Slide's ID" templateElementName="id" />
-                            <StringDragableTemplateElement text="Slide's name" templateElementName="name" />
-                            <FileDragableTemplateElement text="Slide's file" templateElementName="file" />
-                            <ArrayDragableTemplateElement text="Slide template elements" templateElementName="elements" />
-                            <ArrayDragableTemplateElement text="Dynamic attributes" templateElementName="dynamic-attributes" />
-                        </VBox>
-                    </TitledPane>
-                    <TitledPane text="Slide template elements">
-                        <VBox spacing="5">
-                            <ListDragableTemplateElement text="Element container" />
-                            <IntegerDragableTemplateElement text="ID" templateElementName="id" />
-                            <StringDragableTemplateElement text="HTML ID" templateElementName="html-id" />
-                            <StringDragableTemplateElement text="Default content" templateElementName="default-content" />
-                        </VBox>
-                    </TitledPane>
-                    <TitledPane text="Slides's configuration elements">
-                        <VBox spacing="5">
-                            <StringDragableTemplateElement text="Slides container" templateElementName="slides-container" />
-                            <StringDragableTemplateElement text="Slide ID prefix" templateElementName="slide-id-prefix" />
-                            <DirectoryDragableTemplateElement text="Template directory" templateElementName="template-directory" />
-                            <DirectoryDragableTemplateElement text="Presentation directory" templateElementName="presentation-directory" />
-                            <DirectoryDragableTemplateElement text="Thumbnail directory" templateElementName="thumbnail-directory" />
-                        </VBox>
-                    </TitledPane>
-                    <TitledPane text="Misc">
-                        <VBox spacing="5">
-                            <StringDragableTemplateElement text="String field" />
-                        </VBox>
-                    </TitledPane>
-                </panes>
-            </Accordion>
         </SplitPane>
     </center>
 

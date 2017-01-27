@@ -11,22 +11,23 @@ import com.twasyl.slideshowfx.utils.beans.Pair;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.logging.Logger;
 
+import static com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration.*;
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 
 /**
  * This class is used to managed the templates provided by SlideshowFX.
- * The extension of a template is <code>sfxt</code>.
+ * The extension of a template is {@code sfxt}.
  *
  * @author Thierry Wasylczenko
+ * @version 1.1
+ * @since SlideshowFX 1.0
  */
 public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
     private static final Logger LOGGER = Logger.getLogger(TemplateEngine.class.getName());
@@ -50,29 +51,27 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
     }
 
     @Override
-    public TemplateConfiguration readConfiguration(File configurationFile) throws NullPointerException, IOException, IllegalAccessException {
-        if(configurationFile == null) throw new NullPointerException("The configuration file can not be null");
-        if(!configurationFile.exists()) throw new FileNotFoundException("The configuration file does not exist");
-        if(!configurationFile.canRead()) throw new IllegalAccessException("The configuration file can not be read");
+    public TemplateConfiguration readConfiguration(Reader reader) throws NullPointerException, IOException {
+        if(reader == null) throw new NullPointerException("The configuration reader can not be null");
 
         TemplateConfiguration templateConfiguration = new TemplateConfiguration();
 
-        final JsonObject configuration = JSONHelper.readFromFile(configurationFile);
-        final JsonObject templateJson = configuration.getJsonObject("template");
+        final JsonObject configuration = JSONHelper.readFromReader(reader);
+        final JsonObject templateJson = configuration.getJsonObject(TEMPLATE);
 
-        templateConfiguration.setName(templateJson.getString("name"));
+        templateConfiguration.setName(templateJson.getString(TEMPLATE_NAME));
         LOGGER.fine("[Template configuration] name = " + templateConfiguration.getName());
 
-        templateConfiguration.setFile(new File(getWorkingDirectory(), templateJson.getString("file")));
+        templateConfiguration.setFile(new File(getWorkingDirectory(), templateJson.getString(TEMPLATE_FILE)));
         LOGGER.fine("[Template configuration] file = " + templateConfiguration.getFile().getAbsolutePath());
 
-        templateConfiguration.setJsObject(templateJson.getString("js-object"));
+        templateConfiguration.setJsObject(templateJson.getString(JS_OBJECT));
         LOGGER.fine("[Template configuration] jsObject = " + templateConfiguration.getJsObject());
 
         templateConfiguration.setSfxServerObject("sfxServer");
         LOGGER.fine("[Template configuration] server object = " + templateConfiguration.getSfxServerObject());
 
-        templateConfiguration.setResourcesDirectory(new File(getWorkingDirectory(), templateJson.getString("resources-directory")));
+        templateConfiguration.setResourcesDirectory(new File(getWorkingDirectory(), templateJson.getString(TEMPLATE_RESOURCES_DIRECTORY)));
         LOGGER.fine("[Template configuration] resources-directory = " + templateConfiguration.getResourcesDirectory().getAbsolutePath());
 
         templateConfiguration.setContentDefinerMethod("slideshowFXSetField");
@@ -87,12 +86,9 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
         templateConfiguration.setUpdateCodeSnippetConsoleMethod("updateCodeSnippetConsole");
         LOGGER.fine("[Template configuration] update code snippet console method = " + templateConfiguration.getUpdateCodeSnippetConsoleMethod());
 
-        templateConfiguration.setLeapMotionMethod("slideshowFXLeap");
-        LOGGER.fine("[Template configuration] content definer method = " + templateConfiguration.getLeapMotionMethod());
-
         // Settings the default variables
         templateConfiguration.setDefaultVariables(new HashSet<>());
-        JsonArray defaultVariablesJson = templateJson.getJsonArray("default-variables");
+        JsonArray defaultVariablesJson = templateJson.getJsonArray(TEMPLATE_DEFAULT_VARIABLES);
 
         if(defaultVariablesJson != null) {
             LOGGER.fine("Reading default variables");
@@ -101,47 +97,47 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                 final JsonObject variableJson = (JsonObject) variable;
                 templateConfiguration.getDefaultVariables().add(
                         new Pair<>(
-                                variableJson.getString("name"),
-                                new String(Base64.getDecoder().decode(variableJson.getString("value")), getDefaultCharset())
+                                variableJson.getString(TEMPLATE_DEFAULT_VARIABLE_NAME),
+                                new String(Base64.getDecoder().decode(variableJson.getString(TEMPLATE_DEFAULT_VARIABLE_VALUE)), getDefaultCharset())
                         ));
             });
         }
 
         // Setting the slides
         templateConfiguration.setSlideTemplates(new ArrayList<SlideTemplate>());
-        JsonObject slidesJson = templateJson.getJsonObject("slides");
+        JsonObject slidesJson = templateJson.getJsonObject(SLIDES);
 
         if (slidesJson != null) {
             LOGGER.fine("Reading slide's configuration");
-            JsonObject slidesConfigurationJson = slidesJson.getJsonObject("configuration");
+            JsonObject slidesConfigurationJson = slidesJson.getJsonObject(SLIDES_CONFIGURATION);
 
-            templateConfiguration.setSlidesTemplateDirectory(new File(this.getWorkingDirectory(), slidesConfigurationJson.getString("template-directory")));
+            templateConfiguration.setSlidesTemplateDirectory(new File(this.getWorkingDirectory(), slidesConfigurationJson.getString(SLIDES_TEMPLATE_DIRECTORY)));
             LOGGER.fine("[Slide's configuration] templateConfiguration directory = " + templateConfiguration.getSlidesTemplateDirectory().getAbsolutePath());
 
-            templateConfiguration.setSlidesPresentationDirectory(new File(this.getWorkingDirectory(), slidesConfigurationJson.getString("presentation-directory")));
+            templateConfiguration.setSlidesPresentationDirectory(new File(this.getWorkingDirectory(), slidesConfigurationJson.getString(SLIDES_PRESENTATION_DIRECTORY)));
             LOGGER.fine("[Slide's configuration] presentation directory = " + templateConfiguration.getSlidesPresentationDirectory().getAbsolutePath());
 
-            templateConfiguration.setSlidesThumbnailDirectory(new File(this.getWorkingDirectory(), slidesConfigurationJson.getString("thumbnail-directory")));
+            templateConfiguration.setSlidesThumbnailDirectory(new File(this.getWorkingDirectory(), slidesConfigurationJson.getString(SLIDES_THUMBNAIL_DIRECTORY)));
             LOGGER.fine("[Slide's configuration] slides thumbnail directory = " + templateConfiguration.getSlidesThumbnailDirectory().getAbsolutePath());
 
-            templateConfiguration.setSlideIdPrefix(slidesConfigurationJson.getString("slide-id-prefix"));
+            templateConfiguration.setSlideIdPrefix(slidesConfigurationJson.getString(SLIDE_ID_PREFIX));
             LOGGER.fine("[Slide's configuration] slideIdPrefix = " + templateConfiguration.getSlideIdPrefix());
 
-            templateConfiguration.setSlidesContainer(slidesConfigurationJson.getString("slides-container"));
+            templateConfiguration.setSlidesContainer(slidesConfigurationJson.getString(SLIDES_CONTAINER));
             LOGGER.fine("[Slide's configuration] slidesContainer = " + templateConfiguration.getSlidesContainer());
 
-            slidesJson.getJsonArray("slides-definition")
+            slidesJson.getJsonArray(SLIDES_DEFINITION)
                     .forEach(slideJson -> {
                         Number number;
 
                         final SlideTemplate slideTemplate = new SlideTemplate();
-                        slideTemplate.setId((number = ((JsonObject) slideJson).getInteger("id")) != null ? number.intValue() : -1);
+                        slideTemplate.setId((((number = ((JsonObject) slideJson).getInteger(TemplateConfiguration.SLIDE_ID))) != null) ? number.intValue() : -1);
                         LOGGER.fine("[Slide definition] id = " + slideTemplate.getId());
 
-                        slideTemplate.setName(((JsonObject) slideJson).getString("name"));
+                        slideTemplate.setName(((JsonObject) slideJson).getString(SLIDE_NAME));
                         LOGGER.fine("[Slide definition] name = " + slideTemplate.getName());
 
-                        slideTemplate.setFile(new File(templateConfiguration.getSlidesTemplateDirectory(), ((JsonObject) slideJson).getString("file")));
+                        slideTemplate.setFile(new File(templateConfiguration.getSlidesTemplateDirectory(), ((JsonObject) slideJson).getString(SLIDE_FILE)));
                         LOGGER.fine("[Slide definition] file = " + slideTemplate.getFile().getAbsolutePath());
 
                         /* final JsonArray dynamicIdsJson = ((JsonObject) slideJson).getJsonArray("dynamic-ids");
@@ -153,7 +149,7 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                             }
                         }*/
 
-                        final JsonArray dynamicAttributesJson = ((JsonObject) slideJson).getJsonArray("dynamic-attributes");
+                        final JsonArray dynamicAttributesJson = ((JsonObject) slideJson).getJsonArray(SLIDE_DYNAMIC_ATTRIBUTES);
                         if (dynamicAttributesJson != null && dynamicAttributesJson.size() > 0) {
                             slideTemplate.setDynamicAttributes(new DynamicAttribute[dynamicAttributesJson.size()]);
                             DynamicAttribute dynamicAttribute;
@@ -163,15 +159,15 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                                 dynamicAttribute = new DynamicAttribute();
                                 dynamicAttributeJson = dynamicAttributesJson.getJsonObject(index);
 
-                                dynamicAttribute.setAttribute(dynamicAttributeJson.getString("attribute"));
-                                dynamicAttribute.setPromptMessage(dynamicAttributeJson.getString("prompt-message"));
-                                dynamicAttribute.setTemplateExpression(dynamicAttributeJson.getString("templateConfiguration-expression"));
+                                dynamicAttribute.setAttribute(dynamicAttributeJson.getString(DYNAMIC_ATTRIBUTE));
+                                dynamicAttribute.setPromptMessage(dynamicAttributeJson.getString(DYNAMIC_ATTRIBUTE_PROMPT_MESSAGE));
+                                dynamicAttribute.setTemplateExpression(dynamicAttributeJson.getString(DYNAMIC_ATTRIBUTE_TEMPLATE_EXPRESSION));
 
                                 slideTemplate.getDynamicAttributes()[index] = dynamicAttribute;
                             }
                         }
 
-                        final JsonArray elementsJson = ((JsonObject) slideJson).getJsonArray("elements");
+                        final JsonArray elementsJson = ((JsonObject) slideJson).getJsonArray(SLIDE_ELEMENTS);
                         if(elementsJson != null && elementsJson.size() > 0) {
                             slideTemplate.setElements(new SlideElementTemplate[elementsJson.size()]);
                             SlideElementTemplate element;
@@ -181,9 +177,9 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                                 element = new SlideElementTemplate();
                                 elementJson = elementsJson.getJsonObject(index);
 
-                                element.setId(elementJson.getInteger("id").intValue());
-                                element.setHtmlId(elementJson.getString("html-id"));
-                                element.setDefaultContent(elementJson.getString("default-content"));
+                                element.setId(elementJson.getInteger(SLIDE_ELEMENT_ID).intValue());
+                                element.setHtmlId(elementJson.getString(SLIDE_ELEMENT_HTML_ID));
+                                element.setDefaultContent(elementJson.getString(SLIDE_ELEMENT_DEFAULT_CONTENT));
 
                                 slideTemplate.getElements()[index] = element;
                             }
@@ -199,50 +195,50 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
     }
 
     @Override
-    public void writeConfiguration(File configurationFile) throws NullPointerException, IOException {
-        if(configurationFile == null) throw new NullPointerException("The configuration to write into can not be null");
+    public void writeConfiguration(final Writer writer) throws NullPointerException, IOException {
+        if(writer == null) throw new NullPointerException("The configuration to write into can not be null");
 
         if (this.configuration != null) {
 
             final JsonObject configurationJson = new JsonObject()
-                    .put("template", new JsonObject()
-                            .put("name", this.configuration.getName() == null ? "" : this.configuration.getName())
-                            .put("file", this.configuration.getFile() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getFile()))
-                            .put("js-object", this.configuration.getJsObject() == null ? "" : this.configuration.getJsObject())
-                            .put("resources-directory", this.configuration.getResourcesDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getResourcesDirectory()))
-                            .put("default-variables", new JsonArray())
-                            .put("slides", new JsonObject()
-                                    .put("configuration", new JsonObject()
-                                            .put("slides-container", this.configuration.getSlidesContainer() == null ? "" : this.configuration.getSlidesContainer())
-                                            .put("slide-id-prefix", this.configuration.getSlideIdPrefix() == null ? "" : this.configuration.getSlideIdPrefix())
-                                            .put("template-directory", this.configuration.getSlidesTemplateDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getSlidesTemplateDirectory()))
-                                            .put("presentation-directory", this.configuration.getSlidesPresentationDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getSlidesTemplateDirectory()))
-                                            .put("thumbnail-directory", this.configuration.getSlidesThumbnailDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getSlidesThumbnailDirectory())))
-                                    .put("slides-definition", new JsonArray())));
+                    .put(TEMPLATE, new JsonObject()
+                            .put(TEMPLATE_NAME, this.configuration.getName() == null ? "" : this.configuration.getName())
+                            .put(TEMPLATE_FILE, this.configuration.getFile() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getFile()))
+                            .put(JS_OBJECT, this.configuration.getJsObject() == null ? "" : this.configuration.getJsObject())
+                            .put(TEMPLATE_RESOURCES_DIRECTORY, this.configuration.getResourcesDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getResourcesDirectory()))
+                            .put(TEMPLATE_DEFAULT_VARIABLES, new JsonArray())
+                            .put(SLIDES, new JsonObject()
+                                    .put(SLIDES_CONFIGURATION, new JsonObject()
+                                            .put(SLIDES_CONTAINER, this.configuration.getSlidesContainer() == null ? "" : this.configuration.getSlidesContainer())
+                                            .put(SLIDE_ID_PREFIX, this.configuration.getSlideIdPrefix() == null ? "" : this.configuration.getSlideIdPrefix())
+                                            .put(SLIDES_TEMPLATE_DIRECTORY, this.configuration.getSlidesTemplateDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getSlidesTemplateDirectory()))
+                                            .put(SLIDES_PRESENTATION_DIRECTORY, this.configuration.getSlidesPresentationDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getSlidesTemplateDirectory()))
+                                            .put(SLIDES_THUMBNAIL_DIRECTORY, this.configuration.getSlidesThumbnailDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getSlidesThumbnailDirectory())))
+                                    .put(SLIDES_DEFINITION, new JsonArray())));
 
-            final JsonArray defaultVariablesJson = configurationJson.getJsonObject("template")
-                                                                .getJsonArray("default-variables");
+            final JsonArray defaultVariablesJson = configurationJson.getJsonObject(TEMPLATE)
+                                                                .getJsonArray(TEMPLATE_DEFAULT_VARIABLES);
 
             this.configuration.getDefaultVariables()
                     .forEach(variable -> {
                         defaultVariablesJson.add(new JsonObject()
-                                .put("name", variable.getKey())
-                                .put("value", Base64.getEncoder().encodeToString(variable.getValue().getBytes(getDefaultCharset()))));
+                                .put(TEMPLATE_DEFAULT_VARIABLE_NAME, variable.getKey())
+                                .put(TEMPLATE_DEFAULT_VARIABLE_VALUE, Base64.getEncoder().encodeToString(variable.getValue().getBytes(getDefaultCharset()))));
 
                     });
 
-            final JsonArray slidesDefinitionJson = configurationJson.getJsonObject("template")
-                                                                .getJsonObject("slides")
-                                                                .getJsonArray("slides-definition");
+            final JsonArray slidesDefinitionJson = configurationJson.getJsonObject(TEMPLATE)
+                                                                .getJsonObject(SLIDES)
+                                                                .getJsonArray(SLIDES_DEFINITION);
             this.configuration.getSlideTemplates()
                     .forEach(slideTemplate -> {
                         final JsonObject jsonObject = new JsonObject()
-                                .put("id", slideTemplate.getId())
-                                .put("name", slideTemplate.getName() == null ? "" : slideTemplate.getName())
-                                .put("file", slideTemplate.getFile() == null ? "" : slideTemplate.getFile().getName())
-                                .put("dynamic-ids", new JsonArray())
-                                .put("dynamic-attributes", new JsonArray())
-                                .put("elements", new JsonArray());
+                                .put(SLIDE_ID, slideTemplate.getId())
+                                .put(SLIDE_NAME, slideTemplate.getName() == null ? "" : slideTemplate.getName())
+                                .put(SLIDE_FILE, slideTemplate.getFile() == null ? "" : slideTemplate.getFile().getName())
+                                .put(SLIDE_DYNAMIC_IDS, new JsonArray())
+                                .put(SLIDE_DYNAMIC_ATTRIBUTES, new JsonArray())
+                                .put(SLIDE_ELEMENTS, new JsonArray());
 
                        /* if(slideTemplate.getDynamicIds() != null && slideTemplate.getDynamicIds().length > 0) {
                             final JsonArray array = jsonObject.getJsonArray("dynamic-ids");
@@ -251,31 +247,31 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                         } */
 
                         if(slideTemplate.getDynamicAttributes() != null && slideTemplate.getDynamicAttributes().length > 0) {
-                            final JsonArray array = jsonObject.getJsonArray("dynamic-attributes");
+                            final JsonArray array = jsonObject.getJsonArray(SLIDE_DYNAMIC_ATTRIBUTES);
                             Arrays.stream(slideTemplate.getDynamicAttributes())
                                     .forEach(attribute -> {
                                         array.add(new JsonObject()
-                                                            .put("attribute", attribute.getAttribute())
-                                                            .put("template-expression", attribute.getTemplateExpression())
-                                                            .put("prompt-message", attribute.getPromptMessage()));
+                                                            .put(DYNAMIC_ATTRIBUTE, attribute.getAttribute())
+                                                            .put(DYNAMIC_ATTRIBUTE_TEMPLATE_EXPRESSION, attribute.getTemplateExpression())
+                                                            .put(DYNAMIC_ATTRIBUTE_PROMPT_MESSAGE, attribute.getPromptMessage()));
                                     });
                         }
 
                         if(slideTemplate.getElements() != null && slideTemplate.getElements().length > 0) {
-                            final JsonArray array = jsonObject.getJsonArray("elements");
+                            final JsonArray array = jsonObject.getJsonArray(SLIDE_ELEMENTS);
                             Arrays.stream(slideTemplate.getElements())
                                     .forEach(element -> {
                                         array.add(new JsonObject()
-                                                            .put("template-id", element.getId())
-                                                            .put("html-id", element.getHtmlId())
-                                                            .put("default-content", element.getDefaultContent()));
+                                                            .put(SLIDE_ELEMENT_ID, element.getId())
+                                                            .put(SLIDE_ELEMENT_HTML_ID, element.getHtmlId())
+                                                            .put(SLIDE_ELEMENT_DEFAULT_CONTENT, element.getDefaultContent()));
                                     });
                         }
 
                         slidesDefinitionJson.add(jsonObject);
                     });
 
-            JSONHelper.writeObject(configurationJson, configurationFile);
+            JSONHelper.writeObject(configurationJson, writer);
         }
     }
 
@@ -298,7 +294,7 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
         if(file == null) throw new NullPointerException("The destination archive can not be null");
         if(!file.getName().endsWith(this.getArchiveExtension())) throw new IllegalArgumentException("The file does not have the correct extension");
 
-        this.writeConfiguration();
+//         this.writeConfiguration();
         ZipUtils.zip(this.getWorkingDirectory(), file);
     }
 }

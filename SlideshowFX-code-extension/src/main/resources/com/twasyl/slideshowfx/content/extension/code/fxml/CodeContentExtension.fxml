@@ -2,18 +2,28 @@
 
 <?import com.twasyl.slideshowfx.ui.controls.ZoomTextArea?>
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml" style="-fx-padding: 5px;" fx:controller="com.twasyl.slideshowfx.content.extension.code.controllers.CodeContentExtensionController">
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml" style="-fx-padding: 5px;"
+            fx:controller="com.twasyl.slideshowfx.content.extension.code.controllers.CodeContentExtensionController">
 
-    <HBox spacing="5" alignment="BASELINE_LEFT">
-        <Label text="Language:" />
-        <ChoiceBox fx:id="language" />
-        <CheckBox fx:id="showingLineNumbers" text="Show lines number" />
-    </HBox>
+    <SplitPane orientation="HORIZONTAL" dividerPositions="0.25">
+        <VBox spacing="5">
+            <Label text="Language:"/>
+            <ListView fx:id="language" editable="false"/>
+        </VBox>
 
-    <ZoomTextArea fx:id="code" prefColumnCount="50" prefRowCount="20" />
-</VBox>
+        <VBox spacing="5">
+            <HBox spacing="5" alignment="BASELINE_LEFT">
+                <CheckBox fx:id="showingLineNumbers" text="Show lines number"/>
+            </HBox>
+            <ZoomTextArea fx:id="code" prefColumnCount="50" prefRowCount="20"/>
+        </VBox>
+    </SplitPane>
+</AnchorPane>
 

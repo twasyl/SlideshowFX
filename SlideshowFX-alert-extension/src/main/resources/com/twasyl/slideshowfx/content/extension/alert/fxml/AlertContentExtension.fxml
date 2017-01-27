@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.twasyl.slideshowfx.ui.controls.ExtendedTextField?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml" spacing="5" style="-fx-padding: 5px;" fx:controller="com.twasyl.slideshowfx.content.extension.alert.controllers.AlertContentExtensionController">
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml" spacing="5" style="-fx-padding: 5px;"
+      fx:controller="com.twasyl.slideshowfx.content.extension.alert.controllers.AlertContentExtensionController">
     <fx:define>
-        <ToggleGroup fx:id="typeGroup" />
+        <ToggleGroup fx:id="typeGroup"/>
     </fx:define>
 
+    <ExtendedTextField fx:id="title" mandatory="true" label="Title of the alert"/>
+    <ExtendedTextField fx:id="text" mandatory="false" label="Additional text"/>
+    <ExtendedTextField fx:id="buttonText" label="Button's text for displaying the alert"/>
+
     <HBox spacing="5" alignment="BASELINE_LEFT">
-        <Label text="Title:" />
-        <TextField fx:id="title" prefColumnCount="15" />
+        <padding>
+            <Insets top="10" bottom="10"/>
+        </padding>
+        <Label text="Alert's type:"/>
+        <RadioButton fx:id="infoRB" text="Info" selected="true" toggleGroup="$typeGroup"/>
+        <RadioButton fx:id="successRB" text="Success" toggleGroup="$typeGroup"/>
+        <RadioButton fx:id="warningRB" text="Warning" toggleGroup="$typeGroup"/>
+        <RadioButton fx:id="errorRB" text="Error" toggleGroup="$typeGroup"/>
     </HBox>
-    <HBox spacing="5" alignment="BASELINE_LEFT">
-        <Label text="Additional text:" />
-        <TextField fx:id="text" />
-    </HBox>
-    <HBox spacing="5" alignment="BASELINE_LEFT">
-        <Label text="Type:" />
-        <RadioButton fx:id="infoRB" text="Info" selected="true" toggleGroup="$typeGroup" />
-        <RadioButton fx:id="successRB" text="Success" toggleGroup="$typeGroup" />
-        <RadioButton fx:id="warningRB" text="Warning" toggleGroup="$typeGroup" />
-        <RadioButton fx:id="errorRB" text="Error" toggleGroup="$typeGroup" />
-    </HBox>
-    <CheckBox fx:id="allowClickOutside" text="Allow click outside" />
-    <CheckBox fx:id="showCancelButton" text="Show cancel button" />
-    <HBox spacing="5" alignment="BASELINE_LEFT">
-        <Label text="Button's text:" />
-        <TextField fx:id="buttonText" prefColumnCount="15" />
-    </HBox>
+
+    <CheckBox fx:id="allowClickOutside" text="Click outside to close alert">
+        <padding>
+            <Insets bottom="10"/>
+        </padding>
+    </CheckBox>
+
+    <CheckBox fx:id="showCancelButton" text="Show cancel button"/>
 </VBox>
 

@@ -19,21 +19,8 @@ import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
  * @see InformationPane
  */
 public class Context {
-    private boolean leapMotionEnabled;
     private String startAtSlideId;
     private PresentationEngine presentation;
-
-    /**
-     * Indicates if the LeapMotion tracking system is allowed and must track the user gestures.
-     * @return {@code true} if LeapMotion must be enabled, {@code false} otherwise.
-     */
-    public boolean isLeapMotionEnabled() { return leapMotionEnabled; }
-
-    /**
-     * Defines if the LeapMotion tracking system must be allowed and track the user gestures.
-     * @param leapMotionEnabled {@code true} if LeapMotion controller must be enabled, {@code false} otherwise.
-     */
-    public void setLeapMotionEnabled(boolean leapMotionEnabled) { this.leapMotionEnabled = leapMotionEnabled; }
 
     /**
      * Indicates at which slide the slideshow must start. If nothing is specified, {@code null} is returned and the

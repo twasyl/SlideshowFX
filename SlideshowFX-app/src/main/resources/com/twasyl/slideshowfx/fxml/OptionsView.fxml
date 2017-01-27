@@ -3,8 +3,13 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import java.net.URL?>
 <TabPane style="-fx-margin: 5px" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.OptionsViewController"
          minWidth="500" minHeight="400">
+    <stylesheets>
+        <URL value="@/com/twasyl/slideshowfx/css/options-view.css" />
+    </stylesheets>
+
     <Tab text="General" closable="false">
         <VBox spacing="5" alignment="TOP_LEFT">
             <CheckBox fx:id="enableAutoSaving" text="Enable auto save interval" />

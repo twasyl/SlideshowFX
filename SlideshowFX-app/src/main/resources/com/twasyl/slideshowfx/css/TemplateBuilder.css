@@ -1,26 +1,17 @@
-.noDragActive {
-    -fx-border-style: dashed;
-    -fx-border-width: 3px;
-    -fx-border-color: transparent;
-}
-
-.noDragActive .text {
-    -fx-font-style: normal;
-}
-
-.validDragOver {
-    -fx-border-color: app-color-prompt-text-fill;
-}
-
-.validDragOver .text {
-    -fx-font-style: italic;
-}
-
-.invalidDragOver {
-    -fx-border-color: app-color-error;
-}
+.template-tree-view .tree-cell .glyph-icon { -fx-fill: app-color-text-fill; }
+.template-tree-view .tree-cell:validDrag .glyph-icon,
+.template-tree-view .tree-cell:validDrag .text{ -fx-fill: app-color-orange; }
 
 .template-element-delete-button, .template-element-delete-button:hover {
     -fx-background-color: transparent;
     -fx-border-width: 0px;
+}
+
+.add-icon { -fx-fill: app-color-orange; }
+.add-icon:hover { -fx-fill: app-color-mouse-over-border; }
+
+.button.delete-default-template-variable .glyph-icon,
+.button.delete-slide .glyph-icon,
+.button.delete-slide-element .glyph-icon {
+    -fx-fill: app-color-orange;
 }

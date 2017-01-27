@@ -1,10 +1,12 @@
 package com.twasyl.slideshowfx.utils.io;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 
@@ -12,14 +14,26 @@ import static org.junit.Assert.*;
 
 /**
  * Tests the class {@link ListFilesFileVisitor}
+ *
  * @author Thierry Wasylczenko
+ * @version 1.1
  * @since SlideshowFX 1.0
- * @version 1.0.0
  */
 public class ListFilesFileVisitorTest {
 
-    private final File baseLocation = new File("./src/test/resources/com/twasyl/slideshowfx/utils/io");
+    private static File baseLocation;
     private ListFilesFileVisitor visitor;
+
+    @BeforeClass
+    public static void setUp() throws URISyntaxException {
+        // Hack to get the resources folder
+        final File file = new File(ListFilesFileVisitorTest.class.getResource("/com/twasyl/slideshowfx/utils/io/file.txt").toURI());
+        baseLocation = file.getParentFile();
+
+        // Create an empty directory as an empty dir can not be added to the VCS.
+        new File(baseLocation, "emptyDir").mkdir();
+        new File(baseLocation, "dir/dir2").mkdirs();
+    }
 
     @Before
     public void beforeTest() {

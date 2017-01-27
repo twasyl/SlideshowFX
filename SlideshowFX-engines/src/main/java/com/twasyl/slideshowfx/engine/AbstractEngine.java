@@ -1,11 +1,12 @@
 package com.twasyl.slideshowfx.engine;
 
 import com.twasyl.slideshowfx.utils.PlatformHelper;
+import com.twasyl.slideshowfx.utils.io.DefaultCharsetReader;
+import com.twasyl.slideshowfx.utils.io.DefaultCharsetWriter;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * This class implements {@link IEngine} in order to define base treatments used by all engine defined in SlideshowFX.
@@ -74,6 +75,18 @@ public abstract class AbstractEngine<T extends IConfiguration> implements IEngin
     }
 
     @Override
+    public T readConfiguration(File configurationFile) throws NullPointerException, IllegalArgumentException, IOException, IllegalAccessException {
+        if(getWorkingDirectory() == null) throw new NullPointerException("The working directory is null");
+        if(configurationFile == null) throw new NullPointerException("The configuration file can not be null");
+        if(!configurationFile.exists()) throw new FileNotFoundException("The configuration file does not exist");
+        if(!configurationFile.canRead()) throw new IllegalAccessException("The configuration file can not be read");
+
+        final Reader reader = new DefaultCharsetReader(configurationFile);
+
+        return this.readConfiguration(reader);
+    }
+
+    @Override
     public void writeConfiguration() throws NullPointerException, IOException {
         if(getWorkingDirectory() == null) throw new NullPointerException("The working directory is null");
         if(this.configurationFilename == null) throw new NullPointerException("The configuration filename can not be null");
@@ -82,6 +95,16 @@ public abstract class AbstractEngine<T extends IConfiguration> implements IEngin
         final File configurationFile = new File(getWorkingDirectory(), this.configurationFilename);
 
         this.writeConfiguration(configurationFile);
+    }
+
+    @Override
+    public void writeConfiguration(File configurationFile) throws NullPointerException, IOException {
+        if(getWorkingDirectory() == null) throw new NullPointerException("The working directory is null");
+        if(configurationFile == null) throw new NullPointerException("The configuration file can not be null");
+
+        final DefaultCharsetWriter writer = new DefaultCharsetWriter(configurationFile);
+
+        this.writeConfiguration(writer);
     }
 
     @Override public T getConfiguration() { return this.configuration; }

@@ -1,5 +1,5 @@
 description = 'Extension allowing to insert code snippets inside a SlideshowFX presentation'
-version = '1.0'
+version = '1.1'
 
 dependencies {
     compile project(':SlideshowFX-content-extension')
@@ -7,6 +7,8 @@ dependencies {
 
     testCompile configurations.junit
     testCompile configurations.mockito
+    testCompile project(':SlideshowFX-html')
+    testCompile project(':SlideshowFX-markdown')
     testCompile project(':SlideshowFX-textile')
 }
 

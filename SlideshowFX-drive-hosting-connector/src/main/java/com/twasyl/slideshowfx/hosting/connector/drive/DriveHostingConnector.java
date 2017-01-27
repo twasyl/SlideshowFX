@@ -5,8 +5,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.FileContent;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -58,22 +56,22 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
         this.setOptions(new BasicHostingConnectorOptions());
 
         String configuration = GlobalConfiguration.getProperty(getConfigurationBaseName().concat(CONSUMER_KEY_PROPERTY_SUFFIX));
-        if(configuration != null && !configuration.trim().isEmpty()) {
+        if (configuration != null && !configuration.trim().isEmpty()) {
             this.getOptions().setConsumerKey(configuration.trim());
         }
 
         configuration = GlobalConfiguration.getProperty(getConfigurationBaseName().concat(CONSUMER_SECRET_PROPERTY_SUFFIX));
-        if(configuration != null && !configuration.trim().isEmpty()) {
+        if (configuration != null && !configuration.trim().isEmpty()) {
             this.getOptions().setConsumerSecret(configuration.trim());
         }
 
         configuration = GlobalConfiguration.getProperty(getConfigurationBaseName().concat(REDIRECT_URI_PROPERTY_SUFFIX));
-        if(configuration != null && !configuration.trim().isEmpty()) {
+        if (configuration != null && !configuration.trim().isEmpty()) {
             this.getOptions().setRedirectUri(configuration.trim());
         }
 
         configuration = GlobalConfiguration.getProperty(getConfigurationBaseName().concat(ACCESS_TOKEN_PROPERTY_SUFFIX));
-        if(configuration != null && !configuration.trim().isEmpty()) {
+        if (configuration != null && !configuration.trim().isEmpty()) {
             this.accessToken = configuration;
         }
     }
@@ -117,7 +115,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
 
     @Override
     public void saveNewOptions() {
-        if(this.getNewOptions() != null) {
+        if (this.getNewOptions() != null) {
             this.setOptions(this.getNewOptions());
 
             if (this.getOptions().getConsumerKey() != null) {
@@ -139,7 +137,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
 
     @Override
     public void authenticate() throws HostingConnectorException {
-        if(this.getOptions().getConsumerKey() == null || this.getOptions().getConsumerSecret() == null) {
+        if (this.getOptions().getConsumerKey() == null || this.getOptions().getConsumerSecret() == null) {
             throw new HostingConnectorException(HostingConnectorException.MISSING_CONFIGURATION);
         }
 
@@ -147,9 +145,9 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
         final JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
 
         final GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory,
-                    this.getOptions().getConsumerKey(),
-                    this.getOptions().getConsumerSecret(),
-                    Arrays.asList(DriveScopes.DRIVE))
+                this.getOptions().getConsumerKey(),
+                this.getOptions().getConsumerSecret(),
+                Arrays.asList(DriveScopes.DRIVE))
                 .setAccessType("online")
                 .setApprovalPrompt("auto")
                 .build();
@@ -165,7 +163,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
                 try {
                     final Map<String, String> uriParameters = getURIParameters(new URI(newLocation));
 
-                    if(uriParameters.containsKey("code")) {
+                    if (uriParameters.containsKey("code")) {
                         final String authorizationCode = uriParameters.get("code");
 
                         final GoogleTokenResponse response = flow.newTokenRequest(authorizationCode)
@@ -181,7 +179,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
                     LOGGER.log(Level.WARNING, "Failed to get access token", e);
                     this.accessToken = null;
                 } finally {
-                    if(this.accessToken != null) {
+                    if (this.accessToken != null) {
                         GlobalConfiguration.setProperty(getConfigurationBaseName().concat(ACCESS_TOKEN_PROPERTY_SUFFIX),
                                 this.accessToken);
                     }
@@ -197,14 +195,15 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
         stage.setTitle("Authorize SlideshowFX in Google Drive");
         stage.showAndWait();
 
-        if(!this.isAuthenticated()) throw new HostingConnectorException(HostingConnectorException.AUTHENTICATION_FAILURE);
+        if (!this.isAuthenticated())
+            throw new HostingConnectorException(HostingConnectorException.AUTHENTICATION_FAILURE);
     }
 
     @Override
     public boolean checkAccessToken() {
         boolean valid = false;
 
-        if(this.credential == null) {
+        if (this.credential == null) {
             this.credential = new GoogleCredential();
             this.credential.setAccessToken(this.accessToken);
         }
@@ -232,18 +231,18 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
 
     @Override
     public void upload(PresentationEngine engine, RemoteFile folder, boolean overwrite) throws HostingConnectorException, FileNotFoundException {
-        if(this.isAuthenticated()) {
+        if (this.isAuthenticated()) {
             Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), this.credential)
                     .setApplicationName(APPLICATION_NAME)
                     .build();
 
             com.google.api.services.drive.model.File body;
 
-            if(overwrite) {
+            if (overwrite) {
                 body = getFile(engine, folder);
 
                 // We need to delete the file before updating
-                if(body != null) {
+                if (body != null) {
                     try {
                         service.files().delete(body.getId()).execute();
                     } catch (IOException e) {
@@ -255,7 +254,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
             } else {
                 body = this.buildFile(folder, engine);
 
-                if(this.fileExists(engine, folder)) {
+                if (this.fileExists(engine, folder)) {
                     final String nameWithoutExtension = engine.getArchive().getName().substring(0, engine.getArchive().getName().lastIndexOf("."));
                     final Calendar calendar = Calendar.getInstance();
 
@@ -277,25 +276,22 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
 
     @Override
     public File download(File destination, RemoteFile file) throws HostingConnectorException {
-        if(destination == null) throw new NullPointerException("The destination can not be null");
-        if(file == null) throw new NullPointerException("The file to download can not be null");
-        if(!destination.isDirectory()) throw new IllegalArgumentException("The destination is not a folder");
-        if(!(file instanceof GoogleFile)) throw new IllegalArgumentException("The file is not a GoogleFile");
+        if (destination == null) throw new NullPointerException("The destination can not be null");
+        if (file == null) throw new NullPointerException("The file to download can not be null");
+        if (!destination.isDirectory()) throw new IllegalArgumentException("The destination is not a folder");
+        if (!(file instanceof GoogleFile)) throw new IllegalArgumentException("The file is not a GoogleFile");
 
         File result;
 
-        if(this.isAuthenticated()) {
+        if (this.isAuthenticated()) {
             result = new File(destination, file.getName());
 
             Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), this.credential)
                     .setApplicationName(APPLICATION_NAME)
                     .build();
 
-            try(final OutputStream out = new FileOutputStream(result)) {
-                final HttpResponse response = service.getRequestFactory()
-                                                .buildGetRequest(new GenericUrl(((GoogleFile) file).getDownloadUrl()))
-                                                .execute();
-                response.download(out);
+            try (final OutputStream out = new FileOutputStream(result)) {
+                service.files().get(((GoogleFile) file).getId()).executeMediaAndDownloadTo(out);
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not download the file", e);
                 result = null;
@@ -310,12 +306,13 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
 
     @Override
     public List<RemoteFile> list(RemoteFile parent, boolean includeFolders, boolean includePresentations) throws HostingConnectorException {
-        if(parent == null) throw new NullPointerException("The parent can not be null");
-        if(!(parent instanceof GoogleFile)) throw new IllegalArgumentException("The given parent must be a GoogleFile");
+        if (parent == null) throw new NullPointerException("The parent can not be null");
+        if (!(parent instanceof GoogleFile))
+            throw new IllegalArgumentException("The given parent must be a GoogleFile");
 
         final List<RemoteFile> folders = new ArrayList<>();
 
-        if(this.isAuthenticated()) {
+        if (this.isAuthenticated()) {
             final Drive service = new Drive.Builder(new NetHttpTransport(), new JacksonFactory(), this.credential)
                     .setApplicationName(APPLICATION_NAME)
                     .build();
@@ -323,10 +320,13 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
             try {
                 final StringBuilder query = new StringBuilder();
 
-                if(includeFolders && includePresentations) query.append("(mimeType = 'application/vnd.google-apps.folder' or mimeType = '")
-                                                        .append(SLIDESHOWFX_MIME_TYPE).append("') and ");
-                if(includeFolders && !includePresentations) query.append("mimeType = 'application/vnd.google-apps.folder' and ");
-                if(!includeFolders && includePresentations) query.append("mimeType = '").append(SLIDESHOWFX_MIME_TYPE).append("' and ");
+                if (includeFolders && includePresentations)
+                    query.append("(mimeType = 'application/vnd.google-apps.folder' or mimeType = '")
+                            .append(SLIDESHOWFX_MIME_TYPE).append("') and ");
+                if (includeFolders && !includePresentations)
+                    query.append("mimeType = 'application/vnd.google-apps.folder' and ");
+                if (!includeFolders && includePresentations)
+                    query.append("mimeType = '").append(SLIDESHOWFX_MIME_TYPE).append("' and ");
 
                 query.append("not trashed ")
                         .append("and '").append(((GoogleFile) parent).getId()).append("' in parents");
@@ -337,7 +337,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
                         .execute();
 
                 GoogleFile child;
-                for(com.google.api.services.drive.model.File reference : files.getFiles()) {
+                for (com.google.api.services.drive.model.File reference : files.getFiles()) {
                     child = new GoogleFile((GoogleFile) parent, reference.getName(), reference.getId());
                     child.setDownloadUrl(reference.getWebContentLink());
                     folders.add(child);
@@ -354,14 +354,15 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
 
     @Override
     public boolean fileExists(PresentationEngine engine, RemoteFile destination) throws HostingConnectorException {
-        if(engine == null) throw new NullPointerException("The engine can not be null");
-        if(engine.getArchive() == null) throw new NullPointerException("The archive file can not be null");
-        if(destination == null) throw new NullPointerException("The destination can not be null");
-        if(!(destination instanceof GoogleFile)) throw new IllegalArgumentException("The given destination must be a GoogleFile");
+        if (engine == null) throw new NullPointerException("The engine can not be null");
+        if (engine.getArchive() == null) throw new NullPointerException("The archive file can not be null");
+        if (destination == null) throw new NullPointerException("The destination can not be null");
+        if (!(destination instanceof GoogleFile))
+            throw new IllegalArgumentException("The given destination must be a GoogleFile");
 
         boolean exists;
 
-        if(this.isAuthenticated()) {
+        if (this.isAuthenticated()) {
             exists = getFile(engine, destination) != null;
         } else {
             throw new HostingConnectorException(HostingConnectorException.NOT_AUTHENTICATED);
@@ -372,15 +373,17 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
 
     /**
      * Get the {@link com.google.api.services.drive.model.File file} present remotely in the provided folder.
+     *
      * @param engine The presentation to find remotely.
      * @param folder The folder in which the search will be performed.
      * @return The corresponding {@link com.google.api.services.drive.model.File} to the presentation or {@code null} if not found.
      */
     protected com.google.api.services.drive.model.File getFile(final PresentationEngine engine, final RemoteFile folder) {
-        if(engine == null) throw new NullPointerException("The engine can not be null");
-        if(engine.getArchive() == null) throw new NullPointerException("The archive file can not be null");
-        if(folder == null) throw new NullPointerException("The folder can not be null");
-        if(!(folder instanceof GoogleFile)) throw new IllegalArgumentException("The given folder must be a GoogleFile");
+        if (engine == null) throw new NullPointerException("The engine can not be null");
+        if (engine.getArchive() == null) throw new NullPointerException("The archive file can not be null");
+        if (folder == null) throw new NullPointerException("The folder can not be null");
+        if (!(folder instanceof GoogleFile))
+            throw new IllegalArgumentException("The given folder must be a GoogleFile");
 
         com.google.api.services.drive.model.File result = null;
 
@@ -402,7 +405,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
                     .setQ(query.toString())
                     .execute();
 
-            if(!files.getFiles().isEmpty()) {
+            if (!files.getFiles().isEmpty()) {
                 result = files.getFiles().get(0);
             }
         } catch (IOException e) {
@@ -415,6 +418,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
     /**
      * Builds an instance of {@link com.google.api.services.drive.model.File} and initialized correctly with SlideshowFX
      * information.
+     *
      * @param destination The location where the file will be created.
      * @param engine
      * @return A well constructed instance of {@link com.google.api.services.drive.model.File}.
@@ -424,7 +428,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
         body = new com.google.api.services.drive.model.File();
         body.setMimeType(SLIDESHOWFX_MIME_TYPE);
 
-        if(destination instanceof GoogleFile) {
+        if (destination instanceof GoogleFile) {
             final GoogleFile googleFolder = (GoogleFile) destination;
 
             body.setParents(Arrays.asList(googleFolder.getId()));

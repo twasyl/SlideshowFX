@@ -10,7 +10,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseButton;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -20,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -30,7 +32,7 @@ import java.util.logging.Logger;
  * Controller class used for the Template Builder.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class TemplateBuilderController implements Initializable {
@@ -74,7 +76,7 @@ public class TemplateBuilderController implements Initializable {
         final File directory = chooser.showDialog(null);
 
         if (directory != null) {
-            this.addContentToTreeView(directory);
+            this.templateContentTreeView.appendContentToTreeView(directory);
         }
     }
 
@@ -90,7 +92,7 @@ public class TemplateBuilderController implements Initializable {
         final File file = chooser.showOpenDialog(null);
 
         if (file != null) {
-            this.addContentToTreeView(file);
+            this.templateContentTreeView.appendContentToTreeView(file);
         }
     }
 
@@ -208,55 +210,7 @@ public class TemplateBuilderController implements Initializable {
      */
     @FXML
     private void createDirectory(ActionEvent event) {
-        final TextField field = new TextField();
-        field.setPromptText("Directory name");
-
-        ButtonType response = DialogHelper.showCancellableDialog("Create a directory", field);
-
-        if (response != null && response == ButtonType.OK) {
-            if (!field.getText().trim().isEmpty()) {
-                TreeItem<File> parent = this.templateContentTreeView.getSelectionModel().getSelectedItem();
-
-                if (parent == null) parent = this.templateContentTreeView.getRoot();
-                else {
-                    // Ensure the selected item contain a directory. If it contains a file, the parent is taken.
-                    if (parent.getValue().isFile()) {
-                        parent = parent.getParent();
-                    }
-                }
-
-                /**
-                 * Split the text by / and create each directory and append it to the TreeView.
-                 */
-
-                TreeItem<File> tmpItem;
-                for (String name : field.getText().trim().split("/")) {
-                    final File tmpFile = new File(parent.getValue(), name);
-                    tmpItem = new TreeItem<>(tmpFile);
-
-                    if (!tmpFile.exists()) {
-                        final boolean result = tmpFile.mkdir();
-                        if (result) {
-                            // Avoid duplicates in the tree
-                            Optional<TreeItem<File>> sameItem = parent.getChildren()
-                                    .stream()
-                                    .filter(item -> item.getValue().equals(tmpFile))
-                                    .findFirst();
-
-                            if (!sameItem.isPresent()) {
-                                parent.getChildren().add(tmpItem);
-                                parent = tmpItem;
-                            } else {
-                                parent = sameItem.get();
-                            }
-
-                        } else {
-                            LOGGER.log(Level.INFO, "Could not create directory: " + tmpFile.getAbsolutePath());
-                        }
-                    }
-                }
-            }
-        }
+        this.templateContentTreeView.promptUserAndCreateNewDirectory();
     }
 
     /**
@@ -268,53 +222,7 @@ public class TemplateBuilderController implements Initializable {
      */
     @FXML
     private void createFile(ActionEvent event) {
-        final TextField field = new TextField();
-        field.setPromptText("File name");
-
-        ButtonType response = DialogHelper.showCancellableDialog("Create a file", field);
-
-        if (response != null && response == ButtonType.OK) {
-            if (!field.getText().trim().isEmpty()) {
-                TreeItem<File> parent = this.templateContentTreeView.getSelectionModel().getSelectedItem();
-
-                if (parent == null) parent = this.templateContentTreeView.getRoot();
-                else {
-                    // Ensure the selected item contain a directory. If it contains a file, the parent is taken.
-                    if (parent.getValue().isFile()) {
-                        parent = parent.getParent();
-                    }
-                }
-
-                final File newFile = new File(parent.getValue(), field.getText().trim());
-                try {
-                    Files.createFile(newFile.toPath());
-                    final TreeItem<File> newFileItem = new TreeItem<>(newFile);
-
-                    parent.getChildren().add(newFileItem);
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "Can not create the empty file", e);
-                }
-            }
-        }
-    }
-
-    /**
-     * This method adds the given content to the TreeView. It detects if a TreeItem containing a directory
-     * is selected in the TreeView to add the content to the selection. If not, the content is added to the root
-     * of the TreeView.
-     *
-     * @param content The content to add to the TreeView.
-     */
-    private void addContentToTreeView(File content) {
-        if (content != null && content.exists()) {
-            TreeItem<File> parent = this.templateContentTreeView.getSelectionModel().getSelectedItem();
-
-            if (parent == null || !parent.getValue().isDirectory()) {
-                parent = this.templateContentTreeView.getRoot();
-            }
-
-            this.templateContentTreeView.appendContentToTreeView(content, parent);
-        }
+        this.templateContentTreeView.promptUserAndCreateNewFile();
     }
 
     /**
@@ -349,8 +257,14 @@ public class TemplateBuilderController implements Initializable {
 
             final File[] children = this.templateEngine.getWorkingDirectory().listFiles();
             if (children != null) {
-                Arrays.stream(children).forEach(child -> this.addContentToTreeView(child));
+
+                for (File child : children) {
+                    this.templateContentTreeView.appendContentToTreeView(child, root);
+                }
             }
+
+            this.templateContentTreeView.closeItem(root);
+            root.setExpanded(true);
         }
     }
 

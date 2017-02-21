@@ -85,57 +85,53 @@ import java.util.logging.Logger;
  *  represented by the FXML.
  *  
  *  @author Thierry Wasyczenko
- *  @version 1.2
+ *  @version 1.3
  *  @since SlideshowFX 1.0
  */
 public class SlideshowFXController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXController.class.getName());
 
-    private final EventHandler<ActionEvent> addSlideActionEvent = new EventHandler<ActionEvent>() {
-        @Override
-        public void handle(ActionEvent actionEvent) {
-            try {
+    private final EventHandler<ActionEvent> addSlideActionEvent = event -> {
+        try {
 
-                final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
-                final PresentationViewController view = SlideshowFXController.this.getCurrentPresentationView();
-                final Object userData = ((MenuItem) actionEvent.getSource()).getUserData();
+            final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
+            final PresentationViewController view = SlideshowFXController.this.getCurrentPresentationView();
+            final Object userData = ((MenuItem) event.getSource()).getUserData();
 
-                if (userData instanceof SlideTemplate && view != null && presentation != null) {
-                    presentation.addSlide((SlideTemplate) userData, view.getCurrentSlideNumber());
+            if (userData instanceof SlideTemplate && view != null && presentation != null) {
+                final Slide addedSlide = presentation.addSlide((SlideTemplate) userData, view.getCurrentSlideNumber());
 
-                    final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
+                if(addedSlide != null) {
+                    final ReloadPresentationViewTask task = new ReloadPresentationViewAndGoToTask(view, addedSlide.getId());
                     SlideshowFXController.this.taskInProgress.setCurrentTask(task);
                     TaskDAO.getInstance().startTask(task);
 
                     SlideshowFXController.this.updateSlideSplitMenu();
                 }
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Error when adding a slide", e);
             }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error when adding a slide", e);
         }
     };
 
-    private final EventHandler<ActionEvent> moveSlideActionEvent = new EventHandler<ActionEvent>() {
-        @Override
-        public void handle(ActionEvent actionEvent) {
-            final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
-            final PresentationViewController view = SlideshowFXController.this.getCurrentPresentationView();
+    private final EventHandler<ActionEvent> moveSlideActionEvent = event -> {
+        final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
+        final PresentationViewController view = SlideshowFXController.this.getCurrentPresentationView();
 
-            if(view != null && presentation != null) {
-                final SlideMenuItem menunItem = (SlideMenuItem) actionEvent.getSource();
-                final Slide slideToMove = presentation.getConfiguration().getSlideById(view.getCurrentSlideId());
-                final Slide beforeSlide = menunItem.getSlide();
+        if(view != null && presentation != null) {
+            final SlideMenuItem menunItem = (SlideMenuItem) event.getSource();
+            final Slide slideToMove = presentation.getConfiguration().getSlideById(view.getCurrentSlideId());
+            final Slide beforeSlide = menunItem.getSlide();
 
-                presentation.moveSlide(slideToMove, beforeSlide);
+            presentation.moveSlide(slideToMove, beforeSlide);
 
-                final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
-                SlideshowFXController.this.taskInProgress.setCurrentTask(task);
-                TaskDAO.getInstance().startTask(task);
+            final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
+            SlideshowFXController.this.taskInProgress.setCurrentTask(task);
+            TaskDAO.getInstance().startTask(task);
 
-                SlideshowFXController.this.updateSlideSplitMenu();
-            }
-
+            SlideshowFXController.this.updateSlideSplitMenu();
         }
+
     };
 
     @FXML private BorderPane root;

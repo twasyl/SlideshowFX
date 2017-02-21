@@ -46,7 +46,7 @@ allprojects {
         drive 'com.google.apis:google-api-services-drive:v3-rev55-1.22.0'
         dropbox 'com.dropbox.core:dropbox-core-sdk:2.1.2'
         felix 'org.apache.felix:org.apache.felix.framework:5.6.1'
-        fontawesomefx 'de.jensd:fontawesomefx-fontawesome:4.6.1-2'
+        fontawesomefx 'de.jensd:fontawesomefx-fontawesome:4.7.0'
         freemarker 'org.freemarker:freemarker:2.3.25-incubating'
         jsoup 'org.jsoup:jsoup:1.10.2'
         markdown 'com.github.rjeschke:txtmark:0.13'
@@ -131,16 +131,16 @@ ext {
     asciidoctorMarkupBintrayUploadEnabled = false
     htmlMarkupBintrayUploadEnabled = false
     markdownMarkupBintrayUploadEnabled = false
-    textileMarkupBintrayUploadEnabled = true
+    textileMarkupBintrayUploadEnabled = false
 
     boxHostingConnectorBintrayUploadEnabled = false
     driveHostingConnectorBintrayUploadEnabled = false
-    dropboxHostingConnectorBintrayUploadEnabled = true
+    dropboxHostingConnectorBintrayUploadEnabled = false
 
-    alertContentExtensionBintrayUploadEnabled = true
-    codeContentExtensionBintrayUploadEnabled = true
-    imageContentExtensionBintrayUploadEnabled = true
-    linkContentExtensionBintrayUploadEnabled = true
+    alertContentExtensionBintrayUploadEnabled = false
+    codeContentExtensionBintrayUploadEnabled = false
+    imageContentExtensionBintrayUploadEnabled = false
+    linkContentExtensionBintrayUploadEnabled = false
     quizContentExtensionBintrayUploadEnabled = false
     quoteContentExtensionBintrayUploadEnabled = false
 
@@ -242,10 +242,10 @@ ext {
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'distribution'
 
-version = '1.3'
+version = '1.4'
 
 wrapper {
-    gradleVersion = '3.3'
+    gradleVersion = '3.4'
 }
 
 asciidoctorj {
@@ -261,7 +261,7 @@ asciidoctor {
             setanchors: '',
             sectlinks: '',
             linkcss: false,
-            'slideshowfx_version': '1.3',
+            'slideshowfx_version': project.version,
             'asciidoctor-source': new File(project(':SlideshowFX-app').projectDir, 'src/main/resources/com/twasyl/slideshowfx/documentation').absolutePath,
             'javafx-version': '8 update 121',
             'jdk-version': '8 update 121',

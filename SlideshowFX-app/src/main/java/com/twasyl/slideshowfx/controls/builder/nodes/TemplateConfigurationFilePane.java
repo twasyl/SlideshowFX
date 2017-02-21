@@ -34,7 +34,7 @@ import static com.twasyl.slideshowfx.ui.controls.validators.Validators.isNotEmpt
  * In order to get the configuration as a string, the method {@link #getAsString()} must be used.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.3
  */
 public class TemplateConfigurationFilePane extends VBox {
@@ -55,7 +55,7 @@ public class TemplateConfigurationFilePane extends VBox {
     // General slides configuration
     private ExtendedTextField slidesContainer = new ExtendedTextField("Slides' container", true);
     private ExtendedTextField slideIdPrefix = new ExtendedTextField("Slide ID prefix", true);
-    private ExtendedTextField slidesTemplateDirectory = new ExtendedTextField("Presentation directory", true);
+    private ExtendedTextField slidesTemplateDirectory = new ExtendedTextField("Template directory", true);
     private ExtendedTextField slidesPresentationDirectory = new ExtendedTextField("Presentation directory", true);
     private ExtendedTextField slidesThumbnailDirectory = new ExtendedTextField("Thumbnails directory", true);
 
@@ -332,11 +332,13 @@ public class TemplateConfigurationFilePane extends VBox {
                         definition.setName(template.getName());
                         definition.setFile(template.getFile().getName());
 
-                        for (SlideElementTemplate elementTemplate : template.getElements()) {
-                            final SlideElementDefinition slideElementDefinition = definition.addSlideElement();
-                            slideElementDefinition.setElementId(elementTemplate.getId());
-                            slideElementDefinition.setHtmlId(elementTemplate.getHtmlId());
-                            slideElementDefinition.setDefaultContent(elementTemplate.getDefaultContent());
+                        if (template.getElements() != null) {
+                            for (SlideElementTemplate elementTemplate : template.getElements()) {
+                                final SlideElementDefinition slideElementDefinition = definition.addSlideElement();
+                                slideElementDefinition.setElementId(elementTemplate.getId());
+                                slideElementDefinition.setHtmlId(elementTemplate.getHtmlId());
+                                slideElementDefinition.setDefaultContent(elementTemplate.getDefaultContent());
+                            }
                         }
                     });
         } catch (IOException | IllegalAccessException e) {

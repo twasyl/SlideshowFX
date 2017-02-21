@@ -13,13 +13,15 @@ import java.util.ResourceBundle;
  * Controller class of the {@code HelpView.fxml} view.
  *
  * @author Thierry Wasylczenko
+ * @version 1.1
  * @since SlideshowFX 1.0
- * @version 1.0
  */
 public class HelpViewController implements Initializable {
 
-    @FXML private WebView userDocumentationBrowser;
-    @FXML private WebView developerDocumentationBrowser;
+    @FXML
+    private WebView userDocumentationBrowser;
+    @FXML
+    private WebView developerDocumentationBrowser;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -71,7 +73,6 @@ public class HelpViewController implements Initializable {
                 .tableOfContents(Placement.LEFT)
                 .styleSheetName("slideshowfx.css")
                 .stylesDir(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/documentation/css"))
-                .imagesDir(ResourceHelper.getExternalForm("/com/twasyl/slideshowfx/documentation/images"))
                 .noFooter(true)
                 .get();
 

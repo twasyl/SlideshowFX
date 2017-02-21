@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * The extension of a presentation is {@code sfx}.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class PresentationEngine extends AbstractEngine<PresentationConfiguration> {
@@ -84,7 +84,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
     @Override
     public PresentationConfiguration readConfiguration(Reader reader) throws NullPointerException, IllegalArgumentException, IOException {
-        if(reader == null) throw new NullPointerException("The configuration reader can not be null");
+        if (reader == null) throw new NullPointerException("The configuration reader can not be null");
 
         final PresentationConfiguration presentationConfiguration = new PresentationConfiguration();
         presentationConfiguration.setPresentationFile(new File(this.getWorkingDirectory(), PresentationConfiguration.DEFAULT_PRESENTATION_FILENAME));
@@ -94,7 +94,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
         presentationConfiguration.setId(presentationJson.getLong(PresentationConfiguration.PRESENTATION_ID, System.currentTimeMillis()));
 
-        if(presentationJson.getJsonArray(PresentationConfiguration.PRESENTATION_CUSTOM_RESOURCES) != null) {
+        if (presentationJson.getJsonArray(PresentationConfiguration.PRESENTATION_CUSTOM_RESOURCES) != null) {
             presentationJson.getJsonArray(PresentationConfiguration.PRESENTATION_CUSTOM_RESOURCES)
                     .forEach(customResource -> {
                         final Resource resource = new Resource(
@@ -106,7 +106,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                     });
         }
 
-        if(presentationJson.getJsonArray(PresentationConfiguration.PRESENTATION_VARIABLES) != null) {
+        if (presentationJson.getJsonArray(PresentationConfiguration.PRESENTATION_VARIABLES) != null) {
             presentationJson.getJsonArray(PresentationConfiguration.PRESENTATION_VARIABLES)
                     .forEach(variableJson -> {
                         final Pair<String, String> variable = new Pair<>();
@@ -127,7 +127,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
                     try {
                         final File thumbnailFile = this.getThumbnailFile(slide);
-                        if(thumbnailFile.exists()) {
+                        if (thumbnailFile.exists()) {
                             slide.setThumbnail(this.getThumbnailImage(thumbnailFile));
                         }
                     } catch (IOException e) {
@@ -156,7 +156,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     /**
      * Get the thumbnail file for the given slide. This methods only creates a {@link File} without checking its existence.
      * The file is supposed to be found in the {@link TemplateConfiguration#getSlidesThumbnailDirectory() thumbnail directory}
-     *  of the template configuration of this presentation.
+     * of the template configuration of this presentation.
+     *
      * @param slide The slide to get the thumbnail file for.
      * @return The supposed file corresponding to the thumbnail.
      */
@@ -167,6 +168,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
     /**
      * Get the {@link WritableImage image} located in the {@link File thumbnail file}.
+     *
      * @param thumbnailFile The file of the image.
      * @return The thumbnail image.
      * @throws IOException If something went wrong.
@@ -179,9 +181,9 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
     @Override
     public void writeConfiguration(Writer writer) throws NullPointerException, IOException {
-        if(writer == null) throw new NullPointerException("The configuration to write into can not be null");
+        if (writer == null) throw new NullPointerException("The configuration to write into can not be null");
 
-        if(this.configuration != null) {
+        if (this.configuration != null) {
             final JsonObject presentationJson = new JsonObject();
             final JsonArray slidesJson = new JsonArray();
             final JsonArray customResourcesJson = new JsonArray();
@@ -248,10 +250,11 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
     @Override
     public void loadArchive(File file) throws IllegalArgumentException, NullPointerException, IOException, IllegalAccessException {
-        if(file == null) throw new NullPointerException("The archive file can not be null");
-        if(!file.exists()) throw new FileNotFoundException("The archive file does not exist");
-        if(!file.canRead()) throw new IllegalAccessException("The archive file can not be read");
-        if(!file.getName().endsWith(this.getArchiveExtension())) throw new IllegalArgumentException("The extension of the archive is not valid");
+        if (file == null) throw new NullPointerException("The archive file can not be null");
+        if (!file.exists()) throw new FileNotFoundException("The archive file does not exist");
+        if (!file.canRead()) throw new IllegalAccessException("The archive file can not be read");
+        if (!file.getName().endsWith(this.getArchiveExtension()))
+            throw new IllegalArgumentException("The extension of the archive is not valid");
 
         this.setModifiedSinceLatestSave(false);
 
@@ -280,7 +283,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         tokens.put(TEMPLATE_SFX_JAVASCRIPT_RESOURCES_TOKEN, this.buildJavaScriptResourcesToInclude());
 
         // Replacing the template tokens
-        try(final StringWriter writer = new StringWriter()) {
+        try (final StringWriter writer = new StringWriter()) {
 
             final Template documentTemplate = templateConfiguration.getTemplate(this.templateEngine.getConfiguration().getFile().getName());
             documentTemplate.process(tokens, writer);
@@ -297,7 +300,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         // Append the custom resources
         this.configuration.getCustomResources()
                 .stream()
-                .forEach(resource -> this.addCustomResource(resource));
+                .forEach(this::addCustomResource);
 
         // Append the slides' content to the presentation
         tokens.clear();
@@ -305,7 +308,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         tokens.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
         tokens.putAll(this.configuration.getVariables().stream().collect(Collectors.toMap(Pair::getKey, Pair::getValue)));
 
-        for(Slide s : this.configuration.getSlides()) {
+        for (Slide s : this.configuration.getSlides()) {
             templateConfiguration.setDirectoryForTemplateLoading(s.getTemplate().getFile().getParentFile());
 
             try (final StringWriter writer = new StringWriter()) {
@@ -338,8 +341,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         this.writeConfiguration();
 
         LOGGER.fine("Create slides thumbnails");
-        if(!this.templateEngine.getConfiguration().getSlidesThumbnailDirectory().exists()) {
-            if(!this.templateEngine.getConfiguration().getSlidesThumbnailDirectory().mkdirs()) {
+        if (!this.templateEngine.getConfiguration().getSlidesThumbnailDirectory().exists()) {
+            if (!this.templateEngine.getConfiguration().getSlidesThumbnailDirectory().mkdirs()) {
                 LOGGER.log(Level.SEVERE, "Can not create slides thumbnails directory");
             }
         } else {
@@ -371,6 +374,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     /**
      * Indicates if the presentation has already been saved by testing if the {@link #getArchive()}
      * method returns {@code null} or not.
+     *
      * @return {@code true} if {@link #getArchive()} is not {@code null}, {@code false} otherwise.
      */
     public boolean isPresentationAlreadySaved() {
@@ -380,6 +384,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     /**
      * Indicates if the presentation has been modified since the latest save. If the presentation has never been saved,
      * then the presentation is considered modified.
+     *
      * @return {@code true} if the presentation has been modified since the latest save, {@code false} otherwise.
      */
     public boolean isModifiedSinceLatestSave() {
@@ -388,6 +393,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
     /**
      * Set if the presentation has been modified since its latest save.
+     *
      * @param modifiedSinceLatestSave {@code true} to indicate a modification, {@code false} otherwise.
      */
     public void setModifiedSinceLatestSave(boolean modifiedSinceLatestSave) {
@@ -401,7 +407,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
      * in order this engine to be used to create the new presentation.
      *
      * @param templateArchive The template archive file to create the presentation from.
-     * @throws IOException If an error occurred when processing the archive.
+     * @throws IOException            If an error occurred when processing the archive.
      * @throws IllegalAccessException If an error occurred when processing the archive.
      */
     public void createFromTemplate(File templateArchive) throws IOException, IllegalAccessException {
@@ -424,7 +430,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         final Map tokens = new HashMap<>();
         tokens.put(TEMPLATE_SFX_JAVASCRIPT_RESOURCES_TOKEN, this.buildJavaScriptResourcesToInclude());
 
-        try(final StringWriter writer = new StringWriter()) {
+        try (final StringWriter writer = new StringWriter()) {
 
             final Template documentTemplate = templateConfiguration.getTemplate(this.templateEngine.getConfiguration().getFile().getName());
             documentTemplate.process(tokens, writer);
@@ -443,44 +449,48 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
      *
      * @return The configuration of the template.
      */
-    public TemplateConfiguration getTemplateConfiguration() { return this.templateEngine.getConfiguration(); }
+    public TemplateConfiguration getTemplateConfiguration() {
+        return this.templateEngine.getConfiguration();
+    }
 
     /**
      * Add a slide to the presentation and save the presentation. If {@code afterSlideNumber} is {@code null} or not
      * found, the slide is added at the end of the presentation, otherwise it is added after the given slide number.
-     * @param template The template of slide to add.
+     *
+     * @param template         The template of slide to add.
      * @param afterSlideNumber The slide number to insert the new slide after.
      * @return The new added slide.
      * @throws IOException If an error occurred when saving the presentation.
      */
     public Slide addSlide(SlideTemplate template, String afterSlideNumber) throws IOException {
-        if(template == null) throw new IllegalArgumentException("The templateConfiguration for creating a slide can not be null");
+        if (template == null)
+            throw new IllegalArgumentException("The templateConfiguration for creating a slide can not be null");
 
         this.setModifiedSinceLatestSave(true);
         final Pair<Slide, Element> createdSlide = this.createSlide(template);
 
-        if(afterSlideNumber == null) {
+        if (afterSlideNumber == null) {
             this.configuration.getSlides().add(createdSlide.getKey());
         } else {
             ListIterator<Slide> slidesIterator = this.configuration.getSlides().listIterator();
 
             this.configuration.getSlideByNumber(afterSlideNumber);
             int index = -1;
-            while(slidesIterator.hasNext()) {
-                if(slidesIterator.next().getSlideNumber().equals(afterSlideNumber)) {
+            while (slidesIterator.hasNext()) {
+                if (slidesIterator.next().getSlideNumber().equals(afterSlideNumber)) {
                     index = slidesIterator.nextIndex();
                     break;
                 }
             }
 
-            if(index > -1) {
+            if (index > -1) {
                 this.configuration.getSlides().add(index, createdSlide.getKey());
             } else {
                 this.configuration.getSlides().add(createdSlide.getKey());
             }
         }
 
-        if(afterSlideNumber == null || afterSlideNumber.isEmpty()) {
+        if (afterSlideNumber == null || afterSlideNumber.isEmpty()) {
             this.configuration.getDocument()
                     .getElementById(this.templateEngine.getConfiguration().getSlidesContainer())
                     .append(createdSlide.getValue().outerHtml());
@@ -497,15 +507,16 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
     /**
      * Delete the slide with the slideNumber and save the presentation.
+     *
      * @param slideNumber The slide number to delete.
      */
     public void deleteSlide(String slideNumber) {
-        if(slideNumber == null) throw new IllegalArgumentException("Slide number can not be null");
+        if (slideNumber == null) throw new IllegalArgumentException("Slide number can not be null");
 
         this.setModifiedSinceLatestSave(true);
 
         Slide slideToRemove = this.configuration.getSlideByNumber(slideNumber);
-        if(slideToRemove != null) {
+        if (slideToRemove != null) {
             this.configuration.getSlides().remove(slideToRemove);
             this.configuration.getDocument()
                     .getElementById(slideToRemove.getId()).remove();
@@ -516,19 +527,20 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
     /**
      * Duplicates the given slide and add it to the presentation. The presentation is temporary saved.
+     *
      * @param slide The slide to duplicate.
      * @return The duplicated slide.
      */
     public Slide duplicateSlide(Slide slide) throws IOException {
-        if(slide == null) throw new IllegalArgumentException("The slide to duplicate can not be null");
+        if (slide == null) throw new IllegalArgumentException("The slide to duplicate can not be null");
 
         this.setModifiedSinceLatestSave(true);
         final Pair<Slide, Element> duplicatedSlide = this.createSlide(slide.getTemplate());
 
         // Add the slide to the presentation's slides
         int index = this.configuration.getSlides().indexOf(slide);
-        if(index != -1) {
-            if(index == this.configuration.getSlides().size() - 1) {
+        if (index != -1) {
+            if (index == this.configuration.getSlides().size() - 1) {
                 this.configuration.getSlides().add(duplicatedSlide.getKey());
             } else {
                 this.configuration.getSlides().add(index + 1, duplicatedSlide.getKey());
@@ -563,14 +575,15 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
      * the slide is moved at the end of the presentation. If <code>slideToMove</code> is equal to <code>beforeSlide</code>
      * nothing is done.
      * If an operation has been performed, the presentation is temporary saved.
+     *
      * @param slideToMove The slide to move
      * @param beforeSlide The slide before <code>slideToMove</code> is moved
      * @throws IllegalArgumentException if the slideToMove is null
      */
     public void moveSlide(Slide slideToMove, Slide beforeSlide) {
-        if(slideToMove == null) throw new IllegalArgumentException("The slideToMove to move can not be null");
+        if (slideToMove == null) throw new IllegalArgumentException("The slideToMove to move can not be null");
 
-        if(!slideToMove.equals(beforeSlide)) {
+        if (!slideToMove.equals(beforeSlide)) {
             this.setModifiedSinceLatestSave(true);
 
             this.configuration.getSlides().remove(slideToMove);
@@ -582,7 +595,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                     .getElementById(slideToMove.getId())
                     .remove();
 
-            if(beforeSlide == null) {
+            if (beforeSlide == null) {
                 this.configuration.getSlides().add(slideToMove);
                 this.configuration.getDocument()
                         .getElementById(this.templateEngine.getConfiguration().getSlidesContainer())
@@ -603,10 +616,11 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     /**
      * This method adds the given resource to the collection of resources present in {@link #getConfiguration()} as well
      * as in the presentation's document.
+     *
      * @param resource The resource to add in the collection and the document.
      */
     public void addCustomResource(Resource resource) {
-        if(resource != null
+        if (resource != null
                 && resource.getContent() != null
                 && !resource.getContent().trim().isEmpty()) {
 
@@ -620,16 +634,16 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             final String htmlString = resource.buildHTMLString(location);
             final String resourceHtml = Jsoup.parseBodyFragment(htmlString).body().html();
 
-            if(!this.configuration.getDocument().head().html().contains(resourceHtml)) {
+            if (!this.configuration.getDocument().head().html().contains(resourceHtml)) {
                 this.configuration.getDocument().head().append(htmlString);
             }
         }
     }
 
     public void savePresentationFile() {
-        try(final FileOutputStream fileOutputStream = new FileOutputStream(this.configuration.getPresentationFile());
-            final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, GlobalConfiguration.getDefaultCharset());
-            final Writer writer = new BufferedWriter(outputStreamWriter)) {
+        try (final FileOutputStream fileOutputStream = new FileOutputStream(this.configuration.getPresentationFile());
+             final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, GlobalConfiguration.getDefaultCharset());
+             final Writer writer = new BufferedWriter(outputStreamWriter)) {
             writer.write(this.configuration.getDocument().html());
             writer.flush();
         } catch (IOException e) {
@@ -639,6 +653,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
     /**
      * This method loads all JavaScript resources that should be inserted in a template and return them in a String.
+     *
      * @return The String containing the content of all JavaScript resources needed for a template
      */
     private String buildJavaScriptResourcesToInclude() {
@@ -654,14 +669,15 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
     /**
      * Create a {@link Slide slide} from the given {@link SlideTemplate template}.
+     *
      * @param template The template to create the slide from.
      * @return A {@link Pair} where the key is the created {@link Slide} object and the value the HTML code get from the
      * parsed template.
-     * @throws IOException If an error occurs when parsing the template.
+     * @throws IOException          If an error occurs when parsing the template.
      * @throws NullPointerException If the given {@code template} is {@code null}.
      */
     private Pair<Slide, Element> createSlide(final SlideTemplate template) throws NullPointerException, IOException {
-        if(template == null) throw new NullPointerException("The template can not be null");
+        if (template == null) throw new NullPointerException("The template can not be null");
 
         this.setModifiedSinceLatestSave(true);
         final Pair<Slide, Element> result = new Pair<>();
@@ -673,35 +689,36 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
         // Process the SlideElements by replacing their ID and setting their content
         final Configuration defaultConfiguration = TemplateProcessor.getDefaultConfiguration();
-        Arrays.stream(template.getElements())
-            .forEach(element -> {
-                try (final StringWriter writer = new StringWriter();
-                     final StringReader reader = new StringReader(element.getHtmlId())) {
+        if (template.getElements() != null) {
+            Arrays.stream(template.getElements())
+                    .forEach(element -> {
+                        try (final StringWriter writer = new StringWriter();
+                             final StringReader reader = new StringReader(element.getHtmlId())) {
 
-                    final Template elementTemplate = new Template("element template", reader, defaultConfiguration);
-                    elementTemplate.process(tokens, writer);
-                    writer.flush();
+                            final Template elementTemplate = new Template("element template", reader, defaultConfiguration);
+                            elementTemplate.process(tokens, writer);
+                            writer.flush();
 
-                    result.getKey().updateElement(writer.toString(), "HTML", element.getDefaultContent(), element.getDefaultContent())
-                            .setTemplate(element);
-                } catch (IOException | TemplateException e) {
-                    LOGGER.log(Level.WARNING, "Can not parse element", e);
-                }
-            });
-
+                            result.getKey().updateElement(writer.toString(), "HTML", element.getDefaultContent(), element.getDefaultContent())
+                                    .setTemplate(element);
+                        } catch (IOException | TemplateException e) {
+                            LOGGER.log(Level.WARNING, "Can not parse element", e);
+                        }
+                    });
+        }
 
         // Add dynamic attributes to the tokens by asking their values to the user
         // TODO INCUBATING
         tokens.clear();
-        if(result.getKey().getTemplate().getDynamicAttributes() != null && result.getKey().getTemplate().getDynamicAttributes().length > 0) {
+        if (result.getKey().getTemplate().getDynamicAttributes() != null && result.getKey().getTemplate().getDynamicAttributes().length > 0) {
             Scanner scanner = new Scanner(System.in);
             String value;
 
-            for(DynamicAttribute attribute : result.getKey().getTemplate().getDynamicAttributes()) {
+            for (DynamicAttribute attribute : result.getKey().getTemplate().getDynamicAttributes()) {
                 System.out.print(attribute.getPromptMessage() + " ");
                 value = scanner.nextLine();
 
-                if(value == null || value.trim().isEmpty()) {
+                if (value == null || value.trim().isEmpty()) {
                     tokens.put(attribute.getTemplateExpression(), "");
                 } else {
                     tokens.put(attribute.getTemplateExpression(), String.format("%1$s=\"%2$s\"", attribute.getAttribute(), value.trim()));
@@ -716,7 +733,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_CALL);
         tokens.putAll(this.configuration.getVariables().stream().collect(Collectors.toMap(Pair::getKey, Pair::getValue)));
 
-        try(final StringWriter writer = new StringWriter()) {
+        try (final StringWriter writer = new StringWriter()) {
             final Template slideTemplate = defaultConfiguration.getTemplate(template.getFile().getName());
             slideTemplate.process(tokens, writer);
             writer.flush();

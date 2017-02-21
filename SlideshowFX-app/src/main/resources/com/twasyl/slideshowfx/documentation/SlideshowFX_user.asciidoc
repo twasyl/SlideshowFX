@@ -186,7 +186,7 @@ When you click on the button of one of these plugins in the tool bar next to the
 
 ==== Hosting connector plugins
 
-Hosting connector plugins allow to save and download presentations to and from a _cloud storage platform_. Currently SlideshowFX supports https://www.dropbox.com/[Dropbox] and https://www.google.com/drive/[Google Drive].
+Hosting connector plugins allow to save and download presentations to and from a _cloud storage platform_. Currently SlideshowFX supports https://www.box.com/[Box], https://www.dropbox.com/[Dropbox] and https://www.google.com/drive/[Google Drive].
 
 ===== Configuration
 

@@ -48,16 +48,17 @@ import java.util.Base64;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *  This class is the controller of the {@code PresentationView.fxml} file. It defines all actions possible inside the view
- *  represented by the FXML.
- *  
- *  @author Thierry Wasyczenko
- *  @version 1.1
- *  @since SlideshowFX 1.0
+ * This class is the controller of the {@code PresentationView.fxml} file. It defines all actions possible inside the view
+ * represented by the FXML.
+ *
+ * @author Thierry Wasyczenko
+ * @version 1.2
+ * @since SlideshowFX 1.0
  */
 public class PresentationViewController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(PresentationViewController.class.getName());
@@ -67,37 +68,48 @@ public class PresentationViewController implements Initializable {
     private final ReadOnlyStringProperty presentationName = new SimpleStringProperty();
     private final ReadOnlyBooleanProperty presentationModified = new SimpleBooleanProperty(false);
 
-    @FXML private PresentationBrowser browser;
-    @FXML private TextField slideNumber;
-    @FXML private TextField fieldName;
-    @FXML private HBox markupContentTypeBox;
-    @FXML private ToolBar contentExtensionToolBar;
-    @FXML private ToggleGroup markupContentType = new ToggleGroup();
-    @FXML private SlideContentEditor contentEditor;
-    @FXML private Button defineContent;
+    @FXML
+    private PresentationBrowser browser;
+    @FXML
+    private TextField slideNumber;
+    @FXML
+    private TextField fieldName;
+    @FXML
+    private HBox markupContentTypeBox;
+    @FXML
+    private ToolBar contentExtensionToolBar;
+    @FXML
+    private ToggleGroup markupContentType = new ToggleGroup();
+    @FXML
+    private SlideContentEditor contentEditor;
+    @FXML
+    private Button defineContent;
 
     /* All methods called by the FXML */
 
     /**
      * This method is called by the <code>Define</code> button of the FXML. The selected syntax is retrieved as well as the content.
-     * The treatment is then delegated to the {@link #updateSlide(com.twasyl.slideshowfx.markup.IMarkup, String)} method.
+     * The treatment is then delegated to the {@link #updateSlide(IMarkup, String)} method.
      *
      * @param event
-     * @throws javax.xml.transform.TransformerException
-     * @throws java.io.IOException
-     * @throws javax.xml.parsers.ParserConfigurationException
-     * @throws org.xml.sax.SAXException
+     * @throws TransformerException
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
      */
-    @FXML private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
+    @FXML
+    private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
         this.updateSlide();
     }
 
     /**
      * Define and manages variables that are available for the presentation. Variable allow to insert elements which
      * values will be replaced inside the presentation.
+     *
      * @param event The source event calling this method.
      */
-    @FXML private void definePresentationVariables(ActionEvent event) {
+    @FXML
+    private void definePresentationVariables(ActionEvent event) {
         final PresentationVariablesPanel variablesPanel = new PresentationVariablesPanel(this.presentationEngine.getConfiguration());
 
         final ButtonType insert = new ButtonType("Insert", ButtonBar.ButtonData.OTHER);
@@ -105,14 +117,15 @@ public class PresentationViewController implements Initializable {
         final ButtonType answer = DialogHelper.showDialog("Insert a variable", variablesPanel, ButtonType.CANCEL, insert, ButtonType.OK);
 
         // Insert the token inside the editor
-        if(answer != null && answer == insert) {
+        if (answer != null && answer == insert) {
             final Pair<String, String> variable = variablesPanel.getSelectedVariable();
 
-            if(variable != null) this.contentEditor.appendContentEditorValue(String.format("${%1$s}", variable.getKey()));
+            if (variable != null)
+                this.contentEditor.appendContentEditorValue(String.format("${%1$s}", variable.getKey()));
         }
 
         // If cancel wasn't clicked, updates all variables in the presentation and updates it the presentation file
-        if(answer != ButtonType.CANCEL) {
+        if (answer != ButtonType.CANCEL) {
             this.presentationEngine.getConfiguration().setVariables(variablesPanel.getVariables());
 
             this.presentationEngine.getConfiguration()
@@ -128,6 +141,7 @@ public class PresentationViewController implements Initializable {
      * This method updates a slide of the presentation. The <code>markup</code> and the <code>originalContent</code> are
      * deduced from the user interface. If all parameters can be deduced, then {@link #updateSlide(IMarkup, String)} is
      * called, otherwise nothing is performed.
+     *
      * @throws TransformerException
      * @throws IOException
      * @throws ParserConfigurationException
@@ -136,7 +150,7 @@ public class PresentationViewController implements Initializable {
     private void updateSlide() throws TransformerException, IOException, ParserConfigurationException, SAXException {
         RadioButton selectedMarkup = (RadioButton) this.markupContentType.getSelectedToggle();
 
-        if(selectedMarkup != null) {
+        if (selectedMarkup != null) {
             this.updateSlide((IMarkup) selectedMarkup.getUserData(), this.contentEditor.getContentEditorValue());
         }
     }
@@ -148,12 +162,12 @@ public class PresentationViewController implements Initializable {
      * with the HTML content converted in Base64.
      * A screenshot of the slide is taken to update the menu of available slides.
      *
-     * @param markup The markup with which the new content was generated.
+     * @param markup          The markup with which the new content was generated.
      * @param originalContent The original content, in Base64, with which the slide will be updated.
-     * @throws javax.xml.transform.TransformerException
-     * @throws java.io.IOException
-     * @throws javax.xml.parsers.ParserConfigurationException
-     * @throws org.xml.sax.SAXException
+     * @throws TransformerException
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
      */
     private void updateSlide(final IMarkup markup, final String originalContent) throws TransformerException, IOException, ParserConfigurationException, SAXException {
         final String elementId = String.format("%1$s-%2$s", this.slideNumber.getText(), this.fieldName.getText());
@@ -176,7 +190,7 @@ public class PresentationViewController implements Initializable {
         WritableImage thumbnail = this.browser.snapshot(null, null);
         this.presentationEngine.getConfiguration().updateSlideThumbnail(this.slideNumber.getText(), thumbnail);
 
-        if(this.parent != null) this.parent.updateSlideSplitMenu();
+        if (this.parent != null) this.parent.updateSlideSplitMenu();
 
         this.presentationEngine.setModifiedSinceLatestSave(true);
     }
@@ -184,8 +198,8 @@ public class PresentationViewController implements Initializable {
     /**
      * Update the JavaFX UI with the data from the element that has been clicked in the HTML page.
      *
-     * @param slideNumber The slide number of the slide that has been clicked in the HTML page
-     * @param field The field of the slide that has been clicked in the HTML page.
+     * @param slideNumber           The slide number of the slide that has been clicked in the HTML page
+     * @param field                 The field of the slide that has been clicked in the HTML page.
      * @param currentElementContent The current content of the element clicked in the HTML page.
      */
     public void prefillContentDefinition(String slideNumber, String field, String currentElementContent) {
@@ -229,24 +243,24 @@ public class PresentationViewController implements Initializable {
 
     /**
      * This method is called by the presentation in order to execute a code snippet. The executor is identified by the
-     * {@code snippetExecutorCode} and retrieved in the OSGi context to get the {@link com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor}
+     * {@code snippetExecutorCode} and retrieved in the OSGi context to get the {@link ISnippetExecutor}
      * instance that will execute the code.
      * The code to execute is passed to this method in Base64 using the {@code base64CodeSnippet} parameter. The execution
      * result will be pushed back to the presentation in the HTML element {@code consoleOutputId}.
      *
      * @param snippetExecutorCode The unique identifier of the executor that will execute the code.
-     * @param base64CodeSnippet The code snippet to execute, given in Base64.
-     * @param consoleOutputId The HTML element that will be updated with the execution result.
+     * @param base64CodeSnippet   The code snippet to execute, given in Base64.
+     * @param consoleOutputId     The HTML element that will be updated with the execution result.
      */
     public void executeCodeSnippet(final String snippetExecutorCode, final String base64CodeSnippet, final String consoleOutputId) {
 
-        if(snippetExecutorCode != null) {
+        if (snippetExecutorCode != null) {
             final Optional<ISnippetExecutor> snippetExecutor = OSGiManager.getInstance().getInstalledServices(ISnippetExecutor.class)
                     .stream()
                     .filter(executor -> snippetExecutorCode.equals(executor.getCode()))
                     .findFirst();
 
-            if(snippetExecutor.isPresent()) {
+            if (snippetExecutor.isPresent()) {
                 final String decodedString = new String(Base64.getDecoder().decode(base64CodeSnippet), GlobalConfiguration.getDefaultCharset());
                 final CodeSnippet codeSnippetDecoded = CodeSnippet.toObject(decodedString);
                 final ObservableList<String> consoleOutput = snippetExecutor.get().execute(codeSnippetDecoded);
@@ -273,6 +287,7 @@ public class PresentationViewController implements Initializable {
      * added to the panel of markups as well as in the ToggleGroup for all markups.
      * Note that the RadioButton will not request focus when it is clicked. This avoid the cursor to leave an eventual
      * text edition area.
+     *
      * @param markup The markup to create the RadioButton for
      * @return The created RadioButton.
      */
@@ -294,6 +309,7 @@ public class PresentationViewController implements Initializable {
     /**
      * Creates a Button for the given content extension so the user will be able to insert new type of content in a slide.
      * The Button is added to the ToolBar of content extensions.
+     *
      * @param contentExtension The content extension to create the Button for.
      * @return The created Button.
      */
@@ -367,10 +383,10 @@ public class PresentationViewController implements Initializable {
         final Iterator<Node> it = this.markupContentTypeBox.getChildren().iterator();
         Node child;
 
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             child = it.next();
 
-            if(child instanceof RadioButton) it.remove();
+            if (child instanceof RadioButton) it.remove();
         }
 
         // Creating RadioButtons for each markup bundle installed
@@ -386,10 +402,10 @@ public class PresentationViewController implements Initializable {
         final Iterator<Node> iterator = this.contentExtensionToolBar.getItems().iterator();
         Node child;
 
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             child = iterator.next();
 
-            if(child instanceof Button && child.getUserData() instanceof IContentExtension) iterator.remove();
+            if (child instanceof Button && child.getUserData() instanceof IContentExtension) iterator.remove();
         }
 
         // Creating Buttons for each extension bundle installed
@@ -400,10 +416,12 @@ public class PresentationViewController implements Initializable {
     }
 
     /**
-     * This method refreshed the browser displaying the presentation.
+     * Reload the browser displaying the presentation.
+     *
+     * @return A {@link CompletableFuture} which will be completed when the browser is no more loading it's content.
      */
-    public void reloadPresentationBrowser() {
-        this.browser.reload();
+    public CompletableFuture<Boolean> reloadPresentationBrowser() {
+        return this.browser.reload();
     }
 
     /**
@@ -411,7 +429,7 @@ public class PresentationViewController implements Initializable {
      * exists, nothing if done.
      */
     public void loadPresentationInBrowser() {
-        if(this.presentationEngine.getConfiguration().getPresentationFile() != null
+        if (this.presentationEngine.getConfiguration().getPresentationFile() != null
                 && this.presentationEngine.getConfiguration().getPresentationFile().exists()) {
             this.browser.loadPresentation(this.presentationEngine);
         }
@@ -419,11 +437,12 @@ public class PresentationViewController implements Initializable {
 
     /**
      * Defines the presentation for the given view and load it in the browser.
+     *
      * @param presentation The presentation associated to the view.
-     * @throws java.lang.NullPointerException If {@code presentation} is {@code null}.
+     * @throws NullPointerException If {@code presentation} is {@code null}.
      */
-    public void  definePresentation(final PresentationEngine presentation) {
-        if(presentation == null) throw new NullPointerException("The presentation can not be null");
+    public void definePresentation(final PresentationEngine presentation) {
+        if (presentation == null) throw new NullPointerException("The presentation can not be null");
 
         this.presentationEngine = presentation;
         this.loadPresentationInBrowser();
@@ -452,11 +471,14 @@ public class PresentationViewController implements Initializable {
     }
 
     /**
-     * Get the presentation name. This will typically be the name of the {@link com.twasyl.slideshowfx.engine.presentation.PresentationEngine#getArchive()}
+     * Get the presentation name. This will typically be the name of the {@link PresentationEngine#getArchive()}
      * object, or "Untitled" if it doesn't exist.
+     *
      * @return The name of this presentation.
      */
-    public ReadOnlyStringProperty getPresentationName() { return this.presentationName; }
+    public ReadOnlyStringProperty getPresentationName() {
+        return this.presentationName;
+    }
 
     /**
      * Indicates if the presentation has been modified since the latest time it has been saved.
@@ -464,17 +486,20 @@ public class PresentationViewController implements Initializable {
      * @return The property indicating if the presentation has been modified since the latest save.
      */
 
-    public ReadOnlyBooleanProperty presentationModifiedProperty() { return presentationModified; }
+    public ReadOnlyBooleanProperty presentationModifiedProperty() {
+        return presentationModified;
+    }
 
     /**
      * Get the slide number of the slide currently displayed.
+     *
      * @return The slide number of the current displayed slide or {@code null} if no slide is displayed.
      */
     public String getCurrentSlideNumber() {
         String slideNumber = null;
         final String slideId = this.getCurrentSlideId();
 
-        if(slideId != null && !slideId.isEmpty()) {
+        if (slideId != null && !slideId.isEmpty()) {
             slideNumber = slideId.substring(this.presentationEngine.getTemplateConfiguration().getSlideIdPrefix().length());
         }
 
@@ -483,6 +508,7 @@ public class PresentationViewController implements Initializable {
 
     /**
      * Get the ID of the slide currently displayed.
+     *
      * @return The ID of the slide currently displayed or {@code null} if no slide is displayed.
      */
     public String getCurrentSlideId() {
@@ -491,10 +517,11 @@ public class PresentationViewController implements Initializable {
 
     /**
      * Go to a specific slide ID. If the given ID is {@code null} or empty, nothing will be performed.
+     *
      * @param slideId The ID of the slide to go to.
      */
     public void goToSlide(final String slideId) {
-        if(slideId != null && !slideId.isEmpty()) {
+        if (slideId != null && !slideId.isEmpty()) {
             this.browser.slide(slideId);
         }
     }
@@ -515,6 +542,7 @@ public class PresentationViewController implements Initializable {
 
     /**
      * Get the presentation associated to this view.
+     *
      * @return The presentation associated to this view.
      */
     public PresentationEngine getPresentation() {

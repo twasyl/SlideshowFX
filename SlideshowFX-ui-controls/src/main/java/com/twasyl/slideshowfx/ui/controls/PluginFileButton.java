@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.ui.controls;
 
+import com.twasyl.slideshowfx.utils.Jar;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.geometry.Pos;
@@ -15,8 +16,6 @@ import javafx.scene.text.TextAlignment;
 import java.io.*;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +24,7 @@ import java.util.logging.Logger;
  * {@code plugin-file-button}.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1
  * @since SlideshowFX 1.1
  */
 public class PluginFileButton extends ToggleButton {
@@ -33,19 +32,22 @@ public class PluginFileButton extends ToggleButton {
 
     private static final double BUTTON_SIZE = 80;
 
-    private final File pluginFile;
+    private Jar pluginFile;
     private final String label;
     private final String version;
     private final String description;
 
     public PluginFileButton(final File pluginFile) {
-        this.pluginFile = pluginFile;
-        final Attributes manifestAttributes = this.getManifestAttributes();
+        try {
+            this.pluginFile = new Jar(pluginFile);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Invalid JAR file", e);
+        }
 
-        final Node icon = this.buildIconNode(manifestAttributes);
-        this.label = this.getManifestAttributeValue(manifestAttributes, "Setup-Wizard-Label", this.pluginFile.getName());
-        this.version = this.getManifestAttributeValue(manifestAttributes, "Bundle-Version", "");
-        this.description = this.getManifestAttributeValue(manifestAttributes, "Bundle-Description", "");
+        final Node icon = this.buildIconNode(this.pluginFile.getManifestAttributes());
+        this.label = this.pluginFile.getManifestAttributeValue("Setup-Wizard-Label", this.pluginFile.getFile().getName());
+        this.version = this.pluginFile.getManifestAttributeValue("Bundle-Version", "");
+        this.description = this.pluginFile.getManifestAttributeValue("Bundle-Description", "");
 
         this.setPrefSize(BUTTON_SIZE, BUTTON_SIZE);
         this.setMinSize(BUTTON_SIZE, BUTTON_SIZE);
@@ -56,7 +58,7 @@ public class PluginFileButton extends ToggleButton {
         final VBox graphics = new VBox(2);
         graphics.setAlignment(Pos.CENTER);
 
-        if(icon != null) {
+        if (icon != null) {
             graphics.getChildren().add(icon);
         } else {
             graphics.getChildren().add(getLabelNode());
@@ -70,19 +72,25 @@ public class PluginFileButton extends ToggleButton {
             final StringBuilder tooltipText = new StringBuilder(label).append(":\n")
                     .append(description).append(".\n");
 
-            if(newSelected) tooltipText.append("Will be installed");
+            if (newSelected) tooltipText.append("Will be installed");
             else tooltipText.append("Will not be installed");
 
             tooltipText.append('.');
 
             Tooltip tooltip = this.getTooltip();
-            if(tooltip == null) {
+            if (tooltip == null) {
                 tooltip = new Tooltip();
                 this.setTooltip(tooltip);
             }
 
             tooltip.setText(tooltipText.toString());
         });
+
+        try {
+            this.pluginFile.close();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Can not close plugin file", e);
+        }
     }
 
     protected Text getVersionNode() {
@@ -105,66 +113,35 @@ public class PluginFileButton extends ToggleButton {
 
     /**
      * Get the file associated to this button.
+     *
      * @return The file associated to this button.
      */
     public File getFile() {
-        return this.pluginFile;
+        return this.pluginFile.getFile();
     }
 
     /**
      * Get the label of this plugin.
+     *
      * @return The label of this plugin.
      */
-    public String getLabel() { return this.label; }
-
-    /**
-     * Get the attributes contained in the {@code MANIFEST.MF} of the plugin.
-     * @return The attributes contained in the {@code MANIFEST.MF} file of the plugin.
-     */
-    protected final Attributes getManifestAttributes() {
-        Attributes manifestAttributes = null;
-
-        try {
-            final JarFile jarFile = new JarFile(this.pluginFile);
-            final Manifest manifest = jarFile.getManifest();
-            manifestAttributes = manifest.getMainAttributes();
-        } catch(IOException ex) {
-            LOGGER.log(Level.WARNING, "Can not extract manifest attributes", ex);
-        }
-
-        return manifestAttributes;
-    }
-
-    /**
-     * Get the value of an attribute stored within a collection of {@code attributes}. If the value is {@code null} or
-     * empty, the default value will be returned.
-     * @param attributes The whole collection of attributes.
-     * @param name The name of the attribute to retrieve the value for.
-     * @param defaultValue The default value to return if the original value is {@code null} or empty.
-     * @return The value of the attribute.
-     */
-    protected final String getManifestAttributeValue(final Attributes attributes, final String name, final String defaultValue) {
-        final String value = attributes.getValue(name);
-
-        if(value == null || value.isEmpty()) return defaultValue;
-        else return value;
+    public String getLabel() {
+        return this.label;
     }
 
     /**
      * Get the icon of the plugin stored within the JAR file as an array of bytes. If no icon is present, an empty array
      * is returned.
-     * @param plugin The JAR file of the plugin.
+     *
      * @return The icon of the plugin.
      */
-    protected final byte[] getIconFromJar(final File plugin) {
+    protected final byte[] getIconFromJar() {
         final ByteArrayOutputStream iconOut = new ByteArrayOutputStream();
 
-        try {
-            final JarFile jarFile = new JarFile(plugin);
-            final JarEntry icon = jarFile.getJarEntry("META-INF/icon.png");
+        final JarEntry icon = this.pluginFile.getEntry("META-INF/icon.png");
 
-            if(icon != null) {
-                final InputStream iconIn = jarFile.getInputStream(icon);
+        if (icon != null) {
+            try (final InputStream iconIn = this.pluginFile.getInputStream(icon)) {
                 final byte[] buffer = new byte[512];
                 int numberOfBytesRead;
 
@@ -174,9 +151,9 @@ public class PluginFileButton extends ToggleButton {
 
                 iconOut.flush();
                 iconOut.close();
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Can not the icon from JAR", e);
             }
-        } catch(IOException ex) {
-            LOGGER.log(Level.WARNING, "Can not the icon from JAR", ex);
         }
 
         return iconOut.toByteArray();
@@ -184,21 +161,22 @@ public class PluginFileButton extends ToggleButton {
 
     /**
      * Create the {@code Node} that will contain the icon of the plugin.
+     *
      * @param attributes The manifest attributes of the plugin JAR file.
      * @return The element containing the icon of the plugin.
      */
     protected final Node buildIconNode(final Attributes attributes) {
         Node icon = null;
-        final byte[] iconFromJar = this.getIconFromJar(this.pluginFile);
+        final byte[] iconFromJar = this.getIconFromJar();
 
-        if(iconFromJar != null && iconFromJar.length > 0) {
+        if (iconFromJar != null && iconFromJar.length > 0) {
             final ByteArrayInputStream input = new ByteArrayInputStream(iconFromJar);
             final Image image = new Image(input, 50, 50, true, true);
             icon = new ImageView(image);
         } else {
-            final String fontIconName = this.getManifestAttributeValue(attributes, "Setup-Wizard-Icon-Name", "");
+            final String fontIconName = this.pluginFile.getManifestAttributeValue("Setup-Wizard-Icon-Name", "");
 
-            if(!fontIconName.isEmpty()) {
+            if (!fontIconName.isEmpty()) {
                 icon = new FontAwesomeIconView(FontAwesomeIcon.valueOf(fontIconName));
                 ((FontAwesomeIconView) icon).setGlyphSize(50);
             }

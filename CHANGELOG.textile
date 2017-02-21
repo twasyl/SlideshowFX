@@ -4,6 +4,21 @@ p. Changes to the SlideshowFX software are listed by version within this documen
 
 h2. Versions
 
+h3(#1_4). "Version 1.4":#1_4
+
+h4. New and noteworthy
+
+* Create files and directories directly from the tree view of the template builder ("#26":https://github.com/twasyl/SlideshowFX/issues/26)
+* Display the application version in the splash screen ("#29":https://github.com/twasyl/SlideshowFX/issues/29)
+* Go to the newly added slide when adding a slide ("#30":https://github.com/twasyl/SlideshowFX/issues/30)
+
+h4. Bug fixes
+
+* The help can be displayed ("#24":https://github.com/twasyl/SlideshowFX/issues/24)
+* The label for the slides' template directory within the template builder has been corrected ("#25":https://github.com/twasyl/SlideshowFX/issues/25)
+* Allow to load the template's configuration when a slide has no template elements ("#27":https://github.com/twasyl/SlideshowFX/issues/27)
+* Allow to insert a slide that has no template elements in a presentation ("#28":https://github.com/twasyl/SlideshowFX/issues/28)
+
 h3(#1_3). "Version 1.3":#1_3
 
 h4. New and noteworthy

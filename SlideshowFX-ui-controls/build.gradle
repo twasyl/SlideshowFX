@@ -1,6 +1,7 @@
 version = '1.2'
 
 dependencies {
+    compile project(':SlideshowFX-utils')
     compile configurations.fontawesomefx
 
     testCompile configurations.junit

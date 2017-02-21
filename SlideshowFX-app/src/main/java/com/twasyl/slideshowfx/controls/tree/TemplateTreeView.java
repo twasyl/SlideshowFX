@@ -1,12 +1,16 @@
 package com.twasyl.slideshowfx.controls.tree;
 
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
+import com.twasyl.slideshowfx.ui.controls.ExtendedTextField;
+import com.twasyl.slideshowfx.ui.controls.validators.Validators;
+import com.twasyl.slideshowfx.utils.DialogHelper;
 import com.twasyl.slideshowfx.utils.io.DeleteFileVisitor;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -14,12 +18,12 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.HBox;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +35,7 @@ import java.util.logging.Logger;
  * filesystem.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class TemplateTreeView extends TreeView<File> {
@@ -170,36 +174,230 @@ public class TemplateTreeView extends TreeView<File> {
     }
 
     /**
-     * This method adds the given file to the parent TreeItem. If the file is a directory,
+     * This method adds the given file to the selected item in the tree view. If there is no selection, the root of the
+     * tree view will be used.
+     * If the file is a directory, all files included in the directory will be added to the tree view for a TreeItem
+     * corresponding the the current given file.
+     * This method also copy the given file to the temporary archive folder.
+     *
+     * @param file The content to add to the TreeView.
+     * @return Return the {@link TreeItem} that has been created.
+     */
+    public TreeItem<File> appendContentToTreeView(File file) {
+        final TreeItem<File> parent = this.getParentDirectoryOfSelection();
+
+        return this.appendContentToTreeView(file, parent);
+    }
+
+    /**
+     * This method adds the given file to the parent {@link TreeItem}. If the file is a directory,
      * all files included in the directory will be added to the TreeView for a TreeItem corresponding the the current given file.
      * This method also copy the given file to the temporary archive folder.
      *
      * @param file   The content to add to the TreeView.
      * @param parent The item that is the parent of the content to add.
+     * @return Return the {@link TreeItem} that has been created.
      */
-    public void appendContentToTreeView(File file, TreeItem<File> parent) {
+    public TreeItem<File> appendContentToTreeView(File file, TreeItem<File> parent) {
         File relativeToParent = new File(parent.getValue(), file.getName());
 
-        final TreeItem<File> treeItem = new TreeItem<>(relativeToParent);
+        TreeItem<File> treeItem = new TreeItem<>(relativeToParent);
 
         try {
             if (file.isDirectory()) {
                 Files.createDirectories(relativeToParent.toPath());
 
-                Arrays.stream(file.listFiles())
-                        .forEach(subFile -> this.appendContentToTreeView(subFile, treeItem));
+                for (final File child : file.listFiles()) {
+                    this.appendContentToTreeView(child, treeItem);
+                }
             } else {
                 Files.copy(file.toPath(), relativeToParent.toPath());
             }
 
-            if (this.getRoot().equals(parent)) {
-                parent.setExpanded(true);
-            } else {
-                parent.setExpanded(false);
-            }
             parent.getChildren().add(treeItem);
+            this.getSelectionModel().select(treeItem);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Can not copy content", e);
+            treeItem = null;
+        }
+        return treeItem;
+    }
+
+    /**
+     * This methods will prompt the user a name of a file and create an empty file under the current selection.
+     */
+    public void promptUserAndCreateNewFile() {
+        final ExtendedTextField fileName = new ExtendedTextField("File name", true);
+        fileName.setValidator(Validators.isNotEmpty());
+
+        final HBox pane = new HBox(5, fileName);
+
+        final ButtonType answer = DialogHelper.showCancellableDialog("Add a new file", pane);
+
+        if (answer == ButtonType.OK && fileName.isValid()) {
+            this.createFileUnderSelection(fileName.getText());
+        }
+    }
+
+    /**
+     * This methods will prompt the user a name of a file and create an empty file under the current selection.
+     */
+    public void promptUserAndCreateNewDirectory() {
+        final ExtendedTextField directoryName = new ExtendedTextField("Directory name", true);
+        directoryName.setValidator(Validators.isNotEmpty());
+
+        final HBox pane = new HBox(5, directoryName);
+
+        final ButtonType answer = DialogHelper.showCancellableDialog("Add a new directory", pane);
+
+        if (answer == ButtonType.OK && directoryName.isValid()) {
+            this.createDirectoryUnderSelection(directoryName.getText());
+        }
+    }
+
+    /**
+     * Creates an empty file named according the given {@code fileName}. The file is created under the current selection.
+     * If the current selection is a directory, an empty file will be created inside this directory.
+     * If the current selection is a file, the first parent will be determined and the file will be created into this
+     * parent.
+     * If there is no selection, then the file will be created under the root.
+     *
+     * @param fileName The name of the file that must be created.
+     */
+    public void createFileUnderSelection(final String fileName) {
+        if (fileName != null && !fileName.trim().isEmpty()) {
+            final TreeItem<File> parent = getParentDirectoryOfSelection();
+
+            if (parent != null) {
+                final File newFile = new File(parent.getValue(), fileName.trim());
+
+                try {
+                    Files.createFile(newFile.toPath());
+                    final TreeItem<File> newFileItem = new TreeItem<>(newFile);
+
+                    parent.getChildren().add(newFileItem);
+                    this.getSelectionModel().select(newFileItem);
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Can not create the empty file", e);
+                }
+            } else {
+                LOGGER.log(Level.WARNING, "Can not determine where the file must be created");
+            }
+        }
+    }
+
+    /**
+     * Creates an empty directory named according the given {@code directoryName}. The file is created under the
+     * current selection.
+     * If the current selection is a directory, an empty directory will be created inside this directory.
+     * If the current selection is a file, the first parent will be determined and the directory will be created into
+     * this parent.
+     * If there is no selection, then the directory will be created under the root.
+     * <p>
+     * The directory's name can be a path where each directory to create is separated by a {@code /}. For instance:
+     * {@code dir/subdir} will create a subdir directory in a dir directory, itself created under the selection.
+     *
+     * @param directoryName The name of the directory that must be created.
+     */
+    public void createDirectoryUnderSelection(final String directoryName) {
+        final TreeItem<File> parent = getParentDirectoryOfSelection();
+
+        if (directoryName != null && !directoryName.trim().isEmpty() && parent != null) {
+            final String[] directories = directoryName.trim().split("/");
+
+            TreeItem<File> createdDirectory = parent;
+            int index = 0;
+
+            do {
+                createdDirectory = this.createDirectoryUnderParent(createdDirectory, directories[index++]);
+            } while (createdDirectory != null && index < directories.length);
+        }
+    }
+
+    /**
+     * Creates an empty directory under the given parent. The parent must not be {@code null} and it's value must be
+     * non {@code null} and be a directory.
+     * The name of the directory must be non {@code null} and not empty.
+     *
+     * @param parent        The parent of the directory to create.
+     * @param directoryName The name of the directory to create.
+     * @return Return the created directory.
+     */
+    private TreeItem<File> createDirectoryUnderParent(final TreeItem<File> parent, final String directoryName) {
+        TreeItem<File> newDirectoryItem = null;
+
+        if (directoryName != null && !directoryName.trim().isEmpty()) {
+            if (parent != null && parent.getValue() != null) {
+                if (parent.getValue().isDirectory()) {
+                    final File newDirectory = new File(parent.getValue(), directoryName.trim());
+
+                    if (!newDirectory.exists()) {
+                        try {
+                            Files.createDirectory(newDirectory.toPath());
+                            newDirectoryItem = new TreeItem<>(newDirectory);
+
+                            parent.getChildren().add(newDirectoryItem);
+                        } catch (IOException e) {
+                            LOGGER.log(Level.SEVERE, "Can not create the empty file", e);
+                        }
+                    } else {
+                        newDirectoryItem = parent.getChildren()
+                                .stream()
+                                .filter(item -> item.getValue().equals(newDirectory))
+                                .findFirst()
+                                .orElse(null);
+                    }
+
+                    if (newDirectoryItem != null) {
+                        this.getSelectionModel().select(newDirectoryItem);
+                    }
+                } else {
+                    LOGGER.log(Level.WARNING, "Can not create a directory because the parent is not a directory");
+                }
+            } else {
+                LOGGER.log(Level.WARNING, "Can not determine where the file must be created");
+            }
+        }
+
+        return newDirectoryItem;
+    }
+
+    /**
+     * Determine the parent of the current selection that is a directory. If the selection is a directory itself,
+     * then it is returned. If the selection is a file, then it's parent is returned. If there is no selection, the
+     * root of this {@link TemplateTreeView} is returned.
+     *
+     * @return The parent of the selection that is a directory.
+     */
+    protected TreeItem<File> getParentDirectoryOfSelection() {
+        final TreeItem<File> selection = this.getSelectionModel().getSelectedItem();
+        final TreeItem<File> parent;
+
+        if (selection == null) {
+            parent = getRoot();
+        } else if (selection.getValue() != null && selection.getValue().isDirectory()) {
+            parent = selection;
+        } else if (selection.getValue() != null && selection.getValue().isFile()) {
+            parent = selection.getParent();
+        } else {
+            parent = null;
+        }
+
+        return parent;
+    }
+
+    /**
+     * Closes recursively the given {@link TreeItem}.
+     *
+     * @param item The item to close recusively.
+     */
+    public void closeItem(final TreeItem<File> item) {
+        if (item != null) {
+            item.setExpanded(false);
+
+            if(!item.isLeaf()) {
+                item.getChildren().forEach(this::closeItem);
+            }
         }
     }
 
@@ -265,7 +463,7 @@ public class TemplateTreeView extends TreeView<File> {
         if (item != this.getRoot()) {
             final File configurationFile = new File(this.getEngine().getWorkingDirectory(), this.getEngine().getConfigurationFilename());
 
-            canRename = !item.getValue().equals(configurationFile);
+            canRename = item != null && item.getValue() != null && !item.getValue().equals(configurationFile);
         }
 
         return canRename;
@@ -280,7 +478,7 @@ public class TemplateTreeView extends TreeView<File> {
     public boolean isItemDeletionEnabled(TreeItem<File> item) {
         boolean canDelete = false;
 
-        if (item != this.getRoot()) {
+        if (item != null && item != this.getRoot()) {
             final File configurationFile = new File(this.getEngine().getWorkingDirectory(), this.getEngine().getConfigurationFilename());
 
             canDelete = !item.getValue().equals(configurationFile);

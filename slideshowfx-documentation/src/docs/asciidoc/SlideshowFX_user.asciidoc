@@ -1,0 +1,249 @@
+= SlideshowFX user documentation
+:experimental:
+:numbered:
+:icons: font
+:toc: left
+
+== Introduction
+
+SlideshowFX is an application allowing you to create HTML5 based presentation in a very common manner. Nowadays we all
+use PowerPoint, Keynote and their friends but with evolution of web technologies, new perspectives are now possible.
+Indeed there is a lot of HTML5/JavaScript based framework, like http://lab.hakim.se/reveal-js/[reveal.js] or
+https://github.com/bartaz/impress.js/[impress.js], that allow you to create beautiful presentations to keep your
+audience active. It brings you a lot of freedom like adding a YouTube video right inside your presentation, playing
+music, automatically syntax highlighting code example and more. But to do such presentations you have to know HTML, CSS
+and JavaScript programming languages.
+
+SlideshowFX lets programming languages to developers and presentations' creation to end users. This means that you will
+be able to create your presentations without knowing HTML, even if it is recommended to have the basics.
+
+But SlideshowFX isn't just another simple presentation engine. It brings much more for you:
+
+- A chat is provided so your audience can send you questions using their smartphones and you will answer them whenever you want ;
+- A quiz creator so your audience can answer your quiz using their smartphones and you see results live ;
+- Save your presentations on Box, Dropbox or Google Drive ;
+- Insert code snippets that can be executed directly from the presentation and console's output is displayed in the slide.
+
+== User guide
+
+=== Files and extension
+
+SlideshowFX works with two kinds of files: templates and presentations. Templates define:
+
+* what slides can be inserted inside a presentation
+* default variables that can be insert on slides of a presentation (_i.e._ the author, title, etc)
+
+Template's extension is *sfxt* which stands for _SlideshowFX template_.
+
+A presentation is _your_ slide deck based on a template. It contains resources (images, videos, etc), slides and configuration elements. Presentation's extension is *sfx*.
+
+=== Create a new presentation
+
+In order to create a new presentation in SlideshowFX, you can:
+
+* go to the *File* menu and choose the *New* menu item ;
+* click on the *New presentation* icon (icon:file[]) in the tool bar ;
+* press kbd:[Ctrl+N] on Windows or kbd:[Cmd+N] on OSX.
+
+In the new window, you can either choose a template stored within your template's library or import a new template from your disk by clicking on the *Import new template* button. The imported template will be displayed in the template's library but will not be imported until a presentation is created with it.
+
+When choosing a template, if it provides a preview, it will be displayed on the right side of the window.
+
+=== Creating slides
+
+Once you have open a presentation or template (for creating a new presentation), click on the *Add slide* drop down list (icon:file[]) and choose the kind of slide you want to add to your presentation. The slide will be added after the current displayed slide.
+
+=== Copy slides
+
+Once you have displayed the slide you want to copy, click on the *Copy slide* button (icon:copy[]) in the tool bar and the slide will be copied after the current displayed one.
+
+=== Moving slides
+
+Once you have displayed the slide you want to move, click on the *Move slide* button (icon:file[]) in the tool bar and choose the slide *before* which the displayed slide will be moved.
+
+=== Deleting slides
+
+Once you are currently displaying the slide you want to delete, either:
+
+* click on the *Delete slide* button (icon:file) in the tool bar ;
+* press kbd:[Del] on Windows or kbd:[fn+backspace] on OSX.
+
+=== Working on slides
+
+Slides can be rich in SlideshowFX as it is plain HTML slides. It can contains styled elements using CSS, JavaScript objects like charts, timelines, images, quizs, code snippets, executable code snippets, videos, etc.
+
+==== Defining content
+
+Given the template you are using, all or nothing can be defined on a slide.
+
+Given the plugins you have installed, you can define the content of an element on the slide in:
+
+* plain HTML
+* Markdown
+* Textile
+* asciidoctor
+
+In order to define the content of an element, double-click on it in the slide and the text area on the right will be filled with the content of the element you double-clicked. You can now edit it's value and either click the *Define* button or press kbd:[Ctrl+Enter] on Windows or kbd:[Cmd+Enter] on OSX in order to define the new content for the element.
+
+You can zoom in and out inside the text area by using kbd:[Ctrl+Mouse wheel] on Windows and kbd:[Cmd+Mouse wheel] on OSX shortcuts. 
+
+=== Slideshow mode
+
+==== Entering the slideshow mode
+
+Once you have opened a presentation you can enter the slideshow from the beginning by clicking on the *View* menu and then on *Start the slideshow* item or by pressing kbd:[Ctrl+F] on Windows and kbd:[Cmd+F] on OSX.
+
+You can also start the slideshow mode from the current slide by clicking on the *View* menu and then on *Start the slideshow from the current slide* item or by pressing kbd:[Ctrl+Shift+F] on Windows and kbd:[Cmd+Shift+F] on OSX.
+
+==== Exiting the slideshow mode
+
+When you have entered the slideshow mode and want to exit it, press kbd:[Escape] and you will return to the editor, on the slide left during the slideshow mode.
+
+=== Options
+
+SlideshowFX provides some options that can be changed using the *Options* menu and it's *Options* item.
+
+You are able to:
+
+* Enable or disable an automatic save of your work at a given interval ;
+* Define the interval (in minutes) of saving automatically your work ;
+* Enable or disable the temporary files SlideshowFX creates ;
+* Define the max age (in days) of temporary files to be deleted. Files older of than this age will be removed when SlideshowFX closes if the parameter is enabled ;
+* Define how many presentations are suggested for the *Open recent* menu.
+
+=== Embeded server
+
+SlideshowFX embeds a server that allows the audience to chat with the presenter and to answer quizs started by this same presenter.
+
+==== Starting the server
+
+In order to start the server, ensure you joined a network all your audience can join too. 
+
+Then choose an IP address listed in the *IP address* drop down list in the tool bar.
+
+You should also give a valid _free_ port on your computer, for instance _10080_, in the *Server port* field. This is totally opened in order to accomodate all presenters' computer. If no value is specified, then *80* is used.
+
+You can also specify a Twitter hashtag in the *Twitter hashtag* text field if you want the server to look for it on Twitter and display all tweets inside the chat.
+
+Finally press the *Start the server* (icon:play[]) button in the tool bar in order to start the server. If your cursor is still in the *Server port* or *Twitter hashtag* fields, you can press kbd:[Enter] to start the server.
+
+==== Stopping the server
+
+When the server is started, you can press the *Stop the server* button (icon:power-off[]) in the tool bar. When the server is stopped, you will no more be able to use the chat, neither start quizs.
+
+==== QR code
+
+When the server is started and the slideshow mode is activated, you can display a QR code allowing to directly connect to the SlideshowFX web application designed for the audience. In order to do that, click on the QR code button (icon:qrcode[]) on the right of the presentation in order to display information about how accessing this application. Click again on it in order to hide it. 
+
+==== Chat
+
+The chat allows the audience for participate to the presentation by asking questions to the presenter for instance. The presenter can see all messages during his talk, as well as all connected users. In order to start a
+
+==== Quiz
+
+When the server is started and the slideshow mode is activated, if you start a quiz from your slides, then all connected users to the SlideshowFX web application will be able to answer it. If you click on the quiz icon (icon:question[]) on the right of the presentation, you will see live results. When you stop the quiz, then connected users will no more be able to answer it.
+
+=== Plugins
+
+SlideshowFX can be extended using plugins. Currently SlideshowFX defines the following plugin types:
+
+* _markup_ ;
+* _content extension_ ;
+* _hosting connector_ ;
+* _code snippet executor_.
+
+Plugins are represented by files having the **.jar* extension.
+
+==== Install plugins
+
+In order to install a plugin, go to the *?* menu and then click on the *Plugin center* item. In the plugin center, you can use the *Install plugin* button or drag plugin files on it to install new plugins.
+The new plugins should them appear in the list of plugins and should be selected. Once you click on the *OK* button, the plugins will be installed.
+
+It is recommended to restart SlideshowFX in order to take the plugins in consideration properly.
+
+==== Remove plugins
+
+In order to remove a plugin, go to the *?* menu and then click on the *Plugin center* item. Un-check all plugins in the list you want to remove and click on the *OK* button.
+
+It is recommended to restart SlideshowFX in order to take the plugins' removal in consideration properly.
+
+==== Markup plugins
+
+Markup plugins allow to define slides' content using a particular markup syntax. SlideshowFX currently allows to define slides' content in HTML, http://asciidoctor.org/[asciidoctor], markdown and textile.
+
+All available syntaxes are listed at the top of the editing content area. Select the syntax with which you are editing your slide element before you press the *Define* button.
+
+==== Content extension plugins
+
+Content extension plugins allow to facilitate the insertion of specific elements within your slides. SlideshowFX currently provides plugins for inserting:
+
+* images ;
+* hyperlinks ;
+* code snippets ;
+* executable code snippets ;
+* variables (that can be reused on several slides) ;
+* JavaScript sweet alerts ;
+* quotes ;
+* quizs ;
+* sequence diagram ;
+* shapes.
+
+When you click on the button of one of these plugins in the tool bar next to the editing area and then validate it's dialog, the plugin will insert the proper content inside the editing area, according the markup syntax you have chosen. If the plugin doesn't support the chosen syntax, HTML will be generated instead.
+
+==== Hosting connector plugins
+
+Hosting connector plugins allow to save and download presentations to and from a _cloud storage platform_. Currently SlideshowFX supports https://www.box.com/[Box], https://www.dropbox.com/[Dropbox] and https://www.google.com/drive/[Google Drive].
+
+===== Configuration
+
+Hosting connectors need to be configured and currently you must declare an _application_ for the platform you want to use, inside your personal account.
+
+Then you need to configure the hosting connectors in SlideshowFX by clicking on the *Options* menu and then click on the *Options* item. In the new window, go to the *Hosting connectors" tab and, for each hosting connector to use give :
+
+* the consumer key ;
+* the consumer secret ;
+* the redirect URI.
+
+These information are provided directly on the platform you declared the application in.
+
+===== Opening from a hosting platform
+
+Once the hosting connector configured, you can download a presentation by clicking on the *File* menu, then choose *Download from* and click on the item corresponding to the platform you want to download the presentation from.
+
+If this is the first time you connect to the platform using SlideshowFX, you will need to log in with the personal account you want to use.
+
+Then you can browse the platform and choose the presentation you want to download. Once selected, choose the destination on your computer where to download the presentation. Once the presentation is downloaded, SlideshowFX will ask you if you want to open it.
+
+NOTE: Even if a presentation is opened from a hosting platform, saving it will always be a local operation. If the presentation should be saved on the platform, it must be done by uploading it.
+
+===== Saving to a hosting platform
+
+In order to save a presentation to a hosting platform, go to the *File* menu, then go to *Upload to* and click on the item corresponding to the platform you want to upload your presentation to.
+
+If this is the first time you connect to the platform using SlideshowFX, you will need to log in with the personal account you want to use.
+
+Then choose the destination where to upload the presentation. The status bar on the bottom left corner will let you know when the upload is done.
+
+NOTE: Even if a presentation is opened from a hosting platform, saving it will always be a local operation. If the presentation should be saved on the platform, it must be done by uploading it.
+
+==== Code snippet executor plugins
+
+Code snippet executors allow to insert piece of code inside a presentation that can be executed live. This is particularly useful when you want to demonstrate features of a programming language. SlideshowFX currently provides support for the following languages:
+
+* Groovy
+* Go
+* Golo
+* Java
+* JavaScript
+* Kotlin
+* Scala
+
+===== Configuration
+
+A code snippet executor may need some configuration. In order to configure it, go to the *Options* menu and then click on the *Options* item. Go to the *Snippet executors* tab and provide the installation folder of the executor you want to use.
+
+===== Usage
+
+In order to insert an executable code snippet inside your presentation, click on the *Insert an executable code snippet* button (icon:terminal[]) over the editing area. In the new window choose the programming language for which you want to insert a code snippet and provide information about the snippet you want to insert: imports, main method, etc. Validate it and the code snippet will be inserted.
+
+On your slide, click on the icon:terminal[] icon to execute the code snippet and see the live result, click on the icon:reload[] icon to display the code snippet again.

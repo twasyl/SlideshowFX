@@ -1,4 +1,4 @@
-version: 1.0.{build}
+version: 2.0.{build}
 
 branches:
   only:
@@ -12,27 +12,19 @@ skip_tags: false
 
 skip_non_tags: false
 
-image: Visual Studio 2015
+image: Visual Studio 2017
 
 clone_depth: 5
-
-install:
-  - SET PATH=%JAVA_HOME%\bin;%PATH%
-  - java -version
 
 platform:
   - x86
   - x64
 
 before_build:
-  - IF "%PLATFORM%" == "x86" (SET JAVA_HOME="C:\Program Files (x86)\Java\jdk1.8.0")
-  - IF "%PLATFORM%" == "x64" (SET JAVA_HOME="C:\Program Files\Java\jdk1.8.0")
-  - SET PATH=%JAVA_HOME%\bin;%PATH%
+  - IF "%PLATFORM%" == "x86" (SET JAVA_HOME=C:\Progra~2\Java\jdk1.8.0)
+  - IF "%PLATFORM%" == "x64" (SET JAVA_HOME=C:\Progra~1\Java\jdk1.8.0)
+  - ECHO %JAVA_HOME%
 
 build_script:
-  - IF "%APPVEYOR_REPO_BRANCH%" == "master" (gradlew.bat build bintrayUpload -x test)
-  - IF NOT "%APPVEYOR_REPO_BRANCH%" == "master" (gradlew.bat build -x test)
-  - gradlew.bat --stop
-
-artifacts:
-  - path: build/distributions/SlideshowFX-*.zip
+  - cmd: IF "%APPVEYOR_REPO_BRANCH%" == "master" (gradlew clean build bintrayUpload)
+  - cmd: IF NOT "%APPVEYOR_REPO_BRANCH%" == "master" (gradlew clean build)

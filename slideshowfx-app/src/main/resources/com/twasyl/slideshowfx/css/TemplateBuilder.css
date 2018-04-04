@@ -1,0 +1,17 @@
+.template-tree-view .tree-cell .glyph-icon { -fx-fill: app-color-text-fill; }
+.template-tree-view .tree-cell:validDrag .glyph-icon,
+.template-tree-view .tree-cell:validDrag .text{ -fx-fill: app-color-orange; }
+
+.template-element-delete-button, .template-element-delete-button:hover {
+    -fx-background-color: transparent;
+    -fx-border-width: 0px;
+}
+
+.add-icon { -fx-fill: app-color-orange; }
+.add-icon:hover { -fx-fill: app-color-mouse-over-border; }
+
+.button.delete-default-template-variable .glyph-icon,
+.button.delete-slide .glyph-icon,
+.button.delete-slide-element .glyph-icon {
+    -fx-fill: app-color-orange;
+}

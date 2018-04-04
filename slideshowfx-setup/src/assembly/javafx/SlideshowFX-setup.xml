@@ -1,0 +1,88 @@
+<project name="JavaFXApplication"
+         xmlns:fx="javafx:com.sun.javafx.tools.ant">
+
+    <target name="deployOSX">
+        <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+                 uri="javafx:com.sun.javafx.tools.ant"
+                 classpath=".:${classpath}"/>
+
+        <fx:deploy nativeBundles="image" outdir="${build.deploy.out.dir}" outfile="${build.deploy.out.file}">
+            <fx:application name="SlideshowFXSetup"
+                            mainClass="com.twasyl.slideshowfx.setup.app.SlideshowFXSetup"
+                            fallbackClass="com.javafx.main.NoJavaFXFallback">
+            </fx:application>
+
+            <fx:info title="SlideshowFX" vendor="Thierry Wasylczenko"
+                     copyright="Copyright SlideshowFX" license="Apache 2 license">
+            </fx:info>
+
+            <fx:platform javafx="8.0+" j2se="8.0">
+                <fx:jvmarg value="-Xms512m" />
+                <fx:jvmarg value="-Xmx2048m" />
+                <fx:jvmarg value="-Dfile.encoding=UTF-8" />
+            </fx:platform>
+
+            <fx:bundleArgument arg="icon" value="${projectDir}/src/assembly/javafx/package/macosx/SlideshowFXSetup.icns"/>
+
+            <fx:resources>
+                <fx:fileset dir="${build.deploy.resources.dir}" />
+            </fx:resources>
+        </fx:deploy>
+    </target>
+
+    <target name="deployWindows">
+        <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+                 uri="javafx:com.sun.javafx.tools.ant"
+                 classpath=".:${classpath}"/>
+
+        <fx:deploy nativeBundles="all" outdir="${build.deploy.out.dir}" outfile="${build.deploy.out.file}">
+            <fx:application name="SlideshowFXSetup"
+                            mainClass="com.twasyl.slideshowfx.setup.app.SlideshowFXSetup"
+                            fallbackClass="com.javafx.main.NoJavaFXFallback">
+            </fx:application>
+
+            <fx:info title="SlideshowFX" vendor="Thierry Wasylczenko"
+                     copyright="Copyright SlideshowFX" license="Apache 2 license">
+            </fx:info>
+
+            <fx:platform javafx="8.0+" j2se="8.0">
+                <fx:jvmarg value="-Xms512m" />
+                <fx:jvmarg value="-Xmx2048m" />
+                <fx:jvmarg value="-Dfile.encoding=UTF-8" />
+            </fx:platform>
+
+            <fx:bundleArgument arg="icon" value="${projectDir}/src/assembly/javafx/package/windows/SlideshowFXSetup.ico" />
+
+            <fx:resources>
+                <fx:fileset dir="${build.deploy.resources.dir}" />
+            </fx:resources>
+        </fx:deploy>
+    </target>
+
+    <target name="deployUnknown">
+        <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+                 uri="javafx:com.sun.javafx.tools.ant"
+                 classpath=".:${classpath}"/>
+
+        <fx:deploy nativeBundles="all" outdir="${build.deploy.out.dir}" outfile="${build.deploy.out.file}">
+            <fx:application name="SlideshowFXSetup"
+                            mainClass="com.twasyl.slideshowfx.setup.app.SlideshowFXSetup"
+                            fallbackClass="com.javafx.main.NoJavaFXFallback">
+            </fx:application>
+
+            <fx:info title="SlideshowFX" vendor="Thierry Wasylczenko"
+                     copyright="Copyright SlideshowFX" license="Apache 2 license">
+            </fx:info>
+
+            <fx:platform javafx="8.0+" j2se="8.0">
+                <fx:jvmarg value="-Xms512m" />
+                <fx:jvmarg value="-Xmx2048m" />
+                <fx:jvmarg value="-Dfile.encoding=UTF-8" />
+            </fx:platform>
+
+            <fx:resources>
+                <fx:fileset dir="${build.deploy.resources.dir}" />
+            </fx:resources>
+        </fx:deploy>
+    </target>
+</project>

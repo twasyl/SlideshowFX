@@ -4,6 +4,61 @@ p. Changes to the SlideshowFX software are listed by version within this documen
 
 h2. Versions
 
+h3(#2_0). "Version 2.0":#2_0
+
+h4. New and noteworthy
+
+* Update the SlideshowFX-textile plugin ("#32":https://github.com/twasyl/SlideshowFX/issues/32)
+* Update the code and snippet extension to support new programming language
+* Alert content extension plugin uses new version of SweetAlert
+* New Shape plugin allowing to insert shapes in a presentation
+* Change the Windows default installation location
+* Take the log configuration in consideration
+* Creating a new presentation displays a template's library allowing to create presentations from previously used templates
+* Display the current time in the information pane during a slideshow
+* Adding support for speaker notes
+* Ask for confirmation when deleting a presentation's variable
+* Introduction of version for templates
+* Allow to re-open recent presentations
+* Uses ACE 1.3.1 in the slide content editor
+* Using FontAwesome 5.0.8
+* Twitter integration has been improved
+
+h4. Bug fixes
+
+* Information screen during slideshow react to events emitted by the slideshow, meaning it will react correctly to display current and next slide
+* Free information pane's resources correctly when exiting the slideshow mode
+* Box hosting connector overwrite an existing file correctly when asked to
+* Prevent NullPointerException to be thrown when auto saving is enabled and the presentation hasn't been already saved
+* Allow Kotlin snippets to be executed on Windows
+
+h4. Included plugins within the packaging
+
+|_. Plugin |_. Version |
+| SlideshowFX-alert-extension | 1.2 |
+| SlideshowFX-asciidoctor | 1.1 |
+| SlideshowFX-box-hosting-connector | 1.2 |
+| SlideshowFX-code-extension | 1.2 |
+| SlideshowFX-drive-hosting-connector | 1.3 |
+| SlideshowFX-dropbox-hosting-connector | 1.2 |
+| SlideshowFX-go-executor | 1.0 |
+| SlideshowFX-golo-executor | 1.0 |
+| SlideshowFX-groovy-executor | 1.0 |
+| SlideshowFX-html | 1.0 |
+| SlideshowFX-image-extension | 1.3 |
+| SlideshowFX-java-executor | 1.0 |
+| SlideshowFX-javascript-executor | 1.0 |
+| SlideshowFX-kotlin-executor | 1.1 |
+| SlideshowFX-link-extension | 1.2 |
+| SlideshowFX-markdown | 1.0 |
+| SlideshowFX-quiz-extension | 1.1 |
+| SlideshowFX-quote-extension | 1.1 |
+| SlideshowFX-scala-executor | 1.0 |
+| SlideshowFX-sequence-diagram-extension | 1.1 |
+| SlideshowFX-shape-extension | 1.0 |
+| SlideshowFX-snippet-extension | 1.2 |
+| SlideshowFX-textile | 1.2 |
+
 h3(#1_4). "Version 1.4":#1_4
 
 h4. New and noteworthy

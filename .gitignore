@@ -7,13 +7,16 @@ out
 # Application stuff
 felix-cache
 plugins
+.vertx
 
 # gradle files
 .gradle/
-gradle.properties
-**/gradle.properties
 build
 **/build/
+
+# maven files
+target
+**/target/
 
 # Error files generated when JavaFX crashes
 hs_err_*

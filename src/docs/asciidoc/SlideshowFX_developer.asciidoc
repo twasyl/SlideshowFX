@@ -1,1 +1,0 @@
-include::{asciidoctor-source}/SlideshowFX_developer.asciidoc[]

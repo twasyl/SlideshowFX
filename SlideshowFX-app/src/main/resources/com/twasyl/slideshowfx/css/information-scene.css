@@ -1,8 +1,0 @@
-.information-scene {
-    -fx-background-color: app-color-background;
-}
-
-.time-elapsed {
-    -fx-fill: app-color-text-fill;
-    -fx-font-size: 100px;
-}

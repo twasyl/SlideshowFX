@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.twasyl.slideshowfx.icons.FontAwesome?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.web.WebView?>
+<?import java.lang.Double?>
+<?import java.net.URL?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.InternalBrowserController">
+    <stylesheets>
+        <URL value="@/com/twasyl/slideshowfx/css/InternalBrowser.css" />
+    </stylesheets>
+
+    <fx:define>
+        <Double fx:id="TOOLBAR_ICON_WIDTH" fx:value="20" />
+        <Double fx:id="TOOLBAR_ICON_HEIGHT" fx:value="20" />
+    </fx:define>
+
+    <top>
+        <HBox fx:id="addressPanel" alignment="BASELINE_CENTER">
+            <Button fx:id="previousPage" onAction="#navigateToPreviousPage">
+                <graphic>
+                    <FontAwesome icon="CHEVRON_LEFT" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange" />
+                </graphic>
+            </Button>
+
+            <TextField fx:id="addressBar" promptText="Address"
+                       prefColumnCount="50" onKeyPressed="#manageKeyPressed" />
+
+            <Button fx:id="nextPage" onAction="#navigateToNextPage">
+                <graphic>
+                    <FontAwesome icon="CHEVRON_RIGHT" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange" />
+                </graphic>
+            </Button>
+        </HBox>
+    </top>
+
+    <center>
+        <WebView fx:id="browser" />
+    </center>
+</BorderPane>
+

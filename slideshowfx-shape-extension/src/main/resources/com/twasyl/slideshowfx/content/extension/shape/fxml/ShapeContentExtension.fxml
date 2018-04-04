@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.twasyl.slideshowfx.ui.controls.ExtendedTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" style="-fx-padding: 5px;"
+            fx:controller="com.twasyl.slideshowfx.content.extension.shape.controllers.ShapeContentExtensionController"
+            prefWidth="600" prefHeight="400">
+
+    <left>
+        <ListView fx:id="shapeType" editable="false" prefWidth="100">
+        </ListView>
+    </left>
+
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="0" right="0" bottom="0" left="10" />
+            </padding>
+            <HBox spacing="10" alignment="BASELINE_LEFT">
+                <ExtendedTextField fx:id="drawingWidth" label="Drawing's width" mandatory="true" />
+                <ExtendedTextField fx:id="drawingHeight" label="Drawing's height" mandatory="true" />
+            </HBox>
+            <ScrollPane>
+                <VBox fx:id="shapesToDraw" spacing="10"></VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
+

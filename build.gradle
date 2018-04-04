@@ -1,392 +1,248 @@
-import com.sun.javafx.PlatformUtil
-
 buildscript {
-
     repositories {
-        mavenCentral()
         jcenter()
     }
-
     dependencies {
-        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
-        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.11'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
     }
 }
 
 allprojects {
-
     repositories {
         jcenter()
         mavenCentral()
     }
+}
 
-    configurations {
-        asciidoctorj
-        box
-        drive
-        dropbox
-        felix
-        fontawesomefx
-        freemarker
-        jsoup
-        markdown
-        twitter4j
-        vertx
-        wikitext
-        zxing
-
-        junit
-        mockito
-    }
-
-    dependencies {
-        asciidoctorj 'org.asciidoctor:asciidoctorj:1.5.4.1'
-        box 'com.box:box-java-sdk:2.1.1'
-        drive 'com.google.apis:google-api-services-drive:v3-rev55-1.22.0'
-        dropbox 'com.dropbox.core:dropbox-core-sdk:2.1.2'
-        felix 'org.apache.felix:org.apache.felix.framework:5.6.1'
-        fontawesomefx 'de.jensd:fontawesomefx-fontawesome:4.7.0'
-        freemarker 'org.freemarker:freemarker:2.3.25-incubating'
-        jsoup 'org.jsoup:jsoup:1.10.2'
-        markdown 'com.github.rjeschke:txtmark:0.13'
-        twitter4j 'org.twitter4j:twitter4j-core:4.0.6', 'org.twitter4j:twitter4j-stream:4.0.6'
-        vertx 'io.vertx:vertx-core:3.3.3', 'io.vertx:vertx-web:3.3.3'
-        wikitext fileTree(dir: "${rootDir.absolutePath}/lib/WikiText", include: '*.jar')
-        zxing 'com.google.zxing:core:3.3.0', 'com.google.zxing:javase:3.3.0'
-
-        junit 'junit:junit:4.12'
-        mockito 'org.mockito:mockito-core:2.6.8'
-    }
-
-    apply plugin: 'com.jfrog.bintray'
-
-    bintray {
-        user =  project.findProperty('bintray_user_name') ?: System.getenv('BINTRAY_USER_NAME')
-        key = project.findProperty('bintray_api_key') ?: System.getenv('BINTRAY_API_KEY')
-
-        pkg {
-            repo = 'SlideshowFX'
-            name = project.name
-            websiteUrl = 'https://slideshowfx.github.io'
-            issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
-            vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
-
-            desc = project.description
-
-            licenses = ['Apache-2.0']
-
-            githubRepo = 'twasyl/SlideshowFX'
-            githubReleaseNotesFile = 'CHANGELOG.textile'
-        }
+def stripProjectVersion(String version) {
+    if (version.contains("-SNAPSHOT")) {
+        return version.replace("-SNAPSHOT", "")
+    } else {
+        return version
     }
 }
+
+def getPlatform() {
+    def osProperty = System.properties['os.name'].toLowerCase()
+
+    if (osProperty.startsWith('mac')) {
+        return ext.os.MAC
+    } else if (osProperty.startsWith('windows')) {
+        return ext.os.WINDOWS
+    } else if (osProperty.startsWith('linux')) {
+        return ext.os.UNIX
+    } else {
+        return ext.os.UNKNOWN
+    }
+}
+
+def getArchitecture() {
+    return System.properties['os.arch']
+}
+
+/**
+ * Determine the suffix for a package according the platform and the architecture.
+ */
+def getPlatformAndArchitecture() {
+    return "${getPlatform()}-${getArchitecture()}"
+}
+
+def isPlugin(Project project) {
+    return project.findProperty('isPlugin') ?: false
+}
+
+def isMarkupPlugin(Project project) {
+    if (isPlugin(project)) {
+        return project.findProperty('isMarkupPlugin') ?: false
+    } else {
+        return false
+    }
+}
+
+def isSnippetExecutorPlugin(Project project) {
+    if (isPlugin(project)) {
+        return project.findProperty('isSnippetExecutor') ?: false
+    } else {
+        return false
+    }
+}
+
+def isHostingConnectorPlugin(Project project) {
+    if (isPlugin(project)) {
+        return project.findProperty('isHostingConnector') ?: false
+    } else {
+        return false
+    }
+}
+
+def isContentExtensionPlugin(Project project) {
+    if (isPlugin(project)) {
+        return project.findProperty('isContentExtension') ?: false
+    } else {
+        return false
+    }
+}
+
+/**
+ * Get all projects that have a SNAPSHOT version.
+ * @return The list of snapshot projects.
+ */
+def getSnapshotProjects() {
+    return allprojects.findAll { it.version.contains('-SNAPSHOT') }
+}
+
+
+ext.os = [
+        MAC    : 'osx',
+        WINDOWS: 'windows',
+        UNIX   : 'unix',
+        UNKNOWN: 'unknown'
+]
+
+ext.dependencies = [
+        asciidoctorj: [version: '1.5.6'],
+        box         : [version: '2.14.1'],
+        drive       : [version: 'v3-rev103-1.23.0'],
+        dropbox     : [version: '3.0.6'],
+        felix       : [version: '5.6.10'],
+        freemarker  : [version: '2.3.27-incubating'],
+        jsoup       : [version: '1.11.2'],
+        junit       : [version: '5.1.0'],
+        markdown    : [version: '0.13'],
+        mockito     : [version: '2.10.0'],
+        rxJava      : [version: '2.1.9'],
+        vertx       : [version: '3.5.1'],
+        wikitext    : [version: '3.0.23'],
+        zxing       : [version: '3.3.2']
+]
 
 subprojects {
-    apply plugin: 'java'
+    afterEvaluate { project ->
+        def isJavaProject = project.pluginManager.hasPlugin('java') || project.pluginManager.hasPlugin('java-library')
+        def isProjectPlugin = rootProject.isPlugin(project)
 
-    group = "com.twasyl.slideshowfx"
+        if (isJavaProject) {
+            dependencies {
+                testImplementation "org.junit.jupiter:junit-jupiter-api:${rootProject.ext.dependencies.junit.version}"
+                testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${rootProject.ext.dependencies.junit.version}"
+            }
 
-    sourceSets {
-        integrationTest {
-            java {
-                compileClasspath += main.output + test.output
-                runtimeClasspath += main.output + test.output
-                srcDir file('src/integration-test/java')
+            test {
+                useJUnitPlatform()
             }
-            resources {
-                srcDir 'src/integration-test/resources'
+        }
+
+        if (isProjectPlugin || project.name.equals('slideshowfx-setup')) {
+            project.pluginManager.apply('com.jfrog.bintray')
+
+            bintray {
+                user = System.properties['bintrayUserName'] ?: System.env['BINTRAY_USER_NAME']
+                key = System.properties['bintrayApiKey'] ?: System.env['BINTRAY_API_KEY']
+
+                configurations = ['archives']
+
+                pkg {
+                    repo = 'SlideshowFX'
+                    name = project.name
+                    websiteUrl = 'https://slideshowfx.github.io'
+                    issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
+                    vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
+
+                    desc = project.description
+
+                    licenses = ['Apache-2.0']
+
+                    githubRepo = 'twasyl/SlideshowFX'
+                    githubReleaseNotesFile = 'CHANGELOG.textile'
+
+                    version {
+                        name = rootProject.stripProjectVersion(project.version)
+                        desc = project.description
+                        released = new Date()
+                        vcsTag = "v${rootProject.stripProjectVersion(project.version)}"
+                    }
+                }
             }
+
+            bintrayUpload.enabled = System.properties["${project.name}.publish"] ?: false
+        }
+
+        if (isProjectPlugin) {
+
+            dependencies {
+                implementation "org.apache.felix:org.apache.felix.framework:${rootProject.ext.dependencies.felix.version}"
+            }
+
+            task installPlugin(type: Copy) {
+                from project.jar
+                into "${System.properties['user.home']}/.SlideshowFX/plugins"
+            }
+
+            installPlugin.dependsOn jar
         }
     }
 
-    configurations {
-        integrationTestCompile.extendsFrom testCompile
-        integrationTestRuntime.extendsFrom testRuntime
+    tasks.withType(JavaCompile) {
+        compileJava {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+        }
+
+        options.encoding = "UTF-8"
     }
 
-    task integrationTest(type: Test) {
-        testClassesDir = sourceSets.integrationTest.output.classesDir
-        classpath = sourceSets.integrationTest.runtimeClasspath
-        outputs.upToDateWhen { false }
-    }
+    tasks.withType(Jar) { task ->
+        afterEvaluate { project ->
+            Map<String, ?> manifestAttributes = ['Implementation-Vendor': 'Thierry Wasylczenko']
 
-    check.dependsOn integrationTest
-    integrationTest.mustRunAfter test
+            if (rootProject.isPlugin(project)) {
+                manifestAttributes += [
+                        'Bundle-ManifestVersion': '2',
+                        'Bundle-Name'           : project.ext.bundle.name,
+                        'Bundle-SymbolicName'   : project.ext.bundle.symbolicName,
+                        'Bundle-Version'        : stripProjectVersion(project.version),
+                        'Bundle-Description'    : project.ext.bundle.description,
+                        'Bundle-Activator'      : project.ext.bundle.activator,
+                        'Bundle-ClassPath'      : project.ext.bundle.classPath ?: '.',
+                        'Bundle-Vendor'         : 'Thierry Wasylczenko',
+                        'Export-Package'        : project.ext.bundle.exportPackage,
+                        'Setup-Wizard-Label'    : project.ext.bundle.setupWizardLabel,
+                        'Import-Package'        : 'org.osgi.framework'
+                ]
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-
-    test {
-        useJUnit()
-        reports.html.enabled = true
-        reports.html.destination = file("${project.reporting.baseDir}/${name}")
-    }
-}
-
-ext {
-    allLibs = new File(rootDir, '/lib')
-    jdk = System.env.'JAVA_HOME'
-
-    asciidoctorMarkupBintrayUploadEnabled = false
-    htmlMarkupBintrayUploadEnabled = false
-    markdownMarkupBintrayUploadEnabled = false
-    textileMarkupBintrayUploadEnabled = false
-
-    boxHostingConnectorBintrayUploadEnabled = false
-    driveHostingConnectorBintrayUploadEnabled = false
-    dropboxHostingConnectorBintrayUploadEnabled = false
-
-    alertContentExtensionBintrayUploadEnabled = false
-    codeContentExtensionBintrayUploadEnabled = false
-    imageContentExtensionBintrayUploadEnabled = false
-    linkContentExtensionBintrayUploadEnabled = false
-    quizContentExtensionBintrayUploadEnabled = false
-    quoteContentExtensionBintrayUploadEnabled = false
-
-    goSnippetExecutorBintrayUploadEnabled = false
-    goloSnippetExecutorBintrayUploadEnabled = false
-    groovySnippetExecutorBintrayUploadEnabled = false
-    javaSnippetExecutorBintrayUploadEnabled = false
-    javascriptSnippetExecutorBintrayUploadEnabled = false
-    kotlinSnippetExecutorBintrayUploadEnabled = false
-    scalaSnippetExecutorBintrayUploadEnabled = false
-    sequenceDiagramContentExtensionBintrayUploadEnabled = false
-    snippetContentExtensionBintrayUploadEnabled = false
-
-    pluginsFolder = new File(System.getProperty("user.home"), '.SlideshowFX/plugins')
-    felixCacheFolder = new File(System.getProperty("user.home"), '.SlideshowFX/felix-cache')
-
-    markupJars = [ project(':SlideshowFX-asciidoctor').jar, project(':SlideshowFX-html').jar,
-                   project(':SlideshowFX-markdown').jar, project(':SlideshowFX-textile').jar  ]
-
-    markupJarDependencies = [ ':SlideshowFX-asciidoctor:jar', ':SlideshowFX-html:jar', ':SlideshowFX-markdown:jar',
-                              ':SlideshowFX-textile:jar' ]
-
-    markupBintrayUploadDependencies = [ ':SlideshowFX-asciidoctor:bintrayUpload', ':SlideshowFX-html:bintrayUpload',
-                                        ':SlideshowFX-markdown:bintrayUpload', ':SlideshowFX-textile:bintrayUpload' ]
-
-    contentExtensionJars = [ project(':SlideshowFX-alert-extension').jar, project(':SlideshowFX-code-extension').jar,
-                             project(':SlideshowFX-image-extension').jar, project(':SlideshowFX-link-extension').jar,
-                             project(':SlideshowFX-quiz-extension').jar, project(':SlideshowFX-quote-extension').jar,
-                             project(':SlideshowFX-sequence-diagram-extension').jar,
-                             project(':SlideshowFX-snippet-extension').jar ]
-
-    contentExtensionJarDependencies = [ ':SlideshowFX-alert-extension:jar', ':SlideshowFX-code-extension:jar',
-                                        ':SlideshowFX-image-extension:jar', ':SlideshowFX-link-extension:jar',
-                                        ':SlideshowFX-quiz-extension:jar', ':SlideshowFX-quote-extension:jar',
-                                        ':SlideshowFX-sequence-diagram-extension:jar',
-                                        ':SlideshowFX-snippet-extension:jar' ]
-
-    contentExtensionBintrayUploadDependencies = [ ':SlideshowFX-alert-extension:bintrayUpload',
-                                                  ':SlideshowFX-code-extension:bintrayUpload',
-                                                  ':SlideshowFX-image-extension:bintrayUpload',
-                                                  ':SlideshowFX-link-extension:bintrayUpload',
-                                                  ':SlideshowFX-quiz-extension:bintrayUpload',
-                                                  ':SlideshowFX-quote-extension:bintrayUpload',
-                                                  ':SlideshowFX-sequence-diagram-extension:bintrayUpload',
-                                                  ':SlideshowFX-snippet-extension:bintrayUpload' ]
-
-    hostingConnectorJars = [ project(':SlideshowFX-box-hosting-connector').jar,
-                             project(':SlideshowFX-dropbox-hosting-connector').jar,
-                             project(':SlideshowFX-drive-hosting-connector').jar ]
-
-    hostingConnectorJarDependencies = [ ':SlideshowFX-box-hosting-connector:jar',
-                                        ':SlideshowFX-dropbox-hosting-connector:jar',
-                                        ':SlideshowFX-drive-hosting-connector:jar' ]
-
-    hostingConnectorBintrayUploadDependencies = [ ':SlideshowFX-box-hosting-connector:bintrayUpload',
-                                                  ':SlideshowFX-dropbox-hosting-connector:bintrayUpload',
-                                                  ':SlideshowFX-drive-hosting-connector:bintrayUpload' ]
-
-    snippetExecutorJars = [ project(':SlideshowFX-go-executor').jar, project(':SlideshowFX-golo-executor').jar,
-                            project(':SlideshowFX-groovy-executor').jar, project(':SlideshowFX-java-executor').jar,
-                            project(':SlideshowFX-javascript-executor').jar, project(':SlideshowFX-kotlin-executor').jar,
-                            project(':SlideshowFX-scala-executor').jar ]
-
-    snippetExecutorJarDependencies = [ ':SlideshowFX-go-executor:jar', ':SlideshowFX-golo-executor:jar',
-                                       ':SlideshowFX-groovy-executor:jar', ':SlideshowFX-java-executor:jar',
-                                       ':SlideshowFX-javascript-executor:jar', ':SlideshowFX-kotlin-executor:jar',
-                                       ':SlideshowFX-scala-executor:jar' ]
-
-    snippetExecutorBintrayUploadDependencies = [ ':SlideshowFX-go-executor:bintrayUpload',
-                                                 ':SlideshowFX-golo-executor:bintrayUpload',
-                                                 ':SlideshowFX-groovy-executor:bintrayUpload',
-                                                 ':SlideshowFX-java-executor:bintrayUpload',
-                                                 ':SlideshowFX-javascript-executor:bintrayUpload',
-                                                 ':SlideshowFX-kotlin-executor:bintrayUpload',
-                                                 ':SlideshowFX-scala-executor:bintrayUpload' ]
-
-    artifactsBundleDependencies = [ ':SlideshowFX-setup:javafx' ]
-
-    sfxAppArtifactName = "SlideshowFX" + (PlatformUtil.isMac() ? ".app" : "")
-    sfxAppArtifactFile = "${project(':SlideshowFX-app').buildDir.absolutePath}/javafx/bundles/${sfxAppArtifactName}"
-
-    sfxSetupArtifactName = "SlideshowFXSetup" + (PlatformUtil.isMac() ? ".app" : "")
-    sfxSetupArtifactFile = "${project(':SlideshowFX-setup').buildDir.absolutePath}/javafx/bundles/${sfxSetupArtifactName}"
-
-    packagingSuffix = "-"
-    if(PlatformUtil.isMac()) {
-        packagingSuffix += "osx"
-    } else if(PlatformUtil.isWindows()) {
-        packagingSuffix += "windows"
-    } else if(PlatformUtil.isLinux()) {
-        packagingSuffix += "unix"
-    } else {
-        packagingSuffix += "generic"
-    }
-
-    packagingSuffix += "-" + System.getProperty("os.arch");
-}
-
-apply plugin: 'org.asciidoctor.convert'
-apply plugin: 'distribution'
-
-version = '1.4'
-
-wrapper {
-    gradleVersion = '3.4'
-}
-
-asciidoctorj {
-    version = '1.5.4'
-}
-
-asciidoctor {
-    backends = ['html5','pdf']
-    attributes = [
-            'source-highlighter': 'coderay',
-            toc: 'left',
-            icons: 'font',
-            setanchors: '',
-            sectlinks: '',
-            linkcss: false,
-            'slideshowfx_version': project.version,
-            'asciidoctor-source': new File(project(':SlideshowFX-app').projectDir, 'src/main/resources/com/twasyl/slideshowfx/documentation').absolutePath,
-            'javafx-version': '8 update 121',
-            'jdk-version': '8 update 121',
-            'gradle-version': "${wrapper.gradleVersion}",
-            'asciidoctorj-version': "${configurations.asciidoctorj.dependencies[0].version}",
-            'apache-felix-version': "${configurations.felix.dependencies[0].version}",
-            'freemarker-version': "${configurations.freemarker.dependencies[0].version}",
-            'fontawesomefx-version' : "${configurations.fontawesomefx.dependencies[0].version}",
-            'jsoup-version': "${configurations.jsoup.dependencies[0].version}",
-            'wikitext-core-version': '2.11.0.N20161225-2213',
-            'wikitext-textile-core-version': '2.11.0.N20161028-1624',
-            'twitter4j-version': "${configurations.twitter4j.dependencies[0].version}",
-            'txtmark-version': "${configurations.markdown.dependencies[0].version}",
-            'vertx-version': "${configurations.vertx.dependencies[0].version}",
-            'zxing-core-version': "${configurations.zxing.dependencies[0].version}",
-            'zxing-jse-version': "${configurations.zxing.dependencies[1].version}",
-            'ace-version': '1.2.6'
-    ]
-}
-
-task installMarkupPlugins(dependsOn: markupJarDependencies) << {
-
-    copy {
-        from (markupJars)
-
-        into pluginsFolder
-    }
-}
-
-task installContentExtensionPlugins(dependsOn: contentExtensionJarDependencies) << {
-
-    copy {
-        from (contentExtensionJars)
-
-        into pluginsFolder
-    }
-}
-
-task installHostingConnectorPlugins(dependsOn : hostingConnectorJarDependencies) << {
-    copy {
-        from (hostingConnectorJars)
-
-        into pluginsFolder
-    }
-}
-
-task installSnippetExecutorPlugins(dependsOn : snippetExecutorJarDependencies) << {
-    copy {
-        from (snippetExecutorJars)
-
-        into pluginsFolder
-    }
-}
-
-task installAllPlugins(dependsOn: [ ':installMarkupPlugins', ':installContentExtensionPlugins',
-                                    ':installHostingConnectorPlugins', ':installSnippetExecutorPlugins']) << {
-}
-
-task publishAllMarkup(dependsOn : markupBintrayUploadDependencies ) << {
-}
-
-task publishAllContentExtension(dependsOn: contentExtensionBintrayUploadDependencies) << {
-
-}
-task publishAllHostingConnector(dependsOn : hostingConnectorBintrayUploadDependencies) << {
-}
-
-task publishAllSnippetExecutor(dependsOn : snippetExecutorBintrayUploadDependencies) << {
-}
-
-task publishAllToBintray (dependsOn : ['publishAllMarkup', 'publishAllContentExtension', 'publishAllHostingConnector',
-                                       'publishAllSnippetExecutor']) << {
-}
-
-distributions {
-    main {
-        baseName = "SlideshowFX"
-        contents {
-            // Documentation
-            into('documentations/html') {
-                from("${asciidoctor.outputDir}/html5") {
-                    include '*'
-                }
-            }
-            into('documentations/pdf') {
-                from("${asciidoctor.outputDir}/pdf") {
-                    include '*.pdf'
+                if (project.ext.bundle.containsKey('setupWizardIconName')) {
+                    manifestAttributes += ['Setup-Wizard-Icon-Name': project.ext.bundle.setupWizardIconName]
                 }
             }
 
-            into (sfxSetupArtifactName) {
-                from fileTree(dir: sfxSetupArtifactFile)
+            jar {
+                manifest {
+                    attributes(manifestAttributes)
+                }
             }
         }
     }
 }
 
-tasks.distZip.dependsOn = artifactsBundleDependencies
-tasks.distTar.enabled = false
-
-bintray {
-    filesSpec {
-        from tasks.distZip.archivePath
-        into '.'
-        rename '(.+)-(.+)\\.(.+)', '$1-$2' + packagingSuffix + '.$3'
+/**
+ * Task listing the projects that have a SNAPSHOT a version. These projects will be printed on the console with their
+ * version.
+ */
+task listSnapshotProjects {
+    doLast {
+        getSnapshotProjects().each { println "${it.name} => ${it.version}" }
     }
+}
 
-    pkg {
-        repo = 'SlideshowFX'
-        name = project.name
-        websiteUrl = 'https://slideshowfx.github.io'
-        issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
-        vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
-
-        desc = project.description
-
-        licenses = ['Apache-2.0']
-
-        githubRepo = 'twasyl/SlideshowFX'
-
-        version {
-            name = project.version
-            desc = project.description
-            released = new Date()
-            vcsTag = "v${project.version}"
+/**
+ * Save as system properties in {@code gradle.properties} file the project that should be published. This task uses
+ * {@link #getSnapshotProjects()} to determine which project should be published.
+ */
+task saveProjectsToBePublished {
+    doLast {
+        new File("$rootProject.projectDir/gradle.properties").withWriter { out ->
+            getSnapshotProjects().findAll { rootProject.isPlugin(it) || it.name.equals('slideshowfx-setup') } each {
+                out.println "systemProp.${it.name}.publish=true"
+            }
         }
     }
 }

@@ -1,42 +1,49 @@
-rootProject.name = 'SlideshowFX'
+rootProject.name = 'slideshowfx'
 
-include 'SlideshowFX-app'
-include 'SlideshowFX-engines'
-include 'SlideshowFX-global-configuration'
-include 'SlideshowFX-logs'
-include 'SlideshowFX-osgi'
-include 'SlideshowFX-plugin'
-include ':SlideshowFX-server'
-include 'SlideshowFX-setup'
-include 'SlideshowFX-ui-controls'
-include 'SlideshowFX-utils'
+include 'slideshowfx-app',
+        'slideshowfx-content-extension',
+        'slideshowfx-documentation',
+        'slideshowfx-engines',
+        'slideshowfx-global-configuration',
+        'slideshowfx-hosting-connector',
+        'slideshowfx-icons',
+        'slideshowfx-logs',
+        'slideshowfx-markup',
+        'slideshowfx-osgi',
+        'slideshowfx-plugin',
+        'slideshowfx-server',
+        'slideshowfx-setup',
+        'slideshowfx-snippet-executor',
+        'slideshowfx-ui-controls',
+        'slideshowfx-utils',
 
-include 'SlideshowFX-markup'
-include 'SlideshowFX-asciidoctor'
-include 'SlideshowFX-html'
-include 'SlideshowFX-markdown'
-include 'SlideshowFX-textile'
+// Content extension plugin
+        'slideshowfx-alert-extension',
+        'slideshowfx-code-extension',
+        'slideshowfx-image-extension',
+        'slideshowfx-link-extension',
+        'slideshowfx-quiz-extension',
+        'slideshowfx-quote-extension',
+        'slideshowfx-sequence-diagram-extension',
+        'slideshowfx-shape-extension',
+        'slideshowfx-snippet-extension',
 
-include 'SlideshowFX-content-extension'
-include 'SlideshowFX-alert-extension'
-include 'SlideshowFX-code-extension'
-include 'SlideshowFX-image-extension'
-include 'SlideshowFX-link-extension'
-include 'SlideshowFX-quiz-extension'
-include 'SlideshowFX-quote-extension'
-include 'SlideshowFX-sequence-diagram-extension'
-include 'SlideshowFX-snippet-extension'
+// Hosting connector plugins
+        'slideshowfx-box-hosting-connector',
+        'slideshowfx-drive-hosting-connector',
+        'slideshowfx-dropbox-hosting-connector',
 
-include 'SlideshowFX-hosting-connector'
-include 'SlideshowFX-box-hosting-connector'
-include 'SlideshowFX-dropbox-hosting-connector'
-include 'SlideshowFX-drive-hosting-connector'
+// Markup plugins
+        'slideshowfx-asciidoctor',
+        'slideshowfx-html',
+        'slideshowfx-markdown',
+        'slideshowfx-textile',
 
-include 'SlideshowFX-snippet-executor'
-include 'SlideshowFX-go-executor'
-include 'SlideshowFX-golo-executor'
-include 'SlideshowFX-groovy-executor'
-include 'SlideshowFX-java-executor'
-include 'SlideshowFX-javascript-executor'
-include 'SlideshowFX-kotlin-executor'
-include 'SlideshowFX-scala-executor'
+// Snippet executor plugins
+        'slideshowfx-go-executor',
+        'slideshowfx-golo-executor',
+        'slideshowfx-groovy-executor',
+        'slideshowfx-java-executor',
+        'slideshowfx-javascript-executor',
+        'slideshowfx-kotlin-executor',
+        'slideshowfx-scala-executor'

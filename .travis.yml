@@ -13,22 +13,25 @@ sudo: true
 matrix:
   include:
     - os: linux
-      jdk: oraclejdk8
+      dist: trusty
+      addons:
+        apt:
+          packages:
+            - fakeroot
     - os: osx
-      osx_image: xcode8.2
+      osx_image: xcode9.2
 
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export JAVA_HOME=$(/usr/libexec/java_home); fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export JAVA_HOME=$(/usr/libexec/java_home); else chmod +x travis.sh; ./travis.sh; export JAVA_HOME=~/jvm/jdk1.8.0_162; fi;
+  - chmod +x gradlew
 
 install: true
 
 script:
-  - chmod +x ./gradlew
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then ./gradlew build bintrayUpload; else ./gradlew build; fi
-  - ./gradlew --stop
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then ./gradlew clean build bintrayUpload -x :slideshowfx-icons:test; else ./gradlew clean build -x :slideshowfx-icons:test; fi
 
 cache:
   directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+    - $HOME/.gradle
+    - $HOME/jvm

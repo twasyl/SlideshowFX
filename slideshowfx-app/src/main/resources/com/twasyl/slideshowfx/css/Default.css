@@ -1,0 +1,496 @@
+.root {
+    app-color-background: RGB(60, 63, 63);
+    app-color-text-fill: #A9B7C6;
+    app-color-prompt-text-fill: #414142;
+    app-color-border-top: RGB(85, 85, 85);
+    app-color-border-bottom: RGB(40,40,40);
+    app-color-light-gray: RGB(95, 95, 95);
+    app-color-input-background: #2B2B2B;
+    app-color-thumb: RGB(88, 88, 88);
+    app-color-mouse-over: #686B6D;
+    app-color-mouse-over-border: #8c9297;
+    app-color-checkable-background: linear-gradient(
+        from 0% 0%
+        to 100% 100%,
+        #7f7f7f 0%,
+        #747474 100%
+    );
+    app-color-checkable-selected-background: #b1b1b1;
+    app-color-checkable-border: #434344;
+    app-color-checkable-focused-border: linear-gradient(
+        from 0% 0%
+        to 100% 100%,
+        #6d96b6 0%,
+        #678fae 100%
+    );
+    app-color-error: #BC3F3C;
+    app-color-linear-gradient-background: linear-gradient(
+        from 50% 0%
+        to 50% 100%,
+        app-color-background 0%,
+        derive(app-color-background, -10%) 100%
+    );
+    app-color-menu-in-use: #103750;
+    app-color-orange: #FF8000;
+    -fx-background-color: app-color-background;
+    -fx-text-fill: app-color-text-fill;
+
+    -app-color-dark-green: #449d44;
+    -app-color-light-green: #5cb85c;
+}
+
+.text-area, .text-area .content, .text-field {
+    -fx-background-color: app-color-input-background;
+    -fx-text-fill: app-color-text-fill;
+    -fx-prompt-text-fill: app-color-prompt-text-fill;
+    -fx-border-radius: 2 2 2 2
+}
+
+.menu-bar .menu-button .menu {
+    -fx-background-color: app-color-background;
+    -fx-text-fill: app-color-text-fill;
+
+    -fx-border-color: app-color-border-top transparent app-color-border-bottom transparent;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+}
+
+.menu-bar .menu:showing,
+.context-menu .menu:showing {
+    -fx-background-color: app-color-menu-in-use;
+}
+
+.menu-bar .menu:showing .context-menu {
+    -fx-border-style: solid none none none;
+    -fx-border-width: 1.5px 0 0 0;
+    -fx-border-color: app-color-menu-in-use;
+}
+
+.menu-bar .menu:showing .menu {
+    -fx-border-style: none;
+    -fx-border-width: 0;
+}
+
+.menu-bar .menu:showing .menu:hover {
+    -fx-background-color: app-color-menu-in-use;
+}
+
+.menu-bar .menu:showing .menu:hover:disabled {
+    -fx-background-color: transparent;
+}
+
+.menu-bar, .menu-button .menu .menu-item {
+    -fx-background-color: app-color-background;
+}
+
+.context-menu {
+    -fx-background-color: app-color-background;
+}
+
+.context-menu .separator .line {
+    -fx-border-color: app-color-light-gray transparent transparent transparent;
+    -fx-border-width: 2px;
+    -fx-border-style: dotted;
+}
+
+.context-menu .menu,
+.context-menu .menu-item {
+    -fx-border-style: none;
+}
+
+.context-menu .menu .menu-item:hover,
+.context-menu .menu:hover {
+    -fx-background-color: app-color-menu-in-use;
+}
+
+.menu:hover {
+    -fx-background-color: app-color-mouse-over;
+}
+
+.menu-item {
+    -fx-background-color: app-color-background;
+    -fx-text-fill: app-color-text-fill;
+}
+
+.menu-item > .right-container > .arrow {
+    -fx-background-color: app-color-text-fill;
+}
+
+.menu-item:hover {
+    -fx-background-color: app-color-menu-in-use;
+}
+
+.menu:hover:disabled,
+.menu-item:hover:disabled {
+    -fx-background-color: transparent;
+}
+
+.tool-bar {
+    -fx-background-color: app-color-background;
+    -fx-text-fill: app-color-text-fill;
+    -fx-border-style: none;
+}
+
+.button,
+.split-menu-button, .split-menu-button .label, .split-menu-button .arrow-button,
+.combo-box, .combo-box .label, .combo-box .arrow-button  {
+    -fx-background-color: transparent;
+    -fx-text-fill: app-color-text-fill;
+}
+
+.button {
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-border-color: app-color-light-gray;
+}
+
+/* This class can be set to each button containing an image in order to "select" them and apply the style */
+.button.image {
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-border-color: transparent;
+}
+
+.button:hover, .button.image:hover {
+    -fx-background-color: app-color-mouse-over;
+    -fx-border-color: app-color-mouse-over-border;
+}
+
+.button:pressed {
+    -fx-background-color: app-color-input-background;
+}
+
+.toggle-button {
+    -fx-background-color: app-color-background;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-border-color: app-color-light-gray;
+    -fx-text-fill: app-color-text-fill;
+}
+
+.toggle-button:hover {
+    -fx-background-color: app-color-mouse-over;
+    -fx-border-color: app-color-mouse-over-border;
+}
+
+.toggle-button:selected {
+    -fx-background-color: app-color-input-background;
+    -fx-border-color: app-color-orange;
+}
+
+.split-menu-button, .combo-box {
+    -fx-border-color: app-color-light-gray;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.combo-box:showing .list-cell:hover { -fx-background-color: app-color-menu-in-use; }
+
+.split-menu-button:hover, .combo-box:hover {
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-border-color: app-color-mouse-over-border;
+}
+
+.split-menu-button:pressed, .split-menu-button:showing,
+.combo-box:pressed, .combo-box:pressed .list-cell, .combo-box:showing, .combo-box:showing .list-cell {
+    -fx-background-color: app-color-input-background;
+}
+
+.split-menu-button .arrow, .combo-box .arrow {
+    -fx-background-color: RGB(173,  173, 173);
+}
+
+.color-picker, .choice-box {
+    -fx-background-color: app-color-background;
+    -fx-border-color: app-color-light-gray;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.color-picker .text, .choice-box .text {
+    -fx-text-fill: app-color-text-fill;
+}
+
+.color-picker .arrow, .choice-box .arrow {
+    -fx-background-color: RGB(173,  173, 173);
+}
+
+.color-picker:showing, .choice-box:showing {
+    -fx-background-color: app-color-input-background;
+}
+
+.color-palette {
+    -fx-background-color: app-color-background;
+}
+
+.separator:vertical .line {
+    -fx-border-color: transparent app-color-light-gray transparent transparent;
+    -fx-border-width: 2px;
+    -fx-border-style: dotted;
+}
+
+.separator:horizontal .line {
+    -fx-border-color: app-color-light-gray transparent;
+    -fx-border-width: 2px;
+    -fx-border-style: dotted;
+}
+
+.radio-button {
+    -fx-text-fill: app-color-text-fill;
+}
+
+.label {
+    -fx-text-fill: app-color-text-fill;
+}
+
+.progress-bar {
+    -fx-background-color: app-color-input-background;
+}
+
+.progress-bar > .track {
+    -fx-text-box-border: app-color-text-fill;
+    -fx-background-color: app-color-input-background;
+}
+
+.progress-indicator {
+    -fx-progress-color: app-color-background;
+}
+
+.scroll-pane, .scroll-pane .corner {
+    -fx-background-color: app-color-background;
+    -fx-background: app-color-background;
+}
+
+.scroll-bar {
+    -fx-background-color: app-color-background;
+    -fx-background: app-color-background;
+}
+
+.scroll-bar .track, .scroll-bar .track-background {
+    -fx-background-color: app-color-background;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: app-color-thumb;
+}
+
+.scroll-bar .increment-button, .scroll-bar .decrement-button {
+    -fx-background-color: app-color-background;
+}
+
+.check-box > .box, .radio-button > .radio {
+    -fx-background-color: app-color-checkable-background;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-color: app-color-checkable-border;
+}
+
+.check-box > .box {
+    -fx-border-radius: 3px;
+}
+
+.radio-button > .radio {
+    -fx-border-radius: 50px;
+}
+
+.check-box:selected > .box > .mark, .check-box:focused:selected > .box > .mark,
+.radio-button:selected > .radio > .dot, .radio-button:focused:selected > .radio > .dot {
+    -fx-background-color: app-color-checkable-selected-background;
+}
+
+.check-box:focused > .box, .radio-button:focused > .radio {
+    -fx-border-color: app-color-checkable-focused-border;
+}
+
+.tab-pane {
+    -fx-border-width: 0px;
+}
+
+.tab-pane .tab-header-background, .tab-pane .tab-header-area {
+    -fx-background-color: app-color-linear-gradient-background;
+}
+
+.tab-pane .tab-content-area {
+    -fx-border-width: 2px 0 0 0;
+    -fx-border-style: solid none none none;
+    -fx-border-color: app-color-light-gray transparent transparent transparent;
+}
+
+.tab-pane .tab {
+    -fx-background-color: app-color-background;
+    -fx-text-fill: app-color-text-fill;
+    -fx-border-style: solid solid none solid;
+    -fx-border-width: 1px;
+    -fx-border-color: black;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: app-color-text-fill;
+}
+
+.tab-pane .tab:selected {
+     -fx-background-color: linear-gradient(
+         from 50% 0%
+         to 50% 10%,
+         #666666 0%,
+         #4f4f4f 10%
+     );
+     -fx-border-color: app-color-light-gray app-color-light-gray transparent app-color-light-gray;
+ }
+
+.tab-pane .tab:focused {
+    -fx-border-color: app-color-light-gray app-color-light-gray transparent app-color-light-gray;
+}
+
+.tab-pane .tab-content-area .viewport {
+    -fx-background-color: app-color-input-background;
+}
+
+.tab-pane .tab-content-area .viewport .button {
+    -fx-border-color: transparent;
+    -fx-background-color: linear-gradient(
+                                  from 50% 0%
+                                  to 50% 100%,
+                                  #666666 0%,
+                                  #4f4f4f 100%
+                              );
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.tab-pane .tab-content-area .viewport .button:hover {
+    -fx-background-color: app-color-mouse-over;
+    -fx-border-color: app-color-text-fill;
+}
+.list-view  { -fx-background-color: app-color-input-background, app-color-input-background; }
+.list-view:focused  {
+    -fx-background-color: transparent, app-color-input-background, transparent;
+}
+
+.tree-cell:filled, .tree-cell:empty,
+.list-cell:filled, .list-cell:empty {
+    -fx-text-fill: app-color-text-fill;
+    -fx-background-color: app-color-background;
+}
+
+.tree-cell:filled:selected,
+.list-view .list-cell:filled:selected {
+    -fx-background-color: app-color-menu-in-use;
+}
+
+.list-cell:filled:hover { -fx-background-color: app-color-menu-in-use; }
+
+.tree-disclosure-node .arrow { -fx-background-color: app-color-text-fill; }
+
+.split-pane {
+    -fx-background-color: app-color-background;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent transparent app-color-border-bottom transparent;
+    -fx-background-color: app-color-background;
+
+}
+
+.split-pane-divider {
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent app-color-border-bottom;
+    -fx-background-color: app-color-background;
+}
+
+.split-pane *.horizontal-grabber {
+    -fx-padding: 5 1;
+    -fx-background-color: app-color-input-background;
+    -fx-shape: "M0 0 L0 0 L2 0 L2 2 L0 2 Z M0 4 L0 4 L2 4 L2 6 L0 6 Z M0 8 L0 8 L2 8 L2 10 L0 10 Z";
+}
+
+.titled-pane {
+    -fx-text-fill: app-color-input-background;
+}
+
+.titled-pane:expanded {
+    -fx-text-fill: app-color-text-fill;
+}
+
+.titled-pane > .title {
+    -fx-background-color: linear-gradient(
+            from 50% 0%
+            to 50% 100%,
+            #666666 0%,
+            #4f4f4f 100%
+        );
+}
+
+.titled-pane > .title > .arrow-button .arrow {
+    -fx-background-color: app-color-text-fill;
+}
+
+.titled-pane > .content {
+    -fx-background-color: app-color-background;
+}
+
+.titled-pane:expanded > .content {
+    -fx-border-width: 0;
+}
+
+.text {
+    -fx-fill: app-color-text-fill;
+    -fx-color: -fx-fill;
+    -fx-text-fill: -fx-fill;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: transparent;
+}
+
+.messages-box {
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-border-color: app-color-orange;
+    -fx-background-color: derive(app-color-orange, 90%);
+    -fx-padding: 2px;
+}
+
+.messages-box .label, .messages-box .text, .messages-box .hyperlink {
+    -fx-text-fill: app-color-orange;
+}
+
+.plugin-file-button .tooltip {
+    -fx-text-fill: app-color-text-fill;
+}
+
+.plugin-file-button, .plugin-file-button .text {
+     -fx-fill: app-color-text-fill;
+     -fx-color: -fx-fill;
+     -fx-text-fill: -fx-fill;
+}
+
+.plugin-file-button:selected .text {
+    -fx-fill: black;
+    -fx-color: -fx-fill;
+    -fx-text-fill: -fx-fill;
+}
+
+.plugin-file-button:selected {
+     -fx-background-color: linear-gradient(from 50% 0% to 50% 100%, -app-color-dark-green 0%, -app-color-light-green 100%);
+     -fx-text-fill: black;
+}
+
+.extended-text-field .label .text { -fx-fill: app-color-light-gray; -fx-font-size: 11px; }
+.extended-text-field .label:focused .text { -fx-fill: app-color-orange; }
+.extended-text-field .text-field:error { -fx-background-color: app-color-error, app-color-input-background; }
+
+.titled-pane:valid-drag-over {
+                 -fx-border-style: dashed inside;
+                 -fx-border-width: 3px;
+                 -fx-border-color: app-color-text-fill;
+             }

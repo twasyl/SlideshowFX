@@ -1,0 +1,27 @@
+description = 'Extension allowing to insert shapes inside a SlideshowFX presentation'
+version = '1.0'
+
+apply plugin: 'java-library'
+
+dependencies {
+    api project(':slideshowfx-content-extension')
+    implementation project(':slideshowfx-icons')
+    api project(':slideshowfx-markup')
+    api project(':slideshowfx-plugin')
+    api project(':slideshowfx-ui-controls')
+    implementation project(':slideshowfx-utils')
+
+    testCompile "org.mockito:mockito-core:${rootProject.ext.dependencies.mockito.version}"
+}
+
+ext.isPlugin = true
+ext.isContentExtension = true
+ext.bundle = [
+        name               : 'SlideshowFX shape extension',
+        symbolicName       : 'com.twasyl.slideshowfx.content.extension.shape',
+        description        : 'Support for inserting shapes in slides',
+        activator          : 'com.twasyl.slideshowfx.content.extension.shape.activator.ShapeContentExtensionActivator',
+        exportPackage      : 'com.twasyl.slideshowfx.content.extension.shape,com.twasyl.slideshowfx.content.extension.shape.controllers,com.twasyl.slideshowfx.content.extension.shape.activator',
+        setupWizardLabel   : 'Shape',
+        setupWizardIconName: 'STAR'
+]

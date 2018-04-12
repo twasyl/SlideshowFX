@@ -1,4 +1,0 @@
-description = "Module defining a markup"
-version = '1.0'
-
-apply plugin: 'java'

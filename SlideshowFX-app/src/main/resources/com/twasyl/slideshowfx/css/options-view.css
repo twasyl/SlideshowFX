@@ -1,3 +1,0 @@
-#snippetExecutorContainer .text-field {
-	-fx-background-color: derive(app-color-text-fill, 10%), app-color-input-background;
-}

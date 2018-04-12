@@ -29,7 +29,7 @@ before_install:
 install: true
 
 script:
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then ./gradlew clean build bintrayUpload -x :slideshowfx-icons:test; else ./gradlew clean build -x :slideshowfx-icons:test; fi
+  - if [[ "$TRAVIS_TAG" == "" ]]; then ./gradlew clean build -x :slideshowfx-icons:test; else ./gradlew clean build bintrayUpload -x :slideshowfx-icons:test; fi
 
 cache:
   directories:

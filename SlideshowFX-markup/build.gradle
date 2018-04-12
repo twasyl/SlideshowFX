@@ -1,8 +1,0 @@
-description = "Module defining a plugin"
-version = '1.0'
-
-apply plugin: 'java-library'
-
-dependencies {
-    api project(':slideshowfx-plugin')
-}

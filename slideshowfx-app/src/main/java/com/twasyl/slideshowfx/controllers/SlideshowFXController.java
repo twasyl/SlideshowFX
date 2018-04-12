@@ -89,7 +89,7 @@ import java.util.logging.Logger;
  * represented by the FXML.
  *
  * @author Thierry Wasyczenko
- * @version 1.4
+ * @version 1.5
  * @since SlideshowFX 1.0
  */
 public class SlideshowFXController implements Initializable {
@@ -1393,6 +1393,8 @@ public class SlideshowFXController implements Initializable {
             } else if (KeyCode.DELETE.equals(event.getCode())) {
                 consumed = true;
                 this.deleteSlide(null);
+            } else if (KeyCode.ALT.equals(event.getCode())) {
+                consumed = true;
             }
 
             if (consumed) event.consume();

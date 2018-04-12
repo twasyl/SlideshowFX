@@ -1,5 +1,5 @@
 description = 'The SlideshowFX application'
-version = '2.0'
+version = '@@NEXT_VERSION@@'
 
 apply plugin: 'java'
 

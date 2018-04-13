@@ -13,6 +13,7 @@ h4. New and noteworthy
 h4. Bug fixes
 
 * ALT key doesn't focus menu bar, but ALT GR does ("#34":https://github.com/twasyl/SlideshowFX/issues/34)
+* Tooltips are always initialized for plugin buttons in the setup ("#35":https://github.com/twasyl/SlideshowFX/issues/35)
 
 h4. Included plugins within the packaging
 

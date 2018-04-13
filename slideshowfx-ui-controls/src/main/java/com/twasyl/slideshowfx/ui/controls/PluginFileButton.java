@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  * {@code plugin-file-button}.
  *
  * @author Thierry Wasylczenko
- * @version 1.2
+ * @version 1.3
  * @since SlideshowFX 1.1
  */
 public class PluginFileButton extends ToggleButton {
@@ -66,23 +66,10 @@ public class PluginFileButton extends ToggleButton {
         graphics.getChildren().add(getVersionNode());
 
         this.setGraphic(graphics);
+        this.setTooltipText();
 
         this.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {
-            final StringBuilder tooltipText = new StringBuilder(label).append(":\n")
-                    .append(description).append(".\n");
-
-            if (newSelected) tooltipText.append("Will be installed");
-            else tooltipText.append("Will not be installed");
-
-            tooltipText.append('.');
-
-            Tooltip tooltip = this.getTooltip();
-            if (tooltip == null) {
-                tooltip = new Tooltip();
-                this.setTooltip(tooltip);
-            }
-
-            tooltip.setText(tooltipText.toString());
+            this.setTooltipText();
         });
 
         try {
@@ -90,6 +77,25 @@ public class PluginFileButton extends ToggleButton {
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Can not close plugin file", e);
         }
+    }
+
+    protected void setTooltipText() {
+        Tooltip tooltip = this.getTooltip();
+        if (tooltip == null) {
+            tooltip = new Tooltip();
+            this.setTooltip(tooltip);
+        }
+
+        final StringBuilder text = new StringBuilder(label).append(":\n")
+                .append(description).append(".\n");
+
+        if (this.isSelected()) {
+            text.append("Will be installed");
+        } else {
+            text.append("Will not be installed");
+        }
+
+        tooltip.setText(text.toString());
     }
 
     protected Text getVersionNode() {

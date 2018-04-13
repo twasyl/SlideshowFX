@@ -19,10 +19,18 @@ import java.util.Properties;
  * Application class used to perform the setup of the application on the client's computer.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class SlideshowFXSetup extends Application {
+
+    protected static final String SETUP_PLUGINS_DIRECTORY_PROPERTY = "setup.plugins.directory";
+    protected static final String SETUP_APPLICATION_ARTIFACT_PROPERTY = "setup.application.artifact";
+    protected static final String SETUP_DOCUMENTATIONS_DIRECTORY_PROPERTY = "setup.documentations.directory";
+    protected static final String SETUP_APPLICATION_NAME_PROPERTY = "setup.application.name";
+    protected static final String SETUP_APPLICATION_VERSION_PROPERTY = "setup.application.version";
+    protected static final String SETUP_SERVICE_TWITTER_CONSUMER_KEY_PROPERTY = "setup.service.twitter.consumerKey";
+    protected static final String SETUP_SERVICE_TWITTER_CONSUMER_SECRET_PROPERTY = "setup.service.twitter.consumerSecret";
 
     protected File pluginsDirectory;
     protected File applicationArtifact;
@@ -50,22 +58,33 @@ public class SlideshowFXSetup extends Application {
         return root;
     }
 
-    @Override
-    public void init() throws Exception {
-        super.init();
-
+    /**
+     * Loads the properties used during the setup as the version, the various locations for plugins and documentation
+     * and so on.
+     * @return A never {@code null} {@link Properties} instance.
+     * @throws IOException
+     */
+    protected Properties getSetupProperties() throws IOException {
         final Properties properties = new Properties();
         try (final InputStream input = getClass().getResourceAsStream("/com/twasyl/slideshowfx/setup/setup.properties")) {
             properties.load(input);
         }
+        return properties;
+    }
 
-        this.pluginsDirectory = new File(properties.getProperty("setup.plugins.directory"));
-        this.applicationArtifact = new File(properties.getProperty("setup.application.artifact"));
-        this.documentationsFolder = new File(properties.getProperty("setup.documentations.directory"));
-        this.applicationName = properties.getProperty("setup.application.name");
-        this.applicationVersion = properties.getProperty("setup.application.version");
-        this.twitterConsumerKey = properties.getProperty("setup.service.twitter.consumerKey");
-        this.twitterConsumerSecret = properties.getProperty("setup.service.twitter.consumerSecret");
+    @Override
+    public void init() throws Exception {
+        super.init();
+
+        final Properties properties = getSetupProperties();
+
+        this.pluginsDirectory = new File(properties.getProperty(SETUP_PLUGINS_DIRECTORY_PROPERTY));
+        this.applicationArtifact = new File(properties.getProperty(SETUP_APPLICATION_ARTIFACT_PROPERTY));
+        this.documentationsFolder = new File(properties.getProperty(SETUP_DOCUMENTATIONS_DIRECTORY_PROPERTY));
+        this.applicationName = properties.getProperty(SETUP_APPLICATION_NAME_PROPERTY);
+        this.applicationVersion = properties.getProperty(SETUP_APPLICATION_VERSION_PROPERTY);
+        this.twitterConsumerKey = properties.getProperty(SETUP_SERVICE_TWITTER_CONSUMER_KEY_PROPERTY);
+        this.twitterConsumerSecret = properties.getProperty(SETUP_SERVICE_TWITTER_CONSUMER_SECRET_PROPERTY);
     }
 
     @Override

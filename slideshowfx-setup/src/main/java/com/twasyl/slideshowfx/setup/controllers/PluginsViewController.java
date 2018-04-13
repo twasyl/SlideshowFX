@@ -14,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.TilePane;
 
 import java.io.File;
@@ -197,7 +198,7 @@ public class PluginsViewController implements Initializable {
 
         Arrays.stream(specializedPluginsDir.listFiles())
                 .filter(file -> file.getName().endsWith(".jar"))
-                .map(file -> new PluginFileButton(file))
+                .map(PluginFileButton::new)
                 .sorted(Comparator.comparing(PluginFileButton::getLabel))
                 .forEach(button -> {
                     button.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {

@@ -1,0 +1,11 @@
+root = true
+
+[*]
+end_of_line = lf
+
+[*.{asciidoc, css, fxml, gradle, java, md, properties, sh, textile, yml}]
+charset = utf-8
+
+[{.travis.yml, appveyor.yml}]
+indent_style = space
+indent_size = 2

@@ -1,23 +1,24 @@
-h1. Changelog
+# Changelog
 
-p. Changes to the SlideshowFX software are listed by version within this document.
+Changes to the SlideshowFX software are listed by version within this document.
 
-h2. Versions
+## Versions
 
-h3(#@@NEXT_VERSION@@). "Version @@NEXT_VERSION@@":#@@NEXT_VERSION@@
+### Version @@NEXT_VERSION@@
 
-h4. New and noteworthy
+#### New and noteworthy
 
 * TODO
 
-h4. Bug fixes
+#### Bug fixes
 
-* ALT key doesn't focus menu bar, but ALT GR does ("#34":https://github.com/twasyl/SlideshowFX/issues/34)
-* Tooltips are always initialized for plugin buttons in the setup ("#35":https://github.com/twasyl/SlideshowFX/issues/35)
+* ALT key doesn't focus menu bar, but ALT GR does [#34](https://github.com/twasyl/SlideshowFX/issues/34)
+* Tooltips are always initialized for plugin buttons in the setup [#35](https://github.com/twasyl/SlideshowFX/issues/35)
 
-h4. Included plugins within the packaging
+#### Included plugins within the packaging
 
-|_. Plugin |_. Version |
+| Plugin | Version |
+| ------ | ------- |
 | SlideshowFX-alert-extension | 1.2 |
 | SlideshowFX-asciidoctor | 1.1 |
 | SlideshowFX-box-hosting-connector | 1.2 |
@@ -42,11 +43,11 @@ h4. Included plugins within the packaging
 | SlideshowFX-snippet-extension | 1.2 |
 | SlideshowFX-textile | 1.2 |
 
-h3(#2_0). "Version 2.0":#2_0
+### Version 2.0
 
-h4. New and noteworthy
+#### New and noteworthy
 
-* Update the SlideshowFX-textile plugin ("#32":https://github.com/twasyl/SlideshowFX/issues/32)
+* Update the SlideshowFX-textile plugin [#32](https://github.com/twasyl/SlideshowFX/issues/32)
 * Update the code and snippet extension to support new programming language
 * Alert content extension plugin uses new version of SweetAlert
 * New Shape plugin allowing to insert shapes in a presentation
@@ -62,7 +63,7 @@ h4. New and noteworthy
 * Using FontAwesome 5.0.8
 * Twitter integration has been improved
 
-h4. Bug fixes
+#### Bug fixes
 
 * Information screen during slideshow react to events emitted by the slideshow, meaning it will react correctly to display current and next slide
 * Free information pane's resources correctly when exiting the slideshow mode
@@ -70,9 +71,10 @@ h4. Bug fixes
 * Prevent NullPointerException to be thrown when auto saving is enabled and the presentation hasn't been already saved
 * Allow Kotlin snippets to be executed on Windows
 
-h4. Included plugins within the packaging
+#### Included plugins within the packaging
 
-|_. Plugin |_. Version |
+| Plugin | Version |
+| ------ | ------- |
 | SlideshowFX-alert-extension | 1.2 |
 | SlideshowFX-asciidoctor | 1.1 |
 | SlideshowFX-box-hosting-connector | 1.2 |
@@ -97,40 +99,41 @@ h4. Included plugins within the packaging
 | SlideshowFX-snippet-extension | 1.2 |
 | SlideshowFX-textile | 1.2 |
 
-h3(#1_4). "Version 1.4":#1_4
+### Version 1.4
 
-h4. New and noteworthy
+#### New and noteworthy
 
-* Create files and directories directly from the tree view of the template builder ("#26":https://github.com/twasyl/SlideshowFX/issues/26)
-* Display the application version in the splash screen ("#29":https://github.com/twasyl/SlideshowFX/issues/29)
-* Go to the newly added slide when adding a slide ("#30":https://github.com/twasyl/SlideshowFX/issues/30)
+* Create files and directories directly from the tree view of the template builder [#26](https://github.com/twasyl/SlideshowFX/issues/26)
+* Display the application version in the splash screen [#29](https://github.com/twasyl/SlideshowFX/issues/29)
+* Go to the newly added slide when adding a slide [#30](https://github.com/twasyl/SlideshowFX/issues/30)
 
-h4. Bug fixes
+#### Bug fixes
 
-* The help can be displayed ("#24":https://github.com/twasyl/SlideshowFX/issues/24)
-* The label for the slides' template directory within the template builder has been corrected ("#25":https://github.com/twasyl/SlideshowFX/issues/25)
-* Allow to load the template's configuration when a slide has no template elements ("#27":https://github.com/twasyl/SlideshowFX/issues/27)
-* Allow to insert a slide that has no template elements in a presentation ("#28":https://github.com/twasyl/SlideshowFX/issues/28)
+* The help can be displayed [#24](https://github.com/twasyl/SlideshowFX/issues/24)
+* The label for the slides' template directory within the template builder has been corrected [#25](https://github.com/twasyl/SlideshowFX/issues/25)
+* Allow to load the template's configuration when a slide has no template elements [#27](https://github.com/twasyl/SlideshowFX/issues/27)
+* Allow to insert a slide that has no template elements in a presentation [#28](https://github.com/twasyl/SlideshowFX/issues/28)
 
-h3(#1_3). "Version 1.3":#1_3
+### Version 1.3
 
-h4. New and noteworthy
+#### New and noteworthy
 
 * Code extension now supports the markdown syntax
 * Code extension has been updated to support more languages
 * Code extension's UI has been changed to allow better language's selection
 * Link extension now supports the markdown syntax
 * Remove support for LeapMotion
-* The editor for the template configuration file inside the template builder has been improved ("#21":https://github.com/twasyl/SlideshowFX/issues/21)
+* The editor for the template configuration file inside the template builder has been improved [#21](https://github.com/twasyl/SlideshowFX/issues/21)
 * The treeview inside the template builder only expands the root element at the opening
-* The image extension allows to delete images stored within the presentation ("#22":https://github.com/twasyl/SlideshowFX/issues/22)
+* The image extension allows to delete images stored within the presentation [#22](https://github.com/twasyl/SlideshowFX/issues/22)
 * If no image is selected in the image extension, nothing is inserted within the slide editor
 * Uses ACE 1.2.6 in the slide content editor
 * Update libraries
 
-h4. Included plugins within the packaging
+#### Included plugins within the packaging
 
-|_. Plugin |_. Version |
+| Plugin | Version |
+| ------ | ------- |
 | SlideshowFX-alert-extension | 1.1 |
 | SlideshowFX-asciidoctor | 1.0 |
 | SlideshowFX-box-hosting-connector | 1.1 |
@@ -154,23 +157,24 @@ h4. Included plugins within the packaging
 | SlideshowFX-snippet-extension | 1.1 |
 | SlideshowFX-textile | 1.1 |
 
-h3(#1_2). "Version 1.2":#1_2
+### Version 1.2
 
-h4. New and noteworthy
+#### New and noteworthy
 
-* Google Drive hosting connector is now working correctly with the v3 API ("#12":https://github.com/twasyl/SlideshowFX/issues/12)
+* Google Drive hosting connector is now working correctly with the v3 API [#12](https://github.com/twasyl/SlideshowFX/issues/12)
 * It is possible to open files in the internal browser
 * Ask for confirmation before deleting a slide
-* The OSGi manager only starts the most recent plugins ("#15":https://github.com/twasyl/SlideshowFX/issues/15)
+* The OSGi manager only starts the most recent plugins [#15](https://github.com/twasyl/SlideshowFX/issues/15)
 * The image extension now supports the markdown markup
 
-h4. Bug fixes
+#### Bug fixes
 
-* Correct the setup for the Linux platform which wasn't working ("#14":https://github.com/twasyl/SlideshowFX/pull/14)
+* Correct the setup for the Linux platform which wasn't working [#14](https://github.com/twasyl/SlideshowFX/pull/14)
 
-h4. Included plugins within the packaging
+#### Included plugins within the packaging
 
-|_. Plugin |_. Version |
+| Plugin | Version |
+| ------ | ------- |
 | SlideshowFX-alert-extension | 1.0 |
 | SlideshowFX-asciidoctor | 1.0 |
 | SlideshowFX-box-hosting-connector | 1.1 |
@@ -194,22 +198,23 @@ h4. Included plugins within the packaging
 | SlideshowFX-snippet-extension | 1.1 |
 | SlideshowFX-textile | 1.0 |
 
-h3(#1_1). "Version 1.1":#1_1
+### Version 1.1
 
-h4. New and noteworthy
+#### New and noteworthy
 
-* Box hosting connector allowing to interact with box ("#8":https://github.com/twasyl/SlideshowFX/issues/8)
-* Introduce the plugin center allowing to install and remove plugins ("#9":https://github.com/twasyl/SlideshowFX/issues/9)
+* Box hosting connector allowing to interact with box [#8](https://github.com/twasyl/SlideshowFX/issues/8)
+* Introduce the plugin center allowing to install and remove plugins [#9](https://github.com/twasyl/SlideshowFX/issues/9)
 * Uses ACE 1.2.5 in the slide content editor
-* Improve the setup in order to make the selection of at least one markup plugin mandatory ("#11":https://github.com/twasyl/SlideshowFX/issues/11)
+* Improve the setup in order to make the selection of at least one markup plugin mandatory [#11](https://github.com/twasyl/SlideshowFX/issues/11)
 
-h4. Bug fixes
+#### Bug fixes
 
-* Pasting in the slide content editor doesn't paste twice anymore ("#10":https://github.com/twasyl/SlideshowFX/issues/10)
+* Pasting in the slide content editor doesn't paste twice anymore [#10](https://github.com/twasyl/SlideshowFX/issues/10)
 
-h4. Included plugins within the packaging
+#### Included plugins within the packaging
 
-|_. Plugin |_. Version |
+| Plugin | Version |
+| ------ | ------- |
 | SlideshowFX-alert-extension | 1.0 |
 | SlideshowFX-asciidoctor | 1.0 |
 | SlideshowFX-box-hosting-connector | 1.0 |
@@ -233,13 +238,14 @@ h4. Included plugins within the packaging
 | SlideshowFX-snippet-extension | 1.0 |
 | SlideshowFX-textile | 1.0 |
 
-h3(#1_0). "Version 1.0":#1_0
+### Version 1.0
 
-p. This is the first version of SlideshowFX.
+This is the first version of SlideshowFX.
 
-h4. Included plugins within the packaging
+#### Included plugins within the packaging
 
-|_. Plugin |_. Version |
+| Plugin | Version |
+| ------ | ------- |
 | SlideshowFX-alert-extension | 1.0 |
 | SlideshowFX-asciidoctor | 1.0 |
 | SlideshowFX-code-extension | 1.0 |

@@ -11,7 +11,6 @@ import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElement;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.icons.FontAwesome;
 import com.twasyl.slideshowfx.markup.IMarkup;
-import com.twasyl.slideshowfx.markup.MarkupManager;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
@@ -53,7 +52,7 @@ import java.util.logging.Logger;
  * represented by the FXML.
  *
  * @author Thierry Wasyczenko
- * @version 1.3
+ * @version 1.4
  * @since SlideshowFX 1.0
  */
 public class PresentationViewController implements Initializable {
@@ -218,7 +217,7 @@ public class PresentationViewController implements Initializable {
                  * Prefill the content with either the original content is it is still supported either
                  * the HTML content.
                  */
-                if (MarkupManager.isContentSupported(element.getOriginalContentCode())) {
+                if (isContentSupported(element.getOriginalContentCode())) {
                     this.contentEditor.setContentEditorValue(element.getOriginalContent());
                 } else {
                     this.contentEditor.setContentEditorValue(element.getHtmlContent());
@@ -239,6 +238,27 @@ public class PresentationViewController implements Initializable {
         } else {
             LOGGER.info(String.format("Prefill information for the field %1$s of slide #%2$s is impossible: the slide is not found", field, slideNumber));
         }
+    }
+
+    /**
+     * Test if the given {@code contentCode} is supported.
+     * @param contentCode The code of the {@link com.twasyl.slideshowfx.markup.IMarkup} to test if it is supported.
+     * @return {@code true} if there is an OSGi bundle having the given code, {@code false} otherwise.
+     */
+    public boolean isContentSupported(final String contentCode) {
+        boolean supported = false;
+
+        List<IMarkup> services = OSGiManager.getInstance().getInstalledServices(IMarkup.class);
+
+        if(services != null) {
+            Optional<IMarkup> iMarkup =  services.stream()
+                    .filter(service -> contentCode.equals(service.getCode()))
+                    .findFirst();
+
+            supported = iMarkup.isPresent();
+        }
+
+        return supported;
     }
 
     /**
@@ -388,7 +408,8 @@ public class PresentationViewController implements Initializable {
         }
 
         // Creating RadioButtons for each markup bundle installed
-        MarkupManager.getInstalledMarkupSyntax().stream()
+        OSGiManager.getInstance().getInstalledServices(IMarkup.class)
+                .stream()
                 .sorted((markup1, markup2) -> markup1.getName().compareToIgnoreCase(markup2.getName()))
                 .forEach(this::createRadioButtonForMakup);
     }

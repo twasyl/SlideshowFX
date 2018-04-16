@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  * The extension of a presentation is {@code sfx}.
  *
  * @author Thierry Wasylczenko
- * @version 1.3
+ * @version 1.4
  * @since SlideshowFX 1.0
  */
 public class PresentationEngine extends AbstractEngine<PresentationConfiguration> {
@@ -66,10 +66,10 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     private static final String TEMPLATE_SFX_CALLBACK_TOKEN = "sfxCallback";
     private static final String TEMPLATE_SLIDE_ID_PREFIX_TOKEN = "slideIdPrefix";
 
-    private static final String TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT = "/com/twasyl/slideshowfx/js/setField.js";
-    private static final String TEMPLATE_SFX_SNIPPET_EXECUTOR_SCRIPT = "/com/twasyl/slideshowfx/js/snippetExecutor.js";
-    private static final String TEMPLATE_SFX_CALLBACK_SCRIPT = "/com/twasyl/slideshowfx/js/sendInformationToSlideshowFX.js";
-    private static final String TEMPLATE_SFX_QUIZ_CALLER_SCRIPT = "/com/twasyl/slideshowfx/js/quizCaller.js";
+    private static final String TEMPLATE_SFX_CONTENT_DEFINER_SCRIPT = "/com/twasyl/slideshowfx/engine/js/setField.js";
+    private static final String TEMPLATE_SFX_SNIPPET_EXECUTOR_SCRIPT = "/com/twasyl/slideshowfx/engine/js/snippetExecutor.js";
+    private static final String TEMPLATE_SFX_CALLBACK_SCRIPT = "/com/twasyl/slideshowfx/engine/js/sendInformationToSlideshowFX.js";
+    private static final String TEMPLATE_SFX_QUIZ_CALLER_SCRIPT = "/com/twasyl/slideshowfx/engine/js/quizCaller.js";
 
     private static final String TEMPLATE_SFX_CALLBACK_CALL = "sendInformationToSlideshowFX(this);";
 

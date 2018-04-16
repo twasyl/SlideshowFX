@@ -1,6 +1,6 @@
 package com.twasyl.slideshowfx.utils.keys;
 
-import com.sun.javafx.PlatformUtil;
+import com.twasyl.slideshowfx.utils.OSUtils;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
@@ -13,8 +13,8 @@ import java.util.logging.Logger;
  * {@link KeyEvent}.
  * Whether the text or the {@link KeyCode} is checked depends on the platform: on OSX the text is checked while the
  * {@link KeyCode} is checked on Windows and Linux systems.
- * The platform is determined using {@link PlatformUtil#isMac()}, {@link PlatformUtil#isWindows()} and
- * {@link PlatformUtil#isLinux()}.
+ * The platform is determined using {@link OSUtils#isMac()}, {@link OSUtils#isWindows()} and
+ * {@link OSUtils#isLinux()}.
  *
  * @author Thierry Wasylczenko
  * @since SlideshowFX 1.0
@@ -48,11 +48,11 @@ public class SlideshowFXKeyCombination extends KeyCombination {
 
         boolean match = super.match(event);
 
-        if(match) {
+        if (match) {
             // Depending on the platform, we have either to check the text of the event, either the code.
-            if(PlatformUtil.isMac()) {
+            if (OSUtils.isMac()) {
                 match = text.equalsIgnoreCase(event.getText());
-            } else if(PlatformUtil.isLinux() || PlatformUtil.isWindows()) {
+            } else if (OSUtils.isLinux() || OSUtils.isWindows()) {
                 match = code == event.getCode();
             }
         }
@@ -64,14 +64,15 @@ public class SlideshowFXKeyCombination extends KeyCombination {
      * Converts a given {@link String} into a {@link KeyCombination} that matches the text or the code of an event.
      * Whether the code or the text is checked depends on the platform: on OSX, the text will be tested while on
      * other platform the code will be checked.
+     *
      * @param value The value to parse.
      * @return A {@link SlideshowFXKeyCombination} parsed from a string.
-     * @throws NullPointerException If the provided value is {@code null}.
+     * @throws NullPointerException     If the provided value is {@code null}.
      * @throws IllegalArgumentException If the provided value is empty.
      */
     public static SlideshowFXKeyCombination valueOf(String value) {
-        if(value == null) throw new NullPointerException("The value can not be null");
-        if(value.isEmpty()) throw new IllegalArgumentException("The value can not be empty");
+        if (value == null) throw new NullPointerException("The value can not be null");
+        if (value.isEmpty()) throw new IllegalArgumentException("The value can not be empty");
 
         String determinedText = null;
         KeyCode determinedCode = KeyCode.UNDEFINED;
@@ -83,7 +84,7 @@ public class SlideshowFXKeyCombination extends KeyCombination {
         ModifierValue altModifier = ModifierValue.UP;
 
         final String[] tokens = value.split("\\+");
-        for(String token : tokens) {
+        for (String token : tokens) {
             switch (token) {
                 case "Shortcut":
                     shortcutModifier = ModifierValue.DOWN;
@@ -105,7 +106,7 @@ public class SlideshowFXKeyCombination extends KeyCombination {
                     determinedCode = KeyCode.valueOf(determinedText);
             }
         }
-        final SlideshowFXKeyCombination combination  = new SlideshowFXKeyCombination(determinedText, determinedCode, shiftModifier,
+        final SlideshowFXKeyCombination combination = new SlideshowFXKeyCombination(determinedText, determinedCode, shiftModifier,
                 controlModifier, altModifier, metaModifier, shortcutModifier);
 
         return combination;

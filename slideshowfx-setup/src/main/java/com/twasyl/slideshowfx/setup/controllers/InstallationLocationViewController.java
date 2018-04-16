@@ -1,6 +1,6 @@
 package com.twasyl.slideshowfx.setup.controllers;
 
-import com.sun.javafx.PlatformUtil;
+import com.twasyl.slideshowfx.utils.OSUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -69,9 +69,9 @@ public class InstallationLocationViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         String defaultLocation;
 
-        if(PlatformUtil.isWindows()) {
+        if(OSUtils.isWindows()) {
             defaultLocation = System.getenv("LOCALAPPDATA");
-        } else if(PlatformUtil.isMac()) {
+        } else if(OSUtils.isMac()) {
             defaultLocation = "/Applications";
         } else {
             defaultLocation = System.getProperty("user.home");

@@ -1,5 +1,5 @@
 description = 'Extension allowing to define slide\'s content using the textile syntax'
-version = '1.2'
+version = '1.3-SNAPSHOT'
 
 apply plugin: 'java-library'
 

@@ -1,5 +1,5 @@
 description = 'Hosting connector allowing to open and save presentations from and to Google Drive'
-version = '1.3'
+version = '1.4-SNAPSHOT'
 
 apply plugin: 'java-library'
 

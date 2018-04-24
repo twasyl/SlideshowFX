@@ -31,7 +31,7 @@ import static com.twasyl.slideshowfx.server.service.IServicesCode.*;
  * This class provides the quiz services.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class QuizService extends AbstractSlideshowFXService {
@@ -99,11 +99,11 @@ public class QuizService extends AbstractSlideshowFXService {
         router.get("/slideshowfx/quiz/js/quizService.js").handler(routingContext -> {
             final LocalMap<String, String> templateTokens = this.vertx.sharedData().getLocalMap(SHARED_DATA_TEMPLATE_TOKENS);
 
-            final Configuration configuration = TemplateProcessor.getJsConfiguration();
+            final Configuration configuration = TemplateProcessor.getJsConfiguration(QuizService.class);
 
             final Map tokenValues = new HashMap();
-            tokenValues.put(templateTokens.get(SHARED_DATA_SERVER_HOST_TOKEN).toString(), SlideshowFXServer.getSingleton().getHost());
-            tokenValues.put(templateTokens.get(SHARED_DATA_SERVER_PORT_TOKEN).toString(), SlideshowFXServer.getSingleton().getPort() + "");
+            tokenValues.put(templateTokens.get(SHARED_DATA_SERVER_HOST_TOKEN), SlideshowFXServer.getSingleton().getHost());
+            tokenValues.put(templateTokens.get(SHARED_DATA_SERVER_PORT_TOKEN), SlideshowFXServer.getSingleton().getPort() + "");
 
             try (final StringWriter writer = new StringWriter()) {
                 final Template template = configuration.getTemplate("quizService.js");

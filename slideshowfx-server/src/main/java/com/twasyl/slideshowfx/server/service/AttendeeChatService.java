@@ -31,7 +31,7 @@ import static com.twasyl.slideshowfx.server.service.IServicesCode.*;
  * This class represents the attendee part of the internal SlideshowFX chat.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class AttendeeChatService extends AbstractSlideshowFXService {
@@ -82,7 +82,7 @@ public class AttendeeChatService extends AbstractSlideshowFXService {
         router.get("/slideshowfx/chat/js/chatService.js").handler(request -> {
             final LocalMap templateTokens = this.vertx.sharedData().getLocalMap(SlideshowFXServer.SHARED_DATA_TEMPLATE_TOKENS);
 
-            final Configuration configuration = TemplateProcessor.getJsConfiguration();
+            final Configuration configuration = TemplateProcessor.getJsConfiguration(AttendeeChatService.class);
 
             final Map tokenValues = new HashMap();
             tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_HOST_TOKEN).toString(), singleton.getHost());

@@ -14,6 +14,8 @@ Changes to the SlideshowFX software are listed by version within this document.
 
 * ALT key doesn't focus menu bar, but ALT GR does [#34](https://github.com/twasyl/SlideshowFX/issues/34)
 * Tooltips are always initialized for plugin buttons in the setup [#35](https://github.com/twasyl/SlideshowFX/issues/35)
+* Fix answered icon in attendee's chat
+* Fix the author of messages in attendee's chat : for self messages, "I" is displayed instead of the login name
 
 #### Included plugins within the packaging
 

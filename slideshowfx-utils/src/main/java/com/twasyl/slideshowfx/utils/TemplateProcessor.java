@@ -8,7 +8,7 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
  * This class provides utility methods to interact with the template library, which is currently freemarker.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class TemplateProcessor {
@@ -35,16 +35,17 @@ public class TemplateProcessor {
     /**
      * This method returns a {@link freemarker.template.Configuration} as a singleton object, as recommended in the
      * freemarker documentation.
-     * This configuration is initialized with the {@code /com/twasyl/slideshowfx/js/} path for
+     * This configuration is initialized with the {@code /com/twasyl/slideshowfx/server/webapp//js/} path for
      * {@link freemarker.template.Configuration#setDirectoryForTemplateLoading(java.io.File)}
+     * @param classForTemplateLoading The class that will load the template.
      * @return A never {code null} Configuration object.
      */
-    public static synchronized Configuration getJsConfiguration() {
+    public static synchronized Configuration getJsConfiguration(Class classForTemplateLoading) {
         if(jsConfigurationSingleton == null) {
             jsConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_23);
             jsConfigurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
             jsConfigurationSingleton.setDefaultEncoding(getDefaultCharset().displayName());
-            jsConfigurationSingleton.setClassForTemplateLoading(TemplateProcessor.class, "/com/twasyl/slideshowfx/js/");
+            jsConfigurationSingleton.setClassForTemplateLoading(classForTemplateLoading, "/com/twasyl/slideshowfx/server/webapp/js/");
         }
 
         return jsConfigurationSingleton;
@@ -53,16 +54,17 @@ public class TemplateProcessor {
     /**
      * This method returns a {@link freemarker.template.Configuration} as a singleton object, as recommended in the
      * freemarker documentation.
-     * This configuration is initialized with the {@code /com/twasyl/slideshowfx/html/} path for
+     * This configuration is initialized with the {@code /com/twasyl/slideshowfx/server/webapp/html/} path for
      * {@link freemarker.template.Configuration#setDirectoryForTemplateLoading(java.io.File)}
+     * @param classForTemplateLoading The class that will load the template.
      * @return A never {code null} Configuration object.
      */
-    public static synchronized Configuration getHtmlConfiguration() {
+    public static synchronized Configuration getHtmlConfiguration(Class classForTemplateLoading) {
         if(htmlConfigurationSingleton == null) {
             htmlConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_23);
             htmlConfigurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
             htmlConfigurationSingleton.setDefaultEncoding(getDefaultCharset().displayName());
-            htmlConfigurationSingleton.setClassForTemplateLoading(TemplateProcessor.class, "/com/twasyl/slideshowfx/html/");
+            htmlConfigurationSingleton.setClassForTemplateLoading(classForTemplateLoading, "/com/twasyl/slideshowfx/server/webapp/html/");
         }
 
         return htmlConfigurationSingleton;

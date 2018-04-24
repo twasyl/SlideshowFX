@@ -10,13 +10,13 @@ function requestChatHistory() {
 
     var htmlMessage = "<div class=\"chat-message\" id=\"" + data.id + "\">"
                 + "<div id=\"" + data.id + "-check\" style=\"display: none; margin-right: 5px;\">"
-                + "<i class=\"fa fa-check-circle-o fw\" style=\"color: green\"></i></div>"
-                + "<span class=\"author\">" + data.author + " ";
+                + "<i class=\"far fa-check-circle fw\" style=\"color: green\"></i></div>"
+                + "<span class=\"author\">";
 
-    if( data.author == "I") {
-        htmlMessage = htmlMessage + "say";
+    if( data.author == getAttendeeNameFromCookie()) {
+        htmlMessage += "I say";
     } else {
-        htmlMessage = htmlMessage + "said";
+        htmlMessage += data.author + " said";
     }
 
     htmlMessage = htmlMessage + " :" + "</span><br />"

@@ -35,7 +35,7 @@ import static com.twasyl.slideshowfx.server.service.AbstractSlideshowFXService.J
  * This class represents an embedded server which is provided in SlideshowFX.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class SlideshowFXServer {
@@ -275,11 +275,11 @@ public class SlideshowFXServer {
         router.get(CONTEXT_PATH).handler(routingContext -> {
             final LocalMap<String, String> templateTokens = this.vertx.sharedData().getLocalMap(SlideshowFXServer.SHARED_DATA_TEMPLATE_TOKENS);
 
-            final Configuration configuration = TemplateProcessor.getHtmlConfiguration();
+            final Configuration configuration = TemplateProcessor.getHtmlConfiguration(SlideshowFXServer.class);
 
             final Map tokenValues = new HashMap();
-            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_HOST_TOKEN).toString(), this.getHost());
-            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_PORT_TOKEN).toString(), this.getPort() + "");
+            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_HOST_TOKEN), this.getHost());
+            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_PORT_TOKEN), this.getPort() + "");
 
             try (final StringWriter writer = new StringWriter()) {
                 final Template template = configuration.getTemplate("slideshowfx.html");
@@ -298,7 +298,7 @@ public class SlideshowFXServer {
             }
         });
         router.get(CONTEXT_PATH.concat("/images/logo.svg")).handler(routingContext -> {
-            try (final InputStream in = SlideshowFXServer.class.getResourceAsStream("/com/twasyl/slideshowfx/images/logo.svg")) {
+            try (final InputStream in = SlideshowFXServer.class.getResourceAsStream("/com/twasyl/slideshowfx/server/webapp/images/logo.svg")) {
 
                 byte[] imageBuffer = new byte[1028];
                 int numberOfBytesRead;

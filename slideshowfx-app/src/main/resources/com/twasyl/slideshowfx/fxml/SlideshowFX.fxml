@@ -124,19 +124,6 @@
             </graphic>
         </Button>
 
-        <SplitMenuButton fx:id="moveSlideButton">
-            <tooltip>
-                <Tooltip text="Move slide"/>
-            </tooltip>
-            <graphic>
-                <IconStack>
-                    <FontAwesome icon="FILE" size="$TOOLBAR_ICON_WIDTH" color="white"/>
-                    <FontAwesome icon="ARROW_RIGHT" size="15" color="app-color-orange"
-                                 IconStack.alignment="BOTTOM_CENTER"/>
-                </IconStack>
-            </graphic>
-        </SplitMenuButton>
-
         <Button fx:id="deleteSlide" onAction="#deleteSlide" styleClass="image">
             <tooltip>
                 <Tooltip text="Delete slide"/>
@@ -205,7 +192,6 @@
             <fx:reference source="printPresentation"/>
             <fx:reference source="addSlideButton"/>
             <fx:reference source="copySlide"/>
-            <fx:reference source="moveSlideButton"/>
             <fx:reference source="deleteSlide"/>
             <fx:reference source="reloadPresentation"/>
             <fx:reference source="slideshow"/>
@@ -293,8 +279,6 @@
                 <fx:reference source="addSlideButton"/>
 
                 <fx:reference source="copySlide"/>
-
-                <fx:reference source="moveSlideButton"/>
 
                 <fx:reference source="deleteSlide"/>
 

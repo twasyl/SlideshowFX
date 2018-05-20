@@ -30,6 +30,10 @@
                 <Label text="Max recent presentations:" />
                 <TextField fx:id="maxRecentPresentations" prefColumnCount="3" text="10" />
             </HBox>
+            <HBox spacing="5" alignment="BASELINE_LEFT">
+                <Label text="Snapshot delay:" />
+                <TextField fx:id="snapshotDelay" prefColumnCount="3" text="10" />
+            </HBox>
         </VBox>
     </Tab>
     <Tab text="Snippet executors" closable="false">

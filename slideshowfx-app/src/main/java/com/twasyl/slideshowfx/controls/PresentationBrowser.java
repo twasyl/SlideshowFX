@@ -9,6 +9,9 @@ import com.twasyl.slideshowfx.utils.PlatformHelper;
 import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
+import javafx.animation.PauseTransition;
+import javafx.animation.SequentialTransition;
+import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -25,15 +28,21 @@ import javafx.print.PrinterJob;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
+import javafx.util.Duration;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 
 import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
-import java.util.logging.Level;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
+import static java.util.logging.Level.SEVERE;
+import static javafx.util.Duration.ZERO;
 
 /**
  * A browser that displays a presentation and provides methods for interacting with the presentation (like go to a given
@@ -42,7 +51,7 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
  * browser under the name returned by {@link TemplateConfiguration#getJsObject()} variable stored in the {@link #presentationProperty()}.
  *
  * @author Thierry Wasylczenko
- * @version 1.2
+ * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public final class PresentationBrowser extends StackPane {
@@ -172,7 +181,7 @@ public final class PresentationBrowser extends StackPane {
             PresentationBrowser.this.injectServer(SlideshowFXServer.getSingleton());
         });
         this.internalBrowser.getEngine().setOnError(errorEvent -> {
-            LOGGER.log(Level.SEVERE, "An error occurred in the internal browser", errorEvent.getException());
+            LOGGER.log(SEVERE, "An error occurred in the internal browser", errorEvent.getException());
         });
         this.internalBrowser.getEngine().setOnAlert(event -> {
             DialogHelper.showAlert("SlideshowFX", event.getData());
@@ -270,7 +279,18 @@ public final class PresentationBrowser extends StackPane {
         this.loadPresentationAndDo(presentation, null);
     }
 
-    public final void loadPresentationAndDo(final PresentationEngine presentation, Runnable action) {
+    public final void loadPresentationAndDo(final PresentationEngine presentation, final Runnable action) {
+        this.loadPresentationAndDo(presentation, action, 0);
+    }
+
+    /**
+     * Load the presentation and perform an action after a specified delay.
+     *
+     * @param presentation The presentation to load.
+     * @param action       The action to perform.
+     * @param delay        The delay (in millisecond) to wait before executing the action.
+     */
+    public final void loadPresentationAndDo(final PresentationEngine presentation, final Runnable action, final long delay) {
         if (presentation != null) {
             this.presentation.set(presentation);
 
@@ -283,9 +303,14 @@ public final class PresentationBrowser extends StackPane {
                         PresentationBrowser.this.injectServer(SlideshowFXServer.getSingleton());
 
                         try {
-                            if (action != null) action.run();
+                            if (action != null) {
+                                LOGGER.fine("Executing action after presentation loading");
+                                final PauseTransition transition = new PauseTransition(Duration.millis(delay));
+                                transition.setOnFinished(event -> action.run());
+                                transition.playFromStart();
+                            }
                         } catch (JSException jsex) {
-                            LOGGER.log(Level.SEVERE, "Error while executing an action in the internal browser", jsex);
+                            LOGGER.log(SEVERE, "Error while executing an action in the internal browser", jsex);
                         }
                     }
                 }
@@ -302,6 +327,10 @@ public final class PresentationBrowser extends StackPane {
      * @return A {@link CompletableFuture} which will be complete when the browser is no more loading.
      */
     public final CompletableFuture<Boolean> reload() {
+        return this.reloadAndDo(null, 0);
+    }
+
+    public final CompletableFuture<Boolean> reloadAndDo(final Runnable action, final long delay) {
         final Worker<Void> loadWorker = this.internalBrowser.getEngine().getLoadWorker();
         final CompletableFuture<Boolean> reloadDone = new CompletableFuture<>();
 
@@ -309,7 +338,18 @@ public final class PresentationBrowser extends StackPane {
             @Override
             public void changed(ObservableValue<? extends Worker.State> state, Worker.State oldState, Worker.State newState) {
                 if (newState != null && newState != Worker.State.RUNNING && newState != Worker.State.SCHEDULED && newState != Worker.State.READY) {
+                    if (getBackend() != null) {
+                        injectBackend(getBackend());
+                    }
                     loadWorker.stateProperty().removeListener(this);
+
+                    if (action != null) {
+                        LOGGER.fine("Executing action after presentation reloaded");
+                        final PauseTransition transition = new PauseTransition(Duration.millis(delay));
+                        transition.setOnFinished(event -> action.run());
+                        transition.playFromStart();
+                    }
+
                     reloadDone.complete(true);
                 }
             }
@@ -409,14 +449,19 @@ public final class PresentationBrowser extends StackPane {
      */
     public void slide(final String slideId) {
         if (slideId != null && this.getPresentation() != null) {
-            this.internalBrowser.getEngine().executeScript(
-                    String.format(
-                            "%1$s('%2$s');",
-                            this.getPresentation().getTemplateConfiguration().getGotoSlideMethod(),
-                            slideId
-                    )
+            final String script = String.format(
+                    "%1$s('%2$s');",
+                    this.getPresentation().getTemplateConfiguration().getGotoSlideMethod(),
+                    slideId
             );
+
+            this.internalBrowser.getEngine().executeScript(script);
         }
+    }
+
+    public void takeSnapshotAfterDelay(final long delay) {
+        final String script = String.format("takeSnapshotAfterDelay(%1$s);", delay);
+        this.internalBrowser.getEngine().executeScript(script);
     }
 
     /**

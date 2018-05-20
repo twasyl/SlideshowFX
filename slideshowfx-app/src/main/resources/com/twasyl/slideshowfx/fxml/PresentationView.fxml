@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.twasyl.slideshowfx.controls.PresentationBrowser?>
+<?import com.twasyl.slideshowfx.controls.PresentationOutline?>
 <?import com.twasyl.slideshowfx.controls.SlideContentEditor?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
@@ -42,6 +43,8 @@
         <TextField fx:id="slideNumber" prefColumnCount="3" />
         <TextField fx:id="fieldName" prefColumnCount="15" />
     </fx:define>
+
+    <PresentationOutline fx:id="presentationOutline" prefWidth="100" minWidth="100" />
 
     <PresentationBrowser fx:id="browser" minWidth="500" />
 

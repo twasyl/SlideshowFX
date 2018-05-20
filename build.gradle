@@ -101,8 +101,8 @@ ext.os = [
 
 ext.dependencies = [
         asciidoctorj: [version: '1.5.6'],
-        box         : [version: '2.17.0'],
-        drive       : [version: 'v3-rev111-1.23.0'],
+        box         : [version: '2.19.0'],
+        drive       : [version: 'v3-rev118-1.23.0'],
         dropbox     : [version: '3.0.7'],
         felix       : [version: '5.6.10'],
         freemarker  : [version: '2.3.28'],
@@ -110,7 +110,7 @@ ext.dependencies = [
         junit       : [version: '5.2.0'],
         markdown    : [version: '0.13'],
         mockito     : [version: '2.18.3'],
-        rxJava      : [version: '2.1.12'],
+        rxJava      : [version: '2.1.13'],
         vertx       : [version: '3.5.1'],
         wikitext    : [version: '3.0.24'],
         zxing       : [version: '3.3.2']
@@ -122,6 +122,21 @@ subprojects {
         def isProjectPlugin = rootProject.isPlugin(project)
 
         if (isJavaProject) {
+            println "${project.projectDir.absolutePath}"
+            sourceSets {
+                integrationTest {
+                    java.srcDir file("${project.projectDir.absolutePath}/src/integration-test/java")
+                    resources.srcDir file("${project.projectDir.absolutePath}/src/integration-test/resources")
+                    compileClasspath += sourceSets.main.output + configurations.testRuntime
+                    runtimeClasspath += output + compileClasspath
+                }
+            }
+
+            configurations {
+                integrationTestImplementation.extendsFrom implementation
+                integrationTestRuntimeOnly.extendsFrom runtimeOnly
+            }
+
             dependencies {
                 testImplementation "org.junit.jupiter:junit-jupiter-api:${rootProject.ext.dependencies.junit.version}"
                 testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${rootProject.ext.dependencies.junit.version}"

@@ -2,15 +2,17 @@ package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.icons.FontAwesome;
 import javafx.animation.TranslateTransition;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
+import javafx.geometry.HPos;
+import javafx.scene.Node;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+
+import static javafx.geometry.HPos.LEFT;
+import static javafx.geometry.HPos.RIGHT;
 
 /**
  * This pane is used to display icons. If an icon is triggered, the content associated to this this icon is displayed
@@ -24,6 +26,8 @@ public class CollapsibleToolPane extends Region {
 
     private final ObjectProperty<Region> content = new SimpleObjectProperty<>();
     private final ReadOnlyBooleanProperty collapsed = new SimpleBooleanProperty(true);
+    private final ReadOnlyObjectProperty<HPos> position = new SimpleObjectProperty<>(RIGHT);
+
     private final VBox toolbar = new VBox(5);
     private final ToggleGroup iconsGroup = new ToggleGroup();
 
@@ -31,16 +35,18 @@ public class CollapsibleToolPane extends Region {
         this.getStylesheets().add(CollapsibleToolPane.class.getResource("/com/twasyl/slideshowfx/css/collapsible-tool-pane.css").toExternalForm());
 
         /* Ensure that when the scene is shown, the panel is placed completely
-         * on the right of the screen, only displaying the toolbar
+         * on the right/left of the screen, only displaying the toolbar
          */
         this.sceneProperty().addListener((sceneValue, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.widthProperty().addListener((widthValue, oldValue, newWidth) -> {
-                    if (newWidth != null) {
-                        this.setTranslateX(newWidth.doubleValue() - this.toolbar.getWidth());
-                    }
+                    this.placeAccordingSceneAndPosition();
                 });
             }
+        });
+
+        this.positionProperty().addListener((value, oldPos, newPos) -> {
+            this.placeAccordingSceneAndPosition();
         });
 
         this.toolbar.setLayoutX(0);
@@ -53,7 +59,12 @@ public class CollapsibleToolPane extends Region {
             }
 
             if (newContent != null) {
-                newContent.layoutXProperty().bind(this.toolbar.widthProperty());
+                if (this.getPosition() == RIGHT) {
+                    newContent.layoutXProperty().bind(this.toolbar.widthProperty());
+                } else {
+                    newContent.layoutXProperty().bind(this.toolbar.layoutXProperty());
+                }
+
                 newContent.setLayoutY(0);
 
                 this.getChildren().add(newContent);
@@ -83,6 +94,37 @@ public class CollapsibleToolPane extends Region {
     }
 
     /**
+     * Get the position of this pane.
+     *
+     * @return The property corresponding to the position of this pane.
+     */
+    public ReadOnlyObjectProperty<HPos> positionProperty() {
+        return position;
+    }
+
+    /**
+     * Get the position of this pane.
+     *
+     * @return The position of this pane.
+     */
+    public HPos getPosition() {
+        return position.get();
+    }
+
+    /**
+     * Set the position of this pane. The position can only be {@link HPos#LEFT} or {@link HPos#RIGHT}.
+     *
+     * @throws IllegalArgumentException If the position is not valid.
+     */
+    public void setPosition(HPos position) {
+        if (position == RIGHT || position == LEFT) {
+            ((SimpleObjectProperty) this.position).set(position);
+        } else {
+            throw new IllegalArgumentException("Invalid position " + position.name() + ". Only RIGHT or LEFT allowed");
+        }
+    }
+
+    /**
      * Adds an icon associated to its content to this panel.
      *
      * @param icon    The icon that will always be visible in the toolbar.
@@ -98,8 +140,16 @@ public class CollapsibleToolPane extends Region {
 
             // If the panel is already opened, close it and only open it if the current content is different of the given content
             if (!this.isCollapsed()) {
-                final TranslateTransition translation = new TranslateTransition(Duration.millis(500), this);
-                translation.setByX(this.content.get().getWidth());
+                double byX = this.content.get().getWidth();
+
+                if(this.getPosition() == RIGHT) {
+                    byX += this.toolbar.getWidth();
+                } else {
+                    byX -= this.toolbar.getWidth();
+                }
+
+                final TranslateTransition translation = new TranslateTransition(Duration.millis(500), getNodeToTranslate());
+                translation.setByX(byX);
 
                 translation.setOnFinished(animationEvent -> {
                     ((SimpleBooleanProperty) this.collapsedProperty()).set(true);
@@ -108,12 +158,17 @@ public class CollapsibleToolPane extends Region {
                     if (this.content.get() != content) {
                         this.content.set(content);
 
-                        final TranslateTransition internalTranslation = new TranslateTransition(Duration.millis(500), this);
-                        internalTranslation.setByX(-this.content.get().getWidth());
+                        double newContentByX = this.content.get().getWidth();
+                        if(this.getPosition() == RIGHT) {
+                            newContentByX *= -1;
+                        } else {
+                            newContentByX += this.toolbar.getWidth();
+                        }
 
-                        internalTranslation.setOnFinished(internalAnimationEvent -> {
-                            ((SimpleBooleanProperty) this.collapsedProperty()).set(false);
-                        });
+                        final TranslateTransition internalTranslation = new TranslateTransition(Duration.millis(500), getNodeToTranslate());
+                        internalTranslation.setByX(newContentByX);
+
+                        internalTranslation.setOnFinished(internalAnimationEvent -> ((SimpleBooleanProperty) this.collapsedProperty()).set(false));
 
                         internalTranslation.play();
                     }
@@ -124,12 +179,17 @@ public class CollapsibleToolPane extends Region {
             } else {
                 this.content.set(content);
 
-                final TranslateTransition translation = new TranslateTransition(Duration.millis(500), this);
-                translation.setByX(-this.content.get().getWidth());
+                double byX = this.content.get().getWidth();
+                if(this.getPosition() == RIGHT) {
+                    byX *= -1;
+                } else {
+                    byX += this.toolbar.getWidth();
+                }
 
-                translation.setOnFinished(animationEvent -> {
-                    ((SimpleBooleanProperty) this.collapsedProperty()).set(false);
-                });
+                final TranslateTransition translation = new TranslateTransition(Duration.millis(500), getNodeToTranslate());
+                translation.setByX(byX);
+
+                translation.setOnFinished(animationEvent -> ((SimpleBooleanProperty) this.collapsedProperty()).set(false));
 
                 translation.play();
             }
@@ -138,5 +198,23 @@ public class CollapsibleToolPane extends Region {
         this.toolbar.getChildren().add(button);
 
         return this;
+    }
+
+    private Node getNodeToTranslate() {
+        if (getPosition() == RIGHT) {
+            return this;
+        } else {
+            return this.content.get();
+        }
+    }
+
+    private void placeAccordingSceneAndPosition() {
+        if (this.getPosition() != null) {
+            if (getPosition() == RIGHT && this.getScene() != null) {
+                this.setTranslateX(this.getScene().getWidth() - this.toolbar.getWidth());
+            } else if (getPosition() == LEFT) {
+               // this.setTranslateX(-this.toolbar.getWidth());
+            }
+        }
     }
 }

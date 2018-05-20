@@ -43,6 +43,8 @@ public class OptionsViewController implements Initializable {
     private TextField temporaryFilesMaxAge;
     @FXML
     private TextField maxRecentPresentations;
+    @FXML
+    private TextField snapshotDelay;
 
     /**
      * This methods saves the options displayed in the view and make them persistent.
@@ -57,6 +59,7 @@ public class OptionsViewController implements Initializable {
         this.saveAutoSavingOptions();
         this.saveTemporaryFilesDeletion();
         this.saveMaxRecentPresentations();
+        this.saveSnapshotDelay();
     }
 
     /**
@@ -129,6 +132,24 @@ public class OptionsViewController implements Initializable {
     }
 
     /**
+     * Saves the option for the cascading snapshot delay.
+     */
+    private void saveSnapshotDelay() {
+        final String snapshotDelay = this.snapshotDelay.getText();
+
+        if (snapshotDelay != null) {
+            try {
+                GlobalConfiguration.setSnapshotDelay(Long.parseLong(snapshotDelay));
+            } catch (NumberFormatException ex) {
+                LOGGER.log(Level.WARNING, "Invalid snapshot delay", ex);
+                GlobalConfiguration.setSnapshotDelay(GlobalConfiguration.getDefaultSnapshotDelay());
+            }
+        } else {
+            GlobalConfiguration.setSnapshotDelay(GlobalConfiguration.getDefaultSnapshotDelay());
+        }
+    }
+
+    /**
      * Display the configuration UI for each {@link ISnippetExecutor}.
      */
     private void initializeSnippetExecutorUI() {
@@ -188,6 +209,11 @@ public class OptionsViewController implements Initializable {
         this.maxRecentPresentations.setText(String.valueOf(maxRecentPresentations));
     }
 
+    private void initializeSnapshotDelay() {
+        final Long snapshotDelay = GlobalConfiguration.getSnapshotDelay();
+        this.snapshotDelay.setText(String.valueOf(snapshotDelay));
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.initializeAutoSaveUI();
@@ -195,5 +221,6 @@ public class OptionsViewController implements Initializable {
         this.initializeSnippetExecutorUI();
         this.initializeHostingConnectorUI();
         this.initializeMaxRecentPresentations();
+        this.initializeSnapshotDelay();
     }
 }

@@ -33,6 +33,7 @@ public class GlobalConfiguration {
     protected static final String SLIDESHOWFX_CONFIGURATION_FILE = ".slideshowfx.configuration.properties";
     protected static final String SLIDESHOWFX_CONTEXT_FILE_NAME = ".slideshowfx.context.xml";
     protected static final Long DEFAULT_MAX_RECENT_PRESENTATIONS = 10L;
+    protected static final Long DEFAULT_SNAPSHOT_DELAY = 500L;
 
     private static File APPLICATION_DIRECTORY = null;
     private static File PLUGINS_DIRECTORY = null;
@@ -69,6 +70,11 @@ public class GlobalConfiguration {
      * menu of the application.
      */
     protected static final String MAX_RECENT_PRESENTATIONS = "application.max.recentpresentations";
+
+    /**
+     * Name of the parameter used to specify the delay before taking a snapshot of a browser.
+     */
+    protected static final String SNAPSHOT_DELAY = "application.snapshot.delay";
 
     /**
      * Name of the parameter used to specify the Twitter consumer key.
@@ -793,6 +799,34 @@ public class GlobalConfiguration {
      */
     public static void removeMaxRecentPresentations() {
         removeProperty(MAX_RECENT_PRESENTATIONS);
+    }
+
+    /**
+     * Get the default delay before taking snapshots of a browser.
+     *
+     * @return The default delay before taking snapshots of a browser.
+     */
+    public static Long getDefaultSnapshotDelay() {
+        return DEFAULT_SNAPSHOT_DELAY;
+    }
+
+    /**
+     * Get the delay before taking a snapshot of a browser.
+     *
+     * @return The delay before taking a snapshot of a browser.
+     */
+    public static Long getSnapshotDelay() {
+        final Long snapshotDelay = getLongProperty(SNAPSHOT_DELAY);
+        return snapshotDelay == null ? getDefaultSnapshotDelay() : snapshotDelay;
+    }
+
+    /**
+     * Set the delay before taking a snapshot of a browser.
+     *
+     * @param snapshotDelay The delay before taking a snapshot of a browser.
+     */
+    public static void setSnapshotDelay(final long snapshotDelay) {
+        setProperty(SNAPSHOT_DELAY, String.valueOf(snapshotDelay));
     }
 
     /**

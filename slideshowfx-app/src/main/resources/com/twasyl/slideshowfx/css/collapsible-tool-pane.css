@@ -1,6 +1,13 @@
+.toggle-button:left {
+    -fx-border-width: 0 2px 0 0;
+}
+
+.toggle-button:right {
+    -fx-border-width: 0 0 0 2px;
+}
+
 .toggle-button {
     -fx-background-color: transparent;
-    -fx-border-width: 0 2px 0 0;
     -fx-border-color: transparent;
     -fx-border-style: solid;
     -fx-background-radius: 0;

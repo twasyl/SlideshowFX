@@ -3,10 +3,7 @@ package com.twasyl.slideshowfx.controllers;
 import com.twasyl.slideshowfx.concurrent.ReloadPresentationViewAndGoToTask;
 import com.twasyl.slideshowfx.concurrent.ReloadPresentationViewTask;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
-import com.twasyl.slideshowfx.controls.PresentationBrowser;
-import com.twasyl.slideshowfx.controls.PresentationOutline;
-import com.twasyl.slideshowfx.controls.PresentationVariablesPanel;
-import com.twasyl.slideshowfx.controls.SlideContentEditor;
+import com.twasyl.slideshowfx.controls.*;
 import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.Presentations;
@@ -23,10 +20,8 @@ import com.twasyl.slideshowfx.utils.DialogHelper;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.beans.Pair;
 import com.twasyl.slideshowfx.utils.beans.binding.FilenameBinding;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.*;
 import javafx.beans.property.adapter.JavaBeanObjectProperty;
 import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
 import javafx.collections.ListChangeListener;
@@ -39,6 +34,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -51,6 +47,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.lang.Double.NaN;
 import static java.util.logging.Level.SEVERE;
 
 /**
@@ -68,6 +65,8 @@ public class PresentationViewController implements Initializable {
     private final ReadOnlyStringProperty presentationName = new SimpleStringProperty();
     private final ReadOnlyBooleanProperty presentationModified = new SimpleBooleanProperty(false);
 
+    @FXML
+    private SplitPane root;
     @FXML
     private PresentationBrowser browser;
     @FXML
@@ -87,6 +86,7 @@ public class PresentationViewController implements Initializable {
     @FXML
     private TextArea speakerNotes;
     @FXML
+    public CollapsibleToolPane presentationOutlinePane;
     public PresentationOutline presentationOutline;
 
     /* All methods called by the FXML */
@@ -541,6 +541,62 @@ public class PresentationViewController implements Initializable {
     }
 
     /**
+     * Initialize the {@link #presentationOutlinePane}. It will define the behaviour of the pane and how it affects
+     * elements within it.
+     */
+    private void initializePresentationOutlinePane() {
+        final ObservableList<SplitPane.Divider> dividers = this.root.getDividers();
+
+        if (!dividers.isEmpty()) {
+            final SplitPane.Divider divider = dividers.get(0);
+            final DoubleProperty dividerWidth = new SimpleDoubleProperty(NaN);
+
+            this.root.getChildrenUnmodifiable().addListener((ListChangeListener<Node>) event -> {
+                if (event.next() && event.wasAdded() && dividerWidth.getValue().isNaN()) {
+                    final Node node = event.getAddedSubList().get(0);
+
+                    if (node.getStyleClass().contains("split-pane-divider")) {
+                        dividerWidth.bind(((Region) node).widthProperty());
+                        event.reset();
+                    }
+                }
+            });
+
+            final DoubleProperty openedDividerPosition = new SimpleDoubleProperty(NaN);
+
+            final DoubleBinding contentWidth = divider.positionProperty()
+                    .multiply(this.root.widthProperty())
+                    .subtract(this.presentationOutlinePane.toolbarWidthProperty())
+                    .subtract(dividerWidth);
+            this.presentationOutlinePane.contentWidthProperty().bind(contentWidth);
+
+            this.presentationOutlinePane.collapsedProperty().addListener((value, wasCollapsed, isCollapsed) -> {
+                final double position;
+
+                if (isCollapsed) {
+                    position = this.presentationOutlinePane.getToolbarWidth() / this.root.getWidth();
+                    openedDividerPosition.set(divider.getPosition());
+                } else if (openedDividerPosition.getValue().isNaN()){
+                    position = 0.3;
+                } else {
+                    position = openedDividerPosition.get();
+                }
+
+                if(divider.positionProperty().isBound()) {
+                    divider.positionProperty().unbind();
+                }
+
+                divider.setPosition(position);
+            });
+
+            // Initial position
+            this.presentationOutlinePane.toolbarWidthProperty().addListener((widthValue, oldWidth, newWidth) -> {
+                divider.setPosition(newWidth.doubleValue() / this.root.getWidth());
+            });
+        }
+    }
+
+    /**
      * Initialize the presentation outline by :
      * <ul>
      * <li>filling it with slides' preview ;</li>
@@ -548,6 +604,9 @@ public class PresentationViewController implements Initializable {
      * </ul>
      */
     private void initializePresentationOutline() {
+        this.presentationOutline = new PresentationOutline();
+        this.presentationOutline.prefHeightProperty().bind(this.root.heightProperty());
+
         this.presentationOutline.getSelectionModel().selectedIndexProperty().addListener((value, oldIndex, newIndex) -> {
             if (newIndex != null) {
                 final String slideId = this.presentationOutline.getSlideIdAtIndex(newIndex.intValue());
@@ -557,6 +616,8 @@ public class PresentationViewController implements Initializable {
                 }
             }
         });
+
+        this.presentationOutlinePane.addContent("Outline", this.presentationOutline);
 
         final Thread thread = new Thread(() -> PlatformHelper.run(() -> this.presentationOutline.setPresentation(this.presentationEngine)));
 
@@ -598,6 +659,7 @@ public class PresentationViewController implements Initializable {
             LOGGER.log(SEVERE, "Can not create the property for the name of the presentation", e);
         }
 
+        this.initializePresentationOutlinePane();
         this.initializePresentationOutline();
     }
 
@@ -682,7 +744,6 @@ public class PresentationViewController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
         // Make this controller available to JavaScript
         this.browser.setPresentation(this.presentationEngine);
         this.browser.setBackend(this);

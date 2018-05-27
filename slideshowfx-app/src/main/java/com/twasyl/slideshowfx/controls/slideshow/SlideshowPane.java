@@ -31,6 +31,7 @@ import static com.twasyl.slideshowfx.server.service.AbstractSlideshowFXService.*
 import static com.twasyl.slideshowfx.server.service.ISlideshowFXServices.SERVICE_CHAT_ATTENDEE_HISTORY;
 import static com.twasyl.slideshowfx.server.service.PresenterChatService.SERVICE_CHAT_PRESENTER_ON_MESSAGE;
 import static com.twasyl.slideshowfx.server.service.QuizService.SERVICE_QUIZ_ON_RESULT;
+import static javafx.geometry.HPos.RIGHT;
 
 /**
  * A pane that displays a presentation.
@@ -122,6 +123,8 @@ public class SlideshowPane extends StackPane implements Actor {
         final FontAwesome quizIcon = new FontAwesome(Icon.QUESTION);
         quizIcon.setSize(32d);
         quizIcon.setColor("app-color-orange");
+
+        this.collapsibleToolPane.setPosition(RIGHT);
 
         this.collapsibleToolPane.addContent(qrCodeIcon, new QRCodePanel())
                 .addContent(chatIcon, this.chatPanel)

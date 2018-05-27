@@ -7,15 +7,16 @@ package com.twasyl.slideshowfx.controls;
  * @since SlideshowFX @@NEXT-VERSION@@
  */
 
-import com.twasyl.slideshowfx.controls.CollapsibleToolPane;
 import com.twasyl.slideshowfx.icons.FontAwesome;
 import com.twasyl.slideshowfx.icons.Icon;
 import javafx.application.Application;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 public class CollapsibleToolPaneTest extends Application {
@@ -23,16 +24,26 @@ public class CollapsibleToolPaneTest extends Application {
     public void start(Stage primaryStage) throws Exception {
         final CollapsibleToolPane left = new CollapsibleToolPane();
         left.setPosition(HPos.LEFT);
-        final FontAwesome leftIcon = new FontAwesome(Icon.DESKTOP);
-        leftIcon.setColor("black");
-        left.addContent(leftIcon, new Button("Left"));
+        final FontAwesome leftIcon11 = new FontAwesome(Icon.DESKTOP);
+        leftIcon11.setColor("black");
+
+        left.addContent(leftIcon11, new Button("Left 1.1"));
+        left.addContent("Left 1.2", new Button("Left 1.2        !"));
 
         final CollapsibleToolPane right = new CollapsibleToolPane();
+        right.setPosition(HPos.RIGHT);
+
         final FontAwesome rightIcon = new FontAwesome(Icon.COMMENTS_O);
         rightIcon.setColor("black");
-        right.addContent(rightIcon, new Button("Right"));
+        right.addContent(rightIcon, new Button("Right 1.1"));
+        right.addContent("Right 1.2", new Button("Right 1.2"));
 
-        final StackPane root = new StackPane(left, right);
+        final SplitPane root = new SplitPane(left, right);
+
+        // Make the right content fill the split pane
+        final SplitPane.Divider div = root.getDividers().get(0);
+        final DoubleProperty dividerWidth = new SimpleDoubleProperty(0);
+
 
         final Scene scene = new Scene(root);
 
@@ -41,6 +52,19 @@ public class CollapsibleToolPaneTest extends Application {
         primaryStage.setWidth(500);
         primaryStage.setHeight(500);
         primaryStage.show();
+
+
+        div.positionProperty().addListener((positionValue, oldPosition, newPosition) -> {
+            final Region lookup = (Region) root.lookup("> .split-pane-divider");
+            dividerWidth.set(lookup == null ? 0 : lookup.getWidth());
+            double contentWidth = newPosition.doubleValue() * root.getWidth() - left.getToolbarWidth() - dividerWidth.get();
+            left.setContentWidth(contentWidth);
+        });
+
+div.setPosition(div.getPosition());
+//        dividerWidth.setValue(((Region) root.lookup(".split-pane-divider")).getWidth());
+//        final DoubleBinding contentWidth = div.positionProperty().subtract(1).negate().multiply(root.widthProperty()).subtract(right.toolbarWidthProperty()).subtract(dividerWidth);
+//        right.contentWidthProperty().bind(contentWidth);
     }
 
     public static void main(String[] args) {

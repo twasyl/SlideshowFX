@@ -12,9 +12,13 @@ import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Scene;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
@@ -31,6 +35,49 @@ import static java.util.logging.Level.SEVERE;
  * @since SlideshowFX @@NEXT-VERSION@@
  */
 public class PresentationOutline extends ListView<ImageView> {
+
+    private static class SlidePreview extends ListCell<ImageView> {
+        public SlidePreview() {
+            this.setOnDragDetected(event -> {
+                if (getItem() != null && !isEmpty()) {
+                    final Dragboard dragboard = this.startDragAndDrop(TransferMode.MOVE);
+                    final ClipboardContent content = new ClipboardContent();
+                    content.putString("");
+                    dragboard.setContent(content);
+                }
+                event.consume();
+            });
+
+            this.setOnDragOver(event -> {
+                if (event.getGestureSource() != this) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+
+                event.consume();
+            });
+
+            this.setOnDragDropped(event -> {
+                final SlidePreview source = (SlidePreview) event.getGestureSource();
+                final ImageView from = source.getItem();
+                final ImageView to = this.getItem();
+
+                source.setItem(to);
+                this.setItem(from);
+
+                event.setDropCompleted(true);
+                event.consume();
+            });
+        }
+
+        @Override
+        protected void updateItem(ImageView item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if(item != null && !empty) {
+                this.setGraphic(item);
+            }
+        }
+    }
 
     private static Logger LOGGER = Logger.getLogger(PresentationOutline.class.getName());
     private final ObjectProperty<PresentationEngine> presentation = new SimpleObjectProperty<>();
@@ -49,6 +96,11 @@ public class PresentationOutline extends ListView<ImageView> {
         });
 
         this.browser.setInteractionAllowed(false);
+
+        this.setCellFactory(param -> {
+            final SlidePreview cell = new SlidePreview();
+            return cell;
+        });
     }
 
     public ObjectProperty<PresentationEngine> presentationProperty() {

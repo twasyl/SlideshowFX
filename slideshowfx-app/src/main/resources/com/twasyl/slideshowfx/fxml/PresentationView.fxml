@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.twasyl.slideshowfx.controls.CollapsibleToolPane?>
 <?import com.twasyl.slideshowfx.controls.PresentationBrowser?>
-<?import com.twasyl.slideshowfx.controls.PresentationOutline?>
 <?import com.twasyl.slideshowfx.controls.SlideContentEditor?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
-<SplitPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.PresentationViewController">
+<SplitPane xmlns:fx="http://javafx.com/fxml" fx:id="root" fx:controller="com.twasyl.slideshowfx.controllers.PresentationViewController">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
     </stylesheets>
@@ -44,7 +44,7 @@
         <TextField fx:id="fieldName" prefColumnCount="15" />
     </fx:define>
 
-    <PresentationOutline fx:id="presentationOutline" prefWidth="100" minWidth="100" />
+    <CollapsibleToolPane fx:id="presentationOutlinePane" position="LEFT" />
 
     <PresentationBrowser fx:id="browser" minWidth="500" />
 

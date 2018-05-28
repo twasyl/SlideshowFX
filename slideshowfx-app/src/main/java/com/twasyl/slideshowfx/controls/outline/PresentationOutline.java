@@ -1,4 +1,4 @@
-package com.twasyl.slideshowfx.controls;
+package com.twasyl.slideshowfx.controls.outline;
 
 /*
  *
@@ -7,24 +7,24 @@ package com.twasyl.slideshowfx.controls;
  * @since SlideshowFX @@NEXT-VERSION@@
  */
 
+import com.twasyl.slideshowfx.controls.PresentationBrowser;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.twasyl.slideshowfx.controls.outline.PresentationOutlineEvent.SLIDE_DELETED;
+import static com.twasyl.slideshowfx.controls.outline.PresentationOutlineEvent.SLIDE_MOVED;
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getSnapshotDelay;
 import static java.util.logging.Level.SEVERE;
 
@@ -36,51 +36,10 @@ import static java.util.logging.Level.SEVERE;
  */
 public class PresentationOutline extends ListView<ImageView> {
 
-    private static class SlidePreview extends ListCell<ImageView> {
-        public SlidePreview() {
-            this.setOnDragDetected(event -> {
-                if (getItem() != null && !isEmpty()) {
-                    final Dragboard dragboard = this.startDragAndDrop(TransferMode.MOVE);
-                    final ClipboardContent content = new ClipboardContent();
-                    content.putString("");
-                    dragboard.setContent(content);
-                }
-                event.consume();
-            });
-
-            this.setOnDragOver(event -> {
-                if (event.getGestureSource() != this) {
-                    event.acceptTransferModes(TransferMode.MOVE);
-                }
-
-                event.consume();
-            });
-
-            this.setOnDragDropped(event -> {
-                final SlidePreview source = (SlidePreview) event.getGestureSource();
-                final ImageView from = source.getItem();
-                final ImageView to = this.getItem();
-
-                source.setItem(to);
-                this.setItem(from);
-
-                event.setDropCompleted(true);
-                event.consume();
-            });
-        }
-
-        @Override
-        protected void updateItem(ImageView item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if(item != null && !empty) {
-                this.setGraphic(item);
-            }
-        }
-    }
-
     private static Logger LOGGER = Logger.getLogger(PresentationOutline.class.getName());
     private final ObjectProperty<PresentationEngine> presentation = new SimpleObjectProperty<>();
+    private final ObjectProperty<EventHandler<PresentationOutlineEvent>> slideMoved = new SimpleObjectProperty<>();
+    private final ObjectProperty<EventHandler<PresentationOutlineEvent>> slideDeleted = new SimpleObjectProperty<>();
 
     private Stage browserStage;
     private final PresentationBrowser browser = new PresentationBrowser();
@@ -95,12 +54,27 @@ public class PresentationOutline extends ListView<ImageView> {
             }
         });
 
+        this.slideMoved.addListener((value, oldSlideMoved, newSlideMoved) -> {
+            if (oldSlideMoved != null) {
+                this.removeEventHandler(SLIDE_MOVED, oldSlideMoved);
+            }
+            if (newSlideMoved != null) {
+                this.addEventHandler(SLIDE_MOVED, newSlideMoved);
+            }
+        });
+
+        this.slideDeleted.addListener((value, oldSlideDeleted, newSlideDeleted) -> {
+            if (oldSlideDeleted != null) {
+                this.removeEventHandler(SLIDE_DELETED, oldSlideDeleted);
+            }
+            if (newSlideDeleted != null) {
+                this.addEventHandler(SLIDE_DELETED, newSlideDeleted);
+            }
+        });
+
         this.browser.setInteractionAllowed(false);
 
-        this.setCellFactory(param -> {
-            final SlidePreview cell = new SlidePreview();
-            return cell;
-        });
+        this.setCellFactory(param -> new PreviewCell());
     }
 
     public ObjectProperty<PresentationEngine> presentationProperty() {
@@ -113,6 +87,14 @@ public class PresentationOutline extends ListView<ImageView> {
 
     public void setPresentation(PresentationEngine presentation) {
         this.presentation.set(presentation);
+    }
+
+    public void setOnSlideMoved(EventHandler<PresentationOutlineEvent> onSlideMoved) {
+        this.slideMoved.set(onSlideMoved);
+    }
+
+    public void setOnSlideDeleted(EventHandler<PresentationOutlineEvent> onSlideDeleted) {
+        this.slideDeleted.set(onSlideDeleted);
     }
 
     /**
@@ -170,6 +152,7 @@ public class PresentationOutline extends ListView<ImageView> {
         if (view != null) {
             this.getItems().remove(view);
             this.browser.reload();
+            this.fireEvent(new PresentationOutlineEvent(SLIDE_DELETED, slideId, null));
         }
     }
 
@@ -311,7 +294,7 @@ public class PresentationOutline extends ListView<ImageView> {
     }
 
     /**
-     * Find the {@link ImageView} that hosts the preview of the given {@code slideId}.
+     * Find the {@link ImageView} hosting the preview of the given {@code slideId}.
      *
      * @param slideId The slide ID for which find the preview.
      * @return The {@link ImageView} for the given {@code slideId} or {@code null} if it not found.
@@ -324,6 +307,12 @@ public class PresentationOutline extends ListView<ImageView> {
                 .orElse(null);
     }
 
+    /**
+     * Find the index of the {@link ImageView} hosting the preview of the given {@code slideId}.
+     *
+     * @param slideId The slide ID for which find the index's preview.
+     * @return The index of the control hosting the given slide ID or {@code -1} if it's not found.
+     */
     private int findSlidePreviewIndex(final String slideId) {
         int previewIndex = -1;
 

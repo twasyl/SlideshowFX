@@ -4,6 +4,7 @@ import com.twasyl.slideshowfx.concurrent.ReloadPresentationViewAndGoToTask;
 import com.twasyl.slideshowfx.concurrent.ReloadPresentationViewTask;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.controls.*;
+import com.twasyl.slideshowfx.controls.outline.PresentationOutline;
 import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.Presentations;
@@ -196,6 +197,13 @@ public class PresentationViewController implements Initializable {
                 if (slideBefore == null) this.reloadPresentation();
                 else reloadPresentationAndGoToSlide(slideBefore.getId());
             }
+        }
+    }
+
+    public void deleteSlide(final String slideId) {
+        if (slideId != null) {
+            final String currentSlideId = getCurrentSlideId();
+
         }
     }
 
@@ -600,12 +608,23 @@ public class PresentationViewController implements Initializable {
      * Initialize the presentation outline by :
      * <ul>
      * <li>filling it with slides' preview ;</li>
-     * <li>registering listeners for the selection change.</li>
+     * <li>registering listeners for the selection change ;</li>
+     * <li>registering a listener when a slide is moved ;</li>
+     * <li>registering a listener when a slide is deleted.</li>
      * </ul>
      */
     private void initializePresentationOutline() {
         this.presentationOutline = new PresentationOutline();
         this.presentationOutline.prefHeightProperty().bind(this.root.heightProperty());
+
+        this.presentationOutline.setOnSlideMoved(event -> {
+            final Slide slideToMove = this.presentationEngine.getConfiguration().getSlideById(event.getSourceSlideId());
+            final Slide beforeSlide = this.presentationEngine.getConfiguration().getSlideById(event.getTargetSlideId());
+            this.presentationEngine.moveSlide(slideToMove, beforeSlide);
+
+            final ReloadPresentationViewTask task = new ReloadPresentationViewTask(this);
+            TaskDAO.getInstance().startTask(task);
+        });
 
         this.presentationOutline.getSelectionModel().selectedIndexProperty().addListener((value, oldIndex, newIndex) -> {
             if (newIndex != null) {

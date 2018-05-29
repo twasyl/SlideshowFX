@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.controls.outline.PresentationOutlineEvent.SLIDE_DELETED;
+import static com.twasyl.slideshowfx.controls.outline.PresentationOutlineEvent.SLIDE_DELETION_REQUESTED;
 import static com.twasyl.slideshowfx.controls.outline.PresentationOutlineEvent.SLIDE_MOVED;
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getSnapshotDelay;
 import static java.util.logging.Level.SEVERE;
@@ -40,6 +41,7 @@ public class PresentationOutline extends ListView<ImageView> {
     private final ObjectProperty<PresentationEngine> presentation = new SimpleObjectProperty<>();
     private final ObjectProperty<EventHandler<PresentationOutlineEvent>> slideMoved = new SimpleObjectProperty<>();
     private final ObjectProperty<EventHandler<PresentationOutlineEvent>> slideDeleted = new SimpleObjectProperty<>();
+    private ObjectProperty<EventHandler<PresentationOutlineEvent>> slideDeletionRequested = new SimpleObjectProperty<>();
 
     private Stage browserStage;
     private final PresentationBrowser browser = new PresentationBrowser();
@@ -72,6 +74,15 @@ public class PresentationOutline extends ListView<ImageView> {
             }
         });
 
+        this.slideDeletionRequested.addListener((value, oldRequest, newRequest) -> {
+            if (oldRequest != null) {
+                this.removeEventHandler(SLIDE_DELETION_REQUESTED, oldRequest);
+            }
+            if (newRequest != null) {
+                this.addEventHandler(SLIDE_DELETION_REQUESTED, newRequest);
+            }
+        });
+
         this.browser.setInteractionAllowed(false);
 
         this.setCellFactory(param -> new PreviewCell());
@@ -95,6 +106,10 @@ public class PresentationOutline extends ListView<ImageView> {
 
     public void setOnSlideDeleted(EventHandler<PresentationOutlineEvent> onSlideDeleted) {
         this.slideDeleted.set(onSlideDeleted);
+    }
+
+    public void setOnSlideDeletionRequested(final EventHandler<PresentationOutlineEvent> event) {
+        this.slideDeletionRequested.set(event);
     }
 
     /**

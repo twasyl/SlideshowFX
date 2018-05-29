@@ -8,19 +8,27 @@ package com.twasyl.slideshowfx.controls.outline;
  * @since SlideshowFX @@NEXT-VERSION@@
  */
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
+import static com.twasyl.slideshowfx.controls.outline.PresentationOutlineEvent.SLIDE_DELETION_REQUESTED;
+
 public class PreviewCell extends ListCell<ImageView> {
-    private ObjectProperty<EventHandler<PresentationOutlineEvent>> onSlideDeletionRequested = new SimpleObjectProperty<>();
 
     public PreviewCell() {
+        this.initializeDragDropBehaviour();
+        this.initializeContextMenu();
+    }
+
+    /**
+     * This method is responsible for initializing the drag'n'drop behaviour of this cell.
+     */
+    private void initializeDragDropBehaviour() {
         this.setOnDragDetected(event -> {
             if (getItem() != null && !isEmpty()) {
                 final Dragboard dragboard = this.startDragAndDrop(TransferMode.MOVE);
@@ -57,16 +65,28 @@ public class PreviewCell extends ListCell<ImageView> {
         });
     }
 
+    private void initializeContextMenu() {
+        final MenuItem delete = new MenuItem("Delete");
+        delete.setOnAction(event -> {
+            if (getItem() != null) {
+                final String sourceSlideId = (String) getItem().getUserData();
+                final PresentationOutlineEvent requestSlideDeletion = new PresentationOutlineEvent(SLIDE_DELETION_REQUESTED, sourceSlideId, null);
+                getListView().fireEvent(requestSlideDeletion);
+            }
+        });
+
+        final ContextMenu menu = new ContextMenu(delete);
+        setContextMenu(menu);
+    }
+
     @Override
     protected void updateItem(ImageView item, boolean empty) {
         super.updateItem(item, empty);
 
         if (item != null && !empty) {
             this.setGraphic(item);
+        } else {
+            this.setGraphic(null);
         }
-    }
-
-    public void setOnSlideDeletionRequested(final EventHandler<PresentationOutlineEvent> event) {
-        this.onSlideDeletionRequested.set(event);
     }
 }

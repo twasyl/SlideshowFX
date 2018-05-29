@@ -3,7 +3,10 @@ package com.twasyl.slideshowfx.controllers;
 import com.twasyl.slideshowfx.concurrent.ReloadPresentationViewAndGoToTask;
 import com.twasyl.slideshowfx.concurrent.ReloadPresentationViewTask;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
-import com.twasyl.slideshowfx.controls.*;
+import com.twasyl.slideshowfx.controls.CollapsibleToolPane;
+import com.twasyl.slideshowfx.controls.PresentationBrowser;
+import com.twasyl.slideshowfx.controls.PresentationVariablesPanel;
+import com.twasyl.slideshowfx.controls.SlideContentEditor;
 import com.twasyl.slideshowfx.controls.outline.PresentationOutline;
 import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
@@ -200,10 +203,30 @@ public class PresentationViewController implements Initializable {
         }
     }
 
+    /**
+     * Delete the slide identified by the given {@code slideId}.
+     *
+     * @param slideId The slide to delete.
+     */
     public void deleteSlide(final String slideId) {
         if (slideId != null) {
-            final String currentSlideId = getCurrentSlideId();
+            final ButtonType answer = DialogHelper.showConfirmationAlert("Delete slide", "Are you sure you want to delete the slide?");
 
+            if (answer == ButtonType.YES) {
+                final Slide slideToDelete = this.presentationEngine.getConfiguration().getSlideById(slideId);
+                this.presentationEngine.deleteSlide(slideToDelete.getSlideNumber());
+                this.presentationOutline.deletePreview(slideId);
+
+                final String currentSlideId = getCurrentSlideId();
+                if (slideId.equals(currentSlideId)) {
+                    final Slide slideBefore = this.presentationEngine.getConfiguration().getSlideBefore(slideToDelete.getSlideNumber());
+
+                    if (slideBefore == null) this.reloadPresentation();
+                    else reloadPresentationAndGoToSlide(slideBefore.getId());
+                } else {
+                    this.reloadPresentation();
+                }
+            }
         }
     }
 
@@ -584,13 +607,13 @@ public class PresentationViewController implements Initializable {
                 if (isCollapsed) {
                     position = this.presentationOutlinePane.getToolbarWidth() / this.root.getWidth();
                     openedDividerPosition.set(divider.getPosition());
-                } else if (openedDividerPosition.getValue().isNaN()){
+                } else if (openedDividerPosition.getValue().isNaN()) {
                     position = 0.3;
                 } else {
                     position = openedDividerPosition.get();
                 }
 
-                if(divider.positionProperty().isBound()) {
+                if (divider.positionProperty().isBound()) {
                     divider.positionProperty().unbind();
                 }
 
@@ -624,6 +647,10 @@ public class PresentationViewController implements Initializable {
 
             final ReloadPresentationViewTask task = new ReloadPresentationViewTask(this);
             TaskDAO.getInstance().startTask(task);
+        });
+
+        this.presentationOutline.setOnSlideDeletionRequested(event -> {
+            this.deleteSlide(event.getSourceSlideId());
         });
 
         this.presentationOutline.getSelectionModel().selectedIndexProperty().addListener((value, oldIndex, newIndex) -> {

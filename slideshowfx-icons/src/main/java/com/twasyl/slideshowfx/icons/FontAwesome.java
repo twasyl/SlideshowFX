@@ -45,8 +45,8 @@ public class FontAwesome extends Text {
     }
 
     private static final Logger LOGGER = Logger.getLogger(FontAwesome.class.getName());
-    private static final String FONTAWESOME_VERSION = "5.0.8";
-    private static final String FONTAWESOME_ROOT = "/com/twasyl/slideshowfx/icons/fontawesome/" + FONTAWESOME_VERSION + "/";
+    private static final String FONTAWESOME_VERSION = "5.0.13";
+    private static final String FONTAWESOME_ROOT = "/com/twasyl/slideshowfx/icons/fontawesome/" + FONTAWESOME_VERSION.replaceAll("\\.", "_") + "/";
     private static final Map<FontCacheKey, Font> FONT_CACHE = new HashMap<>();
 
     private final ObjectProperty<Icon> icon = new SimpleObjectProperty<>(Icon.FOLDER_OPEN);
@@ -164,7 +164,7 @@ public class FontAwesome extends Text {
      */
     public static URL getFontAwesomeFontFile(final FontType type) {
         final StringBuilder path = new StringBuilder("fonts/fontawesome-")
-                .append(type.name().toLowerCase()).append("-").append(getFontAwesomeVersion()).append(".otf");
+                .append(type.name().toLowerCase()).append(".otf");
 
         return getFontAwesomeFile(path.toString());
     }

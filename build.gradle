@@ -122,7 +122,7 @@ subprojects {
         def isProjectPlugin = rootProject.isPlugin(project)
 
         if (isJavaProject) {
-            println "${project.projectDir.absolutePath}"
+
             sourceSets {
                 integrationTest {
                     java.srcDir file("${project.projectDir.absolutePath}/src/integration-test/java")
@@ -144,6 +144,39 @@ subprojects {
 
             test {
                 useJUnitPlatform()
+            }
+
+            compileJava {
+                sourceCompatibility = JavaVersion.VERSION_1_8
+                targetCompatibility = JavaVersion.VERSION_1_8
+            }
+
+            Map<String, ?> manifestAttributes = ['Implementation-Vendor': 'Thierry Wasylczenko']
+
+            if (rootProject.isPlugin(project)) {
+                manifestAttributes += [
+                        'Bundle-ManifestVersion': '2',
+                        'Bundle-Name'           : project.ext.bundle.name,
+                        'Bundle-SymbolicName'   : project.ext.bundle.symbolicName,
+                        'Bundle-Version'        : stripProjectVersion(project.version),
+                        'Bundle-Description'    : project.ext.bundle.description,
+                        'Bundle-Activator'      : project.ext.bundle.activator,
+                        'Bundle-ClassPath'      : project.ext.bundle.classPath ?: '.',
+                        'Bundle-Vendor'         : 'Thierry Wasylczenko',
+                        'Export-Package'        : project.ext.bundle.exportPackage,
+                        'Setup-Wizard-Label'    : project.ext.bundle.setupWizardLabel,
+                        'Import-Package'        : 'org.osgi.framework'
+                ]
+
+                if (project.ext.bundle.containsKey('setupWizardIconName')) {
+                    manifestAttributes += ['Setup-Wizard-Icon-Name': project.ext.bundle.setupWizardIconName]
+                }
+            }
+
+            jar {
+                manifest {
+                    attributes(manifestAttributes)
+                }
             }
         }
 
@@ -194,46 +227,6 @@ subprojects {
             }
 
             installPlugin.dependsOn jar
-        }
-    }
-
-    tasks.withType(JavaCompile) {
-        compileJava {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-        }
-
-        options.encoding = "UTF-8"
-    }
-
-    tasks.withType(Jar) { task ->
-        afterEvaluate { project ->
-            Map<String, ?> manifestAttributes = ['Implementation-Vendor': 'Thierry Wasylczenko']
-
-            if (rootProject.isPlugin(project)) {
-                manifestAttributes += [
-                        'Bundle-ManifestVersion': '2',
-                        'Bundle-Name'           : project.ext.bundle.name,
-                        'Bundle-SymbolicName'   : project.ext.bundle.symbolicName,
-                        'Bundle-Version'        : stripProjectVersion(project.version),
-                        'Bundle-Description'    : project.ext.bundle.description,
-                        'Bundle-Activator'      : project.ext.bundle.activator,
-                        'Bundle-ClassPath'      : project.ext.bundle.classPath ?: '.',
-                        'Bundle-Vendor'         : 'Thierry Wasylczenko',
-                        'Export-Package'        : project.ext.bundle.exportPackage,
-                        'Setup-Wizard-Label'    : project.ext.bundle.setupWizardLabel,
-                        'Import-Package'        : 'org.osgi.framework'
-                ]
-
-                if (project.ext.bundle.containsKey('setupWizardIconName')) {
-                    manifestAttributes += ['Setup-Wizard-Icon-Name': project.ext.bundle.setupWizardIconName]
-                }
-            }
-
-            jar {
-                manifest {
-                    attributes(manifestAttributes)
-                }
-            }
         }
     }
 }

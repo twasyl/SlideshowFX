@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -13,7 +14,9 @@ import java.nio.file.Paths;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ZipUtilsTest {
@@ -38,18 +41,18 @@ public class ZipUtilsTest {
         ZipUtils.zip(resourcesDir, zip);
 
         // Verify all content of the zip
-        try(final FileInputStream fileInput = new FileInputStream(zip);
-            final ZipInputStream input = new ZipInputStream(fileInput)) {
+        try (final FileInputStream fileInput = new FileInputStream(zip);
+             final ZipInputStream input = new ZipInputStream(fileInput)) {
 
             final int expectedNumberOfEntries = 5;
             int numberOfEntries = 0;
 
             ZipEntry entry;
 
-            while((entry = input.getNextEntry()) != null) {
+            while ((entry = input.getNextEntry()) != null) {
                 numberOfEntries++;
 
-                switch(entry.getName()) {
+                switch (entry.getName()) {
                     case "dir/otherDir/otherDirTest.html":
                         assertFalse(entry.isDirectory(), "otherDirTest.html is a directory");
                         break;
@@ -76,11 +79,12 @@ public class ZipUtilsTest {
         zip.delete();
     }
 
-    @Test public void unzip() throws IOException {
+    @Test
+    public void unzip() throws IOException {
         final File zip = new File(resourcesDir, "archive.zip");
         final File unzippedFolder = new File(testResultsDir, "unzipped").toPath().toAbsolutePath().toFile();
 
-        if(!unzippedFolder.exists()) unzippedFolder.mkdir();
+        if (!unzippedFolder.exists()) unzippedFolder.mkdir();
 
         ZipUtils.unzip(zip, unzippedFolder);
 
@@ -107,6 +111,29 @@ public class ZipUtilsTest {
         unzippedFile = Paths.get(unzippedFolder.getAbsolutePath(), "test.txt").toFile();
         assertTrue(unzippedFile.exists());
         assertTrue(unzippedFile.isFile());
+
+        Files.walkFileTree(unzippedFolder.toPath(), new DeleteFileVisitor());
+    }
+
+    @Test
+    public void zipSlipVulnerabilityManaged() throws IOException {
+        final File zipFile = new File(testResultsDir, "zipSlipVulnerability.zip");
+        zipFile.deleteOnExit();
+
+        try (final FileOutputStream fileOutputStream = new FileOutputStream(zipFile);
+             final ZipOutputStream outputStream = new ZipOutputStream(fileOutputStream)) {
+            outputStream.putNextEntry(new ZipEntry("../zipSlipFile.txt"));
+            outputStream.write("Zip Slip vulnerability !!!".getBytes(UTF_8));
+            outputStream.closeEntry();
+            outputStream.flush();
+        }
+
+        final File unzippedFolder = new File(testResultsDir, "zipSlipVulnerability").toPath().toAbsolutePath().toFile();
+        if (!unzippedFolder.exists()) unzippedFolder.mkdir();
+        ZipUtils.unzip(zipFile, unzippedFolder);
+
+        final File unzippedFile = Paths.get(testResultsDir.getAbsolutePath(), "zipSlipFile.txt").toFile();
+        assertFalse(unzippedFile.exists());
 
         Files.walkFileTree(unzippedFolder.toPath(), new DeleteFileVisitor());
     }

@@ -8,7 +8,9 @@ Changes to the SlideshowFX software are listed by version within this document.
 
 #### New and noteworthy
 
-* TODO
+* Upgrade FontAwesome to version 5.0.13
+* Upgrade Box hosting connector
+* Upgrade Google Drive hosting connector
 
 #### Bug fixes
 
@@ -16,6 +18,7 @@ Changes to the SlideshowFX software are listed by version within this document.
 * Tooltips are always initialized for plugin buttons in the setup [#35](https://github.com/twasyl/SlideshowFX/issues/35)
 * Fix answered icon in attendee's chat
 * Fix the author of messages in attendee's chat : for self messages, "I" is displayed instead of the login name
+* Fix Zip Slip vulnerability
 
 #### Included plugins within the packaging
 

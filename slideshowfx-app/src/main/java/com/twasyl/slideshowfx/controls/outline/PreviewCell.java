@@ -8,6 +8,7 @@ package com.twasyl.slideshowfx.controls.outline;
  * @since SlideshowFX @@NEXT-VERSION@@
  */
 
+import javafx.geometry.Insets;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
@@ -23,6 +24,7 @@ public class PreviewCell extends ListCell<ImageView> {
     public PreviewCell() {
         this.initializeDragDropBehaviour();
         this.initializeContextMenu();
+        this.setPadding(Insets.EMPTY);
     }
 
     /**

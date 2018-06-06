@@ -608,7 +608,7 @@ public class PresentationViewController implements Initializable {
                     position = this.presentationOutlinePane.getToolbarWidth() / this.root.getWidth();
                     openedDividerPosition.set(divider.getPosition());
                 } else if (openedDividerPosition.getValue().isNaN()) {
-                    position = 0.3;
+                    position = 0.15;
                 } else {
                     position = openedDividerPosition.get();
                 }
@@ -663,6 +663,7 @@ public class PresentationViewController implements Initializable {
             }
         });
 
+        this.presentationOutline.disableProperty().bind(this.presentationOutline.loadingProperty());
         this.presentationOutlinePane.addContent("Outline", this.presentationOutline);
 
         final Thread thread = new Thread(() -> PlatformHelper.run(() -> this.presentationOutline.setPresentation(this.presentationEngine)));

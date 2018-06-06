@@ -1,36 +1,40 @@
 package com.twasyl.slideshowfx.controls.outline;
 
 /*
+ * Component holding an outline of a given {@link PresentationEngine}.
  *
  * @author Thierry Wasylczenko
  * @version 1.0
  * @since SlideshowFX @@NEXT-VERSION@@
  */
 
+import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.controls.PresentationBrowser;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.twasyl.slideshowfx.controls.outline.PresentationOutlineEvent.SLIDE_DELETED;
-import static com.twasyl.slideshowfx.controls.outline.PresentationOutlineEvent.SLIDE_DELETION_REQUESTED;
-import static com.twasyl.slideshowfx.controls.outline.PresentationOutlineEvent.SLIDE_MOVED;
+import static com.twasyl.slideshowfx.controls.outline.PresentationOutlineEvent.*;
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getSnapshotDelay;
 import static java.util.logging.Level.SEVERE;
 
 /**
- * Component displaying the outline of a presentation.
+ * Component displaying the outline of a {@link PresentationEngine presentation}.
  *
  * @author Thierry Wasylczenko
  * @since SlideshowFX @@NEXT-VERSION@@
@@ -41,7 +45,8 @@ public class PresentationOutline extends ListView<ImageView> {
     private final ObjectProperty<PresentationEngine> presentation = new SimpleObjectProperty<>();
     private final ObjectProperty<EventHandler<PresentationOutlineEvent>> slideMoved = new SimpleObjectProperty<>();
     private final ObjectProperty<EventHandler<PresentationOutlineEvent>> slideDeleted = new SimpleObjectProperty<>();
-    private ObjectProperty<EventHandler<PresentationOutlineEvent>> slideDeletionRequested = new SimpleObjectProperty<>();
+    private final ObjectProperty<EventHandler<PresentationOutlineEvent>> slideDeletionRequested = new SimpleObjectProperty<>();
+    private final ReadOnlyBooleanProperty loading = new SimpleBooleanProperty(false);
 
     private Stage browserStage;
     private final PresentationBrowser browser = new PresentationBrowser();
@@ -86,6 +91,8 @@ public class PresentationOutline extends ListView<ImageView> {
         this.browser.setInteractionAllowed(false);
 
         this.setCellFactory(param -> new PreviewCell());
+        this.setPadding(Insets.EMPTY);
+        this.setBorder(Border.EMPTY);
     }
 
     public ObjectProperty<PresentationEngine> presentationProperty() {
@@ -98,6 +105,18 @@ public class PresentationOutline extends ListView<ImageView> {
 
     public void setPresentation(PresentationEngine presentation) {
         this.presentation.set(presentation);
+    }
+
+    public ReadOnlyBooleanProperty loadingProperty() {
+        return loading;
+    }
+
+    public boolean isLoading() {
+        return loading.get();
+    }
+
+    private void setLoading(final boolean loading) {
+        ((SimpleBooleanProperty) this.loading).set(loading);
     }
 
     public void setOnSlideMoved(EventHandler<PresentationOutlineEvent> onSlideMoved) {
@@ -180,9 +199,14 @@ public class PresentationOutline extends ListView<ImageView> {
      */
     public void takeSnapshot(String slideId, boolean recursive, boolean javascriptCall) {
         if (!javascriptCall) {
+            this.setLoading(true);
             this.browser.getInternalBrowser().getEngine().executeScript(
                     String.format("window.setTimeout(function() { sfx.takeSnapshot(slideshowFXGetCurrentSlide(), %1$s, true); }, %2$s);", recursive, getSnapshotDelay()));
         } else {
+            if (!isLoading()) {
+                this.setLoading(true);
+            }
+
             try {
                 final ImageView preview = this.findSlidePreview(slideId);
 
@@ -208,14 +232,19 @@ public class PresentationOutline extends ListView<ImageView> {
                                 this.takeSnapshot(after.getId(), true, false);
                             } else {
                                 closeBrowserStage();
+                                this.setLoading(false);
                             }
                         } else {
                             closeBrowserStage();
+                            this.setLoading(false);
                         }
                     }
+                } else {
+                    this.setLoading(false);
                 }
             } catch (Exception e) {
                 LOGGER.log(SEVERE, "Can't take snapshot of browser", e);
+                this.setLoading(false);
             }
         }
     }
@@ -276,9 +305,11 @@ public class PresentationOutline extends ListView<ImageView> {
         browserStage = new Stage();
         browserStage.setTitle("SlideshowFX");
         browserStage.setScene(scene);
-        browserStage.setOpacity(0);
+        browserStage.setIconified(false);
         browserStage.setMaximized(true);
+        browserStage.setOpacity(0);
         browserStage.show();
+        SlideshowFX.getStage().requestFocus();
     }
 
     /**

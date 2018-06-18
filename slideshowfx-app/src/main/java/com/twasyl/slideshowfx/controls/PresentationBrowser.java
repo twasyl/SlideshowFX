@@ -58,6 +58,7 @@ public final class PresentationBrowser extends StackPane {
     private static final Logger LOGGER = Logger.getLogger(PresentationBrowser.class.getName());
 
     private final BooleanProperty interactionAllowed = new SimpleBooleanProperty(true);
+    private final BooleanProperty spinnerAllowed = new SimpleBooleanProperty(true);
     private final ObjectProperty<PresentationEngine> presentation = new SimpleObjectProperty<>();
     private final ObjectProperty<Object> backend = new SimpleObjectProperty<>();
 
@@ -169,9 +170,10 @@ public final class PresentationBrowser extends StackPane {
         this.internalBrowser.getEngine().setJavaScriptEnabled(true);
         this.internalBrowser.getEngine().getLoadWorker().stateProperty().addListener((stateValue, oldState, newState) -> {
 
-            if (newState == Worker.State.RUNNING) {
+            if (this.isSpinnerAllowed() && newState == Worker.State.RUNNING) {
                 this.progressIndicator.setProgress(-1d);
                 this.getChildren().add(this.progressIndicator);
+
             } else {
                 this.progressIndicator.setProgress(0);
                 this.getChildren().remove(this.progressIndicator);
@@ -268,6 +270,33 @@ public final class PresentationBrowser extends StackPane {
      */
     public void setInteractionAllowed(boolean interactionAllowed) {
         this.interactionAllowed.set(interactionAllowed);
+    }
+
+    /**
+     * Indicates if a {@link ProgressIndicator spinner} is displayed when the browser is loading a content.
+     *
+     * @return The property indicating if a {@link ProgressIndicator spinner} is allowed.
+     */
+    public BooleanProperty spinnerAllowedProperty() {
+        return spinnerAllowed;
+    }
+
+    /**
+     * Indicates if a {@link ProgressIndicator spinner} is displayed when the browser is loading a content.
+     *
+     * @return {@code true} if a {@link ProgressIndicator spinner} is allowed, {@code false} otherwise.
+     */
+    public boolean isSpinnerAllowed() {
+        return spinnerAllowed.get();
+    }
+
+    /**
+     * Defines if a {@link ProgressIndicator spinner} is displayed when the browser is loading a content.
+     *
+     * @param spinnerAllowed {@code true} if a spinner should be displayed when loading a content, {@code false} otherwise.
+     */
+    public void setSpinnerAllowed(boolean spinnerAllowed) {
+        this.spinnerAllowed.set(spinnerAllowed);
     }
 
     /**

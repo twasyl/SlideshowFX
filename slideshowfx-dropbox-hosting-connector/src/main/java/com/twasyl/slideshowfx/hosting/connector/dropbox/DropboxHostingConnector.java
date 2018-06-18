@@ -13,15 +13,27 @@ import javafx.concurrent.Worker;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -151,6 +163,9 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
         final String authorizationUrl = authentication.authorize(request);
 
         final WebView browser = new WebView();
+        browser.getEngine().setOnError(error -> LOGGER.log(Level.SEVERE, error.getMessage(), error.getException()));
+        browser.getEngine().setOnAlert(alert -> LOGGER.log(Level.SEVERE, alert.toString()));
+
         final Scene scene = new Scene(browser);
         final Stage stage = new Stage();
 

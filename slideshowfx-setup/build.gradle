@@ -12,23 +12,6 @@ dependencies {
     compile project(':slideshowfx-utils')
 }
 
-sourceSets {
-    integration {
-        java.srcDirs = [ file('src/integration-test/java') ]
-        java.outputDir = [ file('build/classes/java/integration-test')]
-        resources.srcDirs = [ file('src/integration-test/resources') ]
-        resources.outputDir = [ file('build/resources/integration-test')]
-
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output + test.output
-    }
-}
-
-configurations {
-    integrationCompile.extendsFrom testCompile
-    integrationRuntime.extendsFrom testRuntime
-}
-
 ext.packaging = [
         extension: rootProject.ext.os.MAC == rootProject.getPlatform() ? ".app" : ""
 ]

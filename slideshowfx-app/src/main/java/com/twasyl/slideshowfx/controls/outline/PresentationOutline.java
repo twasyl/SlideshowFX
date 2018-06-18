@@ -300,6 +300,7 @@ public class PresentationOutline extends ListView<ImageView> {
         closeBrowserStage();
 
         this.browser.setBackend(this);
+        this.browser.setSpinnerAllowed(false);
 
         final Scene scene = new Scene(this.browser);
         browserStage = new Stage();

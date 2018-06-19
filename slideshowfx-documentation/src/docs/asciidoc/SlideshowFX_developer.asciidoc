@@ -35,8 +35,6 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 | org.eclipse.mylyn.wikitext.textile.core | {wikitext-textile-core-version} | Library used for textile support
 
-| RxJava | {rxJava-version} |
-
 | txtmark | {txtmark-version} | Library used for the markdown support
 
 | vertx-core | {vertx-version} |

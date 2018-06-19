@@ -1,6 +1,9 @@
 package com.twasyl.slideshowfx.controls.slideshow;
 
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
+import com.twasyl.slideshowfx.events.SlideChangedEvent;
+import com.twasyl.slideshowfx.server.bus.Actor;
+import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -22,7 +25,7 @@ import java.util.logging.Logger;
  * @version 1.0.0
  * @since SlideshowFX 1.0
  */
-public class SlideshowStage {
+public class SlideshowStage implements Actor {
     private static final Logger LOGGER = Logger.getLogger(SlideshowStage.class.getName());
     private static final String DO_NOT_CONSIDER_EVENT_TEXT = "do_not_consider";
     private Context context;
@@ -155,22 +158,34 @@ public class SlideshowStage {
             this.informationPane.getScene().addEventHandler(KeyEvent.KEY_PRESSED, handler);
 
             this.slideshowPane.getBrowser().startListeningToSlideChangedEvents();
-            this.slideshowPane.getBrowser().subscribeToEvents(event -> {
-                if (event.getCurrentSlide() != null && !"undefined".equals(event.getCurrentSlide())) {
-                    final Slide currentSlide = this.context.getPresentation().getConfiguration().getSlideById(event.getCurrentSlide());
+            this.slideshowPane.getBrowser().subscribeToEvents(this);
+        }
+    }
 
-                    if(currentSlide != null) {
-                        Slide nextSlide = this.context.getPresentation().getConfiguration().getSlideAfter(currentSlide.getSlideNumber());
-                        if (nextSlide == null) {
-                            nextSlide = currentSlide;
-                        }
+    @Override
+    public boolean supportsMessage(Object message) {
+        return message != null && message instanceof SlideChangedEvent;
+    }
 
-                        this.informationPane.getCurrentSlideBrowser().slide(currentSlide.getId());
-                        this.informationPane.getNextSlideBrowser().slide(nextSlide.getId());
-                        this.informationPane.setSpeakerNotes(currentSlide.getSpeakerNotes());
+    @Override
+    public void onMessage(Object message) {
+        final SlideChangedEvent event = (SlideChangedEvent) message;
+
+        if (event.getCurrentSlide() != null && !"undefined".equals(event.getCurrentSlide())) {
+            final Slide currentSlide = this.context.getPresentation().getConfiguration().getSlideById(event.getCurrentSlide());
+
+            if (currentSlide != null) {
+                PlatformHelper.run(() -> {
+                    Slide nextSlide = this.context.getPresentation().getConfiguration().getSlideAfter(currentSlide.getSlideNumber());
+                    if (nextSlide == null) {
+                        nextSlide = currentSlide;
                     }
-                }
-            });
+
+                    this.informationPane.getCurrentSlideBrowser().slide(currentSlide.getId());
+                    this.informationPane.getNextSlideBrowser().slide(nextSlide.getId());
+                    this.informationPane.setSpeakerNotes(currentSlide.getSpeakerNotes());
+                });
+            }
         }
     }
 

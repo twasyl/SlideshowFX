@@ -4,14 +4,11 @@ import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
 import com.twasyl.slideshowfx.events.SlideChangedEvent;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.server.bus.Actor;
+import com.twasyl.slideshowfx.server.bus.EventBus;
 import com.twasyl.slideshowfx.utils.DialogHelper;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
-import io.reactivex.functions.Consumer;
-import io.reactivex.subjects.PublishSubject;
-import io.reactivex.subjects.Subject;
 import javafx.animation.PauseTransition;
-import javafx.animation.SequentialTransition;
-import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -34,15 +31,10 @@ import netscape.javascript.JSObject;
 
 import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 import static java.util.logging.Level.SEVERE;
-import static javafx.util.Duration.ZERO;
 
 /**
  * A browser that displays a presentation and provides methods for interacting with the presentation (like go to a given
@@ -65,7 +57,8 @@ public final class PresentationBrowser extends StackPane {
     private final WebView internalBrowser = new WebView();
     private final ProgressIndicator progressIndicator = new ProgressIndicator();
 
-    private Subject<SlideChangedEvent> eventBus = null;
+    private boolean browserListeningToEvents = false;
+    private String browserBusEndpoint;
 
     public PresentationBrowser() {
         this.initializeProgressIndicator();
@@ -500,9 +493,9 @@ public final class PresentationBrowser extends StackPane {
      * @param currentSlide The new current slide.
      */
     public void fireSlideChangedEvent(final String currentSlide) {
-        if (this.eventBus != null) {
+        if (browserListeningToEvents) {
             final SlideChangedEvent event = new SlideChangedEvent(currentSlide);
-            eventBus.onNext(event);
+            EventBus.getInstance().broadcast(this.browserBusEndpoint, event);
         }
     }
 
@@ -513,8 +506,9 @@ public final class PresentationBrowser extends StackPane {
      * @see #stopListeningToSlideChangedEvents()
      */
     public synchronized void startListeningToSlideChangedEvents() {
-        if (this.eventBus == null) {
-            this.eventBus = PublishSubject.create();
+        if (!this.browserListeningToEvents) {
+            this.browserListeningToEvents = true;
+            this.browserBusEndpoint = "presentation.browser." + System.currentTimeMillis();
         }
     }
 
@@ -525,23 +519,24 @@ public final class PresentationBrowser extends StackPane {
      * @see #startListeningToSlideChangedEvents()
      */
     public synchronized void stopListeningToSlideChangedEvents() {
-        if (this.eventBus != null) {
-            this.eventBus.onComplete();
-            this.eventBus = null;
+        if (this.browserListeningToEvents) {
+            EventBus.getInstance().removeEndpoint(this.browserBusEndpoint);
+            this.browserListeningToEvents = false;
+            this.browserBusEndpoint = null;
         }
     }
 
     /**
-     * Subscribe the provided consumer to the events fired by this {@link PresentationBrowser}.
+     * Subscribe the provided actor to the events fired by this {@link PresentationBrowser}.
      *
-     * @param consumer The consumer to subscribe.
-     * @throws NullPointerException If the given consumer is {@code null}.
+     * @param actor The actor to subscribe.
+     * @throws NullPointerException If the given actor is {@code null}.
      */
-    public void subscribeToEvents(final Consumer<SlideChangedEvent> consumer) {
-        if (consumer == null) throw new NullPointerException("The consumer can not be null");
-        if (this.eventBus == null)
+    public void subscribeToEvents(final Actor actor) {
+        if (actor == null) throw new NullPointerException("The actor can not be null");
+        if (!this.browserListeningToEvents)
             throw new IllegalStateException("The browser is not configured to listen to slide changed events");
 
-        eventBus.subscribe(consumer);
+        EventBus.getInstance().subscribe(this.browserBusEndpoint, actor);
     }
 }

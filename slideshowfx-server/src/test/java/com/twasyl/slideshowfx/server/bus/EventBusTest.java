@@ -46,6 +46,7 @@ public class EventBusTest {
 
     public static final String ENDPOINT_1 = "endpoint.1";
     public static final String ENDPOINT_2 = "endpoint.2";
+    public static final String ENDPOINT_3 = "endpoint.3";
     public static final String ENDPOINT_UNKNOWN = "endpoint.unknown";
 
     public static DontSupportMessage DONT_SUPPORT_MESSAGE_ACTOR;
@@ -143,5 +144,13 @@ public class EventBusTest {
     @Test
     public void broadcastToUnknownEndpoint() {
         EventBus.getInstance().broadcast(ENDPOINT_UNKNOWN, "Test");
+    }
+
+    @Test
+    public void removeEndpoint() {
+        EventBus.getInstance().subscribe(ENDPOINT_3, SUPPORT_MESSAGE_ACTOR_1);
+        EventBus.getInstance().removeEndpoint(ENDPOINT_3);
+        EventBus.getInstance().broadcast(ENDPOINT_3, "Test");
+        assertFalse(SUPPORT_MESSAGE_ACTOR_1.gotMessage);
     }
 }

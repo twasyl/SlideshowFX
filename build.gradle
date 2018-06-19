@@ -110,7 +110,6 @@ ext.dependencies = [
         junit       : [version: '5.2.0'],
         markdown    : [version: '0.13'],
         mockito     : [version: '2.18.3'],
-        rxJava      : [version: '2.1.13'],
         vertx       : [version: '3.5.2'],
         wikitext    : [version: '3.0.24'],
         zxing       : [version: '3.3.3']

@@ -19,7 +19,6 @@ dependencies {
     compile project(':slideshowfx-ui-controls')
     compile project(':slideshowfx-utils')
 
-    compile "io.reactivex.rxjava2:rxjava:${rootProject.ext.dependencies.rxJava.version}"
     compile "com.google.zxing:javase:${rootProject.ext.dependencies.zxing.version}"
 
     testCompile "org.mockito:mockito-core:${rootProject.ext.dependencies.mockito.version}"

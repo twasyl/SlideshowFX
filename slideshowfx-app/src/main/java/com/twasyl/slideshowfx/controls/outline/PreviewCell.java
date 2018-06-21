@@ -24,7 +24,7 @@ public class PreviewCell extends ListCell<ImageView> {
     public PreviewCell() {
         this.initializeDragDropBehaviour();
         this.initializeContextMenu();
-        this.setPadding(Insets.EMPTY);
+        this.setPadding(new Insets(0, 0, 5, 0));
     }
 
     /**

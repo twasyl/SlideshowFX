@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.twasyl.slideshowfx.controls.tree.TemplateTreeView?>
+<?import com.twasyl.slideshowfx.icons.FontAwesome?>
+<?import com.twasyl.slideshowfx.ui.controls.ExtendedTextField?>
+<?import com.twasyl.slideshowfx.ui.controls.ZoomTextArea?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.twasyl.slideshowfx.theme.ThemeController"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <top>
+        <MenuBar>
+            <Menu text="Menu 1">
+                <MenuItem text="Item 1"/>
+                <Menu text="Item 2">
+                    <MenuItem text="Item 2.1"/>
+                </Menu>
+            </Menu>
+            <Menu text="Menu 2">
+                <MenuItem text="Item 1"/>
+                <MenuItem text="Item 2"/>
+                <SeparatorMenuItem/>
+                <MenuItem text="Item 3"/>
+            </Menu>
+        </MenuBar>
+    </top>
+
+    <center>
+        <TabPane>
+            <Tab text="Buttons">
+                <GridPane hgap="10" vgap="10">
+                    <Button text="Button"         GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <SplitMenuButton text="Split" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                        <items>
+                            <MenuItem text="Item 1" />
+                            <MenuItem text="Item 2" />
+                        </items>
+                    </SplitMenuButton>
+                    <ToggleButton text="Selected toggle" selected="true" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <ToggleButton text="Unselected toggle" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <ToolBar GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2">
+                        <Button text="Button"/>
+                        <Separator/>
+                        <SplitMenuButton text="Split">
+                            <items>
+                                <MenuItem text="Item 1" />
+                                <MenuItem text="Item 2" />
+                            </items>
+                        </SplitMenuButton>
+                        <Separator/>
+                        <SplitMenuButton>
+                            <tooltip>
+                                <Tooltip text="Save"/>
+                            </tooltip>
+                            <graphic>
+                                <FontAwesome icon="FLOPPY" size="20" color="app-color-orange"/>
+                            </graphic>
+                            <items>
+                                <MenuItem text="Item 1"/>
+                            </items>
+                        </SplitMenuButton>
+                    </ToolBar>
+                </GridPane>
+            </Tab>
+            <Tab text="Controls">
+                <GridPane hgap="10" vgap="10">
+                    <RadioButton text="Unchecked radio"               GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <RadioButton text="Checked radio" selected="true" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <CheckBox text="Unchecked box"                    GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <CheckBox text="Checked box" selected="true"      GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <Label text="A label"                             GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <Text text="A text"                               GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                </GridPane>
+            </Tab>
+            <Tab text="Input">
+                <GridPane hgap="10" vgap="10">
+                    <TextField promptText="Enter text..."                       GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <TextField                                                  GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <TextField text="Text"                                      GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                    <TextArea promptText="Enter text..." prefRowCount="3"       GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextArea prefRowCount="3"                                  GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <TextArea prefRowCount="3" text="Text"                      GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                    <ExtendedTextField label="Mandatory field" mandatory="true" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <ExtendedTextField label="Extended field"                   GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                    <ZoomTextArea prefRowCount="3" promptText="Enter text..."   GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <ZoomTextArea prefRowCount="3" text="Text"                  GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                </GridPane>
+            </Tab>
+            <Tab text="Panes">
+                <GridPane hgap="10" vgap="10">
+                    <TitledPane text="Titled pane" expanded="true"  GridPane.rowIndex="0" GridPane.columnIndex="0">
+                        <Button text="Button"/>
+                    </TitledPane>
+                    <TitledPane text="Titled pane" expanded="false" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                        <Button text="Button"/>
+                    </TitledPane>
+                    <SplitPane prefWidth="500"                      GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2">
+                        <Button text="Split pane - left" style="-fx-margin: 10px;"/>
+                        <Button text="Split pane - right" style="-fx-margin: 10px;"/>
+                    </SplitPane>
+                </GridPane>
+            </Tab>
+            <Tab text="Trees">
+                <TemplateTreeView fx:id="templateTreeView"/>
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>

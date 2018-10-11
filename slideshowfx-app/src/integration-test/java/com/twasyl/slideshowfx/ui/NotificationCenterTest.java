@@ -61,9 +61,8 @@ public class NotificationCenterTest extends Application {
         });
 
         final Scene scene = new Scene(center, 500, 300);
-        scene.getStylesheets().addAll(
-                NotificationCenter.class.getResource("/com/twasyl/slideshowfx/css/Default.css").toExternalForm(),
-                NotificationCenter.class.getResource("/com/twasyl/slideshowfx/css/SlideshowFX.css").toExternalForm()
+        scene.getStylesheets().add(
+                NotificationCenter.class.getResource("/com/twasyl/slideshowfx/css/Default.css").toExternalForm()
         );
         primaryStage.setScene(scene);
         primaryStage.show();

@@ -17,6 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class CollapsibleToolPaneTest extends Application {
@@ -25,7 +26,7 @@ public class CollapsibleToolPaneTest extends Application {
         final CollapsibleToolPane left = new CollapsibleToolPane();
         left.setPosition(HPos.LEFT);
         final FontAwesome leftIcon11 = new FontAwesome(Icon.DESKTOP);
-        leftIcon11.setColor("black");
+        leftIcon11.setIconColor(Color.BLACK);
 
         left.addContent(leftIcon11, new Button("Left 1.1"));
         left.addContent("Left 1.2", new Button("Left 1.2        !"));
@@ -34,7 +35,7 @@ public class CollapsibleToolPaneTest extends Application {
         right.setPosition(HPos.RIGHT);
 
         final FontAwesome rightIcon = new FontAwesome(Icon.COMMENTS_O);
-        rightIcon.setColor("black");
+        rightIcon.setIconColor(Color.BLACK);
         right.addContent(rightIcon, new Button("Right 1.1"));
         right.addContent("Right 1.2", new Button("Right 1.2"));
 

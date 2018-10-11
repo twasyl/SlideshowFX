@@ -34,11 +34,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Paint;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -62,7 +64,7 @@ import static java.util.logging.Level.SEVERE;
  * @version 1.5-SNAPSHOT
  * @since SlideshowFX 1.0
  */
-public class PresentationViewController implements Initializable {
+public class PresentationViewController implements ThemeAwareController {
     private static final Logger LOGGER = Logger.getLogger(PresentationViewController.class.getName());
 
     private PresentationEngine presentationEngine;
@@ -432,7 +434,6 @@ public class PresentationViewController implements Initializable {
         button.getStyleClass().add("image");
 
         final FontAwesome icon = new FontAwesome(contentExtension.getIcon(), 20d);
-        icon.setColor("app-color-orange;");
 
         button.setGraphic(icon);
 
@@ -790,7 +791,12 @@ public class PresentationViewController implements Initializable {
     }
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    public Parent getRoot() {
+        return this.root;
+    }
+
+    @Override
+    public void postInitialize(URL url, ResourceBundle resourceBundle) {
         // Make this controller available to JavaScript
         this.browser.setPresentation(this.presentationEngine);
         this.browser.setBackend(this);

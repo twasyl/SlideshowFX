@@ -7,6 +7,7 @@ import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.theme.Themes;
 import com.twasyl.slideshowfx.utils.DialogHelper;
 import com.twasyl.slideshowfx.utils.io.DeleteFileVisitor;
 import com.twasyl.slideshowfx.utils.time.DateTimeUtils;
@@ -50,6 +51,9 @@ public class SlideshowFX extends Application {
     @Override
     public void init() throws Exception {
         Font.loadFont(SlideshowFX.class.getResource("/com/twasyl/slideshowfx/fonts/Inconsolata-Regular.ttf").toExternalForm(), 12);
+
+        // Read all themes
+        Themes.read();
 
         // Initialize the configuration
         GlobalConfiguration.createApplicationDirectory();
@@ -156,7 +160,7 @@ public class SlideshowFX extends Application {
     }
 
     /**
-     * Deletes temporary files older than the configuration parameter {@link GlobalConfiguration#TEMPORARY_FILES_MAX_AGE_PARAMETER}.
+     * Deletes temporary files older than the configuration parameter {@link GlobalConfiguration#getTemporaryFilesMaxAge()}.
      */
     private void deleteTemporaryFiles() {
         if (GlobalConfiguration.canDeleteTemporaryFiles()) {

@@ -1,0 +1,224 @@
+.root {
+    sfx-default-text-fill: #A9B7C6;
+
+    /* Colors for the application */
+    sfx-application-default-background-color: RGB(60, 63, 63);
+    sfx-application-default-text-color: sfx-default-text-fill;
+
+    /* Colors for text areas */
+    sfx-text-area-default-background-color: #2B2B2B;
+    sfx-text-area-default-text-color: sfx-default-text-fill;
+    sfx-text-area-default-prompt-text-color: #414142;
+
+    /* Colors for text fields */
+    sfx-text-field-default-background-color: #2B2B2B;
+    sfx-text-field-default-text-color: sfx-default-text-fill;
+    sfx-text-field-default-prompt-text-color: #414142;
+
+    /* Colors for extended text fields */
+    sfx-extended-text-field-default-text-color: RGB(95, 95, 95);
+    sfx-extended-text-field-focused-default-text-color: #FF8000;
+    sfx-extended-text-field-error-default-background-color1: #BC3F3C;
+    sfx-extended-text-field-error-default-background-color2: #2B2B2B;
+
+    /* Colors for buttons */
+    sfx-button-default-border-color: RGB(95, 95, 95);
+    sfx-button-default-hover-border-color: #8C9297;
+    sfx-button-default-pressed-border-color: #FF8000;
+    sfx-button-default-background-color: RGB(60, 63, 63);
+    sfx-button-default-hover-background-color: #686B6D;
+    sfx-button-default-pressed-background-color: #2B2B2B;
+    sfx-button-default-text-color: sfx-default-text-fill;
+
+    /* Colors for split menu buttons */
+    sfx-split-menu-button-default-background-color: RGB(60, 63, 63);
+    sfx-split-menu-button-default-pressed-background-color: #2B2B2B;
+    sfx-split-menu-button-default-text-color: sfx-default-text-fill;
+
+    /* Colors for arrows displayed within controls */
+    sfx-arrow-default-background-color: #ADADAD;
+
+    /* Colors for radio buttons */
+    sfx-radio-button-default-border-color: #B1B1B1;
+    sfx-radio-button-default-selected-border-color: #B1B1B1;
+    sfx-radio-button-default-background-color: #2B2B2B;
+    sfx-radio-button-default-selected-background-color: #2B2B2B;
+    sfx-radio-button-default-text-color: sfx-default-text-fill;
+    sfx-radio-button-dot-default-background-color: #B1B1B1;
+
+    /* Colors for check boxes */
+    sfx-check-box-default-border-color: #B1B1B1;
+    sfx-check-box-default-selected-border-color: #B1B1B1;
+    sfx-check-box-default-background-color: #2B2B2B;
+    sfx-check-box-default-selected-background-color: #2B2B2B;
+    sfx-check-box-default-text-color: sfx-default-text-fill;
+    sfx-check-box-mark-default-background-color: #B1B1B1;
+
+    /* Colors for labels */
+    sfx-label-default-text-color: sfx-default-text-fill;
+
+    /* Colors for texts */
+    sfx-text-default-text-color: sfx-default-text-fill;
+
+    /* Colors for tab panes */
+    sfx-tab-pane-tab-default-border-color: black;
+    sfx-tab-pane-tab-default-selected-border-color: derive(#2B2B2B, 20%);
+    sfx-tab-pane-tab-default-background-color: derive(#2B2B2B, 10%);
+    sfx-tab-pane-tab-default-selected-background-color: derive(#2B2B2B, 30%);
+    sfx-tab-pane-tab-default-text-color: sfx-default-text-fill;
+    sfx-tab-pane-tab-close-button-default-background-color: #A9B7C6;
+    sfx-tab-pane-tab-header-default-background-color: #2B2B2B;
+    sfx-tab-pane-content-area-default-border-color: black;
+    sfx-tab-pane-content-area-default-background-color: #2B2B2B;
+    sfx-tab-pane-tab-button-default-hover-background-color: #686B6D;
+    sfx-tab-pane-tab-button-default-hover-border-color: sfx-default-text-fill;
+    sfx-tab-pane-viewport-button-default-background-color: linear-gradient(from 50% 0% to 50% 100%, #666666 0%, #4f4f4f 100%);
+
+    /* Colors for titled panes */
+    sfx-titled-pane-default-title-background-color: derive(#2B2B2B, 10%);
+    sfx-titled-pane-default-background-color: RGB(60, 63, 63);
+    sfx-titled-pane-default-test-color: sfx-default-text-fill;
+    sfx-titled-pane-default-valid-drag-over-border-color: #A9B7C6;
+
+    /* Colors for scroll panes */
+    sfx-scroll-pane-default-background-color: RGB(60, 63, 63);
+
+    /* Colors for scroll bars */
+    sfx-scroll-bar-default-background-color: RGB(60, 63, 63);
+    sfx-scroll-bar-track-default-background-color: RGB(60, 63, 63);
+    sfx-scroll-bar-track-background-default-background-color: RGB(60, 63, 63);
+    sfx-scroll-bar-thumb-default-background-color: RGB(88, 88, 88);
+    sfx-scroll-bar-increment-button-default-background-color: RGB(60, 63, 63);
+    sfx-scroll-bar-decrement-button-default-background-color: RGB(60, 63, 63);
+
+    /* Colors for split panes */
+    sfx-split-pane-default-background-color: RGB(60, 63, 63);
+    sfx-split-pane-default-border-color: transparent transparent RGB(40,40,40) transparent;
+    sfx-split-pane-grabber-default-background-color: #2B2B2B;
+    sfx-split-pane-divider-default-border-color: transparent transparent transparent RGB(95, 95, 95);
+
+    /* Colors for dialog panes */
+    sfx-dialog-pane-header-default-background-color: transparent;
+
+    /* Colors for combo boxes */
+    sfx-combo-box-default-border-color: RGB(95, 95, 95);
+    sfx-combo-box-default-hover-border-color: #8C9297;
+    sfx-combo-box-default-pressed-border-color: #FF8000;
+    sfx-combo-box-default-pressed-background-color: RGB(60, 63, 63);
+    sfx-combo-box-default-background-color: RGB(60, 63, 63);
+    sfx-combo-box-cell-default-hover-background-color: #103750;
+    sfx-combo-box-default-text-color: sfx-default-text-fill;
+
+    /* Colors for toolbars */
+    sfx-tool-bar-default-background-color: RGB(60, 63, 63);
+    sfx-tool-bar-default-text-color: sfx-default-text-fill;
+
+    /* Colors for menu bars */
+    sfx-menu-bar-default-background-color: RGB(60, 63, 63);
+    sfx-menu-bar-menu-default-background-color: RGB(60, 63, 63);
+    sfx-menu-bar-menu-default-hover-background-color: #103750;
+    sfx-menu-bar-menu-default-showing-background-color: #103750;
+    sfx-menu-bar-menu-default-showing-border-color: #103750;
+    sfx-menu-bar-menu-default-text-color: sfx-default-text-fill;
+    sfx-menu-bar-menu-default-border-color: RGB(85, 85, 85) transparent app-color-border-bottom RGB(40,40,40);
+    sfx-menu-bar-menu-item-default-background-color: RGB(60, 63, 63);
+
+    /* Colors for context menus */
+    sfx-context-menu-default-background-color: RGB(60, 63, 63);
+    sfx-context-menu-menu-default-showing-background-color: #103750;
+    sfx-context-menu-menu-item-default-hover-background-color: #103750;
+    sfx-context-menu-separator-default-border-color: RGB(95, 95, 95) transparent transparent transparent;
+
+    /* Colors for menus */
+    sfx-menu-default-hover-background-color: #686B6D;
+    sfx-menu-default-hover-disabled-background-color: transparent;
+
+    /* Colors for menu items */
+    sfx-menu-item-default-background-color: RGB(60, 63, 63);
+    sfx-menu-item-default-text-color: #A9B7C6;
+    sfx-menu-item-default-arrow-color: #A9B7C6;
+    sfx-menu-item-default-hover-background-color: #103750;
+    sfx-menu-item-default-hover-disabled-background-color: transparent;
+
+    /* Colors for list views */
+    sfx-list-view-default-background-color: #2B2B2B, #2B2B2B;
+    sfx-list-view-default-focused-background-color: transparent, #2B2B2B, transparent;
+    sfx-list-view-list-cell-default-filled-selected-background-color: #103750;
+
+    /* Colors for list cells */
+    sfx-list-cell-default-background-color: RGB(60, 63, 63);
+    sfx-list-cell-default-text-color: sfx-default-text-fill;
+    sfx-list-cell-default-filled-background-color: sfx-list-cell-default-background-color;
+    sfx-list-cell-default-filled-text-color: sfx-list-cell-default-text-color;
+    sfx-list-cell-default-empty-background-color: sfx-list-cell-default-background-color;
+    sfx-list-cell-default-empty-text-color: sfx-list-cell-default-text-color;
+    sfx-list-cell-default-filled-hover-background-color: #103750;
+
+    /* Colors for tree cells */
+    sfx-tree-cell-default-background-color: RGB(60, 63, 63);
+    sfx-tree-cell-default-text-color: sfx-default-text-fill;
+    sfx-tree-cell-default-filled-background-color: sfx-tree-cell-default-background-color;
+    sfx-tree-cell-default-filled-text-color: sfx-tree-cell-default-text-color;
+    sfx-tree-cell-default-empty-background-color: sfx-tree-cell-default-background-color;
+    sfx-tree-cell-default-empty-text-color: sfx-tree-cell-default-text-color;
+    sfx-tree-cell-default-filled-selected-background-color: #103750;
+    sfx-tree-disclosure-node-arrow-default-background-color: sfx-default-text-fill;
+
+    /* Colors for messages boxes */
+    sfx-messages-box-default-border-color: #FF8000;
+    sfx-messages-box-default-background-color: derive(sfx-messages-box-default-border-color, 90%);
+    sfx-messages-box-default-text-color: #FF8000;
+
+    /* Colors for plugin file buttons */
+    sfx-plugin-file-button-selected-default-background-color: linear-gradient(from 50% 0% to 50% 100%, #449d44 0%, #5cb85c 100%);
+    sfx-plugin-file-button-default-text-color: sfx-default-text-fill;
+    sfx-plugin-file-button-selected-default-text-color: black;
+    sfx-plugin-file-button-tooltip-default-text-color: sfx-default-text-fill;
+
+    /* Colors for separators */
+    sfx-separator-horizontal-default-border-color: RGB(95, 95, 95) transparent;
+    sfx-separator-vertical-default-border-color: transparent RGB(95, 95, 95) transparent transparent;
+
+    /* Colors for progress bars */
+    sfx-progress-bar-default-background-color: #2B2B2B;
+    sfx-progress-bar-track-default-background-color: #2B2B2B;
+    sfx-progress-bar-track-default-text-box-border-color: sfx-default-text-fill;
+
+    /* Colors for progress indicators */
+    sfx-progress-indicator-default-progress-color: RGB(60, 63, 63);
+
+    /* Colors for icons */
+    sfx-icon-default-icon-color: #FF8000;
+    sfx-icon-stack-default-icon-0-color: white;
+    sfx-icon-stack-default-icon-1-color: #FF8000;
+
+    /* Colors for the server button */
+    sfx-server-button-start-server-default-color: green;
+    sfx-server-button-stop-server-default-color: #FF8000;
+
+    /* Colors for the content extension buttons */
+    sfx-app-content-extension-toolbar-icon-default-icon-color: #FF8000;
+
+    /* Colors for the opened presentations tab pane */
+    sfx-opened-presentations-tab-pane-default-background-color: #2B2B2B;
+    sfx-opened-presentations-tab-pane-valid-drag-over-default-border-color: #A9B7C6;
+    sfx-opened-presentations-tab-pane-invalid-drag-over-default-border-color: #BC3F3C;
+
+    /* Colors for the container of the snippet executors in the options view */
+    sfx-snippet-executor-container-text-field-default-background-color-1: derive(sfx-default-text-fill, 10%);
+    sfx-snippet-executor-container-text-field-default-background-color-2: #2B2B2B;
+
+    /* Colors for the internal browser */
+    sfx-internal-browser-address-bar-default-border-color: white;
+    sfx-internal-browser-address-bar-button-default-icon-color: #FF8000;
+
+    /* Colors for the template builder */
+    sfx-template-builder-tool-bar-icon-default-color: #FF8000;
+    sfx-template-builder-tree-cell-default-color-icon: #A9B7C6;
+    sfx-template-builder-tree-cell-valid-drag-default-color-icon: #FF8000;
+    sfx-template-builder-add-icon-default-fill-color: #FF8000;
+    sfx-template-builder-add-icon-default-hover-fill-color: #8C9297;
+    sfx-template-builder-delete-default-template-variable-button-icon-default-fill-color: #FF8000;
+    sfx-template-builder-delete-slide-button-icon-default-fill-color: #FF8000;
+    sfx-template-builder-delete-slide-element-button-icon-default-fill-color: #FF8000;
+}

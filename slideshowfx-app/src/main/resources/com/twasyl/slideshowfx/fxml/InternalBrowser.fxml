@@ -6,23 +6,17 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.web.WebView?>
-<?import java.lang.Double?>
 <?import java.net.URL?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.InternalBrowserController">
+<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.InternalBrowserController">
     <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/InternalBrowser.css" />
+        <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
     </stylesheets>
-
-    <fx:define>
-        <Double fx:id="TOOLBAR_ICON_WIDTH" fx:value="20" />
-        <Double fx:id="TOOLBAR_ICON_HEIGHT" fx:value="20" />
-    </fx:define>
 
     <top>
         <HBox fx:id="addressPanel" alignment="BASELINE_CENTER">
             <Button fx:id="previousPage" onAction="#navigateToPreviousPage">
                 <graphic>
-                    <FontAwesome icon="CHEVRON_LEFT" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange" />
+                    <FontAwesome icon="CHEVRON_LEFT" />
                 </graphic>
             </Button>
 
@@ -31,7 +25,7 @@
 
             <Button fx:id="nextPage" onAction="#navigateToNextPage">
                 <graphic>
-                    <FontAwesome icon="CHEVRON_RIGHT" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange" />
+                    <FontAwesome icon="CHEVRON_RIGHT" />
                 </graphic>
             </Button>
         </HBox>

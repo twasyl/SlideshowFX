@@ -1,5 +1,7 @@
 package com.twasyl.slideshowfx.utils;
 
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.theme.Themes;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -17,7 +19,7 @@ import java.util.logging.Logger;
  * This class provides helper methods to build {@link Dialog} for SlideshowFX.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class DialogHelper {
@@ -128,25 +130,7 @@ public class DialogHelper {
      * @return A well created Alert or {@code null} if an error occurred during the creation of the alert.
      */
     private static Alert buildAlert(final Alert.AlertType type, final String title, final String text, final ButtonType... buttons) {
-        final FutureTask<Alert> future = new FutureTask<>(() -> {
-            final Alert alert = new Alert(type, text, buttons);
-            alert.setGraphic(null);
-            alert.setHeaderText(null);
-            alert.setTitle(title);
-            alert.getDialogPane().getStylesheets().add("/com/twasyl/slideshowfx/css/Default.css");
-            return alert;
-        });
-
-        PlatformHelper.run(future);
-
-        Alert alert = null;
-        try {
-            alert = future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOGGER.log(Level.SEVERE, "Can not build an alert", e);
-        }
-
-        return alert;
+        return buildAlert(type, title, text, null, buttons);
     }
 
     /**
@@ -160,13 +144,31 @@ public class DialogHelper {
      * @return A well created Alert or {@code null} if an error occurred during the creation of the alert.
      */
     private static Alert buildAlert(final Alert.AlertType type, final String title, final Node content, final ButtonType... buttons) {
+        return buildAlert(type, title, null, content, buttons);
+    }
+
+    /**
+     * Build an {@link Alert Alert} object. This method ensures the alert is created in a JavaFX
+     * application thread. If the alert can not be created then {@code null} is returned.
+     *
+     * @param type        The type of alert to create.
+     * @param title       The title of the alert.
+     * @param contentText The text of this alert.
+     * @param content     The content of this alert.
+     * @param buttons     The buttons the alert will contain.
+     * @return A well created Alert or {@code null} if an error occurred during the creation of the alert.
+     */
+    private static Alert buildAlert(final Alert.AlertType type, final String title, final String contentText, final Node content, final ButtonType... buttons) {
         final FutureTask<Alert> future = new FutureTask<>(() -> {
-            final Alert alert = new Alert(type, null, buttons);
+            final Alert alert = new Alert(type, contentText, buttons);
             alert.setGraphic(null);
             alert.setHeaderText(null);
             alert.setTitle(title);
-            alert.getDialogPane().setContent(content);
-            alert.getDialogPane().getStylesheets().add("/com/twasyl/slideshowfx/css/Default.css");
+            if (content != null) {
+                alert.getDialogPane().setContent(content);
+            }
+            styleDialog(alert);
+
             return alert;
         });
 
@@ -199,7 +201,7 @@ public class DialogHelper {
             dialog.setTitle(title);
             dialog.getDialogPane().getButtonTypes().addAll(buttons);
             dialog.getDialogPane().setContent(content);
-            dialog.getDialogPane().getStylesheets().add("/com/twasyl/slideshowfx/css/Default.css");
+            styleDialog(dialog);
 
             return dialog;
         });
@@ -214,6 +216,18 @@ public class DialogHelper {
         }
 
         return dialog;
+    }
+
+    /**
+     * Apply the style and theme to the given {@link Dialog}.
+     *
+     * @param dialog The dialog to style.
+     */
+    private static void styleDialog(final Dialog dialog) {
+        if (dialog != null) {
+            dialog.getDialogPane().getStylesheets().add("/com/twasyl/slideshowfx/css/Default.css");
+            Themes.applyTheme(dialog.getDialogPane(), GlobalConfiguration.getThemeName());
+        }
     }
 
     /**

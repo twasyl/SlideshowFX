@@ -14,7 +14,7 @@
     <fx:define>
         <Button fx:id="addAnswer" styleClass="image" onAction="#addAnswer">
             <graphic>
-                <FontAwesome icon="PLUS_SQUARE" size="20" color="white"/>
+                <FontAwesome icon="PLUS_SQUARE" iconSize="20" iconColor="white"/>
             </graphic>
             <tooltip>
                 <Tooltip text="Add an answer to this quiz"/>
@@ -28,7 +28,7 @@
 
     <top>
         <HBox spacing="5">
-            <FontAwesome icon="QUESTION" size="25" color="app-color-orange"/>
+            <FontAwesome icon="QUESTION" iconSize="25" iconColor="app-color-orange"/>
 
             <ZoomTextArea fx:id="question" promptText="Question ?" wrapText="true" prefColumnCount="25" prefRowCount="2">
                 <tooltip>

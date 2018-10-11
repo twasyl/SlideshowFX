@@ -6,13 +6,18 @@ import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.services.AutoSavingService;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
+import com.twasyl.slideshowfx.theme.Theme;
+import com.twasyl.slideshowfx.theme.ThemeNotFoundException;
+import com.twasyl.slideshowfx.theme.Themes;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -45,6 +50,8 @@ public class OptionsViewController implements Initializable {
     private TextField maxRecentPresentations;
     @FXML
     private TextField snapshotDelay;
+    @FXML
+    private ComboBox<Theme> themes;
 
     /**
      * This methods saves the options displayed in the view and make them persistent.
@@ -60,6 +67,7 @@ public class OptionsViewController implements Initializable {
         this.saveTemporaryFilesDeletion();
         this.saveMaxRecentPresentations();
         this.saveSnapshotDelay();
+        this.saveTheme();
     }
 
     /**
@@ -150,6 +158,19 @@ public class OptionsViewController implements Initializable {
     }
 
     /**
+     * Saves the option for the theme.
+     */
+    private void saveTheme() {
+        final Theme theme = this.themes.getSelectionModel().getSelectedItem();
+
+        if (theme != null) {
+            GlobalConfiguration.setThemeName(theme.getName());
+        } else {
+            GlobalConfiguration.setThemeName(GlobalConfiguration.getDefaultThemeName());
+        }
+    }
+
+    /**
      * Display the configuration UI for each {@link ISnippetExecutor}.
      */
     private void initializeSnippetExecutorUI() {
@@ -214,8 +235,42 @@ public class OptionsViewController implements Initializable {
         this.snapshotDelay.setText(String.valueOf(snapshotDelay));
     }
 
+    private void initializeThemes() {
+        this.themes.setConverter(new StringConverter<Theme>() {
+            @Override
+            public String toString(Theme theme) {
+                if (theme != null) {
+                    return theme.getName();
+                }
+                return null;
+            }
+
+            @Override
+            public Theme fromString(String themeName) {
+                if (themeName != null) {
+                    try {
+                        return Themes.getByName(themeName);
+                    } catch (ThemeNotFoundException e) {
+                        LOGGER.log(Level.WARNING, null, e);
+                    }
+                }
+                return null;
+            }
+        });
+
+        this.themes.getItems().addAll(Themes.read());
+
+        try {
+            final Theme theme = Themes.getByName(GlobalConfiguration.getThemeName());
+            this.themes.getSelectionModel().select(theme);
+        } catch (ThemeNotFoundException e) {
+            LOGGER.log(Level.WARNING, null, e);
+        }
+
+    }
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.initializeThemes();
         this.initializeAutoSaveUI();
         this.initializeTemporaryFilesDeletionUI();
         this.initializeSnippetExecutorUI();

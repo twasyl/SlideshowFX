@@ -50,20 +50,20 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.*;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -86,7 +86,9 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.twasyl.slideshowfx.icons.Icon.PLAY;
 import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 /**
  * This class is the controller of the {@code SlideshowFX.fxml} file. It defines all actions possible inside the view
@@ -96,8 +98,12 @@ import static java.util.logging.Level.SEVERE;
  * @version 1.5
  * @since SlideshowFX 1.0
  */
-public class SlideshowFXController implements Initializable {
+public class SlideshowFXController implements ThemeAwareController {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXController.class.getName());
+    private static final PseudoClass START_SERVER_PSEUDO_CLASS = PseudoClass.getPseudoClass("start-server");
+    private static final PseudoClass STOP_SERVER_PSEUDO_CLASS = PseudoClass.getPseudoClass("stop-server");
+    private static final PseudoClass VALID_DRAG_OVER_PSEUDO_CLASS = PseudoClass.getPseudoClass("valid-drag-over");
+    private static final PseudoClass INVALID_DRAG_OVER_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid-drag-over");
 
     private final EventHandler<ActionEvent> addSlideActionEvent = event -> {
         final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
@@ -141,7 +147,7 @@ public class SlideshowFXController implements Initializable {
     @FXML
     private TextField twitterHashtag;
     @FXML
-    private Button startServerButton;
+    private Button serverButton;
 
     /* Main application UI elements */
     @FXML
@@ -323,8 +329,8 @@ public class SlideshowFXController implements Initializable {
         dragEvent.setDropCompleted(dragSuccess);
         dragEvent.consume();
         PlatformHelper.run(() -> {
-            this.openedPresentationsTabPane.getStyleClass().remove("validDragOver");
-            this.openedPresentationsTabPane.getStyleClass().remove("invalidDragOver");
+            this.openedPresentationsTabPane.pseudoClassStateChanged(VALID_DRAG_OVER_PSEUDO_CLASS, false);
+            this.openedPresentationsTabPane.pseudoClassStateChanged(INVALID_DRAG_OVER_PSEUDO_CLASS, false);
         });
     }
 
@@ -345,26 +351,15 @@ public class SlideshowFXController implements Initializable {
                             || file.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION))
                     .findFirst();
 
-            if (slideshowFXFile != null && slideshowFXFile.isPresent()) {
+            final boolean isDragValid = slideshowFXFile != null && slideshowFXFile.isPresent();
+            if (isDragValid) {
                 dragEvent.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-
-                PlatformHelper.run(() -> {
-                    this.openedPresentationsTabPane.getStyleClass().remove("invalidDragOver");
-
-                    if (!this.openedPresentationsTabPane.getStyleClass().contains("validDragOver")) {
-                        this.openedPresentationsTabPane.getStyleClass().add("validDragOver");
-                    }
-                });
-
-            } else {
-                PlatformHelper.run(() -> {
-                    this.openedPresentationsTabPane.getStyleClass().remove("validDragOver");
-
-                    if (!this.openedPresentationsTabPane.getStyleClass().contains("invalidDragOver")) {
-                        this.openedPresentationsTabPane.getStyleClass().add("invalidDragOver");
-                    }
-                });
             }
+
+            PlatformHelper.run(() -> {
+                this.openedPresentationsTabPane.pseudoClassStateChanged(VALID_DRAG_OVER_PSEUDO_CLASS, isDragValid);
+                this.openedPresentationsTabPane.pseudoClassStateChanged(INVALID_DRAG_OVER_PSEUDO_CLASS, !isDragValid);
+            });
 
             dragEvent.consume();
         }
@@ -378,8 +373,8 @@ public class SlideshowFXController implements Initializable {
     @FXML
     private void dragExitedUI(DragEvent dragEvent) {
         PlatformHelper.run(() -> {
-            this.openedPresentationsTabPane.getStyleClass().remove("validDragOver");
-            this.openedPresentationsTabPane.getStyleClass().remove("invalidDragOver");
+            this.openedPresentationsTabPane.pseudoClassStateChanged(VALID_DRAG_OVER_PSEUDO_CLASS, false);
+            this.openedPresentationsTabPane.pseudoClassStateChanged(INVALID_DRAG_OVER_PSEUDO_CLASS, false);
         });
     }
 
@@ -448,7 +443,7 @@ public class SlideshowFXController implements Initializable {
                 .addStep(new Tour.Step("#serverIpAddress", "The IP address of the embedded server. If nothing is provided, an automatic IP will be used."))
                 .addStep(new Tour.Step("#serverPort", "The port of the embedded server. If nothing is provided, 8080 will be used."))
                 .addStep(new Tour.Step("#twitterHashtag", "Look for the given hashtag on Twitter. If left blank, the Twitter service will not be started."))
-                .addStep(new Tour.Step("#startServerButton", "Start or stop the embedded server."))
+                .addStep(new Tour.Step("#serverButton", "Start or stop the embedded server."))
                 .addStep(new Tour.Step("#browser", "Your presentation is displayed here."))
                 .addStep(new Tour.Step("#contentExtensionToolBar", "Extensions are added here. If you install new ones they will also appear here. An extension provides a feature that adds something to your presentation, like inserting an image."))
                 .addStep(new Tour.Step("#markupContentTypeBox", "The syntaxes available to define slides's content are located here. If you install new ones, they will also appear here."))
@@ -681,7 +676,7 @@ public class SlideshowFXController implements Initializable {
             try {
                 Files.createFile(templateConfigurationFile.toPath());
             } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Can not create template configuration file", e);
+                LOGGER.log(WARNING, "Can not create template configuration file", e);
             }
         }
 
@@ -950,15 +945,18 @@ public class SlideshowFXController implements Initializable {
     private void startServer() {
         FontAwesome icon;
         final Tooltip tooltip = new Tooltip();
+        final PseudoClass stateToEnable, stateToDisable;
 
         if (SlideshowFXServer.getSingleton() != null) {
             SlideshowFXServer.getSingleton().stop();
 
-            icon = new FontAwesome(Icon.PLAY);
-            icon.setSize(20d);
-            icon.setColor("green");
+            icon = new FontAwesome(PLAY);
+            icon.setIconSize(20d);
 
             tooltip.setText("Start the server");
+
+            stateToEnable = START_SERVER_PSEUDO_CLASS;
+            stateToDisable = STOP_SERVER_PSEUDO_CLASS;
         } else {
             String ip = this.serverIpAddress.getValue();
             if (ip == null || ip.isEmpty()) {
@@ -970,7 +968,7 @@ public class SlideshowFXController implements Initializable {
                 try {
                     port = Integer.parseInt(this.serverPort.getText());
                 } catch (NumberFormatException ex) {
-                    LOGGER.log(Level.WARNING, "Can not parse given chat port, use the default one instead", ex);
+                    LOGGER.log(WARNING, "Can not parse given chat port, use the default one instead", ex);
                 }
             }
 
@@ -985,14 +983,19 @@ public class SlideshowFXController implements Initializable {
             );
 
             icon = new FontAwesome(Icon.POWER_OFF);
-            icon.setSize(20d);
-            icon.setColor("app-color-orange");
+            icon.setIconSize(20d);
 
             tooltip.setText("Stop the server");
+
+            stateToEnable = STOP_SERVER_PSEUDO_CLASS;
+            stateToDisable = START_SERVER_PSEUDO_CLASS;
         }
 
-        this.startServerButton.setGraphic(icon);
-        this.startServerButton.setTooltip(tooltip);
+        this.serverButton.setGraphic(icon);
+        this.serverButton.setTooltip(tooltip);
+        this.serverButton.pseudoClassStateChanged(stateToEnable, true);
+        this.serverButton.pseudoClassStateChanged(stateToDisable, false);
+
         this.serverIpAddress.setDisable(!this.serverIpAddress.isDisable());
         this.serverPort.setDisable(!this.serverPort.isDisable());
         this.twitterHashtag.setDisable(!this.twitterHashtag.isDisable());
@@ -1042,7 +1045,7 @@ public class SlideshowFXController implements Initializable {
                 this.openTemplateOrPresentation(recentPresentation);
             } catch (IllegalAccessException | FileNotFoundException e) {
                 DialogHelper.showError("Error", "Can not open presentation " + recentPresentation.getAbsolutePath());
-                LOGGER.log(Level.WARNING, "Can not open presentation " + recentPresentation.getAbsolutePath(), e);
+                LOGGER.log(WARNING, "Can not open presentation " + recentPresentation.getAbsolutePath(), e);
             }
         });
 
@@ -1214,7 +1217,14 @@ public class SlideshowFXController implements Initializable {
     }
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    public Parent getRoot() {
+        return this.root;
+    }
+
+    @Override
+    public void postInitialize(URL url, ResourceBundle resourceBundle) {
+        this.serverButton.pseudoClassStateChanged(START_SERVER_PSEUDO_CLASS, true);
+
         TaskDAO.getInstance().addStartTaskAction(this.taskInProgress::setCurrentTask);
 
         // We use reflection to disable all elements present in the list
@@ -1225,9 +1235,9 @@ public class SlideshowFXController implements Initializable {
             } catch (NoSuchMethodException e) {
                 LOGGER.log(Level.FINE, "No setDisableMethod found", e);
             } catch (InvocationTargetException e) {
-                LOGGER.log(Level.WARNING, "Can not disable element", e);
+                LOGGER.log(WARNING, "Can not disable element", e);
             } catch (IllegalAccessException e) {
-                LOGGER.log(Level.WARNING, "Can not disable element", e);
+                LOGGER.log(WARNING, "Can not disable element", e);
             }
         };
 

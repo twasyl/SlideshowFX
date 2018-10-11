@@ -5,6 +5,7 @@ apply plugin: 'java'
 
 dependencies {
     implementation project(':slideshowfx-global-configuration')
+    implementation project(':slideshowfx-theme')
 
     compile "org.freemarker:freemarker:${rootProject.ext.dependencies.freemarker.version}"
     compile "org.jsoup:jsoup:${rootProject.ext.dependencies.jsoup.version}"

@@ -1,6 +1,8 @@
 package com.twasyl.slideshowfx.controls.stages;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.theme.Themes;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -18,7 +20,7 @@ import java.util.logging.Logger;
  * A custom implementation of the {@link Stage} class. It predefines the icons of the stage as well as the owner of it.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class CustomSlideshowFXStage<T extends Initializable> extends Stage {
@@ -70,6 +72,7 @@ public class CustomSlideshowFXStage<T extends Initializable> extends Stage {
             final FXMLLoader loader = new FXMLLoader(fxml);
             try {
                 final Parent root = loader.load();
+                Themes.applyTheme(root, GlobalConfiguration.getThemeName());
                 this.controller = loader.getController();
 
                 final Scene scene = new Scene(root);

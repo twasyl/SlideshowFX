@@ -1,3 +1,3 @@
 #snippetExecutorContainer .text-field {
-	-fx-background-color: derive(app-color-text-fill, 10%), app-color-input-background;
+	-fx-background-color: sfx-snippet-executor-container-text-field-default-background-color-1, sfx-snippet-executor-container-text-field-default-background-color-2;
 }

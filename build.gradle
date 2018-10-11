@@ -101,17 +101,17 @@ ext.os = [
 
 ext.dependencies = [
         asciidoctorj: [version: '1.5.6'],
-        box         : [version: '2.20.1'],
-        drive       : [version: 'v3-rev118-1.23.0'],
-        dropbox     : [version: '3.0.8'],
-        felix       : [version: '5.6.10'],
+        box         : [version: '2.23.1'],
+        drive       : [version: 'v3-rev130-1.25.0'],
+        dropbox     : [version: '3.0.9'],
+        felix       : [version: '6.0.1'],
         freemarker  : [version: '2.3.28'],
         jsoup       : [version: '1.11.3'],
-        junit       : [version: '5.2.0'],
+        junit       : [version: '5.3.1'],
         markdown    : [version: '0.13'],
-        mockito     : [version: '2.18.3'],
-        vertx       : [version: '3.5.2'],
-        wikitext    : [version: '3.0.24'],
+        mockito     : [version: '2.22.0'],
+        vertx       : [version: '3.5.3'],
+        wikitext    : [version: '3.0.26'],
         zxing       : [version: '3.3.3']
 ]
 

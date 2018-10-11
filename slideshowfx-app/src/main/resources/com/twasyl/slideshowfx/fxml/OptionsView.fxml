@@ -12,6 +12,11 @@
 
     <Tab text="General" closable="false">
         <VBox spacing="5" alignment="TOP_LEFT">
+            <HBox spacing="5" alignment="BASELINE_LEFT">
+                <Label text="Theme:" />
+                <ComboBox fx:id="themes" />
+            </HBox>
+            <Separator />
             <CheckBox fx:id="enableAutoSaving" text="Enable auto save interval" />
             <HBox spacing="5" alignment="BASELINE_LEFT">
                 <Label text="Auto save interval:" />

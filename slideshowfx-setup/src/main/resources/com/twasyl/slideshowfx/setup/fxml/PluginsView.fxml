@@ -21,8 +21,8 @@
                         <Tooltip text="Install all markup plugins"/>
                     </tooltip>
                 </CheckBox>
-                <FontAwesome fx:id="markupErrorSign" icon="EXCLAMATION_TRIANGLE" size="12"
-                             color="white"/>
+                <FontAwesome fx:id="markupErrorSign" icon="EXCLAMATION_TRIANGLE" iconSize="12"
+                             iconColor="white"/>
             </HBox>
         </graphic>
 

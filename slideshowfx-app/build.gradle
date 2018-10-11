@@ -16,6 +16,7 @@ dependencies {
     compile project(':slideshowfx-plugin')
     compile project(':slideshowfx-server')
     compile project(':slideshowfx-snippet-executor')
+    implementation project(':slideshowfx-theme')
     compile project(':slideshowfx-ui-controls')
     compile project(':slideshowfx-utils')
 

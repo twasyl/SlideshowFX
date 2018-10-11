@@ -1,6 +1,12 @@
 package com.twasyl.slideshowfx.icons;
 
-import javafx.beans.property.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.css.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -8,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -45,19 +52,25 @@ public class FontAwesome extends Text {
     }
 
     private static final Logger LOGGER = Logger.getLogger(FontAwesome.class.getName());
+    private static final StyleablePropertyFactory<FontAwesome> FACTORY = new StyleablePropertyFactory<>(Text.getClassCssMetaData());
     private static final String FONTAWESOME_VERSION = "5.0.13";
     private static final String FONTAWESOME_ROOT = "/com/twasyl/slideshowfx/icons/fontawesome/" + FONTAWESOME_VERSION.replaceAll("\\.", "_") + "/";
     private static final Map<FontCacheKey, Font> FONT_CACHE = new HashMap<>();
 
     private final ObjectProperty<Icon> icon = new SimpleObjectProperty<>(Icon.FOLDER_OPEN);
-    private final DoubleProperty size = new SimpleDoubleProperty(10d);
-    private final StringProperty color = new SimpleStringProperty("white");
+
+    private final StyleableProperty<Paint> iconColor =
+            FACTORY.createStyleablePaintProperty(this, "iconColor", "-fx-icon-color", s -> s.iconColor, Color.WHITE);
+    private final StyleableDoubleProperty iconSize = new SimpleStyleableDoubleProperty(
+            FACTORY.createSizeCssMetaData("-fx-icon-size", s -> s.iconSize, 10d), this, "iconSize");
+
 
     public FontAwesome() {
+        getStyleClass().add("font-awesome");
         setText(getIcon().getUnicode());
-        this.setFont(getFontAwesomeFont(getIcon(), 10d));
+        this.setFont(getFontAwesomeFont(getIcon(), iconSize.getValue().doubleValue()));
         this.definePropertyListeners();
-        recomputeStyle();
+        this.defineBindings();
     }
 
     public FontAwesome(final Icon icon) {
@@ -65,9 +78,14 @@ public class FontAwesome extends Text {
         setIcon(icon);
     }
 
-    public FontAwesome(final Icon icon, final Double size) {
+    public FontAwesome(final Icon icon, final Double iconSize) {
         this(icon);
-        this.setSize(size);
+        this.iconSize.setValue(iconSize);
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
+        return FACTORY.getCssMetaData();
     }
 
     protected Font getFontAwesomeFont(final Icon icon, final double size) {
@@ -94,17 +112,15 @@ public class FontAwesome extends Text {
 
     protected void definePropertyListeners() {
         this.icon.addListener((value, oldIcon, newIcon) -> {
-            this.setFont(getFontAwesomeFont(newIcon, getSize()));
+            this.setFont(getFontAwesomeFont(newIcon, getIconSize()));
             setText(newIcon.getUnicode());
-            recomputeStyle();
         });
 
-        this.size.addListener((value, oldSize, newSize) -> {
-            this.setFont(getFontAwesomeFont(getIcon(), newSize.doubleValue()));
-            recomputeStyle();
-        });
+        this.iconSize.addListener((value, oldSize, newSize) -> this.setFont(getFontAwesomeFont(getIcon(), newSize.doubleValue())));
+    }
 
-        this.color.addListener((value, oldSize, newSize) -> recomputeStyle());
+    protected void defineBindings() {
+        fillProperty().bind((ObservableValue<? extends Paint>) iconColor);
     }
 
     public ObjectProperty<Icon> iconProperty() {
@@ -119,32 +135,28 @@ public class FontAwesome extends Text {
         this.icon.set(icon);
     }
 
-    public DoubleProperty sizeProperty() {
-        return size;
+    public DoubleProperty iconSizeProperty() {
+        return iconSize;
     }
 
-    public Double getSize() {
-        return size.get();
+    public Double getIconSize() {
+        return iconSize.get();
     }
 
-    public void setSize(Double size) {
-        this.size.set(size);
+    public void setIconSize(Double iconSize) {
+        this.iconSize.set(iconSize);
     }
 
-    public StringProperty colorProperty() {
-        return color;
+    public ObjectProperty<Paint> iconColorProperty() {
+        return (ObjectProperty<Paint>) iconColor;
     }
 
-    public String getColor() {
-        return color.get();
+    public Paint getIconColor() {
+        return iconColor.getValue();
     }
 
-    public void setColor(String color) {
-        this.color.set(color);
-    }
-
-    protected void recomputeStyle() {
-        setStyle(String.format("-fx-fill: %s;", getColor()));
+    public void setIconColor(Paint color) {
+        this.iconColor.setValue(color);
     }
 
     /**

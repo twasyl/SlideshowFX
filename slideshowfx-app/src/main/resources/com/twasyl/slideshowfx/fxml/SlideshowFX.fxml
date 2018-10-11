@@ -7,21 +7,15 @@
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import java.lang.Double?>
 <?import java.net.URL?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:id="root"
             fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController"
             minWidth="1024" minHeight="768">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css"/>
-        <URL value="@/com/twasyl/slideshowfx/css/SlideshowFX.css"/>
     </stylesheets>
 
     <fx:define>
-        <!-- Global variables -->
-        <Double fx:id="TOOLBAR_ICON_WIDTH" fx:value="20"/>
-        <Double fx:id="TOOLBAR_ICON_HEIGHT" fx:value="20"/>
-
         <!-- Global Menus & MenuItems -->
         <MenuItem fx:id="newMenuItem" text="New" onAction="#loadTemplate">
             <accelerator>
@@ -73,12 +67,12 @@
         </MenuItem>
 
         <!-- Global ToolBar buttons -->
-        <Button fx:id="openPresentation" onAction="#openPresentation" >
+        <Button fx:id="openPresentation" onAction="#openPresentation">
             <tooltip>
                 <Tooltip text="Open presentation"/>
             </tooltip>
             <graphic>
-                <FontAwesome icon="FOLDER_OPEN" color="#FF8000" size="$TOOLBAR_ICON_WIDTH"/>
+                <FontAwesome icon="FOLDER_OPEN"/>
             </graphic>
         </Button>
 
@@ -87,7 +81,7 @@
                 <Tooltip text="Save"/>
             </tooltip>
             <graphic>
-                <FontAwesome icon="FLOPPY" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange"/>
+                <FontAwesome icon="FLOPPY"/>
             </graphic>
             <items>
                 <MenuItem text="Save as ..." onAction="#saveAs"/>
@@ -99,7 +93,7 @@
                 <Tooltip text="Print"/>
             </tooltip>
             <graphic>
-                <FontAwesome icon="PRINT" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange"/>
+                <FontAwesome icon="PRINT"/>
             </graphic>
         </Button>
 
@@ -109,8 +103,8 @@
             </tooltip>
             <graphic>
                 <IconStack>
-                    <FontAwesome icon="FILE" size="$TOOLBAR_ICON_WIDTH" color="white"/>
-                    <FontAwesome icon="PLUS" size="15" color="app-color-orange" IconStack.alignment="BOTTOM_CENTER"/>
+                    <FontAwesome fx:id="addSlideButton_file_icon" icon="FILE"/>
+                    <FontAwesome fx:id="addSlideButton_plus_icon" icon="PLUS" IconStack.alignment="BOTTOM_CENTER"/>
                 </IconStack>
             </graphic>
         </SplitMenuButton>
@@ -120,7 +114,7 @@
                 <Tooltip text="Copy slide"/>
             </tooltip>
             <graphic>
-                <FontAwesome icon="FILES" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange;"/>
+                <FontAwesome icon="FILES"/>
             </graphic>
         </Button>
 
@@ -130,8 +124,8 @@
             </tooltip>
             <graphic>
                 <IconStack>
-                    <FontAwesome icon="FILE" size="$TOOLBAR_ICON_WIDTH" color="white"/>
-                    <FontAwesome icon="TIMES" size="15" color="app-color-orange" IconStack.alignment="BOTTOM_CENTER"/>
+                    <FontAwesome fx:id="deleteSlide_file_icon" icon="FILE" />
+                    <FontAwesome fx:id="deleteSlide_times_icon" icon="TIMES" IconStack.alignment="BOTTOM_CENTER"/>
                 </IconStack>
             </graphic>
         </Button>
@@ -141,7 +135,7 @@
                 <Tooltip text="Reload"/>
             </tooltip>
             <graphic>
-                <FontAwesome icon="REFRESH" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange"/>
+                <FontAwesome icon="REFRESH"/>
             </graphic>
         </Button>
 
@@ -150,7 +144,7 @@
                 <Tooltip text="Slideshow"/>
             </tooltip>
             <graphic>
-                <FontAwesome icon="DESKTOP" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange"/>
+                <FontAwesome icon="DESKTOP"/>
             </graphic>
             <items>
                 <MenuItem text="Slideshow from current slide" onAction="#slideshowFromCurrentSlide"/>
@@ -211,7 +205,7 @@
                 <Menu text="File" fx:id="fileMenu">
                     <fx:reference source="newMenuItem"/>
                     <fx:reference source="openMenuItem"/>
-                    <Menu fx:id="openRecentMenu" text="Open recent" />
+                    <Menu fx:id="openRecentMenu" text="Open recent"/>
                     <fx:reference source="closePresentationMenuItem"/>
                     <SeparatorMenuItem/>
                     <fx:reference source="saveMenuItem"/>
@@ -262,8 +256,8 @@
                     </tooltip>
                     <graphic>
                         <IconStack>
-                            <FontAwesome icon="FILE" size="$TOOLBAR_ICON_WIDTH" color="white"/>
-                            <FontAwesome icon="COG" size="10" color="app-color-orange" IconStack.alignment="TOP_RIGHT"/>
+                            <FontAwesome fx:id="loadTemplate_file_icon" icon="FILE" />
+                            <FontAwesome fx:id="loadTemplate_cog_icon" icon="COG" IconStack.alignment="TOP_RIGHT"/>
                         </IconStack>
                     </graphic>
                 </Button>
@@ -290,7 +284,7 @@
 
                 <Separator/>
 
-                <FontAwesome icon="COMMENTS_O" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange"/>
+                <FontAwesome icon="COMMENTS_O"/>
 
                 <ComboBox promptText="IP address" fx:id="serverIpAddress">
                     <items>
@@ -305,7 +299,7 @@
                     </tooltip>
                 </TextField>
 
-                <FontAwesome icon="TWITTER" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange"/>
+                <FontAwesome icon="TWITTER"/>
 
                 <TextField prefColumnCount="10" promptText="#hashtag" fx:id="twitterHashtag"
                            onKeyPressed="#startServerByKeyPressed">
@@ -314,9 +308,9 @@
                     </tooltip>
                 </TextField>
 
-                <Button onAction="#startServerByButton" fx:id="startServerButton" styleClass="image">
+                <Button onAction="#startServerByButton" fx:id="serverButton" styleClass="image">
                     <graphic>
-                        <FontAwesome icon="PLAY" size="$TOOLBAR_ICON_WIDTH" color="green"/>
+                        <FontAwesome icon="PLAY" iconColor="green"/>
                     </graphic>
                     <tooltip>
                         <Tooltip text="Start the server"/>
@@ -327,7 +321,7 @@
     </top>
 
     <center>
-        <TabPane fx:id="openedPresentationsTabPane" styleClass="noDragActive"
+        <TabPane fx:id="openedPresentationsTabPane"
                  onDragOver="#dragOverUI"
                  onDragDropped="#dragDroppedOnUI"
                  onDragExited="#dragExitedUI"/>

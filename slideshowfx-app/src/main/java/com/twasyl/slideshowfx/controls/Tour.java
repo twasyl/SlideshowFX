@@ -291,7 +291,7 @@ public class Tour extends StackPane {
      */
     private Node getReloadNode() {
         final FontAwesome reloadIcon = new FontAwesome(Icon.REFRESH, 48d);
-        reloadIcon.setColor("white");
+        reloadIcon.setIconColor(Color.WHITE);
 
         final Button reloadButton = new Button();
         reloadButton.setBackground(Background.EMPTY);

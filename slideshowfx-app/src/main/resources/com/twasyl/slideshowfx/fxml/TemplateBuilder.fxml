@@ -5,25 +5,18 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
-<?import java.lang.Double?>
 <?import java.net.URL?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.TemplateBuilderController"
+<BorderPane fx:id="templateBuilder" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.TemplateBuilderController"
             prefHeight="700" prefWidth="1024">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
-        <URL value="@/com/twasyl/slideshowfx/css/TemplateBuilder.css" />
     </stylesheets>
 
-    <fx:define>
-        <Double fx:id="TOOLBAR_ICON_WIDTH" fx:value="20" />
-        <Double fx:id="TOOLBAR_ICON_HEIGHT" fx:value="20" />
-    </fx:define>
-
     <top>
-        <ToolBar>
-            <SplitMenuButton fx:id="buildButton" onAction="#buildTemplateArchive">
+        <ToolBar id="zouzou">
+            <SplitMenuButton onAction="#buildTemplateArchive">
                 <graphic>
-                    <FontAwesome icon="ARCHIVE" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange;" />
+                    <FontAwesome icon="ARCHIVE"  />
                 </graphic>
                 <tooltip>
                     <Tooltip text="Build template archive" />
@@ -33,9 +26,9 @@
                 </items>
             </SplitMenuButton>
 
-            <SplitMenuButton fx:id="saveButton" onAction="#saveCurrentFile">
+            <SplitMenuButton onAction="#saveCurrentFile">
                 <graphic>
-                    <FontAwesome icon="FLOPPY" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange" />
+                    <FontAwesome icon="FLOPPY" />
                 </graphic>
                 <tooltip>
                     <Tooltip text="Save" />
@@ -47,11 +40,11 @@
 
             <Separator />
 
-            <SplitMenuButton fx:id="addFileButton" onAction="#addFileToTreeView">
+            <SplitMenuButton onAction="#addFileToTreeView">
                 <graphic>
                     <IconStack>
-                        <FontAwesome icon="FILE" size="$TOOLBAR_ICON_WIDTH" color="white" />
-                        <FontAwesome icon="PLUS" size="15" color="app-color-orange" StackPane.alignment="BOTTOM_CENTER" />
+                        <FontAwesome id="addFileButton_file_icon" icon="FILE" />
+                        <FontAwesome id="addFileButton_plus_icon" icon="PLUS" StackPane.alignment="BOTTOM_CENTER" />
                     </IconStack>
                 </graphic>
                 <tooltip>
@@ -62,11 +55,11 @@
                 </items>
             </SplitMenuButton>
 
-            <SplitMenuButton fx:id="addFolderButton" onAction="#addFolderToTreeView">
+            <SplitMenuButton onAction="#addFolderToTreeView">
                 <graphic>
                     <IconStack>
-                        <FontAwesome icon="FOLDER" size="$TOOLBAR_ICON_WIDTH" color="white" />
-                        <FontAwesome icon="PLUS" size="13" color="app-color-orange" StackPane.alignment="CENTER" />
+                        <FontAwesome id="addFolderButton_folder_icon" icon="FOLDER" StackPane.alignment="BOTTOM_CENTER" />
+                        <FontAwesome id="addFolderButton_plus_icon" icon="PLUS" StackPane.alignment="BOTTOM_CENTER" />
                     </IconStack>
                 </graphic>
                 <tooltip>
@@ -82,7 +75,7 @@
                     <Tooltip text="Delete selection" />
                 </tooltip>
                 <graphic>
-                    <FontAwesome icon="TRASH_ALT" size="$TOOLBAR_ICON_WIDTH" color="app-color-orange" />
+                    <FontAwesome icon="TRASH_ALT" />
                 </graphic>
             </Button>
         </ToolBar>

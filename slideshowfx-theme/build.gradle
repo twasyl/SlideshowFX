@@ -1,0 +1,4 @@
+description = 'Module defining themes to be used within the SlideshowFX app'
+version = '1.0-SNAPSHOT'
+
+apply plugin: 'java-library'

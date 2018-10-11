@@ -14,6 +14,7 @@ include 'slideshowfx-app',
         'slideshowfx-server',
         'slideshowfx-setup',
         'slideshowfx-snippet-executor',
+        'slideshowfx-theme',
         'slideshowfx-ui-controls',
         'slideshowfx-utils',
 
@@ -47,3 +48,4 @@ include 'slideshowfx-app',
         'slideshowfx-javascript-executor',
         'slideshowfx-kotlin-executor',
         'slideshowfx-scala-executor'
+

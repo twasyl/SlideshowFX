@@ -276,7 +276,7 @@ public class PresentationOutline extends ListView<ImageView> {
      * Loads all the slides of this presentation and take care of starting the process of cascading snapshots of it.
      */
     private void loadAllSlides() {
-        if (this.presentation.get() != null) {
+        if (this.presentation.get() != null && this.presentation.get().getConfiguration().hasSlides()) {
             defineAndShowBrowserStage();
 
             this.presentation.get().getConfiguration().getSlides().forEach(slide -> {
@@ -284,10 +284,10 @@ public class PresentationOutline extends ListView<ImageView> {
                 this.getItems().add(preview);
             });
 
-            final String firstSlide = this.presentation.get().getConfiguration().getFirstSlide().getId();
+            final String firstSlideId = this.presentation.get().getConfiguration().getFirstSlide().getId();
             this.browser.loadPresentationAndDo(this.presentation.get(), () -> {
-                this.browser.slide(firstSlide);
-                this.takeSnapshot(firstSlide, true, false);
+                this.browser.slide(firstSlideId);
+                this.takeSnapshot(firstSlideId, true, false);
             }, getSnapshotDelay());
         }
     }

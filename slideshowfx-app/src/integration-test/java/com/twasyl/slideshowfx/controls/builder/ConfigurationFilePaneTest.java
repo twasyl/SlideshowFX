@@ -18,9 +18,8 @@ public class ConfigurationFilePaneTest extends Application {
         final ScrollPane scrollPane = new ScrollPane(templateConfigurationFilePane);
 
         final Scene scene = new Scene(scrollPane, 500, 600);
-        scene.getStylesheets().addAll(
-                ConfigurationFilePaneTest.class.getResource("/com/twasyl/slideshowfx/css/Default.css").toExternalForm(),
-                ConfigurationFilePaneTest.class.getResource("/com/twasyl/slideshowfx/css/TemplateBuilder.css").toExternalForm());
+        scene.getStylesheets().add(
+                ConfigurationFilePaneTest.class.getResource("/com/twasyl/slideshowfx/css/Default.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
     }

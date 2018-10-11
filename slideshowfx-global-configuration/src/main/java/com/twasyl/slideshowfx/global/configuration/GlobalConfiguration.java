@@ -34,6 +34,7 @@ public class GlobalConfiguration {
     protected static final String SLIDESHOWFX_CONTEXT_FILE_NAME = ".slideshowfx.context.xml";
     protected static final Long DEFAULT_MAX_RECENT_PRESENTATIONS = 10L;
     protected static final Long DEFAULT_SNAPSHOT_DELAY = 500L;
+    protected static final String DEFAULT_THEME_NAME = "Dark";
 
     private static File APPLICATION_DIRECTORY = null;
     private static File PLUGINS_DIRECTORY = null;
@@ -75,6 +76,12 @@ public class GlobalConfiguration {
      * Name of the parameter used to specify the delay before taking a snapshot of a browser.
      */
     protected static final String SNAPSHOT_DELAY = "application.snapshot.delay";
+
+    /**
+     * Name of the parameter used to specify the theme of the application.
+     */
+    protected static final String THEME = "application.theme";
+
 
     /**
      * Name of the parameter used to specify the Twitter consumer key.
@@ -863,6 +870,34 @@ public class GlobalConfiguration {
      */
     public static void setTwitterConsumerSecret(final String twitterConsumerSecret) {
         setProperty(TWITTER_CONSUMER_SECRET, twitterConsumerSecret);
+    }
+
+    /**
+     * Get the default name of the theme to be used by the application.
+     *
+     * @return The default name of the theme to be used by the application.
+     */
+    public static String getDefaultThemeName() {
+        return DEFAULT_THEME_NAME;
+    }
+
+    /**
+     * Get the name of the theme defined for the application.
+     *
+     * @return The theme defined for the application.
+     */
+    public static String getThemeName() {
+        final String theme = getProperty(THEME);
+        return theme == null ? getDefaultThemeName() : theme;
+    }
+
+    /**
+     * Set the name of the theme to be used by the application.
+     *
+     * @param theme The name of theme the application should use.
+     */
+    public static void setThemeName(final String theme) {
+        setProperty(THEME, theme);
     }
 
     /**

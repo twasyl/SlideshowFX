@@ -21,6 +21,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 
 import java.util.Base64;
@@ -113,16 +114,16 @@ public class SlideshowPane extends StackPane implements Actor {
      */
     private final void initializeCollapsibleToolPane() {
         final FontAwesome qrCodeIcon = new FontAwesome(Icon.QRCODE);
-        qrCodeIcon.setSize(32d);
-        qrCodeIcon.setColor("app-color-orange");
+        qrCodeIcon.setIconSize(32d);
+        qrCodeIcon.setIconColor(Paint.valueOf("app-color-orange"));
 
         final FontAwesome chatIcon = new FontAwesome(Icon.COMMENTS_O);
-        chatIcon.setSize(32d);
-        chatIcon.setColor("app-color-orange");
+        chatIcon.setIconSize(32d);
+        chatIcon.setIconColor(Paint.valueOf("app-color-orange"));
 
         final FontAwesome quizIcon = new FontAwesome(Icon.QUESTION);
-        quizIcon.setSize(32d);
-        quizIcon.setColor("app-color-orange");
+        quizIcon.setIconSize(32d);
+        quizIcon.setIconColor(Paint.valueOf("app-color-orange"));
 
         this.collapsibleToolPane.setPosition(RIGHT);
 

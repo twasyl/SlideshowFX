@@ -13,6 +13,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,12 +41,12 @@ public class PresentationVariablesPanel extends BorderPane {
         this.variablesScrollPane.setPrefSize(500, 500);
 
         final FontAwesome backgroundIcon = new FontAwesome(Icon.PLUS_SQUARE);
-        backgroundIcon.setSize(20d);
-        backgroundIcon.setColor("white");
+        backgroundIcon.setIconSize(20d);
+        backgroundIcon.setIconColor(Color.WHITE);
 
         final FontAwesome plusIcon = new FontAwesome(Icon.PLUS);
-        plusIcon.setSize(15d);
-        plusIcon.setColor("app-color-orange");
+        plusIcon.setIconSize(15d);
+        plusIcon.setIconColor(Paint.valueOf("app-color-orange"));
 
         final IconStack stack = new IconStack();
         stack.getChildren().addAll(backgroundIcon, plusIcon);
@@ -97,8 +99,8 @@ public class PresentationVariablesPanel extends BorderPane {
         variableValue.setOnKeyPressed(addVariableByKeyboard);
 
         final FontAwesome icon = new FontAwesome(Icon.TIMES_CIRCLE);
-        icon.setSize(20d);
-        icon.setColor("app-color-orange");
+        icon.setIconSize(20d);
+        icon.setIconColor(Paint.valueOf("app-color-orange"));
 
         final Button delete = new Button();
         delete.setGraphic(icon);

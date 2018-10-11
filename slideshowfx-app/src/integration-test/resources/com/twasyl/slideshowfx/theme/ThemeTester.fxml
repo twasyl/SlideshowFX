@@ -7,6 +7,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.text.TextFlow?>
+<?import com.twasyl.slideshowfx.icons.IconStack?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.twasyl.slideshowfx.theme.ThemeController"
@@ -57,7 +61,7 @@
                                 <Tooltip text="Save"/>
                             </tooltip>
                             <graphic>
-                                <FontAwesome icon="FLOPPY" size="20" color="app-color-orange"/>
+                                <FontAwesome icon="FLOPPY" />
                             </graphic>
                             <items>
                                 <MenuItem text="Item 1"/>
@@ -66,14 +70,43 @@
                     </ToolBar>
                 </GridPane>
             </Tab>
+            <Tab text="FontAwesome">
+                <GridPane hgap="10" vgap="10">
+                    <FontAwesome icon="FLOPPY" style="-fx-icon-size: 50px;"                             GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <FontAwesome icon="FOLDER_OPEN" style="-fx-icon-color: green; -fx-icon-size: 50px;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <IconStack fx:id="modifiableIconStack"                                              GridPane.rowIndex="1" GridPane.columnIndex="0">
+                        <FontAwesome icon="FILE" style="-fx-icon-size: 50px;" />
+                        <FontAwesome icon="PLUS" StackPane.alignment="BOTTOM_CENTER" />
+                    </IconStack>
+                    <Button text="Add to stack" onAction="#addIconToStack"                              GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <Button text="Remove from stack" onAction="#removeIconFromStack"                    GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                </GridPane>
+            </Tab>
             <Tab text="Controls">
                 <GridPane hgap="10" vgap="10">
                     <RadioButton text="Unchecked radio"               GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                     <RadioButton text="Checked radio" selected="true" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
                     <CheckBox text="Unchecked box"                    GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                     <CheckBox text="Checked box" selected="true"      GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                    <Label text="A label"                             GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <Text text="A text"                               GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                    <ComboBox promptText="Choose..."                  GridPane.rowIndex="2" GridPane.columnIndex="0">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="Value 1"/>
+                                <String fx:value="Value 2"/>
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+                </GridPane>
+            </Tab>
+            <Tab text="Texts">
+                <GridPane hgap="10" vgap="10">
+                    <Label text="A label"                 GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <Text text="A text" styleClass="text" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                    <TextFlow styleClass="messages-box"   GridPane.rowIndex="1" GridPane.columnIndex="0">
+                        <Label text="This label is within a messages box. "/>
+                        <Text styleClass="text" text="This text is also within a messages box. " />
+                        <Hyperlink text="Go on the internet." />
+                    </TextFlow>
                 </GridPane>
             </Tab>
             <Tab text="Input">
@@ -106,6 +139,25 @@
             </Tab>
             <Tab text="Trees">
                 <TemplateTreeView fx:id="templateTreeView"/>
+            </Tab>
+            <Tab text="Lists">
+                <ListView>
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="Value 1" />
+                            <String fx:value="Value 2" />
+                            <String fx:value="Value 3" />
+                        </FXCollections>
+                    </items>
+                </ListView>
+            </Tab>
+            <Tab text="Progress controls">
+                <GridPane hgap="10" vgap="10">
+                    <ProgressBar progress="-0.5"       GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                    <ProgressBar progress="0.5"        GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                    <ProgressIndicator progress="-0.5" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                    <ProgressIndicator progress="1"    GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                </GridPane>
             </Tab>
         </TabPane>
     </center>

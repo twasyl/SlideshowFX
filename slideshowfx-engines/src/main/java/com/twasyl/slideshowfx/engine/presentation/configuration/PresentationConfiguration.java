@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * Represents a presentation
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class PresentationConfiguration implements IConfiguration {
@@ -61,6 +61,15 @@ public class PresentationConfiguration implements IConfiguration {
 
     public void setPresentationFile(File presentationFile) {
         this.presentationFile = presentationFile;
+    }
+
+    /**
+     * Indicates if the current presentation has slides.
+     *
+     * @return {@code true} if the presentation has at least one slide returned by {@link #getSlides()}, {@code false} otherwise.
+     */
+    public boolean hasSlides() {
+       return this.slides != null && !this.slides.isEmpty();
     }
 
     public List<Slide> getSlides() {
@@ -224,10 +233,10 @@ public class PresentationConfiguration implements IConfiguration {
     /**
      * Update the given {@code slide} in the HTML file. Each {@link SlideElement}
      * of the {@code slide} in the HTML document is updated.
-     * If {@link Slide#elements elements}
+     * If {@link Slide#getElements()}  elements}
      * in the given {@code slide} contain variables, their values are inserted in the final HTML document. But the slide
      * will not be updated.
-     * If the slide contains variables outside the {@link Slide#elements elements}
+     * If the slide contains variables outside the {@link Slide#getElements()} elements}
      * they will also be replaced in the HTML document.
      *
      * @param slide The slide to update in the HTML document.

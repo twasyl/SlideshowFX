@@ -29,7 +29,7 @@ import java.util.Set;
  * {@code error} pseudo class state is set on the text field.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.3
  */
 public class ExtendedTextField extends VBox {
@@ -96,7 +96,7 @@ public class ExtendedTextField extends VBox {
 
     private void initializeFocusEvents() {
         this.textField.focusedProperty().addListener((focusedValue, oldFocus, newFocus) -> {
-            if (newFocus || (!newFocus && this.textField.getText().isEmpty())) {
+            if (newFocus || (!newFocus && isTextEmpty())) {
                 this.animateLabel(newFocus);
 
                 if (!newFocus) {
@@ -106,7 +106,7 @@ public class ExtendedTextField extends VBox {
                     this.textField.pseudoClassStateChanged(ERROR, false);
                     this.hidePromptText();
                 }
-            } else if (!newFocus && !this.textField.getText().isEmpty()) {
+            } else if (!newFocus && !isTextEmpty()) {
                 if (this.isMandatory() && this.validator != null && !isValid()) {
                     this.textField.pseudoClassStateChanged(ERROR, true);
                 }
@@ -114,6 +114,15 @@ public class ExtendedTextField extends VBox {
                 this.uiLabel.pseudoClassStateChanged(FOCUSED, newFocus);
             }
         });
+    }
+
+    /**
+     * Indicates if the text is {@code null} or empty.
+     *
+     * @return {@code true} if the text is {@code null} or empty, {@code false} otherwise.
+     */
+    private boolean isTextEmpty() {
+        return this.textField.getText() == null || this.textField.getText().isEmpty();
     }
 
     /**

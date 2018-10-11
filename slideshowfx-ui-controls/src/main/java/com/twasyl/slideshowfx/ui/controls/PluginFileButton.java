@@ -10,6 +10,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
@@ -182,7 +183,7 @@ public class PluginFileButton extends ToggleButton {
 
             if (!fontIconName.isEmpty()) {
                 icon = new FontAwesome(Icon.valueOf(fontIconName), 50d);
-                ((FontAwesome) icon).setColor("black");
+                ((FontAwesome) icon).setIconColor(Color.BLACK);
             }
         }
 

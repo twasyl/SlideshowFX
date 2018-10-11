@@ -6,9 +6,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Side;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
@@ -24,8 +26,10 @@ import java.util.ResourceBundle;
  * @version 1.1
  * @since SlideshowFX 1.0
  */
-public class InternalBrowserController implements Initializable {
+public class InternalBrowserController implements ThemeAwareController {
 
+    @FXML
+    private BorderPane root;
     @FXML
     private TextField addressBar;
     @FXML
@@ -141,7 +145,12 @@ public class InternalBrowserController implements Initializable {
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public Parent getRoot() {
+        return this.root;
+    }
+
+    @Override
+    public void postInitialize(URL location, ResourceBundle resources) {
         this.browsingHistoryContextMenu.setAutoFix(true);
         this.browsingHistoryContextMenu.setHideOnEscape(true);
 

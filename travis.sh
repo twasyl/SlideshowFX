@@ -1,14 +1,14 @@
-echo "Setup JDK 1.8.0_172"
-jdkVersion=1.8.0_172
+echo "Setup JDK 1.8.0_181"
+jdkVersion=1.8.0_181
 jdkInstallationFolder=jdk$jdkVersion
-jdkArchive=jdk-8u172-linux-x64.tar.gz
+jdkArchive=jdk-8u181-linux-x64.tar.gz
 
 mkdir -p ~/jvm
 pushd ~/jvm > /dev/null
 
 if [ ! -d "$jdkInstallationFolder" ]; then
 	echo "Downloading JDK $jdkVersion"
-	wget --quiet --continue --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u172-b11/a58eab1ec242421181065cdc37240b08/$jdkArchive
+	wget --quiet --continue --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u181-b13/96a7b8442fe848ef90c96a2fad6ed6d1/$jdkArchive
 	tar xzf $jdkArchive
 	rm $jdkArchive
 	pushd $jdkInstallationFolder > /dev/null

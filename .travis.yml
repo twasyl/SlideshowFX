@@ -23,7 +23,7 @@ matrix:
 
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export JAVA_HOME=$(/usr/libexec/java_home); else chmod +x travis.sh; ./travis.sh; export JAVA_HOME=~/jvm/jdk1.8.0_162; fi;
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export JAVA_HOME=$(/usr/libexec/java_home); else chmod +x travis.sh; ./travis.sh; export JAVA_HOME=~/jvm/jdk1.8.0_181; fi;
   - chmod +x gradlew
 
 install: true

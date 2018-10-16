@@ -1,7 +1,5 @@
-package com.twasyl.slideshowfx.themes;
+package com.twasyl.slideshowfx.theme;
 
-import com.twasyl.slideshowfx.theme.Theme;
-import com.twasyl.slideshowfx.theme.Themes;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,7 +31,7 @@ public class ThemesTest {
     @Test
     @DisplayName("must be of the number of CSS files")
     public void correctNumbersOfThemes() throws URISyntaxException {
-        final File directory = new File(ThemesTest.class.getResource("/com/twasyl/slideshowfx/css/themes").toURI());
+        final File directory = new File(ThemesTest.class.getResource("/com/twasyl/slideshowfx/theme/css").toURI());
         final File[] cssFiles = directory.listFiles(pathname -> pathname.getName().endsWith(".css"));
 
         assertEquals(1, cssFiles.length);

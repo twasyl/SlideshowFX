@@ -68,8 +68,12 @@ public class CodeContentExtension extends AbstractContentExtension {
     public String buildContentString(IMarkup markup) {
         final StringBuilder builder = new StringBuilder();
 
-        if ("TEXTILE".equals(markup.getCode()) && !this.controller.shouldHighlightLines()) {
+        if (markup == null || "HTML".equals(markup.getCode())) {
+            builder.append(this.buildDefaultContentString());
+        } else if ("TEXTILE".equals(markup.getCode())) {
             builder.append(this.buildTextileContentString());
+        } else if ("MARKDOWN".equals(markup.getCode()) && !this.controller.isShowingLineNumbers() && !this.controller.shouldHighlightLines()) {
+            builder.append(this.buildMarkdownContentString());
         } else {
             builder.append(this.buildDefaultContentString());
         }
@@ -123,6 +127,18 @@ public class CodeContentExtension extends AbstractContentExtension {
         if (this.controller.isShowingLineNumbers()) cssClass.add(LINE_NUMBERS_CSS_CLASS);
 
         return cssClass.length() == 2 ? "" : cssClass.toString();
+    }
+
+    protected String buildMarkdownContentString() {
+        final StringBuilder builder = new StringBuilder("```");
+
+        if (this.controller.getLanguage() != null) {
+            builder.append(this.controller.getLanguage().getCssClass());
+        }
+
+        builder.append("\n").append(this.controller.getCode()).append("\n```");
+
+        return builder.toString();
     }
 
     protected boolean codeContainsBlankLines(final String code) {

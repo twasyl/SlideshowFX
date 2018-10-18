@@ -595,6 +595,14 @@
     -fx-background-color: app-color-background;
 }
 
+.notification-item .font-awesome:successful-task {
+    -fx-icon-color: sfx-notification-successful-task-state-default-icon-color;
+}
+
+.notification-item .font-awesome:failed-task {
+    -fx-icon-color: sfx-notification-failed-task-state-default-icon-color;
+}
+
 .button.notification, .button.notification:hover {
     -fx-border-width: 0;
     -fx-background-color: transparent;
@@ -608,6 +616,11 @@
     -fx-font-size: 10px;
 }
 
+.font-awesome {
+    -fx-icon-size: 20px;
+    -fx-icon-color: sfx-icon-default-icon-color;
+}
+
 .tool-bar .font-awesome {
     -fx-icon-size: 20px;
     -fx-icon-color: sfx-icon-default-icon-color;
@@ -619,6 +632,19 @@
 
 .icon-stack .font-awesome.default-icon-color-1 {
     -fx-icon-color: sfx-icon-stack-default-icon-1-color;
+}
+
+.presentation-variables-panel .icon-stack .font-awesome.icon-index-0 {
+    -fx-icon-size: 20px;
+}
+
+.presentation-variables-panel .icon-stack .font-awesome.icon-index-1 {
+    -fx-icon-size: 15px;
+}
+
+.slideshow-pane .collapsible-tool-pane .font-awesome {
+    -fx-icon-color: sfx-collapsible-tool-pane-default-icon-color;
+    -fx-icon-size: 32px;
 }
 
 /* CSS for elements identified by their ID */
@@ -736,4 +762,13 @@
 
 #templateBuilder .button.delete-slide-element .font-awesome {
     -fx-icon-color: sfx-template-builder-delete-slide-element-button-icon-default-fill-color;
+}
+
+/************************/
+/**** Quiz extension ****/
+/************************/
+
+#quiz-content-extension-question-icon.font-awesome {
+    -fx-icon-color: sfx-quiz-content-extension-question-icon-default-icon-color;
+    -fx-icon-size: 25px;
 }

@@ -1,7 +1,6 @@
 package com.twasyl.slideshowfx.controls.notification;
 
 import com.twasyl.slideshowfx.beans.properties.TaskStatusIconBinding;
-import com.twasyl.slideshowfx.beans.properties.TaskStatusIconColorBinding;
 import com.twasyl.slideshowfx.icons.FontAwesome;
 import com.twasyl.slideshowfx.icons.Icon;
 import com.twasyl.slideshowfx.utils.DialogHelper;
@@ -14,6 +13,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
+import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
@@ -30,21 +30,27 @@ import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static javafx.concurrent.Worker.State.*;
+
 /**
  * Represents a notification to be present in the {@link NotificationCenter}. It displays the title of the {@link SlideshowFXTask}
  * that is associated to the notification, as well as an icon representing the status of the task and a button for deleting
  * the notification in the notification center.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class Notification extends MenuItem {
     private static final Logger LOGGER = Logger.getLogger(Notification.class.getName());
+    private static final PseudoClass SUCCESSFUL_TASK_PSEUDO_STATE = PseudoClass.getPseudoClass("successful-task");
+    private static final PseudoClass FAILED_TASK_PSEUDO_STATE = PseudoClass.getPseudoClass("failed-task");
+
     private final ReadOnlyObjectProperty<SlideshowFXTask> task = new SimpleObjectProperty<>();
 
     public Notification(final SlideshowFXTask task) {
         ((SimpleObjectProperty) this.task).set(task);
+        this.getStyleClass().add("notification-item");
 
         final Text taskTitle = this.getTaskTitle();
         final Text statusChangeTime = this.getStatusChangeTimeText();
@@ -138,8 +144,12 @@ public class Notification extends MenuItem {
             }
         });
         statusIcon.iconProperty().bind(new TaskStatusIconBinding(this.task.get()));
-        // TODO
-//        statusIcon.iconColorProperty().bind(new TaskStatusIconColorBinding(this.task.get()));
+        setTaskStateOnIcon(statusIcon);
+
+        this.getTask().stateProperty().addListener((value, oldState, newState) -> {
+            setTaskStateOnIcon(statusIcon);
+        });
+
         statusIcon.setIconSize(20d);
 
         return statusIcon;
@@ -160,6 +170,30 @@ public class Notification extends MenuItem {
         deleteButton.setOnAction(event -> Notification.this.getParentPopup().getItems().remove(Notification.this));
 
         return deleteButton;
+    }
+
+    private void setTaskStateOnIcon(final FontAwesome statusIcon) {
+        final boolean shouldFailedTaskStateBeActive = shouldFailedTaskStateBeActive();
+        statusIcon.pseudoClassStateChanged(FAILED_TASK_PSEUDO_STATE, shouldFailedTaskStateBeActive);
+        statusIcon.pseudoClassStateChanged(SUCCESSFUL_TASK_PSEUDO_STATE, !shouldFailedTaskStateBeActive);
+    }
+
+    private boolean shouldFailedTaskStateBeActive() {
+        boolean active;
+
+        switch (this.task.get().getState()) {
+            case SCHEDULED:
+            case READY:
+            case RUNNING:
+            case CANCELLED:
+            case FAILED:
+                active = true;
+                break;
+            default:
+                active = false;
+        }
+
+        return active;
     }
 
     /**

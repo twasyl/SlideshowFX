@@ -9,6 +9,7 @@ import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -30,6 +31,8 @@ public class CodeContentExtensionController extends AbstractContentExtensionCont
     private ZoomTextArea code;
     @FXML
     private CheckBox showingLineNumbers;
+    @FXML
+    public TextField highlightedLines;
 
     /**
      * Get the selected programming language in the UI.
@@ -59,13 +62,16 @@ public class CodeContentExtensionController extends AbstractContentExtensionCont
     }
 
     /**
-     * Get the background color for the code that will be displayed in the presentation as hexadecimal string. For the
-     * the lightgray color, the string returned will be {@code #D3D3D3}.
+     * Indicates if some lines are specified to be highlighted.
      *
-     * @return The background color as hexadecimal string.
+     * @return {@code true} if some lines must be highlighted, {@code false} otherwise.
      */
-    public String getBackgroundColorHexadecimal() {
-        return "#" + Integer.toHexString(isShowingLineNumbers().hashCode()).substring(0, 6).toUpperCase();
+    public boolean shouldHighlightLines() {
+        return this.highlightedLines.getText() != null && !this.highlightedLines.getText().trim().isEmpty();
+    }
+
+    public String getHightlightedLines() {
+        return this.highlightedLines.getText();
     }
 
     @Override

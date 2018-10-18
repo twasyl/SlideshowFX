@@ -28,7 +28,7 @@
 
     <top>
         <HBox spacing="5">
-            <FontAwesome icon="QUESTION" iconSize="25" iconColor="app-color-orange"/>
+            <FontAwesome id="quiz-content-extension-question-icon" icon="QUESTION" />
 
             <ZoomTextArea fx:id="question" promptText="Question ?" wrapText="true" prefColumnCount="25" prefRowCount="2">
                 <tooltip>

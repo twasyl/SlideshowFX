@@ -2,7 +2,6 @@ package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.concurrent.*;
-import com.twasyl.slideshowfx.controls.SlideMenuItem;
 import com.twasyl.slideshowfx.controls.Tour;
 import com.twasyl.slideshowfx.controls.notification.NotificationCenter;
 import com.twasyl.slideshowfx.controls.slideshow.Context;
@@ -14,7 +13,6 @@ import com.twasyl.slideshowfx.controls.stages.TemplateBuilderStage;
 import com.twasyl.slideshowfx.dao.TaskDAO;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.Presentations;
-import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
@@ -112,25 +110,6 @@ public class SlideshowFXController implements ThemeAwareController {
 
         if (userData instanceof SlideTemplate && view != null && presentation != null) {
             view.addSlide((SlideTemplate) userData);
-        }
-    };
-
-    /**
-     * TODO Move this in the PresentationViewController
-     */
-    private final EventHandler<ActionEvent> moveSlideActionEvent = event -> {
-        final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
-        final PresentationViewController view = SlideshowFXController.this.getCurrentPresentationView();
-
-        if (view != null && presentation != null) {
-            final SlideMenuItem menunItem = (SlideMenuItem) event.getSource();
-            final Slide slideToMove = presentation.getConfiguration().getSlideById(view.getCurrentSlideId());
-            final Slide beforeSlide = menunItem.getSlide();
-
-            presentation.moveSlide(slideToMove, beforeSlide);
-
-            final ReloadPresentationViewTask task = new ReloadPresentationViewTask(view);
-            TaskDAO.getInstance().startTask(task);
         }
     };
 

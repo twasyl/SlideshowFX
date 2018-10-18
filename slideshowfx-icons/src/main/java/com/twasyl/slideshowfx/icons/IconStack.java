@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
  */
 public class IconStack extends StackPane {
 
-    private static final String ICON_STYLE_CLASS = "default-icon-color-";
+    private static final String DEFAULT_ICON_COLOR_STYLE_CLASS = "default-icon-color-";
+    private static final String ICON_INDEX_STYLE_CLASS = "icon-index-";
 
     public IconStack() {
         getStyleClass().add("icon-stack");
@@ -58,12 +59,12 @@ public class IconStack extends StackPane {
 
     private void cleanAllIconStyleClassFromNode(final Node node) {
         final List<String> styleClasses = node.getStyleClass().stream()
-                .filter(styleClass -> styleClass.startsWith(ICON_STYLE_CLASS))
+                .filter(styleClass -> styleClass.startsWith(DEFAULT_ICON_COLOR_STYLE_CLASS) || styleClass.startsWith(ICON_INDEX_STYLE_CLASS))
                 .collect(Collectors.toList());
         node.getStyleClass().removeAll(styleClasses);
     }
 
     private void addIconStyleClassForNode(final Node node, final int index) {
-        node.getStyleClass().add(ICON_STYLE_CLASS + index);
+        node.getStyleClass().addAll(DEFAULT_ICON_COLOR_STYLE_CLASS + index, ICON_INDEX_STYLE_CLASS + index);
     }
 }

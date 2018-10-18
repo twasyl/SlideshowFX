@@ -38,15 +38,15 @@ public class PresentationVariablesPanel extends BorderPane {
     public PresentationVariablesPanel(final PresentationConfiguration configuration) {
         this.configuration = configuration;
 
+        this.getStyleClass().add("presentation-variables-panel");
+
         this.variablesScrollPane.setPrefSize(500, 500);
 
         final FontAwesome backgroundIcon = new FontAwesome(Icon.PLUS_SQUARE);
         backgroundIcon.setIconSize(20d);
-        backgroundIcon.setIconColor(Color.WHITE);
 
         final FontAwesome plusIcon = new FontAwesome(Icon.PLUS);
         plusIcon.setIconSize(15d);
-        plusIcon.setIconColor(Paint.valueOf("app-color-orange"));
 
         final IconStack stack = new IconStack();
         stack.getChildren().addAll(backgroundIcon, plusIcon);
@@ -99,8 +99,6 @@ public class PresentationVariablesPanel extends BorderPane {
         variableValue.setOnKeyPressed(addVariableByKeyboard);
 
         final FontAwesome icon = new FontAwesome(Icon.TIMES_CIRCLE);
-        icon.setIconSize(20d);
-        icon.setIconColor(Paint.valueOf("app-color-orange"));
 
         final Button delete = new Button();
         delete.setGraphic(icon);

@@ -221,4 +221,14 @@
     sfx-template-builder-delete-default-template-variable-button-icon-default-fill-color: #FF8000;
     sfx-template-builder-delete-slide-button-icon-default-fill-color: #FF8000;
     sfx-template-builder-delete-slide-element-button-icon-default-fill-color: #FF8000;
+
+    /* Colors for the collapsible tool pane */
+    sfx-collapsible-tool-pane-default-icon-color: #FF8000;
+
+    /* Colors for the quiz extension */
+    sfx-quiz-content-extension-question-icon-default-icon-color: #FF8000;
+
+    /* Colors for notifications */
+    sfx-notification-failed-task-state-default-icon-color: #FF8000;
+    sfx-notification-successful-task-state-default-icon-color: green;
 }

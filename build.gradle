@@ -111,7 +111,7 @@ ext.dependencies = [
         markdown    : [version: '0.13'],
         mockito     : [version: '2.22.0'],
         vertx       : [version: '3.5.3'],
-        wikitext    : [version: '3.0.26'],
+        wikitext    : [version: '3.0.27'],
         zxing       : [version: '3.3.3']
 ]
 

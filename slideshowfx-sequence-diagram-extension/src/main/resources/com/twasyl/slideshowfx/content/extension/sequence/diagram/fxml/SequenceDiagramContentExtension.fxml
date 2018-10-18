@@ -10,8 +10,8 @@
       spacing="5">
 
     <TextFlow styleClass="messages-box">
-        <Label style="-fx-text-fill: app-color-orange" text="The syntax is the one from " />
-        <Hyperlink style="-fx-text-fill: app-color-orange" fx:id="jumlyLink" text="JUMLY" />
+        <Label text="The syntax is the one from " />
+        <Hyperlink fx:id="jumlyLink" text="JUMLY" />
     </TextFlow>
 
     <Label text="Sequence diagram text:" />

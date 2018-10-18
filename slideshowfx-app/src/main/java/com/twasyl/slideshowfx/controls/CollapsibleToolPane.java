@@ -39,6 +39,7 @@ public class CollapsibleToolPane extends Region {
     private final ToggleGroup iconsGroup = new ToggleGroup();
 
     public CollapsibleToolPane() {
+        this.getStyleClass().add("collapsible-tool-pane");
         this.getStylesheets().add(CollapsibleToolPane.class.getResource("/com/twasyl/slideshowfx/css/collapsible-tool-pane.css").toExternalForm());
 
         ((SimpleDoubleProperty) this.toolbarWidth).bind(this.toolbar.widthProperty());

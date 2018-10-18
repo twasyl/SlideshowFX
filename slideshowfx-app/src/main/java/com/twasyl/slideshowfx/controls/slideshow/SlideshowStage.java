@@ -2,7 +2,9 @@ package com.twasyl.slideshowfx.controls.slideshow;
 
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.events.SlideChangedEvent;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.server.bus.Actor;
+import com.twasyl.slideshowfx.theme.Themes;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -55,7 +57,8 @@ public class SlideshowStage implements Actor {
      * on it.
      */
     private final void initializeSlideshowStage() {
-        this.slideshowPane = new SlideshowPane(this.context);
+        this.slideshowPane = new SlideshowPane();
+        Themes.applyTheme(this.slideshowPane, GlobalConfiguration.getThemeName());
 
         final Scene scene = new Scene(this.slideshowPane);
 

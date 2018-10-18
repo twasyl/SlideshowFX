@@ -14,6 +14,8 @@ Changes to the SlideshowFX software are listed by version within this document.
 * Upgrade Dropbox hosting connector internal library
 * Upgrade Google Drive hosting connector internal library
 * Introducing a presentation outline
+* New theme functionality
+* Uses ACE 1.4.1 in the slide content editor
 
 #### Bug fixes
 

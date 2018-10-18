@@ -22,7 +22,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
 
 import java.util.Base64;
 import java.util.Optional;
@@ -45,7 +44,6 @@ public class SlideshowPane extends StackPane implements Actor {
     private static final Logger LOGGER = Logger.getLogger(SlideshowPane.class.getName());
 
     private final ObjectProperty<PresentationBrowser> browser = new SimpleObjectProperty<>();
-    private final ObjectProperty<Circle> pointer = new SimpleObjectProperty<>();
 
     private final ChatPanel chatPanel = new ChatPanel();
     private final QuizPanel quizPanel = new QuizPanel();
@@ -55,20 +53,20 @@ public class SlideshowPane extends StackPane implements Actor {
      * Creates a SlideshowPane object for the given {@code context}. The slideshow will be started at the
      * given {@link Context#getStartAtSlideId()}.
      *
-     * @param context The context to create the {@link SlideshowPane}.
      * @see Context
      */
-    public SlideshowPane(Context context) {
+    public SlideshowPane() {
         super();
 
-        EventBus.getInstance().subscribe(SERVICE_QUIZ_ON_RESULT, this)
-                .subscribe(SERVICE_CHAT_PRESENTER_ON_MESSAGE, this);
+        EventBus.getInstance()
+            .subscribe(SERVICE_QUIZ_ON_RESULT, this)
+            .subscribe(SERVICE_CHAT_PRESENTER_ON_MESSAGE, this);
 
+        this.getStyleClass().add("slideshow-pane");
         this.setAlignment(Pos.TOP_LEFT);
-        this.getStylesheets().add(SlideshowPane.class.getResource("/com/twasyl/slideshowfx/css/Default.css").toExternalForm());
 
-        this.initializeBrowser()
-        ;
+        this.initializeBrowser();
+
         if (SlideshowFXServer.getSingleton() != null) {
             this.initializeChatPanel();
             this.initializeCollapsibleToolPane();
@@ -114,16 +112,8 @@ public class SlideshowPane extends StackPane implements Actor {
      */
     private final void initializeCollapsibleToolPane() {
         final FontAwesome qrCodeIcon = new FontAwesome(Icon.QRCODE);
-        qrCodeIcon.setIconSize(32d);
-        qrCodeIcon.setIconColor(Paint.valueOf("app-color-orange"));
-
         final FontAwesome chatIcon = new FontAwesome(Icon.COMMENTS_O);
-        chatIcon.setIconSize(32d);
-        chatIcon.setIconColor(Paint.valueOf("app-color-orange"));
-
         final FontAwesome quizIcon = new FontAwesome(Icon.QUESTION);
-        quizIcon.setIconSize(32d);
-        quizIcon.setIconColor(Paint.valueOf("app-color-orange"));
 
         this.collapsibleToolPane.setPosition(RIGHT);
 

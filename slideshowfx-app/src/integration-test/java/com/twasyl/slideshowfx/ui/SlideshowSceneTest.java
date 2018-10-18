@@ -23,7 +23,7 @@ public class SlideshowSceneTest extends Application {
         context.setPresentation(presentationEngine);
         context.setStartAtSlideId("slide-1427809422878");
 
-        final SlideshowPane root = new SlideshowPane(context);
+        final SlideshowPane root = new SlideshowPane();
         final Scene scene = new Scene(root);
 
         primaryStage.setScene(scene);

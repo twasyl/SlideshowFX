@@ -1,6 +1,9 @@
 package com.twasyl.slideshowfx.icons;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.testfx.framework.junit5.ApplicationExtension;
+import org.testfx.framework.junit5.Start;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -10,13 +13,21 @@ import static com.twasyl.slideshowfx.icons.FontType.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import javafx.stage.Stage;
+
 /**
  * Test of class {@link FontAwesome}.
  *
  * @author Thierry Wasylczenko
  * @since SlideshowFX 2.0
  */
+@ExtendWith(ApplicationExtension.class)
 public class FontAwesomeTest {
+
+    @Start
+    void onStart(final Stage stage) {
+        stage.show();
+    }
 
     protected void assertFontAwesomeUrl(final URL url) throws URISyntaxException {
         assertNotNull(url);

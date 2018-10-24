@@ -16,6 +16,9 @@ image: Visual Studio 2017
 
 clone_depth: 5
 
+environment:
+  - _JAVA_OPTIONS: "-Djava.awt.headless=true -Dtestfx.robot=glass -Dtestfx.headless=true -Dprism.order=sw -Dprism.text=t2k"
+
 platform:
   - x86
   - x64

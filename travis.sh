@@ -1,16 +1,19 @@
-echo "Setup JDK 1.8.0_181"
-jdkVersion=1.8.0_181
+echo "Setup JDK 1.8.0_191"
+jdkVersion=1.8.0_191
 jdkInstallationFolder=jdk$jdkVersion
-jdkArchive=jdk-8u181-linux-x64.tar.gz
+jdkArchive=jdk-8u191-linux-x64.tar.gz
 
 mkdir -p ~/jvm
 pushd ~/jvm > /dev/null
 
 if [ ! -d "$jdkInstallationFolder" ]; then
+    echo "Cleaning existing JDK installations"
+    rm -rf *
 	echo "Downloading JDK $jdkVersion"
-	wget --quiet --continue --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u181-b13/96a7b8442fe848ef90c96a2fad6ed6d1/$jdkArchive
+	wget --quiet --continue --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u191-b12/2787e4a523244c269598db4e85c51e0c/$jdkArchive
 	tar xzf $jdkArchive
 	rm $jdkArchive
+    ln -s $jdkInstallationFolder current
 	pushd $jdkInstallationFolder > /dev/null
 	rm -f src.zip
 	rm -f javafx-src.zip

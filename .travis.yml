@@ -4,9 +4,9 @@ git:
   depth: 5
 
 branches:
- only:
-  - master
-  - development
+  only:
+    - master
+    - development
 
 sudo: true
 
@@ -18,18 +18,28 @@ matrix:
         apt:
           packages:
             - fakeroot
+      env:
+        - _JAVA_OPTIONS="-Djava.awt.headless=true -Dtestfx.robot=glass -Dtestfx.headless=true -Dprism.order=sw"
     - os: osx
-      osx_image: xcode9.2
-
+      osx_image: xcode9.3
+      env:
+        - _JAVA_OPTIONS="-Djava.awt.headless=true -Dtestfx.robot=glass -Dtestfx.headless=true -Dprism.order=sw -Dprism.verbose=true"
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export JAVA_HOME=$(/usr/libexec/java_home); else chmod +x travis.sh; ./travis.sh; export JAVA_HOME=~/jvm/jdk1.8.0_181; fi;
+  - if [[ "$TRAVIS_OS_NAME" == linux ]]; then export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export JAVA_HOME=$(/usr/libexec/java_home); else chmod +x travis.sh; ./travis.sh; export JAVA_HOME=~/jvm/current; fi;
   - chmod +x gradlew
 
 install: true
 
 script:
-  - if [[ "$TRAVIS_TAG" == "" ]]; then ./gradlew clean build -x :slideshowfx-icons:test; else ./gradlew clean build bintrayUpload -x :slideshowfx-icons:test; fi
+  - if [[ "$TRAVIS_TAG" == "" ]]; then ./gradlew clean build; else ./gradlew clean build bintrayUpload; fi
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -f  $HOME/.gradle/caches/*/fileHashes/fileHashes.bin
+  - rm -f  $HOME/.gradle/caches/*/fileHashes/fileHashes.lock
 
 cache:
   directories:

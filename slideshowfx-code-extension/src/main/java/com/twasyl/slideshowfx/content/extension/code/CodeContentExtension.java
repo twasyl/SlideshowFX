@@ -70,7 +70,7 @@ public class CodeContentExtension extends AbstractContentExtension {
 
         if (markup == null || "HTML".equals(markup.getCode())) {
             builder.append(this.buildDefaultContentString());
-        } else if ("TEXTILE".equals(markup.getCode())) {
+        } else if ("TEXTILE".equals(markup.getCode()) && !this.controller.shouldHighlightLines()) {
             builder.append(this.buildTextileContentString());
         } else if ("MARKDOWN".equals(markup.getCode()) && !this.controller.isShowingLineNumbers() && !this.controller.shouldHighlightLines()) {
             builder.append(this.buildMarkdownContentString());

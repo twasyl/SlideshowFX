@@ -18,11 +18,16 @@ public abstract class BaseCodeContentExtensionTest {
     protected static CodeContentExtension extension;
     protected static IMarkup markup;
 
-    protected CodeContentExtensionController mockController(final String code, final boolean showLineNumbers, final SupportedLanguage language) {
+    protected CodeContentExtensionController mockController(final String code, final boolean showLineNumbers, final SupportedLanguage language, String highlightedLines) {
         final CodeContentExtensionController controller = mock(CodeContentExtensionController.class);
         when(controller.getCode()).thenReturn(code);
         when(controller.isShowingLineNumbers()).thenReturn(showLineNumbers);
         when(controller.getLanguage()).thenReturn(language);
+
+        if (highlightedLines != null) {
+            when(controller.shouldHighlightLines()).thenReturn(true);
+            when(controller.getHightlightedLines()).thenReturn(highlightedLines);
+        }
 
         return controller;
     }

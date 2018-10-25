@@ -28,7 +28,7 @@ public class TextileCodeContentExtensionTest extends BaseCodeContentExtensionTes
 
     @Test
     public void showLines() {
-        extension.controller = mockController("private String s;", true, JAVA);
+        extension.controller = mockController("private String s;", true, JAVA, null);
         final String content = extension.buildContentString(markup);
 
         final Pattern pattern = Pattern.compile("line\\-numbers");
@@ -39,7 +39,7 @@ public class TextileCodeContentExtensionTest extends BaseCodeContentExtensionTes
 
     @Test
     public void dontShowLines() {
-        extension.controller = mockController("private String s;", false, JAVA);
+        extension.controller = mockController("private String s;", false, JAVA, null);
         final String content = extension.buildContentString(markup);
 
         final Pattern pattern = Pattern.compile("line\\-numbers");
@@ -50,7 +50,7 @@ public class TextileCodeContentExtensionTest extends BaseCodeContentExtensionTes
 
     @Test
     public void javaLanguage() {
-        extension.controller = mockController("private String s;", true, JAVA);
+        extension.controller = mockController("private String s;", true, JAVA, null);
         final String content = extension.buildContentString(markup);
 
         final Pattern pattern = Pattern.compile(JAVA.getCssClass());
@@ -61,7 +61,7 @@ public class TextileCodeContentExtensionTest extends BaseCodeContentExtensionTes
 
     @Test
     public void lineSpecifierCodeMultiLineWithoutEmptyLines() {
-        extension.controller = mockController("private String s;\nprivate boolean b;", false, JAVA);
+        extension.controller = mockController("private String s;\nprivate boolean b;", false, JAVA, null);
         final String content = extension.buildContentString(markup);
 
         assertTrue(content.startsWith("bc(" + JAVA.getCssClass() + "). "));
@@ -69,7 +69,7 @@ public class TextileCodeContentExtensionTest extends BaseCodeContentExtensionTes
 
     @Test
     public void lineSpecifierCodeMultiLineWithEmptyLines() {
-        extension.controller = mockController("private String s;\n\nprivate boolean b;", false, JAVA);
+        extension.controller = mockController("private String s;\n\nprivate boolean b;", false, JAVA, null);
         final String content = extension.buildContentString(markup);
 
         assertTrue(content.startsWith("bc(" + JAVA.getCssClass() + ").. "));
@@ -77,7 +77,7 @@ public class TextileCodeContentExtensionTest extends BaseCodeContentExtensionTes
 
     @Test
     public void lineSpecifierCodeMultiLineWithLinesContainingOnlySpaces() {
-        extension.controller = mockController("private String s;\n  \nprivate boolean b;", false, JAVA);
+        extension.controller = mockController("private String s;\n  \nprivate boolean b;", false, JAVA, null);
         final String content = extension.buildContentString(markup);
 
         assertTrue(content.startsWith("bc(" + JAVA.getCssClass() + ").. "));
@@ -85,7 +85,7 @@ public class TextileCodeContentExtensionTest extends BaseCodeContentExtensionTes
 
     @Test
     public void lineSpecifierCodeSingleLineWithoutEmptyLines() {
-        extension.controller = mockController("private String s;", false, JAVA);
+        extension.controller = mockController("private String s;", false, JAVA, null);
         final String content = extension.buildContentString(markup);
 
         assertTrue(content.startsWith("bc(" + JAVA.getCssClass() + "). "));
@@ -93,9 +93,45 @@ public class TextileCodeContentExtensionTest extends BaseCodeContentExtensionTes
 
     @Test
     public void withoutLanguageAndDontShowLines() {
-        extension.controller = mockController("private String s;", false, null);
+        extension.controller = mockController("private String s;", false, null, null);
         final String content = extension.buildContentString(markup);
 
         assertTrue(content.startsWith("bc. "));
+    }
+
+    @Test
+    public void withoutLanguageAndHighlightedLine() {
+        extension.controller = mockController("private String s;", false, null, "1");
+        final String content = extension.buildContentString(markup);
+
+        assertTrue(content.startsWith("<pre data-line=\"1\"><code>"));
+        assertTrue(content.endsWith("</code></pre>"));
+    }
+
+    @Test
+    public void withOneHighlightedLine() {
+        extension.controller = mockController("private String s;\n\nprivate boolean b;", false, JAVA, "2");
+        final String content = extension.buildContentString(markup);
+
+        assertTrue(content.startsWith("<pre class=\"" + JAVA.getCssClass() + "\" data-line=\"2\"><code class=\"" + JAVA.getCssClass() + "\">"));
+        assertTrue(content.endsWith("</code></pre>"));
+    }
+
+    @Test
+    public void withMultipleHighlightedLines() {
+        extension.controller = mockController("private String s;\n\nprivate boolean b;", false, JAVA, "1,2");
+        final String content = extension.buildContentString(markup);
+
+        assertTrue(content.startsWith("<pre class=\"" + JAVA.getCssClass() + "\" data-line=\"1,2\"><code class=\"" + JAVA.getCssClass() + "\">"));
+        assertTrue(content.endsWith("</code></pre>"));
+    }
+
+    @Test
+    public void withHighlightedLinesRange() {
+        extension.controller = mockController("private String s;\n\nprivate boolean b;", false, JAVA, "1-2");
+        final String content = extension.buildContentString(markup);
+
+        assertTrue(content.startsWith("<pre class=\"" + JAVA.getCssClass() + "\" data-line=\"1-2\"><code class=\"" + JAVA.getCssClass() + "\">"));
+        assertTrue(content.endsWith("</code></pre>"));
     }
 }

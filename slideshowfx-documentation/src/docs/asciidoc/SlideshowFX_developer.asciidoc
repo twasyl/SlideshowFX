@@ -105,7 +105,10 @@ Some gradle tasks are provided to help the developer :
 
 - *installPlugin* provided for all plugins and allowing to deploy the plugin directly to the folder : `~/.SlideshowFX/plugins` ;
 - *listSnapshotProjects* allowing to list projects having a `SNAPSHOT` version. This is particularly useful for knowing which project should update it's version before publishing ;
-- *saveProjectsToBePublished* allowing to save within the `gradle.properties` file the projects having a `SNAPSHOT` version and that should be published on bintray.
+- *saveProjectsToBePublished* allowing to save within the `gradle.properties` file the projects having a `SNAPSHOT` version and that should be published on bintray ;
+- *:slideshowfx-app:createSlideContentEditor* allows to build the `sfx-slide-content-editor.zip` archive when passing the `-PaceVersion=xxx` property on the command line ;
+- *:slideshowfx-alert-extension:createSweetAlertPackage* allows to build the `sweetalert.zip` archive when passing the `-PsweetAlertVersion=xxx` property on the command line ;
+- *:slideshowfx-shape-extension:createSnapSVGPackage* allows to build the `snapsvg.zip` archive when passing the `-PsnapSvgVersion=xxx` property on the command line.
 
 === Set up your environment
 

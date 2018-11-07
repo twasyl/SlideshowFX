@@ -24,7 +24,7 @@ import static com.twasyl.slideshowfx.icons.Icon.TERMINAL;
  * {@link #buildDefaultContentString()} and {@link #buildContentString(IMarkup)}.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class SnippetContentExtension extends AbstractContentExtension {
@@ -43,9 +43,9 @@ public class SnippetContentExtension extends AbstractContentExtension {
 
         // Add URL
         this.putResource(CSS_FILE, String.format("%sfont-awesome/%s/css/%s", baseURL, getFontAwesomeVersion(), getFontAwesomeCSSFilename()), getFontAwesomeCSSFile());
-        this.putResource(CSS_FILE, baseURL.concat("prism/1.11.0/prism.css"));
+        this.putResource(CSS_FILE, baseURL.concat("prism/1.15.0/prism.css"));
         this.putResource(JAVASCRIPT_FILE, String.format("%sfont-awesome/%s/js/%s", baseURL, getFontAwesomeVersion(), getFontAwesomeJSFilename()), getFontAwesomeJSFile());
-        this.putResource(JAVASCRIPT_FILE, baseURL.concat("prism/1.11.0/prism.js"));
+        this.putResource(JAVASCRIPT_FILE, baseURL.concat("prism/1.15.0/prism.js"));
     }
 
     @Override

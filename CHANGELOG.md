@@ -9,10 +9,14 @@ Changes to the SlideshowFX software are listed by version within this document.
 #### New and noteworthy
 
 * Upgrade FontAwesome to version 5.0.13
-* Upgrade vert.x to version 3.5.2
+* Upgrade vert.x to version 3.5.4
 * Upgrade Box hosting connector internal library
 * Upgrade Dropbox hosting connector internal library
 * Upgrade Google Drive hosting connector internal library
+* Upgrade the alert extension internal library
+* Upgrade the code extension internal library
+* Upgrade the snippet extension internal library
+* Upgrade the asciidoctor markup extension internal libray
 * Introducing a presentation outline
 * New theme functionality
 * Uses ACE 1.4.1 in the slide content editor

@@ -36,7 +36,7 @@ public class AlertContentExtension extends AbstractContentExtension {
                 "Insert an alert",
                 "Insert an alert");
 
-        final String baseURL = "sweetalert/2.1.0/";
+        final String baseURL = "sweetalert/2.1.2/";
 
         // Add URL
         this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("sweetalert.min.js"));

@@ -25,3 +25,52 @@ ext.bundle = [
         setupWizardLabel   : 'Shape',
         setupWizardIconName: 'STAR'
 ]
+
+task createSnapSVGPackage() {
+    doLast {
+        def snapSvgVersion = project.findProperty('snapSvgVersion') ?: ''
+        def binaryDir = new File("${buildDir}/tmp/snapsvg-update")
+        def newPackageDir = new File("${binaryDir}/snapsvg", snapSvgVersion)
+        def binary = new File("${binaryDir}/Snap.svg-${snapSvgVersion}.zip")
+        def unpackedBinary = new File(binaryDir, "Snap.svg-${snapSvgVersion}")
+        
+        if (!binaryDir.exists()) {
+            binaryDir.mkdirs()
+        }
+
+        if (!newPackageDir.exists()) {
+            newPackageDir.mkdirs()
+        }
+        
+        new URL("https://github.com/adobe-webplatform/Snap.svg/archive/v${snapSvgVersion}.zip").withInputStream { i ->
+            binary.withOutputStream {
+                it << i
+            }
+        }
+
+        copy {
+            from zipTree(binary)
+            into binaryDir
+        }
+        
+        binary.delete()
+
+        copy {
+            from fileTree("${unpackedBinary}/dist")
+            include "snap.svg-min.js"
+            into newPackageDir
+        }
+        
+        unpackedBinary.deleteDir()
+    }
+}
+
+task zipSnapSVGPackage(type: Zip) {
+    archiveName = "snapsvg.zip"
+    destinationDir = file("${buildDir}/tmp")
+    from("${buildDir}/tmp/snapsvg-update/snapsvg") {
+        into "snapsvg"
+    }
+}
+
+createSnapSVGPackage.finalizedBy zipSnapSVGPackage

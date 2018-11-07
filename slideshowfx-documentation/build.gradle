@@ -1,19 +1,19 @@
 buildscript {
     dependencies {
-        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.15'
+        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.16'
     }
 }
 
 plugins {
     id 'distribution'
-    id 'org.asciidoctor.convert' version '1.5.6'
+    id 'org.asciidoctor.convert' version '1.5.9.2'
 }
 
 description = 'SlideshowFX documentation to be included within the application and the setup package'
 version = '1.0'
 
 asciidoctorj {
-    version = '1.5.6'
+    version = '1.5.8.1'
 }
 asciidoctor {
     backends = ['html5', 'pdf']
@@ -26,8 +26,8 @@ asciidoctor {
             'linkcss'                      : 'false',
             'slideshowfx_version'          : "${rootProject.version}",
             'asciidoctor-source'           : "${project.projectDir}/src/asciidoc",
-            'javafx-version'               : '8 update 181',
-            'jdk-version'                  : '8 update 181',
+            'javafx-version'               : '8 update 191',
+            'jdk-version'                  : '8 update 191',
             'gradle-version'               : '4.10.2',
             'asciidoctorj-version'         : "${rootProject.ext.dependencies.asciidoctorj.version}",
             'apache-felix-version'         : "${rootProject.ext.dependencies.felix.version}",

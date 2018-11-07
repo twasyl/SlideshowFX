@@ -4,7 +4,6 @@ import com.twasyl.slideshowfx.markup.AbstractMarkup;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.AttributesBuilder;
 import org.asciidoctor.OptionsBuilder;
-import org.jruby.RubyInstanceConfig;
 import org.jruby.javasupport.JavaEmbedUtils;
 
 import java.util.Arrays;
@@ -16,7 +15,7 @@ import java.util.logging.Logger;
  *
  * @author Thierry Wasylczenko
  * @since SlideshowFX 1.0
- * @version 1.1
+ * @version 1.2
  */
 public class AsciidoctorMarkup extends AbstractMarkup {
 
@@ -26,15 +25,7 @@ public class AsciidoctorMarkup extends AbstractMarkup {
     public AsciidoctorMarkup() {
         super("ASCIIDOCTOR", "asciidoctor", "ace/mode/asciidoc");
 
-        /*
-         This part is absolutely mandatory in order to be able to instantiate asciidoctor in an
-         OSGi context. In someways it initialize Ruby for Java by getting/discovering the classpath.
-         Without it, in the OSGi context it will be impossible to find JRuby and asciidoctor gems.
-         */
-        RubyInstanceConfig config = new RubyInstanceConfig();
-        config.setLoader(AsciidoctorMarkup.class.getClassLoader());
-
-        JavaEmbedUtils.initialize(Arrays.asList("gems/asciidoctor-1.5.6.1/lib"), config);
+        JavaEmbedUtils.initialize(Arrays.asList("uri:classloader:/gems/asciidoctor-1.5.8/lib"));
 
         this.asciidoctor = Asciidoctor.Factory.create(AsciidoctorMarkup.class.getClassLoader());
     }

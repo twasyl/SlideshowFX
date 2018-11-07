@@ -2,6 +2,7 @@ package com.twasyl.slideshowfx.content.extension.image.controllers;
 
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtensionController;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.utils.DialogHelper;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.event.ActionEvent;
@@ -27,7 +28,7 @@ import java.util.logging.Logger;
  * This class is the controller for the {@code com.twasyl.slideshowfx.content.extension.images.fxmlImageContentExtension.fxml}.
  *
  * @author Thierry Wasylczenko
- * @version 1.2
+ * @version 1.3
  * @since SlideshowFX 1.0
  */
 public class ImageContentExtensionController extends AbstractContentExtensionController {
@@ -173,9 +174,8 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
             final File image = (File) button.getUserData();
 
             if (image != null && image.exists()) {
-                final Alert confirmation = getAlert(Alert.AlertType.CONFIRMATION, "Delete image",
-                        String.format("Are you sure you want to delete the image %1$s?", image.getName()), ButtonType.NO, ButtonType.YES);
-                final ButtonType answer = confirmation.showAndWait().orElse(ButtonType.NO);
+                final ButtonType answer = DialogHelper.showConfirmationAlert("Delete image",
+                        String.format("Are you sure you want to delete the image %1$s?", image.getName()));
 
                 if (answer == ButtonType.YES) {
 
@@ -183,9 +183,8 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
                         if (image.delete()) {
                             this.imagesPane.getChildren().remove(button);
                         } else {
-                            final Alert error = getAlert(Alert.AlertType.ERROR, "Delete image",
-                                    String.format("The image %1$s can not be deleted", image.getName()), ButtonType.OK);
-                            error.showAndWait();
+                            DialogHelper.showError("Delete image",
+                                    String.format("The image %1$s can not be deleted", image.getName()));
                         }
                     }
                 }
@@ -196,24 +195,6 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
 
         final ContextMenu menu = new ContextMenu(delete);
         button.setContextMenu(menu);
-    }
-
-    /**
-     * Builds an {@link Alert} to be used in order to display information.
-     *
-     * @param type    The type of the alert to build.
-     * @param title   The title of the alert.
-     * @param text    The text of the alert.
-     * @param buttons The buttons to include in the alert.
-     * @return An alert that can be shown in the UI.
-     */
-    private Alert getAlert(final Alert.AlertType type, final String title, final String text, final ButtonType... buttons) {
-        final Alert alert = new Alert(type, text, buttons);
-        alert.setGraphic(null);
-        alert.setHeaderText(null);
-        alert.setTitle(title);
-        alert.getDialogPane().getStylesheets().add("/com/twasyl/slideshowfx/css/Default.css");
-        return alert;
     }
 
     /**

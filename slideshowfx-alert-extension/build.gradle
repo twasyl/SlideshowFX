@@ -1,5 +1,5 @@
 description = 'Extension allowing to insert alerts inside a SlideshowFX presentation'
-version = '1.2'
+version = '1.3-SNAPSHOT'
 
 apply plugin: 'java-library'
 
@@ -24,3 +24,36 @@ ext.bundle = [
         setupWizardLabel   : 'Alert',
         setupWizardIconName: 'EXCLAMATION_TRIANGLE'
 ]
+
+task createSweetAlertPackage() {
+    doLast {
+        def sweetAlertVersion = project.findProperty('sweetAlertVersion') ?: ''
+        def binaryDir = new File("${buildDir}/tmp/sweetalert-update")
+        def newPackageDir = new File("${binaryDir}/sweetalert", sweetAlertVersion)
+        def binary = new File(newPackageDir, "sweetalert.min.js")
+
+        if (!binaryDir.exists()) {
+            binaryDir.mkdirs()
+        }
+
+        if (!newPackageDir.exists()) {
+            newPackageDir.mkdirs()
+        }
+
+        new URL("https://unpkg.com/sweetalert@${sweetAlertVersion}/dist/sweetalert.min.js").withInputStream { i ->
+            binary.withOutputStream {
+                it << i
+            }
+        }
+    }
+}
+
+task zipSweetAlertPackage(type: Zip) {
+    archiveName = "sweetalert.zip"
+    destinationDir = file("${buildDir}/tmp")
+    from("${buildDir}/tmp/sweetalert-update/sweetalert") {
+        into "sweetalert"
+    }
+}
+
+createSweetAlertPackage.finalizedBy zipSweetAlertPackage

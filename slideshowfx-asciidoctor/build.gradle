@@ -1,5 +1,5 @@
 description = 'Extension allowing to define slide\'s content using the markdown syntax'
-version = '1.1'
+version = '1.2-SNAPSHOT'
 
 apply plugin: 'java-library'
 
@@ -7,7 +7,6 @@ dependencies {
     implementation project(':slideshowfx-markup')
 
     compile "org.asciidoctor:asciidoctorj:${rootProject.ext.dependencies.asciidoctorj.version}"
-    compile 'org.jruby:jruby-complete:1.7.26'
 }
 
 ext.isPlugin = true

@@ -29,7 +29,7 @@ And developers aren't forgotten in SlideshowFX! Sometimes you display code snipp
 results right? In SlideshowFX, insert executable code snippets and see the console's output directly in your 
 presentation! Currently you can create [Go](https://golang.org/), [golo](http://golo-lang.org/), 
 [groovy](http://www.groovy-lang.org/), [Java](https://www.oracle.com/java/index.html), JavaScript, 
-[kotlin](https://kotlinlang.org/) and [scala](http://www.scala-lang.org/).
+[kotlin](https://kotlinlang.org/), [Ruby](https://www.ruby-lang.org) and [scala](http://www.scala-lang.org/).
 
 With SlideshowFX, bring your presentation to the next level of interactivity.
 
@@ -37,7 +37,7 @@ With SlideshowFX, bring your presentation to the next level of interactivity.
 
 As SlideshowFX is a still young project, you will need to build it manually in order to test it. In order to do so, you will need:
 
-* A JDK 8 update 181 ;
+* A JDK 8 update 191 ;
 * The `JAVA_HOME` system variable set to point to your JDK installation.
 
 Then in order to build the application:

@@ -1,0 +1,22 @@
+description = 'Snippet executor allowing to execute some Ruby inside a SlideshowFX presentation'
+version = '1.0-SNAPSHOT'
+
+apply plugin: 'java-library'
+
+dependencies {
+    implementation project(':slideshowfx-global-configuration')
+    implementation project(':slideshowfx-snippet-executor')
+    implementation project(':slideshowfx-plugin')
+    implementation project(':slideshowfx-utils')
+}
+
+ext.isPlugin = true
+ext.isSnippetExecutor = true
+ext.bundle = [
+        name            : 'SlideshowFX Ruby executor',
+        symbolicName    : 'com.twasyl.slideshowfx.snippet.executor.ruby',
+        description     : 'Allow to execute Ruby code inside a presentation',
+        activator       : 'com.twasyl.slideshowfx.snippet.executor.ruby.activator.RubySnippetExecutorActivator',
+        exportPackage   : 'com.twasyl.slideshowfx.snippet.executor.ruby,com.twasyl.slideshowfx.snippet.executor.ruby.activator',
+        setupWizardLabel: 'Ruby'
+]

@@ -1,20 +1,15 @@
-.root {
-    -fx-background-color: sfx-application-default-background-color;
-    -fx-text-fill: sfx-application-default-text-color;
-}
-
 .text-area, .text-area .content {
     -fx-background-color: sfx-text-area-default-background-color;
     -fx-text-fill: sfx-text-area-default-text-color;
     -fx-prompt-text-fill: sfx-text-area-default-prompt-text-color;
-    -fx-border-radius: 2 2 2 2
+    -fx-border-radius: 2 2 2 2;
 }
 
 .text-field {
     -fx-background-color: sfx-text-field-default-background-color;
     -fx-text-fill: sfx-text-field-default-text-color;
     -fx-prompt-text-fill: sfx-text-field-default-prompt-text-color;
-    -fx-border-radius: 2 2 2 2
+    -fx-border-radius: 2 2 2 2;
 }
 
 .menu-bar {
@@ -535,6 +530,11 @@
     -fx-fill: sfx-messages-box-default-text-color;
     -fx-color: -fx-fill;
     -fx-text-fill: -fx-fill;
+}
+
+.plugin-file-button .icon.font-awesome {
+    -fx-icon-size: 50px;
+    -fx-icon-color: sfx-plugin-file-button-default-icon-color;
 }
 
 .plugin-file-button .tooltip {

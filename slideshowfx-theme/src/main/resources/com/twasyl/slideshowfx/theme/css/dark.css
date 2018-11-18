@@ -1,4 +1,7 @@
 .root {
+    -fx-background-color: sfx-application-default-background-color;
+    -fx-text-fill: sfx-application-default-text-color;
+
     sfx-default-text-fill: #A9B7C6;
 
     /* Colors for the application */
@@ -174,6 +177,7 @@
     sfx-plugin-file-button-default-text-color: sfx-default-text-fill;
     sfx-plugin-file-button-selected-default-text-color: black;
     sfx-plugin-file-button-tooltip-default-text-color: sfx-default-text-fill;
+    sfx-plugin-file-button-default-icon-color: black;
 
     /* Colors for separators */
     sfx-separator-horizontal-default-border-color: RGB(95, 95, 95) transparent;

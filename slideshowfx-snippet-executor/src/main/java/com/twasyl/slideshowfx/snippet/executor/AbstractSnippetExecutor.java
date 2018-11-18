@@ -37,21 +37,44 @@ public abstract class AbstractSnippetExecutor<T extends ISnippetExecutorOptions>
     }
 
     @Override
-    public String getConfigurationBaseName() { return this.configurationBaseName; }
+    public String getConfigurationBaseName() {
+        return this.configurationBaseName;
+    }
 
     @Override
-    public T getNewOptions() { return this.newOptions; }
+    public T getNewOptions() {
+        return this.newOptions;
+    }
 
     protected File getTemporaryDirectory() {
         return new File(System.getProperty("java.io.tmpdir"));
     }
 
     @Override
-    public String getCode() { return this.code; }
+    public String getCode() {
+        return this.code;
+    }
 
     @Override
-    public String getLanguage() { return this.language; }
+    public String getLanguage() {
+        return this.language;
+    }
 
     @Override
-    public String getCssClass() { return this.cssClass; }
+    public String getCssClass() {
+        return this.cssClass;
+    }
+
+    /**
+     * Sanitize the {@link File#getAbsolutePath() absolute path} of the given file by replacing all {@code \} by {@code /}.
+     *
+     * @param file The file to sanitize the path.
+     * @return The sanitized path of the file.
+     */
+    protected String sanitizePath(final File file) {
+        if (file != null) {
+            return file.getAbsolutePath().replaceAll("\\\\", "/");
+        }
+        return null;
+    }
 }

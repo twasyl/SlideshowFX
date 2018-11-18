@@ -20,6 +20,7 @@ Changes to the SlideshowFX software are listed by version within this document.
 * Introducing a presentation outline
 * New theme functionality
 * Uses ACE 1.4.1 in the slide content editor
+* Support Ruby executable snippets
 
 #### Bug fixes
 
@@ -51,6 +52,7 @@ Changes to the SlideshowFX software are listed by version within this document.
 | SlideshowFX-markdown | 1.0 |
 | SlideshowFX-quiz-extension | 1.1 |
 | SlideshowFX-quote-extension | 1.1 |
+| SlideshowFX-ruby-executor | 1.0 |
 | SlideshowFX-scala-executor | 1.0 |
 | SlideshowFX-sequence-diagram-extension | 1.1 |
 | SlideshowFX-shape-extension | 1.0 |

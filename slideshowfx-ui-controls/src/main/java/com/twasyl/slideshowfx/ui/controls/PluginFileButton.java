@@ -182,8 +182,7 @@ public class PluginFileButton extends ToggleButton {
             final String fontIconName = this.pluginFile.getManifestAttributeValue("Setup-Wizard-Icon-Name", "");
 
             if (!fontIconName.isEmpty()) {
-                icon = new FontAwesome(Icon.valueOf(fontIconName), 50d);
-                ((FontAwesome) icon).setIconColor(Color.BLACK);
+                icon = new FontAwesome(Icon.valueOf(fontIconName));
             }
         }
 

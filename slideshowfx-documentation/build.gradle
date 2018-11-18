@@ -21,6 +21,8 @@ asciidoctor {
             'source-highlighter'           : 'coderay',
             'toc'                          : 'left',
             'icons'                        : 'font',
+            'iconfont-remote!'             : '',
+            'webfonts!'                    : '',
             'setanchors'                   : '',
             'sectlinks'                    : '',
             'linkcss'                      : 'false',

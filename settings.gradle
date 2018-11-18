@@ -47,5 +47,6 @@ include 'slideshowfx-app',
         'slideshowfx-java-executor',
         'slideshowfx-javascript-executor',
         'slideshowfx-kotlin-executor',
-        'slideshowfx-scala-executor'
+        'slideshowfx-scala-executor', 
+        'slideshowfx-ruby-executor'
 

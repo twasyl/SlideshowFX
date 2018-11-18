@@ -178,7 +178,12 @@ public class OptionsViewController implements Initializable {
                 .forEach(snippet -> {
                     final Node configurationUI = snippet.getConfigurationUI();
 
-                    if (configurationUI != null) this.snippetExecutorContainer.getChildren().add(configurationUI);
+                    if (configurationUI != null) {
+                        final TitledPane pane = new TitledPane(snippet.getLanguage(), configurationUI);
+                        pane.setCollapsible(true);
+                        pane.setExpanded(false);
+                        this.snippetExecutorContainer.getChildren().add(pane);
+                    }
                 });
     }
 

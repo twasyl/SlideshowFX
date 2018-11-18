@@ -246,4 +246,4 @@ A code snippet executor may need some configuration. In order to configure it, g
 
 In order to insert an executable code snippet inside your presentation, click on the *Insert an executable code snippet* button (icon:terminal[]) over the editing area. In the new window choose the programming language for which you want to insert a code snippet and provide information about the snippet you want to insert: imports, main method, etc. Validate it and the code snippet will be inserted.
 
-On your slide, click on the icon:terminal[] icon to execute the code snippet and see the live result, click on the icon:reload[] icon to display the code snippet again.
+On your slide, click on the icon:terminal[] icon to execute the code snippet and see the live result, click on the icon:refresh[] icon to display the code snippet again.

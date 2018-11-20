@@ -31,6 +31,7 @@ import com.twasyl.slideshowfx.server.service.PresenterChatService;
 import com.twasyl.slideshowfx.server.service.QuizService;
 import com.twasyl.slideshowfx.server.service.TwitterService;
 import com.twasyl.slideshowfx.services.AutoSavingService;
+import com.twasyl.slideshowfx.theme.Themes;
 import com.twasyl.slideshowfx.utils.DialogHelper;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
@@ -728,6 +729,7 @@ public class SlideshowFXController implements ThemeAwareController {
         FXMLLoader loader = new FXMLLoader(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/OptionsView.fxml"));
         try {
             final Parent root = loader.load();
+            Themes.applyTheme(root, GlobalConfiguration.getThemeName());
             final OptionsViewController controller = loader.getController();
 
             final ButtonType response = DialogHelper.showCancellableDialog("Options", root);

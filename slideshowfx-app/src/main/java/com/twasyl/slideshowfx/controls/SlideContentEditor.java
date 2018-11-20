@@ -1,8 +1,15 @@
 package com.twasyl.slideshowfx.controls;
 
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfigurationObserver;
+import com.twasyl.slideshowfx.theme.Theme;
+import com.twasyl.slideshowfx.theme.Themes;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import com.twasyl.slideshowfx.utils.keys.KeyEventUtils;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker.State;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -18,21 +25,33 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
+import static javafx.concurrent.Worker.State.SUCCEEDED;
 
 /**
  * This control allows to define the content for a slide. It provides helper methods for inserting the current slide
  * content in the editor as well as getting it.
  *
  * @author Thierry Wasylczenko
- * @version 1.2
+ * @version 1.3
  * @since SlideshowFX 1.0
  */
-public class SlideContentEditor extends BorderPane {
+public class SlideContentEditor extends BorderPane implements GlobalConfigurationObserver {
     private static final Logger LOGGER = Logger.getLogger(SlideContentEditor.class.getName());
 
     private final WebView browser = new WebView();
 
     public SlideContentEditor() {
+        final ChangeListener<State> editorLoadedListener = new ChangeListener<State>() {
+            @Override
+            public void changed(ObservableValue<? extends State> value, State oldState, State newState) {
+                if (newState.equals(SUCCEEDED)) {
+                    SlideContentEditor.this.setSlideEditorTheme(Themes.getByName(GlobalConfiguration.getThemeName()));
+                    SlideContentEditor.this.browser.getEngine().getLoadWorker().stateProperty().removeListener(this);
+                }
+            }
+        };
+
+        this.browser.getEngine().getLoadWorker().stateProperty().addListener(editorLoadedListener);
         this.browser.getEngine().load(this.prepareAndGetEditorPageURI());
 
         this.browser.setOnKeyPressed(event -> {
@@ -49,6 +68,7 @@ public class SlideContentEditor extends BorderPane {
         });
 
         this.setCenter(this.browser);
+        GlobalConfiguration.addObserver(this);
     }
 
     /**
@@ -72,6 +92,22 @@ public class SlideContentEditor extends BorderPane {
         }
 
         return uri;
+    }
+
+    /**
+     * Set the slide editor theme defined in the given {@link Theme} to the editor.
+     *
+     * @param theme The theme to apply.
+     */
+    private void setSlideEditorTheme(final Theme theme) {
+        if (theme != null) {
+            this.browser.getEngine().executeScript(String.format("changeTheme('%1$s');", theme.getSlideEditorTheme()));
+        }
+    }
+
+    @Override
+    public void updateTheme(String oldTheme, String newTheme) {
+        this.setSlideEditorTheme(Themes.getByName(newTheme));
     }
 
     /**

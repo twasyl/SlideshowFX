@@ -18,7 +18,7 @@ public class ThemeTester extends Application {
     public void start(Stage primaryStage) throws Exception {
         final Parent root = FXMLLoader.load(getClass().getResource("/com/twasyl/slideshowfx/theme/ThemeTester.fxml"));
         root.getStylesheets().add(getClass().getResource("/com/twasyl/slideshowfx/css/Default.css").toExternalForm());
-        Themes.applyTheme(root, "Dark");
+        Themes.applyTheme(root, "Light");
 
         final Scene scene = new Scene(root);
         primaryStage.setTitle("Theme tester");

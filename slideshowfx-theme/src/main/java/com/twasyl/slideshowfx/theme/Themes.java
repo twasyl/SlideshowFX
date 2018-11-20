@@ -16,11 +16,15 @@ import org.xml.sax.InputSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
+import static java.util.stream.Collectors.toList;
 
 public class Themes {
     private static final Logger LOGGER = Logger.getLogger(Themes.class.getName());
@@ -45,6 +49,7 @@ public class Themes {
                             final Theme theme = new Theme();
                             theme.setName(item.getAttributes().getNamedItem("name").getTextContent());
                             theme.setCssFile(Themes.class.getResource(item.getAttributes().getNamedItem("cssFile").getTextContent()));
+                            theme.setSlideEditorTheme(item.getAttributes().getNamedItem("slideEditorTheme").getTextContent());
                             themes.add(theme);
                         }
                     }
@@ -72,7 +77,8 @@ public class Themes {
     }
 
     /**
-     * Apply the given theme identified by it's name to the given parent.
+     * Apply the given theme identified by it's name to the given parent. Other theme that may have been applied are
+     * removed from the given parent.
      *
      * @param parent    The parent to apply the theme on.
      * @param themeName The name of the theme to apply.
@@ -80,8 +86,25 @@ public class Themes {
     public static void applyTheme(final Parent parent, final String themeName) {
         if (parent != null && themeName != null) {
             try {
-                final Theme theme = getByName(themeName);
-                parent.getStylesheets().add(theme.getCssFile().toExternalForm());
+                // formatter:off
+                List<String> themesExternalForm = read().stream()
+                        .map(Theme::getCssFile)
+                        .map(URL::toExternalForm)
+                        .collect(toList());
+                // formatter:on
+                final String theme = getByName(themeName).getCssFile().toExternalForm();
+
+                final ListIterator<String> appliedThemes = parent.getStylesheets().listIterator();
+
+                while (appliedThemes.hasNext()) {
+                    final String appliedTheme = appliedThemes.next();
+
+                    if (themesExternalForm.contains(appliedTheme)) {
+                        appliedThemes.remove();
+                    }
+                }
+
+                appliedThemes.add(theme);
             } catch (ThemeNotFoundException e) {
                 LOGGER.log(WARNING, "Can not apply theme", e);
             }

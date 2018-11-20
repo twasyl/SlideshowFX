@@ -43,7 +43,7 @@ public class TemplateVariable extends FlowPane {
     }
 
     private void initializeDeleteButton() {
-        this.delete.getStyleClass().add("delete-default-template-variable");
+        this.delete.getStyleClass().addAll("image", "delete-default-template-variable");
         this.delete.setGraphic(new FontAwesome(Icon.TRASH_ALT));
         this.delete.setTooltip(new Tooltip("Delete this default template variable"));
     }

@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
 <?import java.net.URL?>
-<BorderPane fx:id="templateBuilder" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.TemplateBuilderController"
+<BorderPane fx:id="templateBuilder" id="templateBuilder" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.TemplateBuilderController"
             prefHeight="700" prefWidth="1024">
     <stylesheets>
         <URL value="@/com/twasyl/slideshowfx/css/Default.css" />

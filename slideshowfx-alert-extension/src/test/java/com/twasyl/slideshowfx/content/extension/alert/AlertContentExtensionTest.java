@@ -19,16 +19,14 @@ public class AlertContentExtensionTest {
     public static String EXPECTED_SCRIPT_WITH_TEXT_FORMAT = "<button id=\"{0}\">My button</button>\n" +
             "<script type=\"text/javascript\">\n" +
             "\tdocument.querySelector(''#{0}'').onclick = function() '{'\n" +
-            "\t\tswal('{'\n" +
-            "\t\t\ttitle: \"{1}\",\n" +
+            "\t\tSwal('{'\n" +
+            "\t\t\ttitleText: \"{1}\",\n" +
             "\t\t\ttext: \"{2}\",\n" +
-            "\t\t\ticon: \"{3}\",\n" +
-            "\t\t\tbuttons: '{'\n" +
-            "\t\t\t\tconfirm: {4},\n" +
-            "\t\t\t\tcancel: {5}\n" +
-            "\t\t\t'}',\n" +
-            "\t\t\tcloseOnClickOutside: {6},\n" +
-            "\t\t\tcloseOnEsc: {7},\n" +
+            "\t\t\ttype: \"{3}\",\n" +
+            "\t\t\tshowConfirmButton: {4},\n" +
+            "\t\t\tshowCancelButton: {5},\n" +
+            "\t\t\tallowOutsideClick: {6},\n" +
+            "\t\t\tallowEscapeKey: {7},\n" +
             "\t\t'}');\n" +
             "\t'}';\n" +
             "</script>";
@@ -36,15 +34,13 @@ public class AlertContentExtensionTest {
     public static String EXPECTED_SCRIPT_WITHOUT_TEXT_FORMAT = "<button id=\"{0}\">My button</button>\n" +
             "<script type=\"text/javascript\">\n" +
             "\tdocument.querySelector(''#{0}'').onclick = function() '{'\n" +
-            "\t\tswal('{'\n" +
-            "\t\t\ttitle: \"{1}\",\n" +
-            "\t\t\ticon: \"{2}\",\n" +
-            "\t\t\tbuttons: '{'\n" +
-            "\t\t\t\tconfirm: {3},\n" +
-            "\t\t\t\tcancel: {4}\n" +
-            "\t\t\t'}',\n" +
-            "\t\t\tcloseOnClickOutside: {5},\n" +
-            "\t\t\tcloseOnEsc: {6},\n" +
+            "\t\tSwal('{'\n" +
+            "\t\t\ttitleText: \"{1}\",\n" +
+            "\t\t\ttype: \"{2}\",\n" +
+            "\t\t\tshowConfirmButton: {3},\n" +
+            "\t\t\tshowCancelButton: {4},\n" +
+            "\t\t\tallowOutsideClick: {5},\n" +
+            "\t\t\tallowEscapeKey: {6},\n" +
             "\t\t'}');\n" +
             "\t'}';\n" +
             "</script>";

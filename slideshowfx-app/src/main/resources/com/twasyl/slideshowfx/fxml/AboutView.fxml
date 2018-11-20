@@ -10,14 +10,11 @@
 <?import java.net.URL?>
 <StackPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.AboutViewController"
            alignment="TOP_CENTER"
-           onMouseClicked="#exitByClick"
-           style="-fx-background-fill: transparent">
+           onMouseClicked="#exitByClick" style="-fx-background-color: transparent">
 
     <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/about-stage.css" />
+        <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
     </stylesheets>
-
-    <background><Background fx:constant="EMPTY" /></background>
 
     <fx:define>
         <Double fx:id="VIEWPORT_HEIGHT" fx:value="230" />

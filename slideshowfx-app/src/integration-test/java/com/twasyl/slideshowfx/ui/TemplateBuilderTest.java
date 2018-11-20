@@ -2,6 +2,7 @@ package com.twasyl.slideshowfx.ui;
 
 import com.twasyl.slideshowfx.controls.stages.TemplateBuilderStage;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
+import com.twasyl.slideshowfx.theme.Themes;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -18,6 +19,7 @@ public class TemplateBuilderTest extends Application {
         template.loadArchive(new File("examples/templates/dark-template.sfxt"));
 
         primaryStage = new TemplateBuilderStage(template);
+        Themes.applyTheme(primaryStage.getScene().getRoot(), "Light");
         primaryStage.show();
     }
 

@@ -5,10 +5,12 @@ import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.icons.FontAwesome;
 import com.twasyl.slideshowfx.icons.Icon;
 import com.twasyl.slideshowfx.icons.IconStack;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TreeItem;
 
 import java.io.File;
@@ -26,6 +28,8 @@ import java.util.ResourceBundle;
 public class ThemeController implements Initializable {
     @FXML
     private TemplateTreeView templateTreeView;
+    @FXML
+    private TableColumn<String, String> column1;
     @FXML
     public IconStack modifiableIconStack;
 
@@ -54,6 +58,8 @@ public class ThemeController implements Initializable {
 
         this.templateTreeView.closeItem(root);
         root.setExpanded(true);
+
+        this.column1.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
     }
 
     public void addIconToStack(ActionEvent event) {

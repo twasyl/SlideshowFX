@@ -1,650 +1,558 @@
-.text-area, .text-area .content {
-    -fx-background-color: sfx-text-area-default-background-color;
-    -fx-text-fill: sfx-text-area-default-text-color;
-    -fx-prompt-text-fill: sfx-text-area-default-prompt-text-color;
-    -fx-border-radius: 2 2 2 2;
+.arrow {
+    -fx-background-color: sfx-arrow-background-color;
 }
 
-.text-field {
-    -fx-background-color: sfx-text-field-default-background-color;
-    -fx-text-fill: sfx-text-field-default-text-color;
-    -fx-prompt-text-fill: sfx-text-field-default-prompt-text-color;
-    -fx-border-radius: 2 2 2 2;
+.arrow-button {
+    -fx-background-color: sfx-arrow-button-background-color;
+}
+
+.label {
+    -fx-text-fill: sfx-label-text-color;
+}
+
+.text {
+    -fx-fill: sfx-text-text-color;
+    -fx-color: -fx-fill;
+    -fx-text-fill: -fx-fill;
+}
+
+.tooltip {
+    -fx-background-color: sfx-tooltip-background-color;
+}
+.tooltip > .text {
+    -fx-fill: sfx-tooltip-text-color;
+}
+
+.separator:vertical .line {
+    -fx-border-color: sfx-separator-vertical-color;
+    -fx-border-width: 0 2px 0 0;
+    -fx-border-style: none dotted none none;
+}
+
+.separator:horizontal .line {
+    -fx-border-color: sfx-separator-horizontal-color;
+    -fx-border-width: 2px 0 0 0;
+    -fx-border-style: dotted none none none;
+}
+
+.font-awesome {
+    -fx-icon-color: sfx-font-awesome-color;
+    -fx-icon-size: 20px;
+}
+
+.icon-stack .font-awesome.default-icon-color-0 {
+    -fx-icon-color: sfx-icon-stack-icon-0-color;
+}
+.icon-stack .font-awesome.default-icon-color-1 {
+    -fx-icon-color: sfx-icon-stack-icon-1-color;
+}
+
+.list-cell,
+.list-cell:empty,
+.list-cell:filled {
+    -fx-background-color: sfx-list-cell-background-color;
+    -fx-text-fill: sfx-list-cell-text-color;
+}
+.list-cell:filled:hover {
+    -fx-background-color: sfx-list-cell-background-hover-color;
+    -fx-text-fill: sfx-list-cell-text-hover-color;
+}
+.list-cell:filled:selected {
+    -fx-background-color: sfx-list-cell-background-selected-color;
+}
+.list-cell:filled:hover .text {
+    -fx-fill: sfx-list-cell-text-hover-color;
+}
+.list-cell:filled:selected .text {
+    -fx-fill: sfx-list-cell-text-selected-color;
+}
+
+.column-header-background,
+.column-header-background .filler,
+.column-header {
+    -fx-background-color: sfx-table-header-background-color;
+}
+.table-row-cell {
+    -fx-border-color: transparent;
+    -fx-table-cell-border-color: transparent;
+}
+.table-row-cell:even {
+    -fx-background-color: sfx-table-cell-background-even-color;
+}
+.table-row-cell:odd {
+    -fx-background-color: sfx-table-cell-background-odd-color;
+}
+.table-row-cell:selected {
+    -fx-background-color: sfx-table-cell-background-selected-color;
+}
+.table-row-cell:filled:selected .text {
+    -fx-fill: sfx-table-cell-text-selected-color;
+}
+
+.tree-cell,
+.tree-cell:empty,
+.tree-cell:filled {
+    -fx-background-color: sfx-tree-cell-background-color;
+    -fx-text-fill: sfx-tree-cell-text-color;
+}
+.tree-cell:filled:selected {
+    -fx-background-color: sfx-tree-cell-background-selected-color;
+}
+.tree-cell:filled:selected .text {
+    -fx-fill: sfx-tree-cell-text-selected-color;
+}
+.tree-cell .font-awesome {
+    -fx-icon-size: 10pt;
+}
+
+.messages-box {
+    -fx-background-color: sfx-messages-box-background-color;
+    -fx-border-color: sfx-messages-box-border-color;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-padding: 2px;
+}
+.messages-box .label, .messages-box .text, .messages-box .hyperlink {
+    -fx-fill: sfx-messages-box-text-color;
+    -fx-text-fill: -fx-fill;
+    -fx-color: -fx-fill;
 }
 
 .menu-bar {
-    -fx-background-color: sfx-menu-bar-default-background-color;
-}
-
-.menu-bar .menu-button .menu {
-    -fx-background-color: sfx-menu-bar-menu-default-background-color;
-    -fx-text-fill: sfx-menu-bar-menu-default-text-color;
-    -fx-border-color: sfx-menu-bar-menu-default-border-color;
-    -fx-border-width: 1px;
-    -fx-border-style: solid;
-}
-
-.menu-bar .menu:showing {
-    -fx-background-color: sfx-menu-bar-menu-default-showing-background-color;
-}
-
-.menu-bar .menu:showing .context-menu {
-    -fx-border-style: solid none none none;
-    -fx-border-width: 1.5px 0 0 0;
-    -fx-border-color: sfx-menu-bar-menu-default-showing-border-color;
-}
-
-.menu-bar .menu:showing .menu {
-    -fx-border-style: none;
-    -fx-border-width: 0;
-}
-
-.menu-bar .menu:showing .menu:hover {
-    -fx-background-color: sfx-menu-bar-menu-default-showing-background-color;
-}
-
-.menu-bar .menu:showing .menu:hover:disabled {
-    -fx-background-color: transparent;
-}
-
-.menu-button .menu .menu-item {
-    -fx-background-color: sfx-menu-bar-menu-item-default-background-color;
+    -fx-background-color: sfx-menu-bar-background-color;
 }
 
 .context-menu {
-    -fx-background-color: sfx-context-menu-default-background-color;
+    -fx-background-color: sfx-context-menu-background-color;
+    -fx-border-width: 1.5px 0 0 0;
 }
 
-.context-menu .menu:showing {
-    -fx-background-color: sfx-context-menu-menu-default-showing-background-color;
+.context-menu:showing {
+    -fx-background-color: sfx-context-menu-background-showing-color;
 }
 
-.context-menu .separator .line {
-    -fx-border-color: sfx-context-menu-separator-default-border-color;
-    -fx-border-width: 2px;
-    -fx-border-style: dotted;
+.menu {
+    -fx-background-color: sfx-menu-background-color;
 }
-
-.context-menu .menu,
-.context-menu .menu-item {
-    -fx-border-style: none;
-}
-
-.context-menu .menu .menu-item:hover,
-.context-menu .menu:hover {
-    -fx-background-color: sfx-context-menu-menu-item-default-hover-background-color;
-}
-
 .menu:hover {
-    -fx-background-color: sfx-menu-default-hover-background-color;
+    -fx-background-color: sfx-menu-background-hover-color;
 }
-
-.menu:hover:disabled {
-    -fx-background-color: sfx-menu-default-hover-disabled-background-color;
+.menu:showing {
+    -fx-background-color: sfx-menu-background-showing-color;
+}
+.menu > .label > .text {
+    -fx-fill: sfx-menu-text-color;
+}
+.menu:hover > .label > .text {
+    -fx-fill: sfx-menu-text-hover-color;
+}
+.menu:showing >.label > .text {
+    -fx-fill: sfx-menu-text-showing-color;
 }
 
 .menu-item {
-    -fx-background-color: sfx-menu-item-default-background-color;
-    -fx-text-fill: sfx-menu-item-default-text-color;
+    -fx-background-color: transparent;
+}
+.menu-item:hover {
+    -fx-background-color: sfx-menu-item-background-hover-color;
+}
+.menu-item:showing {
+    -fx-background-color: sfx-menu-item-background-showing-color;
+}
+.menu-item > .label {
+    -fx-background-color: transparent;
+}
+.menu-item > .label > .text {
+    -fx-fill: sfx-menu-item-text-color;
+}
+.menu-item:hover > .label > .text  {
+    -fx-fill: sfx-menu-item-text-hover-color;
+}
+.menu-item:showing > .label > .text {
+    -fx-fill: sfx-menu-item-text-showing-color;
 }
 
-.menu-item > .right-container > .arrow {
-    -fx-background-color: sfx-menu-item-default-arrow-color;
+.text-area,
+.text-area .content,
+.text-field {
+    -fx-background-color: sfx-text-input-background-color;
+    -fx-text-fill: sfx-text-input-text-color;
+    -fx-prompt-text-fill: sfx-text-input-prompt-text-color;
+    -fx-border-radius: 2 2 2 2;
 }
 
-.menu-item:hover,
-.menu-item:hover .label {
-    -fx-background-color: sfx-menu-item-default-hover-background-color;
+.extended-text-field .label .text {
+    -fx-fill: sfx-extended-text-field-text-color;
+    -fx-font-size: 11px;
 }
 
-.menu-item:hover:disabled {
-    -fx-background-color: sfx-menu-item-default-hover-disabled-background-color;
+.extended-text-field .label:focused .text {
+    -fx-fill: sfx-extended-text-field-text-focused-color;
+}
+
+.extended-text-field .text-field:error {
+    -fx-background-color: sfx-extended-text-field-background-error-color1, sfx-extended-text-field-background-error-color2;
 }
 
 .tool-bar {
-    -fx-background-color: sfx-tool-bar-default-background-color;
-    -fx-text-fill: sfx-tool-bar-default-text-color;
+    -fx-background-color: sfx-tool-bar-background-color;
+    -fx-text-fill: sfx-tool-bar-text-color;
     -fx-border-style: none;
 }
 
 .button {
-    -fx-background-color: sfx-button-default-background-color;
-    -fx-text-fill: sfx-button-default-text-color;
-}
-
-.button {
+    -fx-background-color: sfx-button-background-color;
+    -fx-text-fill: sfx-button-text-color;
     -fx-border-radius: 3px;
     -fx-border-width: 1px;
     -fx-border-style: solid;
-    -fx-border-color: sfx-button-default-border-color;
+    -fx-border-color: sfx-button-border-color;
 }
-
 /* This class can be set to each button containing an image in order to "select" them and apply the style */
 .button.image {
-    -fx-border-radius: 3px;
-    -fx-border-width: 1px;
-    -fx-border-style: solid;
     -fx-border-color: transparent;
 }
-
-.button:hover, .button.image:hover {
-    -fx-background-color: sfx-button-default-hover-background-color;
-    -fx-border-color: sfx-button-default-hover-border-color;
+.button:hover,
+.button.image:hover {
+    -fx-background-color: sfx-button-background-hover-color;
+    -fx-border-color: sfx-button-border-hover-color;
 }
-
-.button:pressed {
-    -fx-background-color: sfx-button-default-pressed-background-color;
-    -fx-border-color: sfx-button-default-pressed-border-color;
-}
-
-.toggle-button {
-    -fx-background-color: sfx-button-default-background-color;
-    -fx-border-radius: 3px;
-    -fx-border-width: 1px;
-    -fx-border-style: solid;
-    -fx-border-color: sfx-button-default-border-color;
-    -fx-text-fill: sfx-button-default-text-color;
-}
-
-.toggle-button:hover {
-    -fx-background-color: sfx-button-default-hover-background-color;
-    -fx-border-color: sfx-button-default-hover-border-color;
-}
-
-.toggle-button:selected {
-    -fx-background-color: sfx-button-default-pressed-background-color;
-    -fx-border-color: sfx-button-default-pressed-border-color;
-}
-
-.split-menu-button, .split-menu-button .label, .split-menu-button .arrow-button {
-    -fx-background-color: sfx-split-menu-button-default-background-color;
-    -fx-text-fill: sfx-split-menu-button-default-text-color;
+.button:pressed,
+.button.image:pressed {
+    -fx-background-color: sfx-button-background-pressed-color;
+    -fx-border-color: sfx-button-border-pressed-color;
 }
 
 .split-menu-button {
-    -fx-border-color: sfx-button-default-border-color;
+    -fx-background-color: sfx-button-background-color;
+    -fx-border-color: sfx-button-border-color;
     -fx-border-style: solid;
     -fx-border-width: 1px;
     -fx-border-radius: 3px;
 }
-
-
 .split-menu-button:hover {
+    -fx-border-color: sfx-button-border-hover-color;
     -fx-border-width: 1px;
     -fx-border-style: solid;
-    -fx-border-color: sfx-button-default-hover-border-color;
 }
-
 .split-menu-button:pressed,
 .split-menu-button:showing {
-    -fx-border-color: sfx-button-default-pressed-border-color;
+    -fx-background-color: sfx-button-background-pressed-color;
+    -fx-border-color: sfx-button-border-pressed-color;
 }
 
-.split-menu-button:pressed,
-.split-menu-button:showing {
-    -fx-background-color: sfx-split-menu-button-default-pressed-background-color;
+.split-menu-button > .label {
+    -fx-background-color: sfx-button-background-color;
+    -fx-text-fill: sfx-button-text-color;
 }
 
-.split-menu-button .arrow,
-.color-picker .arrow,
-.choice-box .arrow  {
-    -fx-background-color: sfx-arrow-default-background-color;
+.toggle-button {
+    -fx-background-color: sfx-button-background-color;
+    -fx-border-color: sfx-button-border-color;
+    -fx-text-fill: sfx-button-text-color;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+}
+.toggle-button:hover {
+    -fx-background-color: sfx-button-background-hover-color;
+    -fx-border-color: sfx-button-border-hover-color;
+}
+.toggle-button:selected {
+    -fx-background-color: sfx-button-background-selected-color;
+    -fx-border-color: sfx-button-border-selected-color;
 }
 
 .combo-box {
-    -fx-border-color: sfx-combo-box-default-border-color;
+    -fx-background-color: sfx-combo-box-background-color;
+    -fx-border-color: sfx-combo-box-border-color;
     -fx-border-style: solid;
     -fx-border-width: 1px;
     -fx-border-radius: 3px;
 }
-
 .combo-box:hover {
+    -fx-border-color: sfx-combo-box-border-hover-color;
     -fx-border-width: 1px;
     -fx-border-style: solid;
-    -fx-border-color: sfx-combo-box-default-hover-border-color;
 }
-
+.combo-box:showing,
+.combo-box:pressed {
+    -fx-background-color: sfx-combo-box-background-pressed-color;
+    -fx-border-color: sfx-combo-box-border-pressed-color;
+}
 .combo-box:armed,
 .combo-box:focused,
 .combo-box:focused .text-input {
     -fx-focus-effect: none;
     -fx-focus-color: transparent;
 }
-
-.combo-box:pressed,
+.combo-box .label {
+    -fx-text-fill: sfx-combo-box-text-color;
+}
 .combo-box:pressed .list-cell,
-.combo-box:showing,
 .combo-box:showing .list-cell,
 .combo-box:showing .text-input {
-    -fx-background-color: sfx-combo-box-default-pressed-background-color;
+    -fx-background-color: sfx-combo-box-background-pressed-color;
 }
-
-.combo-box:showing {
-    -fx-border-color: sfx-combo-box-default-pressed-border-color;
-}
-
 .combo-box:showing .list-cell:hover {
-    -fx-background-color: sfx-combo-box-cell-default-hover-background-color;
+    -fx-background-color: sfx-combo-box-cell-background-hover-color;
+}
+.combo-box > .list-cell {
+    -fx-background-color: transparent;
+}
+.combo-box > .list-cell > .text {
+    -fx-fill: sfx-combo-box-text-color;
 }
 
-.combo-box,
-.combo-box .label,
-.combo-box .arrow-button  {
-    -fx-background-color: sfx-combo-box-default-background-color;
-    -fx-text-fill: sfx-combo-box-default-text-color;
+.radio-button,
+.check-box {
+    -fx-text-fill: sfx-checkable-text-color;
 }
-
-.combo-box .arrow {
-    -fx-background-color: sfx-arrow-default-background-color;
-}
-
-.separator:vertical .line {
-    -fx-border-color: sfx-separator-vertical-default-border-color;
-    -fx-border-width: 2px;
-    -fx-border-style: dotted;
-}
-
-.separator:horizontal .line {
-    -fx-border-color: sfx-separator-horizontal-default-border-color;
-    -fx-border-width: 2px;
-    -fx-border-style: dotted;
-}
-
-.progress-bar {
-    -fx-background-color: sfx-progress-bar-default-background-color;
-}
-
-.progress-bar > .track {
-    -fx-text-box-border: sfx-progress-bar-track-default-text-box-border-color;
-    -fx-background-color: sfx-progress-bar-track-default-background-color;
-}
-
-.progress-indicator {
-    -fx-progress-color: sfx-progress-indicator-default-progress-color;
-}
-
-.scroll-pane, .scroll-pane .corner {
-    -fx-background-color: sfx-scroll-pane-default-background-color;
-    -fx-background: sfx-scroll-pane-default-background-color;
-}
-
-.scroll-bar {
-    -fx-background-color: sfx-scroll-bar-default-background-color;
-    -fx-background: sfx-scroll-bar-default-background-color;
-}
-
-.scroll-bar .track {
-    -fx-background-color: sfx-scroll-bar-track-default-background-color;
-}
-
-.scroll-bar .track-background {
-    -fx-background-color: sfx-scroll-bar-track-background-default-background-color;
-}
-
-.scroll-bar .thumb {
-    -fx-background-color: sfx-scroll-bar-thumb-default-background-color;
-}
-
-.scroll-bar .increment-button {
-    -fx-background-color: sfx-scroll-bar-increment-button-default-background-color;
-}
-
-.scroll-bar .decrement-button {
-    -fx-background-color: sfx-scroll-bar-decrement-button-default-background-color;
-}
-
-.radio-button {
-    -fx-text-fill: sfx-radio-button-default-text-color;
-}
-
 .radio-button > .radio {
-    -fx-background-color: sfx-radio-button-default-background-color;
+    -fx-background-color: sfx-checkable-background-color;
+    -fx-border-color: sfx-checkable-border-color;
     -fx-border-style: solid;
     -fx-border-width: 1px;
-    -fx-border-color: sfx-radio-button-default-border-color;
     -fx-border-radius: 50px;
 }
-
-.radio-button:selected > .radio {
-    -fx-background-color: sfx-radio-button-default-selected-background-color;
-    -fx-border-color: sfx-radio-button-default-selected-border-color;
+.radio-button:selected > .radio,
+.radio-button:focused > .radio,
+.check-box:selected > .box,
+.check-box:focused > .box {
+    -fx-background-color: sfx-checkable-background-selected-color;
+    -fx-border-color: sfx-checkable-border-selected-color;
 }
-
 .radio-button:selected > .radio > .dot,
 .radio-button:focused:selected > .radio > .dot {
-    -fx-background-color: sfx-radio-button-dot-default-background-color;
-}
-
-.radio-button:focused > .radio {
-    -fx-border-color: sfx-radio-button-default-selected-border-color;
-}
-
-.check-box {
-    -fx-text-fill: sfx-check-box-default-text-color;
+    -fx-background-insets: 0, 0;
+    -fx-background-color: sfx-checkable-graphic-background-color;
 }
 
 .check-box > .box {
-    -fx-background-color: sfx-check-box-default-background-color;
+    -fx-background-color: sfx-checkable-background-color;
+    -fx-border-color: sfx-checkable-border-color;
     -fx-border-style: solid;
     -fx-border-width: 1px;
-    -fx-border-color: sfx-check-box-default-border-color;
     -fx-border-radius: 0px;
 }
-
-.check-box:selected > .box {
-    -fx-background-color: sfx-check-box-default-selected-background-color;
-    -fx-border-color: sfx-check-box-default-selected-border-color;
-}
-
 .check-box:selected > .box > .mark,
 .check-box:focused:selected > .box > .mark {
-    -fx-background-color: sfx-check-box-mark-default-background-color;
-}
-
-.check-box:focused > .box {
-    -fx-border-color: sfx-check-box-default-selected-border-color;
+    -fx-background-color: sfx-checkable-graphic-background-color;
 }
 
 .tab-pane {
     -fx-border-width: 0px;
 }
-
 .tab-pane .tab-header-background,
 .tab-pane .tab-header-area {
-    -fx-background-color: sfx-tab-pane-tab-header-default-background-color;
+    -fx-background-color: sfx-tab-pane-header-background-color;
 }
-
 .tab-pane .tab {
-    -fx-background-color: sfx-tab-pane-tab-default-background-color;
-    -fx-text-fill: sfx-tab-pane-tab-default-text-color;
+    -fx-background-color: sfx-tab-pane-tab-background-color;
+    -fx-text-fill: sfx-tab-pane-tab-text-color;
+    -fx-border-color: sfx-tab-pane-tab-border-color;
     -fx-border-style: solid solid none solid;
     -fx-border-width: 0.5px;
-    -fx-border-color: sfx-tab-pane-tab-default-border-color;
     -fx-border-radius: 0;
     -fx-background-radius: 0;
 }
-
 .tab-pane .tab .tab-label {
-    -fx-text-fill: sfx-tab-pane-tab-default-text-color;
+    -fx-text-fill: sfx-tab-pane-tab-text-color;
 }
-
 .tab-pane .tab:selected {
-     -fx-background-color: sfx-tab-pane-tab-default-selected-background-color;
-     -fx-border-color: sfx-tab-pane-tab-default-selected-border-color;
- }
-
-.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
-    -fx-border-style: none, none;
-    -fx-border-color: transparent, transparent;
+     -fx-background-color: sfx-tab-pane-tab-background-selected-color;
+     -fx-border-color: sfx-tab-pane-tab-border-selected-color;
 }
-
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-color: transparent, transparent;
+    -fx-border-style: none, none;
+}
 .tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-close-button {
-    -fx-background-color: sfx-tab-pane-tab-close-button-default-background-color;
-    -fx-opacity: 0.3;
+    -fx-background-color: sfx-tab-pane-tab-close-button-background-color;
+    -fx-opacity: sfx-tab-pane-tab-close-button-opacity;
     -fx-effect: none;
 }
-
 .tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-close-button:hover {
-    -fx-opacity: 0.6;
+    -fx-opacity: sfx-tab-pane-tab-close-button-opacity-hover;
 }
-
 .tab-pane .tab-content-area {
+    -fx-border-color: sfx-tab-pane-content-area-border-color;
     -fx-border-width: 1px 0 0 0;
     -fx-border-style: solid none none none;
-    -fx-border-color: sfx-tab-pane-content-area-default-border-color;
 }
-
 .tab-pane .tab-content-area .viewport {
-    -fx-background-color: sfx-tab-pane-content-area-default-background-color;
-}
-
-.tab-pane .tab-content-area .viewport .button {
-    -fx-border-color: transparent;
-    -fx-background-color: sfx-tab-pane-viewport-button-default-background-color;
-    -fx-border-style: solid;
-    -fx-border-width: 1px;
-    -fx-border-radius: 3px;
-}
-
-.tab-pane .tab-content-area .viewport .button:hover {
-    -fx-background-color: sfx-tab-pane-tab-button-default-hover-background-color;
-    -fx-border-color: sfx-tab-pane-tab-button-default-hover-border-color;
-}
-
-.list-view  {
-    -fx-background-color: sfx-list-view-default-background-color;
-}
-
-.list-view:focused  {
-    -fx-background-color: sfx-list-view-default-focused-background-color;
-}
-
-.list-view .list-cell:filled:selected {
-    -fx-background-color: sfx-list-view-list-cell-default-filled-selected-background-color;
-}
-
-.list-cell:empty {
-    -fx-text-fill: sfx-list-cell-default-empty-text-color;
-    -fx-background-color: sfx-list-cell-default-empty-background-color;
-}
-
-.list-cell:filled {
-    -fx-text-fill: sfx-list-cell-default-filled-text-color;
-    -fx-background-color: sfx-list-cell-default-filled-background-color;
-}
-
-.list-cell:filled:hover {
-    -fx-background-color: sfx-list-cell-default-filled-hover-background-color;
-}
-
-.tree-cell:empty {
-    -fx-text-fill: sfx-tree-cell-default-empty-text-color;
-    -fx-background-color: sfx-tree-cell-default-empty-background-color;
-}
-
-.tree-cell:filled {
-    -fx-text-fill: sfx-tree-cell-default-filled-text-color;
-    -fx-background-color: sfx-tree-cell-default-filled-background-color;
-}
-
-.tree-cell:filled:selected {
-    -fx-background-color: sfx-tree-cell-default-filled-selected-background-color;
-}
-
-.tree-disclosure-node .arrow {
-    -fx-background-color: sfx-tree-disclosure-node-arrow-default-background-color;
-}
-
-.split-pane {
-    -fx-background-color: sfx-split-pane-default-background-color;
-    -fx-border-style: solid;
-    -fx-border-width: 1px;
-    -fx-border-color: sfx-split-pane-default-border-color;
-
-}
-
-.split-pane *.horizontal-grabber {
-    -fx-background-color: sfx-split-pane-grabber-default-background-color;
-}
-
-.split-pane-divider {
-    -fx-padding: 0 0 0 0;
-    -fx-border-style: none none none solid;
-    -fx-border-width: 0 0 0 1px;
-    -fx-border-color: sfx-split-pane-divider-default-border-color;
+    -fx-background-color: sfx-tab-pane-content-area-background-color;
 }
 
 .titled-pane:expanded {
-    -fx-text-fill: sfx-titled-pane-default-test-color;
+    -fx-text-fill: sfx-titled-pane-text-color;
 }
-
 .titled-pane > .title {
-    -fx-background-color: sfx-titled-pane-default-title-background-color;
+    -fx-background-color: sfx-titled-pane-title-background-color;
 }
-
-.titled-pane > .title > .arrow-button .arrow {
-    -fx-background-color: sfx-arrow-default-background-color;
-}
-
 .titled-pane > .content {
-    -fx-background-color: sfx-titled-pane-default-background-color;
+    -fx-background-color: sfx-titled-pane-background-color;
 }
-
 .titled-pane > .content,
 .titled-pane:expanded > .content {
     -fx-border-width: 0;
 }
-
 .titled-pane:focused > .title > .arrow-button .arrow {
+    -fx-border-color: transparent;
     -fx-border-style: none;
     -fx-border-width: 0;
-    -fx-border-color: transparent;
     -fx-effect: none;
 }
-
 .titled-pane:valid-drag-over {
+    -fx-border-color: sfx-titled-pane-border-valid-drag-over-color;
     -fx-border-style: dashed inside;
     -fx-border-width: 3px;
-    -fx-border-color: sfx-titled-pane-default-valid-drag-over-border-color;
 }
 
-.text {
-    -fx-fill: sfx-text-default-text-color;
-    -fx-color: -fx-fill;
-    -fx-text-fill: -fx-fill;
+.split-pane {
+    -fx-background-color: sfx-split-pane-background-color;
+    -fx-border-color: sfx-split-pane-border-color;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+}
+.split-pane *.horizontal-grabber {
+    -fx-background-color: sfx-split-pane-grabber-background-color;
+}
+.split-pane-divider {
+    -fx-border-color: sfx-split-pane-divider-border-color;
+    -fx-padding: 0 0 0 0;
+    -fx-border-style: none none none solid;
+    -fx-border-width: 0 0 0 1px;
 }
 
 .dialog-pane .header-panel {
-    -fx-background-color: sfx-dialog-pane-header-default-background-color;
+    -fx-background-color: sfx-dialog-pane-header-background-color;
 }
 
-.messages-box {
-    -fx-background-radius: 5px;
-    -fx-border-radius: 5px;
-    -fx-border-color: sfx-messages-box-default-border-color;
-    -fx-background-color: sfx-messages-box-default-background-color;
-    -fx-padding: 2px;
+.scroll-pane,
+.scroll-pane > .viewport,
+.scroll-pane .corner {
+    -fx-background-color: sfx-scroll-pane-background-color;
 }
 
-.messages-box .label, .messages-box .text, .messages-box .hyperlink {
-    -fx-fill: sfx-messages-box-default-text-color;
-    -fx-color: -fx-fill;
-    -fx-text-fill: -fx-fill;
+.scroll-bar {
+    -fx-background: sfx-scroll-bar-main-background-color;
+}
+.scroll-bar,
+.scroll-bar .track,
+.scroll-bar .track-background,
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: sfx-scroll-bar-main-background-color;
+}
+.scroll-bar .thumb {
+    -fx-background-color: sfx-scroll-bar-thumb-background-color;
+}
+
+.progress-bar {
+    -fx-background-color: sfx-progress-bar-background-color;
+    -fx-accent: sfx-progress-indicator-color;
+}
+.progress-bar > .track {
+    -fx-text-box-border: sfx-progress-bar-track-text-box-border-color;
+    -fx-background-color: sfx-progress-bar-track-background-color;
+}
+.progress-bar > .bar {
+    -fx-padding: 5px;
+    -fx-background-insets: 0;
+}
+
+.progress-indicator {
+    -fx-progress-color: sfx-progress-indicator-color;
+}
+
+.list-view  {
+    -fx-background-color: sfx-list-view-background-color;
+}
+.list-view:focused  {
+    -fx-background-color: sfx-list-view-background-focused-color;
 }
 
 .plugin-file-button .icon.font-awesome {
+    -fx-icon-color: sfx-plugin-file-button-icon-color;
     -fx-icon-size: 50px;
-    -fx-icon-color: sfx-plugin-file-button-default-icon-color;
 }
-
 .plugin-file-button .tooltip {
-    -fx-text-fill: sfx-plugin-file-button-tooltip-default-text-color;
+    -fx-text-fill: sfx-plugin-file-button-tooltip-text-color;
 }
-
 .plugin-file-button, .plugin-file-button .text {
-     -fx-fill: sfx-plugin-file-button-default-text-color;
+     -fx-fill: sfx-plugin-file-button-text-color;
      -fx-color: -fx-fill;
      -fx-text-fill: -fx-fill;
 }
-
 .plugin-file-button:selected .text {
-    -fx-fill: sfx-plugin-file-button-selected-default-text-color;
+    -fx-fill: sfx-plugin-file-button-text-selected-color;
     -fx-color: -fx-fill;
     -fx-text-fill: -fx-fill;
 }
-
 .plugin-file-button:selected {
-     -fx-background-color: sfx-plugin-file-button-selected-default-background-color;
-     -fx-text-fill: sfx-plugin-file-button-selected-default-text-color;
-}
-
-.extended-text-field .label .text {
-    -fx-fill: sfx-extended-text-field-default-text-color;
-    -fx-font-size: 11px;
-}
-
-.extended-text-field .label:focused .text {
-    -fx-fill: sfx-extended-text-field-focused-default-text-color;
-}
-
-.extended-text-field .text-field:error {
-    -fx-background-color: sfx-extended-text-field-error-default-background-color1, sfx-extended-text-field-error-default-background-color2;
-}
-
-.label {
-    -fx-text-fill: sfx-label-default-text-color;
-}
-
-.color-picker, .choice-box {
-    -fx-background-color: app-color-background;
-    -fx-border-color: app-color-light-gray;
-    -fx-border-style: solid;
-    -fx-border-width: 1px;
-    -fx-border-radius: 3px;
-}
-
-.color-picker .text, .choice-box .text {
-    -fx-text-fill: app-color-text-fill;
-}
-
-.color-picker:showing, .choice-box:showing {
-    -fx-background-color: app-color-input-background;
-}
-
-.color-palette {
-    -fx-background-color: app-color-background;
+     -fx-background-color: sfx-plugin-file-button-background-selected-color;
+     -fx-text-fill: sfx-plugin-file-button-text-selected-color;
 }
 
 .notification-item .font-awesome:successful-task {
-    -fx-icon-color: sfx-notification-successful-task-state-default-icon-color;
+    -fx-icon-color: sfx-notification-state-icon-successful-task-color;
 }
-
 .notification-item .font-awesome:failed-task {
-    -fx-icon-color: sfx-notification-failed-task-state-default-icon-color;
+    -fx-icon-color: sfx-notification-state-icon-failed-task-color;
 }
-
 .button.notification, .button.notification:hover {
-    -fx-border-width: 0;
     -fx-background-color: transparent;
+    -fx-border-width: 0;
 }
-
 .notification.title, .notification.title:hover {
     -fx-font-size: 12px;
 }
-
 .notification.time, .notification.time:hover {
     -fx-font-size: 10px;
-}
-
-.font-awesome {
-    -fx-icon-size: 20px;
-    -fx-icon-color: sfx-icon-default-icon-color;
-}
-
-.tool-bar .font-awesome {
-    -fx-icon-size: 20px;
-    -fx-icon-color: sfx-icon-default-icon-color;
-}
-
-.icon-stack .font-awesome.default-icon-color-0 {
-    -fx-icon-color: sfx-icon-stack-default-icon-0-color;
-}
-
-.icon-stack .font-awesome.default-icon-color-1 {
-    -fx-icon-color: sfx-icon-stack-default-icon-1-color;
 }
 
 .presentation-variables-panel .icon-stack .font-awesome.icon-index-0 {
     -fx-icon-size: 20px;
 }
-
 .presentation-variables-panel .icon-stack .font-awesome.icon-index-1 {
     -fx-icon-size: 15px;
 }
 
 .slideshow-pane .collapsible-tool-pane .font-awesome {
-    -fx-icon-color: sfx-collapsible-tool-pane-default-icon-color;
+    -fx-icon-color: sfx-collapsible-tool-pane-icon-color;
     -fx-icon-size: 32px;
+}
+
+.information-scene {
+    -fx-background-color: sfx-information-pane-background-color;
+}
+.information-scene .current-time,
+.information-scene .time-elapsed {
+	-fx-font-family: 'Inconsolata';
+}
+.information-scene .current-time,
+.information-scene .time-elapsed,
+.information-scene .speaker-notes {
+    -fx-fill: sfx-text-fill;
+}
+.information-scene .current-time {
+    -fx-font-size: 30px;
+}
+.information-scene .time-elapsed {
+    -fx-fill: sfx-text-fill;
+    -fx-font-size: 100px;
+}
+.information-scene .speaker-notes-pane {
+	-fx-background-color: transparent;
+    -fx-background: transparent;
+}
+.information-scene .speaker-notes {
+	-fx-font-size: 30px;
+}
+
+.about-stage {
+    -fx-background-color: transparent;
 }
 
 /* CSS for elements identified by their ID */
@@ -660,35 +568,28 @@
 }
 
 #serverButton:start-server .font-awesome {
-    -fx-icon-color: sfx-server-button-start-server-default-color;
+    -fx-icon-color: sfx-server-button-start-server-color;
 }
-
 #serverButton:stop-server .font-awesome {
-    -fx-icon-color: sfx-server-button-stop-server-default-color;
-}
-
-#contentExtensionToolBar .font-awesome {
-    -fx-icon-color: sfx-app-content-extension-toolbar-icon-default-icon-color;
+    -fx-icon-color: sfx-server-button-stop-server-color;
 }
 
 #openedPresentationsTabPane {
-    -fx-background-color: sfx-opened-presentations-tab-pane-default-background-color;
+    -fx-background-color: sfx-opened-presentations-tab-pane-background-color;
     -fx-background-image: url(../images/dark-logo.png);
     -fx-background-position: center;
     -fx-background-repeat: no-repeat;
     -fx-border-style: none;
 }
-
 #openedPresentationsTabPane:valid-drag-over {
+    -fx-border-color: sfx-opened-presentations-tab-pane-border-valid-drag-over-color;
     -fx-border-style: dashed inside;
     -fx-border-width: 3px;
-    -fx-border-color: sfx-opened-presentations-tab-pane-valid-drag-over-default-border-color;
 }
-
 #openedPresentationsTabPane:invalid-drag-over {
+    -fx-border-color: sfx-opened-presentations-tab-pane-border-invalid-drag-over-color;
     -fx-border-style: dashed inside;
     -fx-border-width: 3px;
-    -fx-border-color: sfx-opened-presentations-tab-pane-invalid-drag-over-default-border-color;
 }
 
 /**********************/
@@ -696,7 +597,7 @@
 /**********************/
 
 #snippetExecutorContainer .text-field {
-	-fx-background-color: sfx-snippet-executor-container-text-field-default-background-color-1, sfx-snippet-executor-container-text-field-default-background-color-2;
+	-fx-background-color: sfx-snippet-executor-container-text-field-background-color-1, sfx-snippet-executor-container-text-field-background-color-2;
 }
 
 /**************************/
@@ -704,19 +605,13 @@
 /**************************/
 
 #addressBar {
+    -fx-border-color: sfx-internal-browser-address-bar-border-color;
     -fx-background-radius: 10px;
-    -fx-border-color: sfx-internal-browser-address-bar-default-border-color;
     -fx-border-width: 0.5px;
-
 }
 
 #addressPanel {
     -fx-padding: 10px 0 0 0;
-}
-
-#addressPanel .font-awesome {
-    -fx-icon-size: 20px;
-    -fx-icon-color: sfx-internal-browser-address-bar-button-default-icon-color;
 }
 
 /**************************/
@@ -729,12 +624,12 @@
 }
 
 #templateBuilder .template-tree-view .tree-cell .font-awesome {
-    -fx-icon-color: sfx-template-builder-tree-cell-default-color-icon;
+    -fx-icon-color: sfx-template-builder-tree-cell-icon-color;
 }
 
 #templateBuilder .template-tree-view .tree-cell:validDrag .font-awesome,
 #templateBuilder .template-tree-view .tree-cell:validDrag .text {
-    -fx-fill: sfx-template-builder-tree-cell-valid-drag-default-color-icon;
+    -fx-fill: sfx-template-builder-tree-cell-icon-valid-drag-color;
     -fx-icon-color: -fx-fill;
 }
 
@@ -745,23 +640,22 @@
 }
 
 #templateBuilder .add-icon {
-    -fx-fill: sfx-template-builder-add-icon-default-fill-color;
+    -fx-fill: sfx-template-builder-add-icon-color;
 }
-
 #templateBuilder .add-icon:hover {
-    -fx-fill: sfx-template-builder-add-icon-default-hover-fill-color;
+    -fx-fill: sfx-template-builder-add-icon-hover-color;
 }
 
-#templateBuilder .button.delete-default-template-variable .font-awesome {
-    -fx-icon-color: sfx-template-builder-delete-default-template-variable-button-icon-default-fill-color;
-}
-
-#templateBuilder .button.delete-slide .font-awesome {
-    -fx-icon-color: sfx-template-builder-delete-slide-button-icon-default-fill-color;
-}
-
+#templateBuilder .button.delete-template-variable .font-awesome,
+#templateBuilder .button.delete-slide .font-awesome,
 #templateBuilder .button.delete-slide-element .font-awesome {
-    -fx-icon-color: sfx-template-builder-delete-slide-element-button-icon-default-fill-color;
+    -fx-icon-color: sfx-template-builder-delete-icon-color;
+}
+
+#templateBuilder .button.delete-template-variable:hover .font-awesome,
+#templateBuilder .button.delete-slide:hover .font-awesome,
+#templateBuilder .button.delete-slide-element:hover .font-awesome {
+    -fx-icon-color: sfx-template-builder-delete-icon-hover-color;
 }
 
 /************************/
@@ -769,6 +663,5 @@
 /************************/
 
 #quiz-content-extension-question-icon.font-awesome {
-    -fx-icon-color: sfx-quiz-content-extension-question-icon-default-icon-color;
     -fx-icon-size: 25px;
 }

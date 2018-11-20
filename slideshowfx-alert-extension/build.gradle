@@ -29,30 +29,45 @@ task createSweetAlertPackage() {
     doLast {
         def sweetAlertVersion = project.findProperty('sweetAlertVersion') ?: ''
         def binaryDir = new File("${buildDir}/tmp/sweetalert-update")
-        def newPackageDir = new File("${binaryDir}/sweetalert", sweetAlertVersion)
-        def binary = new File(newPackageDir, "sweetalert.min.js")
-
+        def binary = new File(binaryDir, "binary.zip")
+        def newPackageDir = new File("${binaryDir}/sweetalert2", sweetAlertVersion)
+        def unpackedBinary = new File("${binaryDir}/sweetalert2-${sweetAlertVersion}")
         if (!binaryDir.exists()) {
             binaryDir.mkdirs()
         }
 
-        if (!newPackageDir.exists()) {
-            newPackageDir.mkdirs()
-        }
-
-        new URL("https://unpkg.com/sweetalert@${sweetAlertVersion}/dist/sweetalert.min.js").withInputStream { i ->
+        new URL("https://github.com/sweetalert2/sweetalert2/archive/v${sweetAlertVersion}.zip").withInputStream { i ->
             binary.withOutputStream {
                 it << i
             }
         }
+
+        copy {
+            from zipTree(binary)
+            into binaryDir
+        }
+
+        binary.delete()
+
+        if (newPackageDir.exists()) {
+            newPackageDir.deleteDir()
+        }
+
+        copy {
+            from fileTree("${unpackedBinary}/dist")
+            include "sweetalert2.all.min.js"
+            into newPackageDir
+        }
+
+        unpackedBinary.deleteDir()
     }
 }
 
 task zipSweetAlertPackage(type: Zip) {
-    archiveName = "sweetalert.zip"
+    archiveName = "sweetalert2.zip"
     destinationDir = file("${buildDir}/tmp")
-    from("${buildDir}/tmp/sweetalert-update/sweetalert") {
-        into "sweetalert"
+    from("${buildDir}/tmp/sweetalert-update/sweetalert2") {
+        into "sweetalert2"
     }
 }
 

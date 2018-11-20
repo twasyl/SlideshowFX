@@ -20,7 +20,7 @@ import java.time.LocalTime;
  * the current slide of the presentation, the next one and the time elapsed since the beginning of the presentation.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class InformationPane extends StackPane {
@@ -40,10 +40,7 @@ public class InformationPane extends StackPane {
         super();
 
         this.setAlignment(Pos.TOP_LEFT);
-        this.getStylesheets().addAll(
-                InformationPane.class.getResource("/com/twasyl/slideshowfx/css/Default.css").toExternalForm(),
-                InformationPane.class.getResource("/com/twasyl/slideshowfx/css/information-scene.css").toExternalForm());
-
+        this.getStylesheets().add(InformationPane.class.getResource("/com/twasyl/slideshowfx/css/Default.css").toExternalForm());
         this.getStyleClass().add("information-scene");
 
         this.context = context;
@@ -94,7 +91,7 @@ public class InformationPane extends StackPane {
         final DoubleBinding scrollPaneWidth = width.add(10);
         final DoubleBinding height = this.heightProperty().divide(3);
 
-        this.speakerNotes.getStyleClass().add("speaker-notes");
+        this.speakerNotes.getStyleClass().addAll("text", "speaker-notes");
         this.speakerNotes.wrappingWidthProperty().bind(width);
         this.speakerNotes.setTextAlignment(TextAlignment.JUSTIFY);
 
@@ -212,13 +209,19 @@ public class InformationPane extends StackPane {
 
     /**
      * Get the browser that displays the next slide of the presentation.
+     *
      * @return The browser displaying the next slide of the presentation.
      */
-    public PresentationBrowser getNextSlideBrowser() { return nextSlideBrowser; }
+    public PresentationBrowser getNextSlideBrowser() {
+        return nextSlideBrowser;
+    }
 
     /**
      * Get the browser that displays the current slide of the presentation.
+     *
      * @return The browser displaying the current slide of the presentation.
      */
-    public PresentationBrowser getCurrentSlideBrowser() { return currentSlideBrowser; }
+    public PresentationBrowser getCurrentSlideBrowser() {
+        return currentSlideBrowser;
+    }
 }

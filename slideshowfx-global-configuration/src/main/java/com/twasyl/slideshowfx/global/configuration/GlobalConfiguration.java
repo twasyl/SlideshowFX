@@ -43,6 +43,8 @@ public class GlobalConfiguration {
     private static File LOGGING_CONFIG_FILE = null;
     private static Set<RecentPresentation> RECENT_PRESENTATIONS = null;
 
+    private static GlobalConfigurationObservable OBSERVABLE = new GlobalConfigurationObservable();
+
     /**
      * Name of the parameter used to specify if auto saving files is enabled. The value of the parameter is a boolean.
      */
@@ -133,6 +135,10 @@ public class GlobalConfiguration {
      * Name of the parameter for specifying if logs must be appended to the log file.
      */
     protected static final String LOG_FILE_APPEND_PARAMETER = "java.util.logging.FileHandler.append";
+
+    public static void addObserver(final GlobalConfigurationObserver observer) {
+        OBSERVABLE.addObserver(observer);
+    }
 
     /**
      * Get the application directory used to store the plugins and the configuration. The method will determine the
@@ -897,7 +903,12 @@ public class GlobalConfiguration {
      * @param theme The name of theme the application should use.
      */
     public static void setThemeName(final String theme) {
-        setProperty(THEME, theme);
+        String oldTheme = getThemeName();
+
+        if (!oldTheme.equals(theme)) {
+            setProperty(THEME, theme);
+            OBSERVABLE.notifyThemeChanged(oldTheme, theme);
+        }
     }
 
     /**

@@ -31,15 +31,15 @@ public class AlertContentExtension extends AbstractContentExtension {
 
     public AlertContentExtension() {
         super("ALERT",
-                AlertContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/alert/resources/sweetalert.zip"),
+                AlertContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/alert/resources/sweetalert2.zip"),
                 EXCLAMATION_TRIANGLE,
                 "Insert an alert",
                 "Insert an alert");
 
-        final String baseURL = "sweetalert/2.1.2/";
+        final String baseURL = "sweetalert2/7.29.1/";
 
         // Add URL
-        this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("sweetalert.min.js"));
+        this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("sweetalert2.all.min.js"));
     }
 
     @Override
@@ -73,21 +73,18 @@ public class AlertContentExtension extends AbstractContentExtension {
 
         builder.append("<script type=\"text/javascript\">\n");
         builder.append("\tdocument.querySelector('#").append(id).append("').onclick = function() {\n");
-        builder.append("\t\tswal({\n");
-        builder.append("\t\t\ttitle: \"").append(this.controller.getTitle()).append("\"");
+        builder.append("\t\tSwal({\n");
+        builder.append("\t\t\ttitleText: \"").append(this.controller.getTitle()).append("\"");
 
         if (this.controller.getText() != null && !this.controller.getText().isEmpty()) {
             builder.append(",\n\t\t\ttext: \"").append(this.controller.getText()).append("\"");
         }
 
-        builder.append(",\n\t\t\ticon: \"").append(this.controller.getType()).append("\",\n");
-
-        builder.append("\t\t\tbuttons: {\n");
-        builder.append("\t\t\t\tconfirm: true,\n");
-        builder.append("\t\t\t\tcancel: ").append(this.controller.isCancelButtonVisible());
-        builder.append("\n\t\t\t},\n");
-        builder.append("\t\t\tcloseOnClickOutside: ").append(this.controller.isClickOutsideAllowed()).append(",\n");
-        builder.append("\t\t\tcloseOnEsc: ").append(this.controller.isClickOutsideAllowed()).append(",\n");
+        builder.append(",\n\t\t\ttype: \"").append(this.controller.getType()).append("\",\n");
+        builder.append("\t\t\tshowConfirmButton: true,\n");
+        builder.append("\t\t\tshowCancelButton: ").append(this.controller.isCancelButtonVisible()).append(",\n");
+        builder.append("\t\t\tallowOutsideClick: ").append(this.controller.isClickOutsideAllowed()).append(",\n");
+        builder.append("\t\t\tallowEscapeKey: ").append(this.controller.isClickOutsideAllowed()).append(",\n");
         builder.append("\t\t});\n");
         builder.append("\t};\n");
         builder.append("</script>");

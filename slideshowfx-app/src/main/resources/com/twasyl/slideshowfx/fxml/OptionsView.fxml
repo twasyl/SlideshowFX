@@ -7,7 +7,7 @@
 <TabPane style="-fx-margin: 5px" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.OptionsViewController"
          minWidth="500" minHeight="400">
     <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/options-view.css" />
+        <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
     </stylesheets>
 
     <Tab text="General" closable="false">

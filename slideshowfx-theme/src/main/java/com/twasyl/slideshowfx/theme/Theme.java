@@ -12,6 +12,7 @@ import java.net.URL;
 public class Theme {
     private String name;
     private URL cssFile;
+    private String slideEditorTheme;
 
     public String getName() {
         return name;
@@ -27,6 +28,14 @@ public class Theme {
 
     public void setCssFile(URL cssFile) {
         this.cssFile = cssFile;
+    }
+
+    public String getSlideEditorTheme() {
+        return slideEditorTheme;
+    }
+
+    public void setSlideEditorTheme(String slideEditorTheme) {
+        this.slideEditorTheme = slideEditorTheme;
     }
 
     @Override

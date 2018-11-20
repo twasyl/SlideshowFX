@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.concurrent.Task;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -23,6 +24,8 @@ import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
 import java.util.HashSet;
+
+import static javafx.geometry.Pos.CENTER_LEFT;
 
 /**
  * A center that contains multiple {@link Notification}. The center displays a progress for the task that is considered
@@ -56,6 +59,7 @@ public class NotificationCenter extends StackPane {
         this.initProgressBar();
 
         final HBox currentNotificationPane = new HBox(5);
+        currentNotificationPane.setAlignment(CENTER_LEFT);
         currentNotificationPane.getChildren().addAll(this.currentTaskProgress, this.currentTaskMessage);
 
         this.getChildren().add(currentNotificationPane);

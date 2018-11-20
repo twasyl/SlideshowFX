@@ -21,7 +21,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Paint;
 
 import java.util.Base64;
 import java.util.Optional;
@@ -59,8 +58,8 @@ public class SlideshowPane extends StackPane implements Actor {
         super();
 
         EventBus.getInstance()
-            .subscribe(SERVICE_QUIZ_ON_RESULT, this)
-            .subscribe(SERVICE_CHAT_PRESENTER_ON_MESSAGE, this);
+                .subscribe(SERVICE_QUIZ_ON_RESULT, this)
+                .subscribe(SERVICE_CHAT_PRESENTER_ON_MESSAGE, this);
 
         this.getStyleClass().add("slideshow-pane");
         this.setAlignment(Pos.TOP_LEFT);

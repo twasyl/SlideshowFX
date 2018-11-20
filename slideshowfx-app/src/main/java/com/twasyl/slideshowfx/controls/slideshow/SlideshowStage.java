@@ -113,6 +113,7 @@ public class SlideshowStage implements Actor {
             final Screen screenToDisplayOn = Screen.getPrimary();
 
             this.informationPane = new InformationPane(this.context);
+            Themes.applyTheme(this.informationPane, GlobalConfiguration.getThemeName());
 
             final Scene scene = new Scene(this.informationPane);
 

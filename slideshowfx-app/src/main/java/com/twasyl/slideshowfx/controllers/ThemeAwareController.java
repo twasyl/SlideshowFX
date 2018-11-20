@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfigurationObserver;
 import com.twasyl.slideshowfx.theme.Themes;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX @@NEXT-VERSION@@
  */
-public interface ThemeAwareController extends Initializable {
+public interface ThemeAwareController extends Initializable, GlobalConfigurationObserver {
     Logger LOGGER = Logger.getLogger(ThemeAwareController.class.getName());
 
     /**
@@ -26,13 +27,19 @@ public interface ThemeAwareController extends Initializable {
 
     void postInitialize(URL location, ResourceBundle resources);
 
-    default void applyTheme() {
-        Themes.applyTheme(getRoot(), GlobalConfiguration.getThemeName());
+    default void applyTheme(final String theme) {
+        Themes.applyTheme(getRoot(), theme);
     }
 
     @Override
     default void initialize(URL location, ResourceBundle resources) {
-        this.applyTheme();
+        this.applyTheme(GlobalConfiguration.getThemeName());
+        GlobalConfiguration.addObserver(this);
         this.postInitialize(location, resources);
+    }
+
+    @Override
+    default void updateTheme(String oldTheme, String newTheme) {
+        applyTheme(newTheme);
     }
 }

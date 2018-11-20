@@ -2,11 +2,11 @@
     -fx-background-color: sfx-application-background-color;
     -fx-text-fill: sfx-text-fill;
 
-    sfx-text-fill: #A9B7C6;
-    sfx-application-background-color: #3C3F3F;
+    sfx-application-background-color: #F2F2F2;
+    sfx-text-fill: #000000;
 
     /* Colors for arrows */
-    sfx-arrow-background-color: #ADADAD;
+    sfx-arrow-background-color: sfx-text-fill;
     sfx-arrow-button-background-color: transparent;
 
     /* Colors for labels & texts */
@@ -14,21 +14,21 @@
     sfx-text-text-color: sfx-label-text-color;
 
     /* Colors for tooltips */
-    sfx-tooltip-background-color: #2B2B2B;
+    sfx-tooltip-background-color: #CFCFCF;
     sfx-tooltip-text-color: sfx-text-fill;
 
     /* Colors for separators */
     sfx-separator-horizontal-color: #5F5F5F transparent transparent transparent;
     sfx-separator-vertical-color: transparent #5F5F5F transparent transparent;
 
-    sfx-menu-bar-background-color: #3C3F3F;
+    sfx-menu-bar-background-color: #F2F2F2;
 
     sfx-menu-background-color: sfx-menu-bar-background-color;
-    sfx-menu-background-hover-color: #103750;
+    sfx-menu-background-hover-color: #3875D6;
     sfx-menu-background-showing-color: sfx-menu-background-hover-color;
 
     sfx-menu-text-color: sfx-text-fill;
-    sfx-menu-text-hover-color: sfx-menu-text-color;
+    sfx-menu-text-hover-color: #FFFFFF;
     sfx-menu-text-showing-color: sfx-menu-text-hover-color;
 
     sfx-menu-item-background-hover-color: sfx-menu-background-hover-color;
@@ -41,15 +41,15 @@
     sfx-context-menu-background-showing-color: sfx-menu-background-color;
 
     /* Colors for text inputs */
-    sfx-text-input-background-color: #2B2B2B;
+    sfx-text-input-background-color: #FFFFFF;
     sfx-text-input-text-color: sfx-text-fill;
-    sfx-text-input-prompt-text-color: #414142;
+    sfx-text-input-prompt-text-color: #DFDFDF;
 
     /* Colors for extended text fields */
-    sfx-extended-text-field-text-color: #5F5F5F;
+    sfx-extended-text-field-text-color: sfx-text-fill;
     sfx-extended-text-field-text-focused-color: #FF8000;
     sfx-extended-text-field-background-error-color1: #BC3F3C;
-    sfx-extended-text-field-background-error-color2: #2B2B2B;
+    sfx-extended-text-field-background-error-color2: #FFFFFF;
 
     /* Colors for toolbars */
     sfx-tool-bar-background-color: sfx-application-background-color;
@@ -57,13 +57,13 @@
 
     /* Colors for buttons */
     sfx-button-background-color: transparent;
-    sfx-button-background-hover-color: #686B6D;
-    sfx-button-background-pressed-color: #2B2B2B;
+    sfx-button-background-hover-color: #DFDFDF;
+    sfx-button-background-pressed-color: #CFCFCF;
     sfx-button-background-selected-color: sfx-button-background-pressed-color;
-    sfx-button-border-color: #5F5F5F;
-    sfx-button-border-hover-color: #8C9297;
-    sfx-button-border-pressed-color: #FF8000;
-    sfx-button-border-selected-color: sfx-button-border-pressed-color;
+    sfx-button-border-color: sfx-button-background-hover-color;
+    sfx-button-border-hover-color: sfx-button-border-color;
+    sfx-button-border-pressed-color: sfx-button-background-pressed-color;
+    sfx-button-border-selected-color: #FF8000;
     sfx-button-text-color: sfx-text-fill;
 
     /* Colors for combo boxes */
@@ -76,7 +76,7 @@
     sfx-combo-box-text-color: sfx-text-fill;
 
     /* Colors for checkable controls */
-    sfx-checkable-background-color: #2B2B2B;
+    sfx-checkable-background-color: #CFCFCF;
     sfx-checkable-background-selected-color: sfx-checkable-background-color;
     sfx-checkable-border-color: #B1B1B1;
     sfx-checkable-border-selected-color: sfx-checkable-border-color;
@@ -84,42 +84,42 @@
     sfx-checkable-graphic-background-color: #FF8000;
 
     /* Colors for tab panes */
-    sfx-tab-pane-header-background-color: #2B2B2B;
-    sfx-tab-pane-tab-background-color: derive(sfx-tab-pane-header-background-color, 10%);
-    sfx-tab-pane-tab-background-selected-color: derive(sfx-tab-pane-header-background-color, 30%);
+    sfx-tab-pane-header-background-color: sfx-application-background-color;
+    sfx-tab-pane-tab-background-color: #CFCFCF;
+    sfx-tab-pane-tab-background-selected-color: #FFFFFF;
     sfx-tab-pane-tab-text-color: sfx-text-fill;
-    sfx-tab-pane-tab-border-color: black;
-    sfx-tab-pane-tab-border-selected-color: derive(sfx-tab-pane-header-background-color, 20%);
-    sfx-tab-pane-tab-close-button-background-color: #A9B7C6;
-    sfx-tab-pane-tab-close-button-opacity: 0.3;
-    sfx-tab-pane-tab-close-button-opacity-hover: 0.6;
+    sfx-tab-pane-tab-border-color: #CFCFCF;
+    sfx-tab-pane-tab-border-selected-color: #CFCFCF;
+    sfx-tab-pane-tab-close-button-background-color: #CFCFCF;
+    sfx-tab-pane-tab-close-button-opacity: 0.9;
+    sfx-tab-pane-tab-close-button-opacity-hover: 1;
     sfx-tab-pane-content-area-background-color: sfx-tab-pane-header-background-color;
     sfx-tab-pane-content-area-border-color: black;
 
     /* Colors for titled panes */
     sfx-titled-pane-background-color: sfx-application-background-color;
     sfx-titled-pane-text-color: sfx-text-fill;
-    sfx-titled-pane-title-background-color: derive(#2B2B2B, 10%);
+    sfx-titled-pane-title-background-color: #CFCFCF;
     sfx-titled-pane-border-valid-drag-over-color: #A9B7C6;
 
     /* Colors for split panes */
-    sfx-split-pane-background-color: #3C3F3F;
-    sfx-split-pane-border-color: transparent transparent #282828 transparent;
-    sfx-split-pane-grabber-background-color: #2B2B2B;
-    sfx-split-pane-divider-border-color: transparent transparent transparent #5F5F5F;
+    sfx-split-pane-background-color: sfx-application-background-color;
+    sfx-split-pane-border-color: transparent transparent #CFCFCF transparent;
+    sfx-split-pane-grabber-background-color: #DFDFDF;
+    sfx-split-pane-divider-border-color: transparent transparent transparent #CFCFCF;
 
     /* Colors for dialog panes */
     sfx-dialog-pane-header-background-color: transparent;
 
     /* Colors for scroll panes */
-    sfx-scroll-pane-background-color: #3C3F3F;
+    sfx-scroll-pane-background-color: sfx-application-background-color;
 
     /* Colors for scroll bars */
-    sfx-scroll-bar-main-background-color: #3C3F3F;
-    sfx-scroll-bar-thumb-background-color: #585858;
+    sfx-scroll-bar-main-background-color: #CFCFCF;
+    sfx-scroll-bar-thumb-background-color: #DFDFDF;
 
     /* Colors for progress bars */
-    sfx-progress-bar-background-color: #2B2B2B;
+    sfx-progress-bar-background-color: sfx-button-background-pressed-color;
     sfx-progress-bar-track-background-color: sfx-progress-bar-background-color;
     sfx-progress-bar-track-text-box-border-color: sfx-text-fill;
 
@@ -132,27 +132,27 @@
     sfx-icon-stack-icon-1-color: #FF8000;
 
     /* Colors for list cells */
-    sfx-list-cell-background-color: #3C3F3F;
+    sfx-list-cell-background-color: sfx-application-background-color;
     sfx-list-cell-background-empty-color: sfx-list-cell-background-color;
     sfx-list-cell-background-filled-color: sfx-list-cell-background-color;
-    sfx-list-cell-background-hover-color: #103750;
+    sfx-list-cell-background-hover-color: #3875D6;
     sfx-list-cell-background-selected-color: sfx-list-cell-background-hover-color;
     sfx-list-cell-text-color: sfx-text-fill;
-    sfx-list-cell-text-hover-color: sfx-list-cell-text-color;
+    sfx-list-cell-text-hover-color: #FFFFFF;
     sfx-list-cell-text-selected-color: sfx-list-cell-text-hover-color;
 
     /* Colors for tree cells */
-    sfx-tree-cell-background-color: #3C3F3F;
-    sfx-tree-cell-background-selected-color: #103750;
+    sfx-tree-cell-background-color: sfx-application-background-color;
+    sfx-tree-cell-background-selected-color: #3875D6;
     sfx-tree-cell-text-color: sfx-text-fill;
-    sfx-tree-cell-text-selected-color: sfx-tree-cell-text-color;
+    sfx-tree-cell-text-selected-color: #FFFFFF;
 
-    /* Colors for table cells */
-    sfx-table-header-background-color: derive(sfx-tab-pane-header-background-color, 10%);
-    sfx-table-cell-background-even-color: derive(#3C3F3F, 10%);
-    sfx-table-cell-background-odd-color: #3C3F3F;
-    sfx-table-cell-background-selected-color: #103750;
-    sfx-table-cell-text-selected-color: sfx-text-fill;
+    /* Colors for tables */
+    sfx-table-header-background-color: #CFCFCF;
+    sfx-table-cell-background-even-color: #FFFFFF;
+    sfx-table-cell-background-odd-color: #F2F2F2;
+    sfx-table-cell-background-selected-color: #3875D6;
+    sfx-table-cell-text-selected-color: #FFFFFF;
 
     /* Colors for messages boxes */
     sfx-messages-box-border-color: #FF8000;
@@ -182,7 +182,7 @@
     sfx-server-button-stop-server-color: #FF8000;
 
     /* Colors for the opened presentations tab pane */
-    sfx-opened-presentations-tab-pane-background-color: #2B2B2B;
+    sfx-opened-presentations-tab-pane-background-color: #B6B6B6;
     sfx-opened-presentations-tab-pane-border-valid-drag-over-color: #A9B7C6;
     sfx-opened-presentations-tab-pane-border-invalid-drag-over-color: #BC3F3C;
 

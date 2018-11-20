@@ -120,7 +120,7 @@ task createSlideContentEditor {
 
         copy {
             from fileTree("${unpackedBinary}/src-min-noconflict")
-            include "ace.js", "snippets/asciidoc.js", "snippets/html*.js", "snippets/markdown.js", "snippets/textile.js", "ext-language_tools.js", "ext-searchbox.js", "ext-static_highlight.js", "ext-whitespace.js", "keybinding-*.js", "mode-asciidoc.js", "mode-html.js", "mode-markdown.js", "mode-textile.js", "theme-tomorrow_night.js", "worker-*.js"
+            include "ace.js", "snippets/asciidoc.js", "snippets/html*.js", "snippets/markdown.js", "snippets/textile.js", "ext-language_tools.js", "ext-searchbox.js", "ext-static_highlight.js", "ext-whitespace.js", "keybinding-*.js", "mode-asciidoc.js", "mode-html.js", "mode-markdown.js", "mode-textile.js", "theme-tomorrow_night.js", "theme-xcode.js", "worker-*.js"
             into file("${newEditorDir}/ace/${aceVersion}")
         }
 
@@ -212,6 +212,12 @@ task createSlideContentEditor {
                 editor.setFontSize(currentFontSize + changeFontSizeBy);
             }
         }
+        
+        // Change the theme of the editor.
+        function changeTheme(theme) {
+            var editor = ace.edit("editor");
+            editor.setTheme("ace/theme/" + theme);
+        }
     </script>
     <script src="ace/${aceVersion}/ace.js"></script>
 </head>
@@ -220,8 +226,8 @@ task createSlideContentEditor {
 
     <script type="text/javascript">
         var editor = ace.edit("editor");
-        editor.setTheme("ace/theme/tomorrow_night");
         editor.getSession().setUseWrapMode(true);
+        changeTheme('tomorrow_night');
     </script>
 </body>
 </html>

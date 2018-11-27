@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 <VBox xmlns:fx="http://javafx.com/fxml" spacing="5" style="-fx-padding: 5px;"
@@ -23,6 +22,12 @@
         </ScrollPane>
     </SplitPane>
 
-    <Button text="Add a new image to the resources" prefWidth="300" onAction="#chooseNewFile" />
+    <HBox spacing="5" alignment="BASELINE_LEFT">
+        <Button text="Add a new image to the resources" prefWidth="300" onAction="#chooseNewFile" />
+        <Label text="Image width:" />
+        <TextField fx:id="imageWidth" prefColumnCount="5" />
+        <Label text="Image height:" />
+        <TextField fx:id="imageHeight" prefColumnCount="5" />
+    </HBox>
 </VBox>
 

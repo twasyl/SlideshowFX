@@ -21,6 +21,8 @@ Changes to the SlideshowFX software are listed by version within this document.
 * New theme functionality
 * Uses ACE 1.4.1 in the slide content editor
 * Support Ruby executable snippets
+* Image extension allows to specify image's dimensions
+* Image extension memorize the latest used folder
 
 #### Bug fixes
 

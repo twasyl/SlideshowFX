@@ -58,9 +58,9 @@ public class ImageContentExtension extends AbstractContentExtension {
             if (markup == null || "HTML".equals(markup.getCode())) {
                 builder.append(this.buildDefaultContentString());
             } else if ("TEXTILE".equals(markup.getCode())) {
-                builder.append("!").append(this.controller.getSelectedFileUrl()).append("!");
+                builder.append(this.buildTextileContentString());
             } else if ("MARKDOWN".equals(markup.getCode())) {
-                builder.append("![](").append(this.controller.getSelectedFileUrl()).append(")");
+                builder.append(this.buildMarkdownContentString());
             } else {
                 builder.append(this.buildDefaultContentString());
             }
@@ -75,7 +75,56 @@ public class ImageContentExtension extends AbstractContentExtension {
         final StringBuilder builder = new StringBuilder();
         builder.append("<img src=\"")
                 .append(this.controller.getSelectedFileUrl())
-                .append("\" />");
+                .append("\" ");
+
+        if (this.controller.hasImageWidth()) {
+            builder.append("width=\"").append(this.controller.getImageWidth()).append("\" ");
+        }
+
+        if (this.controller.hasImageHeight()) {
+            builder.append("height=\"").append(this.controller.getImageHeight()).append("\" ");
+        }
+
+        builder.append("/>");
+
+        return builder.toString();
+    }
+
+    private String buildTextileContentString() {
+        final StringBuilder builder = new StringBuilder("!");
+
+        final boolean hasImageWidth = this.controller.hasImageWidth();
+        final boolean hasImageHeight = this.controller.hasImageHeight();
+
+        if (hasImageWidth || hasImageHeight) {
+            builder.append("{");
+
+            if (hasImageWidth) {
+                builder.append("width: ").append(this.controller.getImageWidth()).append(";");
+            }
+            if (hasImageHeight) {
+                builder.append("height: ").append(this.controller.getImageHeight()).append(";");
+            }
+
+            builder.append("}");
+        }
+
+        builder.append(this.controller.getSelectedFileUrl()).append("!");
+
+        return builder.toString();
+    }
+
+    private String buildMarkdownContentString() {
+        final StringBuilder builder = new StringBuilder();
+
+        final boolean hasImageWidth = this.controller.hasImageWidth();
+        final boolean hasImageHeight = this.controller.hasImageHeight();
+
+        if (hasImageWidth || hasImageHeight) {
+            builder.append(this.buildDefaultContentString());
+        } else {
+            builder.append("![](").append(this.controller.getSelectedFileUrl()).append(")");
+        }
 
         return builder.toString();
     }

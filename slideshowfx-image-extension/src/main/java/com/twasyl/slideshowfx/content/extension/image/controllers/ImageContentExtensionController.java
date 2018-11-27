@@ -16,6 +16,7 @@ import javafx.stage.FileChooser;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,17 +25,22 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.twasyl.slideshowfx.osgi.OSGiManager.PRESENTATION_RESOURCES_FOLDER;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.util.stream.Collectors.toList;
+import static javafx.scene.control.ButtonType.CANCEL;
+
 /**
  * This class is the controller for the {@code com.twasyl.slideshowfx.content.extension.images.fxmlImageContentExtension.fxml}.
  *
  * @author Thierry Wasylczenko
- * @version 1.3
+ * @version 1.4
  * @since SlideshowFX 1.0
  */
 public class ImageContentExtensionController extends AbstractContentExtensionController {
     private static final Logger LOGGER = Logger.getLogger(ImageContentExtensionController.class.getName());
-    public static final FileChooser.ExtensionFilter IMAGES_FILES = new FileChooser.ExtensionFilter("Image files", "*.png", "*.bmp", "*.jpg", "*.jpeg", "*.gif", "*.svg");
-    public static final FileFilter IMAGE_FILTER = new FileFilter() {
+    private static final FileChooser.ExtensionFilter IMAGES_FILES = new FileChooser.ExtensionFilter("Image files", "*.png", "*.bmp", "*.jpg", "*.jpeg", "*.gif", "*.svg");
+    private static final FileFilter IMAGE_FILTER = new FileFilter() {
         private final String[] extensions = new String[]{".png", ".bmp", ".gif", ".jpg", ".jpeg", ".svg"};
 
         @Override
@@ -49,11 +55,16 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
             return accept;
         }
     };
+    private static File previouslyChosenImageDir;
 
     @FXML
     private FlowPane imagesPane;
     @FXML
     private ImageView preview;
+    @FXML
+    private TextField imageWidth;
+    @FXML
+    private TextField imageHeight;
 
     private final ToggleGroup imagesGroup = new ToggleGroup();
 
@@ -61,24 +72,49 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
     private void chooseNewFile(ActionEvent event) {
 
         final FileChooser chooser = new FileChooser();
+
+        if (previouslyChosenImageDir != null) {
+            chooser.setInitialDirectory(previouslyChosenImageDir);
+        }
+
         chooser.getExtensionFilters().add(IMAGES_FILES);
 
         File imageFile = chooser.showOpenDialog(null);
 
         if (imageFile != null) {
-
             final OSGiManager manager = OSGiManager.getInstance();
-            File targetFile = new File((File) manager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER), imageFile.getName());
+            File targetFile = new File((File) manager.getPresentationProperty(PRESENTATION_RESOURCES_FOLDER), imageFile.getName());
+            final CopyOption[] copyOptions;
 
             if (targetFile.exists()) {
-                // If the file exists, add a timestamp to the source
-                targetFile = new File((File) manager.getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER), System.currentTimeMillis() + imageFile.getName());
+                final ButtonType replace = new ButtonType("Replace");
+                final ButtonType keepBoth = new ButtonType("Keep both");
+
+                final ButtonType answer = DialogHelper.showDialog("Image already exists",
+                        new Label("The image already exists. What would you like to do?"),
+                        CANCEL, replace, keepBoth);
+                if (CANCEL == answer) {
+                    return;
+                } else if (replace == answer) {
+                    copyOptions = new CopyOption[]{REPLACE_EXISTING};
+                } else {
+                    copyOptions = new CopyOption[0];
+                    // If the file exists, add a timestamp to the source
+                    targetFile = new File((File) manager.getPresentationProperty(PRESENTATION_RESOURCES_FOLDER), System.currentTimeMillis() + imageFile.getName());
+                }
+            } else {
+                copyOptions = new CopyOption[0];
             }
 
             try {
-                Files.copy(imageFile.toPath(), targetFile.toPath());
+                Files.copy(imageFile.toPath(), targetFile.toPath(), copyOptions);
+                previouslyChosenImageDir = imageFile.getParentFile();
 
-                final ToggleButton newFileButton = this.addFile(targetFile);
+                if (Arrays.binarySearch(copyOptions, REPLACE_EXISTING) != -1) {
+                    this.cleanButtonsWithFile(targetFile);
+                }
+
+                final ToggleButton newFileButton = this.addButtonWithFile(targetFile);
                 newFileButton.setSelected(true);
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not copy the image file", e);
@@ -94,14 +130,27 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
     private List<File> lookupResources() {
         final List<File> images = new ArrayList<>();
 
-        final File resourcesFolder = (File) OSGiManager.getInstance().getPresentationProperty(OSGiManager.PRESENTATION_RESOURCES_FOLDER);
+        final File resourcesFolder = (File) OSGiManager.getInstance().getPresentationProperty(PRESENTATION_RESOURCES_FOLDER);
         final File[] files = resourcesFolder.listFiles(IMAGE_FILTER);
 
         if (files != null) {
-            Arrays.stream(files).forEach(images::add);
+            images.addAll(Arrays.asList(files));
         }
 
         return images;
+    }
+
+    /**
+     * Clean all {@link ToggleButton} having the same file as the given one stored in their
+     * {@link ToggleButton#getUserData() user data}. If the given file is {@code null}, nothing is performed.
+     *
+     * @param file The file to remove the duplicates.
+     */
+    private void cleanButtonsWithFile(final File file) {
+        this.imagesPane.getChildren().removeAll(
+                this.imagesPane.getChildren().stream()
+                        .filter(node -> file.equals(node.getUserData()))
+                        .collect(toList()));
     }
 
     /**
@@ -112,7 +161,7 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
      * @param file The file to add.
      * @return The button created for the given file.
      */
-    private ToggleButton addFile(File file) {
+    private ToggleButton addButtonWithFile(File file) {
 
         Node buttonGraphic = null;
 
@@ -140,9 +189,6 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
         buttonFile.setToggleGroup(this.imagesGroup);
         this.defineContextMenuForImageButton(buttonFile);
 
-        /**
-         * Defines the listener for the #selectedProperty.
-         */
         buttonFile.selectedProperty().addListener((value, oldValue, newValue) -> {
 
             if (newValue != null && newValue) {
@@ -178,14 +224,11 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
                         String.format("Are you sure you want to delete the image %1$s?", image.getName()));
 
                 if (answer == ButtonType.YES) {
-
-                    if (image != null && image.exists()) {
-                        if (image.delete()) {
-                            this.imagesPane.getChildren().remove(button);
-                        } else {
-                            DialogHelper.showError("Delete image",
-                                    String.format("The image %1$s can not be deleted", image.getName()));
-                        }
+                    if (image.delete()) {
+                        this.imagesPane.getChildren().remove(button);
+                    } else {
+                        DialogHelper.showError("Delete image",
+                                String.format("The image %1$s can not be deleted", image.getName()));
                     }
                 }
             } else {
@@ -230,6 +273,42 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
         return url;
     }
 
+    /**
+     * Get the desired image width the user has put in the text field. The returned value may be {@code null}.
+     *
+     * @return The filled image width.
+     */
+    public String getImageWidth() {
+        return this.imageWidth.getText();
+    }
+
+    /**
+     * Checks if a value has been entered in the image width field text field.
+     *
+     * @return {@code true} if a value has been entered and is not empty, {@code false} otherwise.
+     */
+    public boolean hasImageWidth() {
+        return this.getImageWidth() != null && !this.getImageWidth().trim().isEmpty();
+    }
+
+    /**
+     * Get the desired image height the user has put in the text field. The returned value may be {@code null}.
+     *
+     * @return The filled image height.
+     */
+    public String getImageHeight() {
+        return this.imageHeight.getText();
+    }
+
+    /**
+     * Checks if a value has been entered in the image height field text field.
+     *
+     * @return {@code true} if a value has been entered and is not empty, {@code false} otherwise.
+     */
+    public boolean hasImageHeight() {
+        return this.getImageHeight() != null && !this.getImageHeight().trim().isEmpty();
+    }
+
     @Override
     public ReadOnlyBooleanProperty areInputsValid() {
         final ReadOnlyBooleanWrapper property = new ReadOnlyBooleanWrapper();
@@ -241,6 +320,6 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         List<File> images = this.lookupResources();
-        images.forEach(image -> this.addFile(image));
+        images.forEach(this::addButtonWithFile);
     }
 }

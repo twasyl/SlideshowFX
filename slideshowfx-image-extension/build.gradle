@@ -10,6 +10,11 @@ dependencies {
     api project(':slideshowfx-plugin')
     implementation project(':slideshowfx-osgi')
     api project(':slideshowfx-ui-controls')
+
+    testCompile "org.mockito:mockito-core:${rootProject.ext.dependencies.mockito.version}"
+    testCompile project(':slideshowfx-html')
+    testCompile project(':slideshowfx-markdown')
+    testCompile project(':slideshowfx-textile')
 }
 
 ext.isPlugin = true

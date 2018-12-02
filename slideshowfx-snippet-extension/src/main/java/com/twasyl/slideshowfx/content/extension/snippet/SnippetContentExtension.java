@@ -27,10 +27,8 @@ import static com.twasyl.slideshowfx.icons.Icon.TERMINAL;
  * @version 1.2
  * @since SlideshowFX 1.0
  */
-public class SnippetContentExtension extends AbstractContentExtension {
+public class SnippetContentExtension extends AbstractContentExtension<SnippetContentExtensionController> {
     private static final Logger LOGGER = Logger.getLogger(SnippetContentExtension.class.getName());
-
-    private SnippetContentExtensionController controller;
 
     public SnippetContentExtension() {
         super("SNIPPET",
@@ -83,14 +81,14 @@ public class SnippetContentExtension extends AbstractContentExtension {
                 .append("border-radius: 10px 10px 0 0\" id=\"").append(codeSnippetId).append("\">\n")
                 .append("   <i id=\"").append(executeCodeSnippetId).append("\" class=\"fas fa-terminal fa-fw\" ")
                 .append("onclick=\"javascript:executeCodeSnippet('")
-                .append(this.controller.getSnippetExecutor().getCode())
-                .append("', '").append(Base64.getEncoder().encodeToString(this.controller.getCodeSnippet().toJson().getBytes(getDefaultCharset()))).append("', '")
+                .append(this.getController().getSnippetExecutor().getCode())
+                .append("', '").append(Base64.getEncoder().encodeToString(this.getController().getCodeSnippet().toJson().getBytes(getDefaultCharset()))).append("', '")
                 .append(id).append("');\"></i>\n")
                 .append("</div>\n")
                 .append("<pre id=\"").append(codeSnippetConsoleId).append("\" style=\"margin-top: 0\" ")
-                .append("class=\"").append(this.controller.getSnippetExecutor().getCssClass()).append("\">")
-                .append("<code class=\"").append(this.controller.getSnippetExecutor().getCssClass()).append("\">")
-                .append(this.controller.getCodeSnippet().getCode())
+                .append("class=\"").append(this.getController().getSnippetExecutor().getCssClass()).append("\">")
+                .append("<code class=\"").append(this.getController().getSnippetExecutor().getCssClass()).append("\">")
+                .append(this.getController().getCodeSnippet().getCode())
                 .append("</code></pre>\n")
                 .append("<pre id=\"").append(codeSnippetConsoleOutputId).append("\" class=\"language-bash\" style=\"display: none; margin-top: 0;\">")
                 .append("<code class=\"language-bash\"></code></pre>");
@@ -99,6 +97,6 @@ public class SnippetContentExtension extends AbstractContentExtension {
 
     @Override
     public ReadOnlyBooleanProperty areInputsValid() {
-        return this.controller.areInputsValid();
+        return this.getController().areInputsValid();
     }
 }

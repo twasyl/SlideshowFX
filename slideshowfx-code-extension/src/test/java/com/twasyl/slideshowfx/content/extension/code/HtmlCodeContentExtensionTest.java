@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import static com.twasyl.slideshowfx.content.extension.code.enums.SupportedLanguage.JAVA;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 
 /**
  * This class tests the {@link CodeContentExtension} class using a HTML markup.
@@ -20,13 +21,12 @@ public class HtmlCodeContentExtensionTest extends BaseCodeContentExtensionTest {
 
     @BeforeAll
     public static void setUp() {
-        extension = new CodeContentExtension();
         markup = new HtmlMarkup();
     }
 
     @Test
     public void showLines() {
-        extension.controller = mockController("private String s;", true, JAVA, null);
+        doReturn(mockController("private String s;", true, JAVA, null)).when(extension).getController();
         final String content = extension.buildContentString(markup);
 
         final Pattern pattern = Pattern.compile("line\\-numbers");
@@ -38,7 +38,7 @@ public class HtmlCodeContentExtensionTest extends BaseCodeContentExtensionTest {
 
     @Test
     public void dontShowLines() {
-        extension.controller = mockController("private String s;", false, JAVA, null);
+        doReturn(mockController("private String s;", false, JAVA, null)).when(extension).getController();
         final String content = extension.buildContentString(markup);
 
         final Pattern pattern = Pattern.compile("line\\-numbers");
@@ -49,7 +49,7 @@ public class HtmlCodeContentExtensionTest extends BaseCodeContentExtensionTest {
 
     @Test
     public void javaLanguage() {
-        extension.controller = mockController("private String s;", true, JAVA, null);
+        doReturn(mockController("private String s;", true, JAVA, null)).when(extension).getController();
         final String content = extension.buildContentString(markup);
 
         final Pattern pattern = Pattern.compile(JAVA.getCssClass());
@@ -60,7 +60,7 @@ public class HtmlCodeContentExtensionTest extends BaseCodeContentExtensionTest {
 
     @Test
     public void lineSpecifierCodeMultiLines() {
-        extension.controller = mockController("private String s;\n\nprivate boolean b;", false, JAVA, null);
+        doReturn(mockController("private String s;\n\nprivate boolean b;", false, JAVA, null)).when(extension).getController();
         final String content = extension.buildContentString(markup);
 
         assertTrue(content.startsWith("<pre class=\"" + JAVA.getCssClass() + "\"><code class=\"" + JAVA.getCssClass() + "\">"));
@@ -69,7 +69,7 @@ public class HtmlCodeContentExtensionTest extends BaseCodeContentExtensionTest {
 
     @Test
     public void withoutLanguageAndDontShowLines() {
-        extension.controller = mockController("private String s;", false, null, null);
+        doReturn(mockController("private String s;", false, null, null)).when(extension).getController();
         final String content = extension.buildContentString(markup);
 
         assertTrue(content.startsWith("<pre><code>"));
@@ -78,7 +78,7 @@ public class HtmlCodeContentExtensionTest extends BaseCodeContentExtensionTest {
 
     @Test
     public void withoutLanguageAndHighlightedLine() {
-        extension.controller = mockController("private String s;", false, null, "1");
+        doReturn(mockController("private String s;", false, null, "1")).when(extension).getController();
         final String content = extension.buildContentString(markup);
 
         assertTrue(content.startsWith("<pre data-line=\"1\"><code>"));
@@ -87,7 +87,7 @@ public class HtmlCodeContentExtensionTest extends BaseCodeContentExtensionTest {
 
     @Test
     public void withOneHighlightedLine() {
-        extension.controller = mockController("private String s;\n\nprivate boolean b;", false, JAVA, "2");
+        doReturn(mockController("private String s;\n\nprivate boolean b;", false, JAVA, "2")).when(extension).getController();
         final String content = extension.buildContentString(markup);
 
         assertTrue(content.startsWith("<pre class=\"" + JAVA.getCssClass() + "\" data-line=\"2\"><code class=\"" + JAVA.getCssClass() + "\">"));
@@ -96,7 +96,7 @@ public class HtmlCodeContentExtensionTest extends BaseCodeContentExtensionTest {
 
     @Test
     public void withMultipleHighlightedLines() {
-        extension.controller = mockController("private String s;\n\nprivate boolean b;", false, JAVA, "1,2");
+        doReturn(mockController("private String s;\n\nprivate boolean b;", false, JAVA, "1,2")).when(extension).getController();
         final String content = extension.buildContentString(markup);
 
         assertTrue(content.startsWith("<pre class=\"" + JAVA.getCssClass() + "\" data-line=\"1,2\"><code class=\"" + JAVA.getCssClass() + "\">"));
@@ -105,7 +105,7 @@ public class HtmlCodeContentExtensionTest extends BaseCodeContentExtensionTest {
 
     @Test
     public void withHighlightedLinesRange() {
-        extension.controller = mockController("private String s;\n\nprivate boolean b;", false, JAVA, "1-2");
+        doReturn(mockController("private String s;\n\nprivate boolean b;", false, JAVA, "1-2")).when(extension).getController();
         final String content = extension.buildContentString(markup);
 
         assertTrue(content.startsWith("<pre class=\"" + JAVA.getCssClass() + "\" data-line=\"1-2\"><code class=\"" + JAVA.getCssClass() + "\">"));

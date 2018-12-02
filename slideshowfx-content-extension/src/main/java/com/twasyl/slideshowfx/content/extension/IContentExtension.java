@@ -19,7 +19,7 @@ import java.util.Set;
  * @version 1.1
  * @since SlideshowFX 1.0
  */
-public interface IContentExtension extends IPlugin {
+public interface IContentExtension<T extends AbstractContentExtensionController> extends IPlugin {
 
     /**
      * Get the code of this content extension. The code represents a unique ID between all content extensions in order
@@ -83,6 +83,14 @@ public interface IContentExtension extends IPlugin {
      * @return The pane containing the UI for this content extension.
      */
     Pane getUI();
+
+    /**
+     * Get the JavaFX controller of this extension. The implementation of the controller is a subclass of {@link AbstractContentExtensionController}.
+     * The controller may only be set after the call of the {@link #getUI()} method.
+     *
+     * @return The controller of this extension.
+     */
+    T getController();
 
     /**
      * Build the content defined by the {@link #getUI()} method according the given markup. If the given markup is null,

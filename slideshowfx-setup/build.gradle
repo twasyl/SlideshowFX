@@ -1,5 +1,5 @@
 description = 'Module for the installer of SlideshowFX'
-version = '2.0'
+version = '@@NEXT_VERSION@@'
 
 apply plugin: 'java'
 apply plugin: 'distribution'
@@ -13,7 +13,9 @@ dependencies {
 }
 
 ext.packaging = [
-        extension: rootProject.ext.os.MAC == rootProject.getPlatform() ? ".app" : ""
+        extension: rootProject.ext.os.MAC == rootProject.getPlatform() ? ".app" : "",
+        deployOutDir: new File("${buildDir}/bundle"),
+        deployResourcesDir: new File("${buildDir}/tmp/bundles")
 ]
 
 processResources {
@@ -82,41 +84,40 @@ task prepareBundle() {
     }
 }
 
+task cleanResidualBundlesFile(type: Delete) {
+    delete fileTree(dir: project.ext.packaging.deployResourcesDir)
+    delete fileTree(dir: project.ext.packaging.deployOutDir, include: '*', exclude: 'bundles')
+    delete fileTree(dir: "${buildDir}/bundle/bundles", include: '*', excludes: ["documentations", "SlideshowFXSetup${project.ext.packaging.extension}"])
+}
+
 task createBundle() {
-    outputs.files("${buildDir}/bundle/bundles/SlideshowFXSetup${project.ext.packaging.extension}")
+    def platform = rootProject.getPlatform()
 
-    doLast {
-        def deployOutDir = new File("${buildDir}/bundle")
-        def deployResourcesDir = new File("${buildDir}/tmp/bundles")
+    ant.importBuild "${projectDir}/src/assembly/javafx/SlideshowFX-setup.xml"
+    ant.classpath = "${System.env['JAVA_HOME']}/lib/ant-javafx.jar"
+    ant['build.deploy.out.dir'] = project.ext.packaging.deployOutDir.absolutePath
+    ant['build.deploy.out.file'] = "SlideshowFXSetup"
+    ant['build.deploy.resources.dir'] = project.ext.packaging.deployResourcesDir.absolutePath
 
-        ant.importBuild "${projectDir}/src/assembly/javafx/SlideshowFX-setup.xml"
-        ant.classpath = "${System.env['JAVA_HOME']}/lib/ant-javafx.jar"
-        ant['build.deploy.out.dir'] = deployOutDir.absolutePath
-        ant['build.deploy.out.file'] = "SlideshowFXSetup"
-        ant['build.deploy.resources.dir'] = deployResourcesDir.absolutePath
-
-        if (!new File(ant['build.deploy.out.dir']).exists()) {
-            new File(ant['build.deploy.out.dir']).mkdirs()
-        }
-
-        def platform = rootProject.getPlatform()
-
-        if (platform == rootProject.ext.os.MAC) {
-            logger.info('Building the OSX bundle')
-            deployOSX.execute()
-        } else if (platform == rootProject.ext.os.WINDOWS) {
-            logger.info('Building the Windows bundle')
-            deployWindows.execute()
-        } else {
-            logger.info('Building the unix bundle')
-            deployUnknown.execute()
-        }
-
-        deployResourcesDir.deleteDir()
-        new File(deployOutDir, "package").deleteDir()
-        delete fileTree(dir: deployOutDir, exclude: 'bundles')
-        delete fileTree(dir: "${buildDir}/bundle/bundles", excludes: ["documentations", "SlideshowFXSetup${project.ext.packaging.extension}"])
+    if (!project.ext.packaging.deployOutDir.exists()) {
+        project.ext.packaging.deployOutDir.mkdirs()
     }
+
+    if (platform == rootProject.ext.os.MAC) {
+        logger.info('Building the OSX setup bundle')
+        finalizedBy deployOSX
+        deployOSX.finalizedBy cleanResidualBundlesFile
+    } else if (platform == rootProject.ext.os.WINDOWS) {
+        logger.info('Building the Windows setup bundle')
+        finalizedBy deployWindows
+        deployWindows.finalizedBy cleanResidualBundlesFile
+    } else {
+        logger.info('Building the unix setup bundle')
+        finalizedBy deployUnknown
+        deployUnknown.finalizedBy cleanResidualBundlesFile
+    }
+
+    outputs.files("${buildDir}/bundle/bundles/SlideshowFXSetup${project.ext.packaging.extension}")
 }
 
 distributions {

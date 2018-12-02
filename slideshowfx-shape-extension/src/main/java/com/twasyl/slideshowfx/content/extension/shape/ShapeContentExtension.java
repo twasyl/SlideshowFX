@@ -25,10 +25,8 @@ import static com.twasyl.slideshowfx.icons.Icon.STAR;
  * @version 1.0
  * @since SlideshowFX 2.0
  */
-public class ShapeContentExtension extends AbstractContentExtension {
+public class ShapeContentExtension extends AbstractContentExtension<ShapeContentExtensionController> {
     private static final Logger LOGGER = Logger.getLogger(ShapeContentExtension.class.getName());
-
-    protected ShapeContentExtensionController controller;
 
     public ShapeContentExtension() {
         super("SHAPE",
@@ -70,8 +68,8 @@ public class ShapeContentExtension extends AbstractContentExtension {
     @Override
     public String buildDefaultContentString() {
         final String id = "sfx" + System.currentTimeMillis();
-        final int drawingWidth = this.controller.getDrawingWidth();
-        final int drawingHeight = this.controller.getDrawingHeight();
+        final int drawingWidth = this.getController().getDrawingWidth();
+        final int drawingHeight = this.getController().getDrawingHeight();
         final String paper = "paper";
 
         final StringBuilder builder = new StringBuilder("<svg id=\"").append(id).append("\" ")
@@ -82,7 +80,7 @@ public class ShapeContentExtension extends AbstractContentExtension {
 
         final StringJoiner shapes = new StringJoiner("\n\t");
 
-        this.controller.getShapes().forEach(drawing -> {
+        this.getController().getShapes().forEach(drawing -> {
             shapes.add(drawing.buildCreatingInstruction(paper));
         });
 
@@ -93,6 +91,6 @@ public class ShapeContentExtension extends AbstractContentExtension {
 
     @Override
     public ReadOnlyBooleanProperty areInputsValid() {
-        return this.controller.areInputsValid();
+        return this.getController().areInputsValid();
     }
 }

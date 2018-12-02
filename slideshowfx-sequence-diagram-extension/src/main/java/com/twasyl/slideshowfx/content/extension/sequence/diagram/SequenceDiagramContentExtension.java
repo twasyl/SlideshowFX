@@ -23,10 +23,8 @@ import static com.twasyl.slideshowfx.icons.Icon.SHARE_ALT_SQUARE;
  * @version 1.1
  * @since SlideshowFX 1.0
  */
-public class SequenceDiagramContentExtension extends AbstractContentExtension {
+public class SequenceDiagramContentExtension extends AbstractContentExtension<SequenceDiagramContentExtensionController> {
     private static final Logger LOGGER = Logger.getLogger(SequenceDiagramContentExtension.class.getName());
-
-    private SequenceDiagramContentExtensionController controller;
 
     public SequenceDiagramContentExtension() {
         super("SEQUENCE_DIAGRAM",
@@ -68,7 +66,7 @@ public class SequenceDiagramContentExtension extends AbstractContentExtension {
     public String buildDefaultContentString() {
         final StringBuilder builder = new StringBuilder("<script type='text/jumly+sequence'>\n");
 
-        builder.append(this.controller.getSequenceDiagramText())
+        builder.append(this.getController().getSequenceDiagramText())
                 .append("\n</script>");
 
         return builder.toString();
@@ -76,6 +74,6 @@ public class SequenceDiagramContentExtension extends AbstractContentExtension {
 
     @Override
     public ReadOnlyBooleanProperty areInputsValid() {
-        return this.controller.areInputsValid();
+        return this.getController().areInputsValid();
     }
 }

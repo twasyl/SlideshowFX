@@ -23,10 +23,8 @@ import static com.twasyl.slideshowfx.icons.Icon.LINK;
  * @version 1.2
  * @since SlideshowFX 1.0
  */
-public class LinkContentExtension extends AbstractContentExtension {
+public class LinkContentExtension extends AbstractContentExtension<LinkContentExtensionController> {
     private static final Logger LOGGER = Logger.getLogger(LinkContentExtension.class.getName());
-
-    protected LinkContentExtensionController controller;
 
     public LinkContentExtension() {
         super("LINK", null,
@@ -54,7 +52,7 @@ public class LinkContentExtension extends AbstractContentExtension {
     @Override
     public String buildContentString(IMarkup markup) {
         final StringBuilder builder = new StringBuilder();
-        final boolean addressNotEmpty = this.controller.getAddress() != null && !this.controller.getAddress().trim().isEmpty();
+        final boolean addressNotEmpty = this.getController().getAddress() != null && !this.getController().getAddress().trim().isEmpty();
 
         if (addressNotEmpty) {
             if (markup == null || "HTML".equals(markup.getCode())) {
@@ -74,9 +72,9 @@ public class LinkContentExtension extends AbstractContentExtension {
     public String buildDefaultContentString() {
 
         final StringBuilder builder = new StringBuilder();
-        builder.append("<a href=\"").append(this.controller.getAddress()).append("\">")
-                .append(this.controller.getText() == null || this.controller.getText().trim().isEmpty() ?
-                        this.controller.getAddress() : this.controller.getText())
+        builder.append("<a href=\"").append(this.getController().getAddress()).append("\">")
+                .append(this.getController().getText() == null || this.getController().getText().trim().isEmpty() ?
+                        this.getController().getAddress() : this.getController().getText())
                 .append("</a>");
 
         return builder.toString();
@@ -90,13 +88,13 @@ public class LinkContentExtension extends AbstractContentExtension {
     private String buildTextileContentString() {
         final StringBuilder builder = new StringBuilder("\"");
 
-        if (this.controller.getText() == null || this.controller.getText().trim().isEmpty()) {
-            builder.append(this.controller.getAddress());
+        if (this.getController().getText() == null || this.getController().getText().trim().isEmpty()) {
+            builder.append(this.getController().getAddress());
         } else {
-            builder.append(this.controller.getText());
+            builder.append(this.getController().getText());
         }
 
-        builder.append("\":").append(this.controller.getAddress());
+        builder.append("\":").append(this.getController().getAddress());
         return builder.toString();
     }
 
@@ -108,13 +106,13 @@ public class LinkContentExtension extends AbstractContentExtension {
     private String buildMarkdownContentString() {
         final StringBuilder builder = new StringBuilder();
 
-        final boolean emptyText = this.controller.getText() == null || this.controller.getText().trim().isEmpty();
+        final boolean emptyText = this.getController().getText() == null || this.getController().getText().trim().isEmpty();
 
         if (!emptyText) {
-            builder.append("[").append(this.controller.getText().trim()).append("](");
+            builder.append("[").append(this.getController().getText().trim()).append("](");
         }
 
-        builder.append(this.controller.getAddress());
+        builder.append(this.getController().getAddress());
 
         if (!emptyText) {
             builder.append(")");
@@ -125,6 +123,6 @@ public class LinkContentExtension extends AbstractContentExtension {
 
     @Override
     public ReadOnlyBooleanProperty areInputsValid() {
-        return this.controller.areInputsValid();
+        return this.getController().areInputsValid();
     }
 }

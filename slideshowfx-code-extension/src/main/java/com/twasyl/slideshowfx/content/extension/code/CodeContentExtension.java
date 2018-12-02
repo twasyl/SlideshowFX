@@ -28,11 +28,9 @@ import static java.util.regex.Pattern.MULTILINE;
  * @version 1.3
  * @since SlideshowFX 1.0
  */
-public class CodeContentExtension extends AbstractContentExtension {
+public class CodeContentExtension extends AbstractContentExtension<CodeContentExtensionController> {
     private static final Logger LOGGER = Logger.getLogger(CodeContentExtension.class.getName());
     protected static final String LINE_NUMBERS_CSS_CLASS = "line-numbers";
-
-    protected CodeContentExtensionController controller;
 
     public CodeContentExtension() {
         super("CODE",
@@ -70,9 +68,9 @@ public class CodeContentExtension extends AbstractContentExtension {
 
         if (markup == null || "HTML".equals(markup.getCode())) {
             builder.append(this.buildDefaultContentString());
-        } else if ("TEXTILE".equals(markup.getCode()) && !this.controller.shouldHighlightLines()) {
+        } else if ("TEXTILE".equals(markup.getCode()) && !this.getController().shouldHighlightLines()) {
             builder.append(this.buildTextileContentString());
-        } else if ("MARKDOWN".equals(markup.getCode()) && !this.controller.isShowingLineNumbers() && !this.controller.shouldHighlightLines()) {
+        } else if ("MARKDOWN".equals(markup.getCode()) && !this.getController().isShowingLineNumbers() && !this.getController().shouldHighlightLines()) {
             builder.append(this.buildMarkdownContentString());
         } else {
             builder.append(this.buildDefaultContentString());
@@ -86,13 +84,13 @@ public class CodeContentExtension extends AbstractContentExtension {
         final StringBuilder builder = new StringBuilder();
         builder.append("<pre").append(this.buildDefaultCssClass());
 
-        if (this.controller.shouldHighlightLines()) {
-            builder.append(" data-line=\"").append(this.controller.getHightlightedLines()).append("\"");
+        if (this.getController().shouldHighlightLines()) {
+            builder.append(" data-line=\"").append(this.getController().getHightlightedLines()).append("\"");
         }
 
         builder.append("><code").append(this.buildDefaultCssClass())
                 .append(">")
-                .append(this.controller.getCode())
+                .append(this.getController().getCode())
                 .append("</code></pre>");
 
         return builder.toString();
@@ -103,18 +101,18 @@ public class CodeContentExtension extends AbstractContentExtension {
         final String suffix = "\"";
         final StringJoiner cssClass = new StringJoiner(" ", prefix, suffix);
 
-        if (this.controller.getLanguage() != null) cssClass.add(this.controller.getLanguage().getCssClass());
+        if (this.getController().getLanguage() != null) cssClass.add(this.getController().getLanguage().getCssClass());
 
-        if (this.controller.isShowingLineNumbers()) cssClass.add(LINE_NUMBERS_CSS_CLASS);
+        if (this.getController().isShowingLineNumbers()) cssClass.add(LINE_NUMBERS_CSS_CLASS);
 
         return cssClass.length() == (prefix + suffix).length() ? "" : cssClass.toString();
     }
 
     protected String buildTextileContentString() {
         final StringBuilder builder = new StringBuilder("bc").append(this.buildTextileCssClass())
-                .append(codeContainsBlankLines(this.controller.getCode()) ? ".." : ".")
+                .append(codeContainsBlankLines(this.getController().getCode()) ? ".." : ".")
                 .append(" ")
-                .append(this.controller.getCode());
+                .append(this.getController().getCode());
 
         return builder.toString();
     }
@@ -122,9 +120,9 @@ public class CodeContentExtension extends AbstractContentExtension {
     protected String buildTextileCssClass() {
         final StringJoiner cssClass = new StringJoiner(" ", "(", ")");
 
-        if (this.controller.getLanguage() != null) cssClass.add(this.controller.getLanguage().getCssClass());
+        if (this.getController().getLanguage() != null) cssClass.add(this.getController().getLanguage().getCssClass());
 
-        if (this.controller.isShowingLineNumbers()) cssClass.add(LINE_NUMBERS_CSS_CLASS);
+        if (this.getController().isShowingLineNumbers()) cssClass.add(LINE_NUMBERS_CSS_CLASS);
 
         return cssClass.length() == 2 ? "" : cssClass.toString();
     }
@@ -132,11 +130,11 @@ public class CodeContentExtension extends AbstractContentExtension {
     protected String buildMarkdownContentString() {
         final StringBuilder builder = new StringBuilder("```");
 
-        if (this.controller.getLanguage() != null) {
-            builder.append(this.controller.getLanguage().getCssClass());
+        if (this.getController().getLanguage() != null) {
+            builder.append(this.getController().getLanguage().getCssClass());
         }
 
-        builder.append("\n").append(this.controller.getCode()).append("\n```");
+        builder.append("\n").append(this.getController().getCode()).append("\n```");
 
         return builder.toString();
     }
@@ -150,6 +148,6 @@ public class CodeContentExtension extends AbstractContentExtension {
 
     @Override
     public ReadOnlyBooleanProperty areInputsValid() {
-        return this.controller.areInputsValid();
+        return this.getController().areInputsValid();
     }
 }

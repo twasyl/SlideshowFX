@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.icons.Icon.EXCLAMATION_TRIANGLE;
+import static java.lang.System.currentTimeMillis;
 
 /**
  * The AlertContentExtension extends the AbstractContentExtension. It allows to build a content containing alert to insert
@@ -24,10 +25,8 @@ import static com.twasyl.slideshowfx.icons.Icon.EXCLAMATION_TRIANGLE;
  * @version 1.1
  * @since SlideshowFX 1.0
  */
-public class AlertContentExtension extends AbstractContentExtension {
+public class AlertContentExtension extends AbstractContentExtension<AlertContentExtensionController> {
     private static final Logger LOGGER = Logger.getLogger(AlertContentExtension.class.getName());
-
-    protected AlertContentExtensionController controller;
 
     public AlertContentExtension() {
         super("ALERT",
@@ -60,7 +59,7 @@ public class AlertContentExtension extends AbstractContentExtension {
 
     @Override
     public String buildContentString(IMarkup markup) {
-        return this.buildDefaultContentString().toString();
+        return this.buildDefaultContentString();
     }
 
     @Override
@@ -69,22 +68,22 @@ public class AlertContentExtension extends AbstractContentExtension {
 
         final String id = generateID();
 
-        builder.append("<button id=\"").append(id).append("\">").append(this.controller.getButtonText()).append("</button>\n");
+        builder.append("<button id=\"").append(id).append("\">").append(this.getController().getButtonText()).append("</button>\n");
 
         builder.append("<script type=\"text/javascript\">\n");
         builder.append("\tdocument.querySelector('#").append(id).append("').onclick = function() {\n");
         builder.append("\t\tSwal({\n");
-        builder.append("\t\t\ttitleText: \"").append(this.controller.getTitle()).append("\"");
+        builder.append("\t\t\ttitleText: \"").append(this.getController().getTitle()).append("\"");
 
-        if (this.controller.getText() != null && !this.controller.getText().isEmpty()) {
-            builder.append(",\n\t\t\ttext: \"").append(this.controller.getText()).append("\"");
+        if (this.getController().getText() != null && !this.getController().getText().isEmpty()) {
+            builder.append(",\n\t\t\ttext: \"").append(this.getController().getText()).append("\"");
         }
 
-        builder.append(",\n\t\t\ttype: \"").append(this.controller.getType()).append("\",\n");
+        builder.append(",\n\t\t\ttype: \"").append(this.getController().getType()).append("\",\n");
         builder.append("\t\t\tshowConfirmButton: true,\n");
-        builder.append("\t\t\tshowCancelButton: ").append(this.controller.isCancelButtonVisible()).append(",\n");
-        builder.append("\t\t\tallowOutsideClick: ").append(this.controller.isClickOutsideAllowed()).append(",\n");
-        builder.append("\t\t\tallowEscapeKey: ").append(this.controller.isClickOutsideAllowed()).append(",\n");
+        builder.append("\t\t\tshowCancelButton: ").append(this.getController().isCancelButtonVisible()).append(",\n");
+        builder.append("\t\t\tallowOutsideClick: ").append(this.getController().isClickOutsideAllowed()).append(",\n");
+        builder.append("\t\t\tallowEscapeKey: ").append(this.getController().isClickOutsideAllowed()).append(",\n");
         builder.append("\t\t});\n");
         builder.append("\t};\n");
         builder.append("</script>");
@@ -95,10 +94,10 @@ public class AlertContentExtension extends AbstractContentExtension {
 
     @Override
     public ReadOnlyBooleanProperty areInputsValid() {
-        return this.controller.areInputsValid();
+        return this.getController().areInputsValid();
     }
 
     protected String generateID() {
-        return "swal-btn-" + System.currentTimeMillis();
+        return "swal-btn-" + currentTimeMillis();
     }
 }

@@ -427,7 +427,7 @@ public class PresentationViewController implements ThemeAwareController {
      * @param contentExtension The content extension to create the Button for.
      * @return The created Button.
      */
-    private Button createButtonForContentExtension(final IContentExtension contentExtension) {
+    private Button createButtonForContentExtension(final IContentExtension<?> contentExtension) {
         final Button button = new Button();
         button.setUserData(contentExtension);
         button.setTooltip(new Tooltip(contentExtension.getToolTip()));

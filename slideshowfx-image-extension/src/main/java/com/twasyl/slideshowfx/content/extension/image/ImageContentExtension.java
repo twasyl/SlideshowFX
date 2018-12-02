@@ -22,10 +22,8 @@ import static com.twasyl.slideshowfx.icons.Icon.PICTURE_ALT;
  * @version 1.3
  * @since SlideshowFX 1.0
  */
-public class ImageContentExtension extends AbstractContentExtension {
+public class ImageContentExtension extends AbstractContentExtension<ImageContentExtensionController> {
     private static final Logger LOGGER = Logger.getLogger(ImageContentExtension.class.getName());
-
-    private ImageContentExtensionController controller;
 
     public ImageContentExtension() {
         super("IMAGE", null,
@@ -54,7 +52,7 @@ public class ImageContentExtension extends AbstractContentExtension {
     public String buildContentString(IMarkup markup) {
         final StringBuilder builder = new StringBuilder();
 
-        if (this.controller.getSelectedFile() != null) {
+        if (this.getController().getSelectedFile() != null) {
             if (markup == null || "HTML".equals(markup.getCode())) {
                 builder.append(this.buildDefaultContentString());
             } else if ("TEXTILE".equals(markup.getCode())) {
@@ -74,15 +72,15 @@ public class ImageContentExtension extends AbstractContentExtension {
 
         final StringBuilder builder = new StringBuilder();
         builder.append("<img src=\"")
-                .append(this.controller.getSelectedFileUrl())
+                .append(this.getController().getSelectedFileUrl())
                 .append("\" ");
 
-        if (this.controller.hasImageWidth()) {
-            builder.append("width=\"").append(this.controller.getImageWidth()).append("\" ");
+        if (this.getController().hasImageWidth()) {
+            builder.append("width=\"").append(this.getController().getImageWidth()).append("\" ");
         }
 
-        if (this.controller.hasImageHeight()) {
-            builder.append("height=\"").append(this.controller.getImageHeight()).append("\" ");
+        if (this.getController().hasImageHeight()) {
+            builder.append("height=\"").append(this.getController().getImageHeight()).append("\" ");
         }
 
         builder.append("/>");
@@ -93,23 +91,23 @@ public class ImageContentExtension extends AbstractContentExtension {
     private String buildTextileContentString() {
         final StringBuilder builder = new StringBuilder("!");
 
-        final boolean hasImageWidth = this.controller.hasImageWidth();
-        final boolean hasImageHeight = this.controller.hasImageHeight();
+        final boolean hasImageWidth = this.getController().hasImageWidth();
+        final boolean hasImageHeight = this.getController().hasImageHeight();
 
         if (hasImageWidth || hasImageHeight) {
             builder.append("{");
 
             if (hasImageWidth) {
-                builder.append("width: ").append(this.controller.getImageWidth()).append(";");
+                builder.append("width: ").append(this.getController().getImageWidth()).append(";");
             }
             if (hasImageHeight) {
-                builder.append("height: ").append(this.controller.getImageHeight()).append(";");
+                builder.append("height: ").append(this.getController().getImageHeight()).append(";");
             }
 
             builder.append("}");
         }
 
-        builder.append(this.controller.getSelectedFileUrl()).append("!");
+        builder.append(this.getController().getSelectedFileUrl()).append("!");
 
         return builder.toString();
     }
@@ -117,13 +115,13 @@ public class ImageContentExtension extends AbstractContentExtension {
     private String buildMarkdownContentString() {
         final StringBuilder builder = new StringBuilder();
 
-        final boolean hasImageWidth = this.controller.hasImageWidth();
-        final boolean hasImageHeight = this.controller.hasImageHeight();
+        final boolean hasImageWidth = this.getController().hasImageWidth();
+        final boolean hasImageHeight = this.getController().hasImageHeight();
 
         if (hasImageWidth || hasImageHeight) {
             builder.append(this.buildDefaultContentString());
         } else {
-            builder.append("![](").append(this.controller.getSelectedFileUrl()).append(")");
+            builder.append("[](").append(this.getController().getSelectedFileUrl()).append(")");
         }
 
         return builder.toString();
@@ -131,6 +129,6 @@ public class ImageContentExtension extends AbstractContentExtension {
 
     @Override
     public ReadOnlyBooleanProperty areInputsValid() {
-        return this.controller.areInputsValid();
+        return this.getController().areInputsValid();
     }
 }

@@ -23,7 +23,7 @@ import static com.twasyl.slideshowfx.content.extension.ResourceLocation.EXTERNAL
  * @version 1.2
  * @since SlideshowFX 1.0
  */
-public abstract class AbstractContentExtension extends AbstractPlugin implements IContentExtension {
+public abstract class AbstractContentExtension<T extends AbstractContentExtensionController> extends AbstractPlugin implements IContentExtension<T> {
     private static final Logger LOGGER = Logger.getLogger(AbstractContentExtension.class.getName());
 
     protected final String code;
@@ -32,6 +32,7 @@ public abstract class AbstractContentExtension extends AbstractPlugin implements
     protected final String title;
     protected final URL resourcesArchive;
     protected Set<Resource> resources = new LinkedHashSet<>();
+    protected T controller;
 
     /**
      * Creates a new instance of the content extension.
@@ -95,8 +96,8 @@ public abstract class AbstractContentExtension extends AbstractPlugin implements
      * {@link Resource#getLocation() location} will be set to {@link ResourceLocation#EXTERNAL}. The given URL must
      * correspond to a file and not a directory.
      *
-     * @param type           The type of the resource.
-     * @param content        The content that will be added to the presentation of the resource.
+     * @param type        The type of the resource.
+     * @param content     The content that will be added to the presentation of the resource.
      * @param resourceUrl The {@link URL} of the resource.
      * @return This content extension.
      */
@@ -171,5 +172,15 @@ public abstract class AbstractContentExtension extends AbstractPlugin implements
     @Override
     public String getTitle() {
         return this.title;
+    }
+
+    @Override
+    public T getController() {
+        if (this.controller == null) {
+            LOGGER.warning("The controller for the "
+                    + getClass().getSimpleName()
+                    + " is null. The getUI() method may not have been called or didn't initialize the controller");
+        }
+        return this.controller;
     }
 }

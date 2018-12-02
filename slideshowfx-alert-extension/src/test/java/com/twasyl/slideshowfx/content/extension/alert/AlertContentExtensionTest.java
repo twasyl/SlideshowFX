@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 import java.text.MessageFormat;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
 /**
  * @author Thierry Wasylczenko
@@ -51,13 +52,13 @@ public class AlertContentExtensionTest {
     @BeforeAll
     public static void setUp() {
         extension = spy(new AlertContentExtension());
-        when(extension.generateID()).thenReturn(GENERATED_ID);
+        doReturn(GENERATED_ID).when(extension).generateID();
     }
 
     @BeforeEach
     public void before() {
         final AlertContentExtensionController controller = spy(new AlertContentExtensionController());
-        extension.controller = controller;
+        doReturn(controller).when(extension).getController();
     }
 
     @Test
@@ -71,12 +72,13 @@ public class AlertContentExtensionTest {
         final String alertsText = "Text of the alert";
         final String alertsType = "info";
 
-        doReturn(cancelButtonVisible).when(extension.controller).isCancelButtonVisible();
-        doReturn(clickOutsideAllowed).when(extension.controller).isClickOutsideAllowed();
-        doReturn(buttonsText).when(extension.controller).getButtonText();
-        doReturn(alertsText).when(extension.controller).getText();
-        doReturn(title).when(extension.controller).getTitle();
-        doReturn(alertsType).when(extension.controller).getType();
+        final AlertContentExtensionController controller = extension.getController();
+        doReturn(cancelButtonVisible).when(controller).isCancelButtonVisible();
+        doReturn(clickOutsideAllowed).when(controller).isClickOutsideAllowed();
+        doReturn(buttonsText).when(controller).getButtonText();
+        doReturn(alertsText).when(controller).getText();
+        doReturn(title).when(controller).getTitle();
+        doReturn(alertsType).when(controller).getType();
 
         final String expected = MessageFormat.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
         final String content = extension.buildDefaultContentString();
@@ -94,12 +96,13 @@ public class AlertContentExtensionTest {
         final boolean clickOutsideAllowed = true;
         final String alertsType = "info";
 
-        doReturn(cancelButtonVisible).when(extension.controller).isCancelButtonVisible();
-        doReturn(clickOutsideAllowed).when(extension.controller).isClickOutsideAllowed();
-        doReturn(buttonsText).when(extension.controller).getButtonText();
-        doReturn("").when(extension.controller).getText();
-        doReturn(title).when(extension.controller).getTitle();
-        doReturn(alertsType).when(extension.controller).getType();
+        final AlertContentExtensionController controller = extension.getController();
+        doReturn(cancelButtonVisible).when(controller).isCancelButtonVisible();
+        doReturn(clickOutsideAllowed).when(controller).isClickOutsideAllowed();
+        doReturn(buttonsText).when(controller).getButtonText();
+        doReturn("").when(controller).getText();
+        doReturn(title).when(controller).getTitle();
+        doReturn(alertsType).when(controller).getType();
 
         final String expected = MessageFormat.format(EXPECTED_SCRIPT_WITHOUT_TEXT_FORMAT, GENERATED_ID, title, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
         final String content = extension.buildDefaultContentString();
@@ -118,12 +121,13 @@ public class AlertContentExtensionTest {
         final String alertsText = "Text of the alert";
         final String alertsType = "info";
 
-        doReturn(cancelButtonVisible).when(extension.controller).isCancelButtonVisible();
-        doReturn(clickOutsideAllowed).when(extension.controller).isClickOutsideAllowed();
-        doReturn(buttonsText).when(extension.controller).getButtonText();
-        doReturn(alertsText).when(extension.controller).getText();
-        doReturn(title).when(extension.controller).getTitle();
-        doReturn(alertsType).when(extension.controller).getType();
+        final AlertContentExtensionController controller = extension.getController();
+        doReturn(cancelButtonVisible).when(controller).isCancelButtonVisible();
+        doReturn(clickOutsideAllowed).when(controller).isClickOutsideAllowed();
+        doReturn(buttonsText).when(controller).getButtonText();
+        doReturn(alertsText).when(controller).getText();
+        doReturn(title).when(controller).getTitle();
+        doReturn(alertsType).when(controller).getType();
 
         final String expected = MessageFormat.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
         final String content = extension.buildDefaultContentString();
@@ -142,12 +146,13 @@ public class AlertContentExtensionTest {
         final String alertsText = "Text of the alert";
         final String alertsType = "success";
 
-        doReturn(cancelButtonVisible).when(extension.controller).isCancelButtonVisible();
-        doReturn(clickOutsideAllowed).when(extension.controller).isClickOutsideAllowed();
-        doReturn(buttonsText).when(extension.controller).getButtonText();
-        doReturn(alertsText).when(extension.controller).getText();
-        doReturn(title).when(extension.controller).getTitle();
-        doReturn(alertsType).when(extension.controller).getType();
+        final AlertContentExtensionController controller = extension.getController();
+        doReturn(cancelButtonVisible).when(controller).isCancelButtonVisible();
+        doReturn(clickOutsideAllowed).when(controller).isClickOutsideAllowed();
+        doReturn(buttonsText).when(controller).getButtonText();
+        doReturn(alertsText).when(controller).getText();
+        doReturn(title).when(controller).getTitle();
+        doReturn(alertsType).when(controller).getType();
 
         final String expected = MessageFormat.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
         final String content = extension.buildDefaultContentString();
@@ -166,12 +171,13 @@ public class AlertContentExtensionTest {
         final String alertsText = "Text of the alert";
         final String alertsType = "warning";
 
-        doReturn(cancelButtonVisible).when(extension.controller).isCancelButtonVisible();
-        doReturn(clickOutsideAllowed).when(extension.controller).isClickOutsideAllowed();
-        doReturn(buttonsText).when(extension.controller).getButtonText();
-        doReturn(alertsText).when(extension.controller).getText();
-        doReturn(title).when(extension.controller).getTitle();
-        doReturn(alertsType).when(extension.controller).getType();
+        final AlertContentExtensionController controller = extension.getController();
+        doReturn(cancelButtonVisible).when(controller).isCancelButtonVisible();
+        doReturn(clickOutsideAllowed).when(controller).isClickOutsideAllowed();
+        doReturn(buttonsText).when(controller).getButtonText();
+        doReturn(alertsText).when(controller).getText();
+        doReturn(title).when(controller).getTitle();
+        doReturn(alertsType).when(controller).getType();
 
         final String expected = MessageFormat.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
         final String content = extension.buildDefaultContentString();
@@ -190,12 +196,13 @@ public class AlertContentExtensionTest {
         final String alertsText = "Text of the alert";
         final String alertsType = "error";
 
-        doReturn(cancelButtonVisible).when(extension.controller).isCancelButtonVisible();
-        doReturn(clickOutsideAllowed).when(extension.controller).isClickOutsideAllowed();
-        doReturn(buttonsText).when(extension.controller).getButtonText();
-        doReturn(alertsText).when(extension.controller).getText();
-        doReturn(title).when(extension.controller).getTitle();
-        doReturn(alertsType).when(extension.controller).getType();
+        final AlertContentExtensionController controller = extension.getController();
+        doReturn(cancelButtonVisible).when(controller).isCancelButtonVisible();
+        doReturn(clickOutsideAllowed).when(controller).isClickOutsideAllowed();
+        doReturn(buttonsText).when(controller).getButtonText();
+        doReturn(alertsText).when(controller).getText();
+        doReturn(title).when(controller).getTitle();
+        doReturn(alertsType).when(controller).getType();
 
         final String expected = MessageFormat.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
         final String content = extension.buildDefaultContentString();

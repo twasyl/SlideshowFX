@@ -23,10 +23,8 @@ import static com.twasyl.slideshowfx.icons.Icon.QUOTE_LEFT;
  * @version 1.1
  * @since SlideshowFX 1.0
  */
-public class QuoteContentExtension extends AbstractContentExtension {
+public class QuoteContentExtension extends AbstractContentExtension<QuoteContentExtensionController> {
     private static final Logger LOGGER = Logger.getLogger(QuoteContentExtension.class.getName());
-
-    private QuoteContentExtensionController controller;
 
     public QuoteContentExtension() {
         super("QUOTE", null,
@@ -59,9 +57,9 @@ public class QuoteContentExtension extends AbstractContentExtension {
             builder.append(this.buildDefaultContentString());
         } else if ("TEXTILE".equals(markup.getCode())) {
             builder.append("bq.. ")
-                    .append(this.controller.getQuote())
+                    .append(this.getController().getQuote())
                     .append("\np{text-align: right; font-weight: bold; font-style: italic;}. ")
-                    .append(this.controller.getAuthor());
+                    .append(this.getController().getAuthor());
         } else {
             builder.append(this.buildDefaultContentString());
         }
@@ -74,9 +72,9 @@ public class QuoteContentExtension extends AbstractContentExtension {
 
         final StringBuilder builder = new StringBuilder();
         builder.append("<blockquote><p>")
-                .append(this.controller.getQuote())
+                .append(this.getController().getQuote())
                 .append("</p></blockquote>\n<p style=\"text-align: right; font-weight: bold; font-style: italic;\">")
-                .append(this.controller.getAuthor())
+                .append(this.getController().getAuthor())
                 .append("</p>");
 
         return builder.toString();
@@ -84,6 +82,6 @@ public class QuoteContentExtension extends AbstractContentExtension {
 
     @Override
     public ReadOnlyBooleanProperty areInputsValid() {
-        return this.controller.areInputsValid();
+        return this.getController().areInputsValid();
     }
 }

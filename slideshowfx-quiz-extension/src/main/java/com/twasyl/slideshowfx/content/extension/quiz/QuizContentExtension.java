@@ -29,10 +29,8 @@ import static com.twasyl.slideshowfx.icons.Icon.QUESTION;
  * @version 1.1
  * @since SlideshowFX 1.0
  */
-public class QuizContentExtension extends AbstractContentExtension {
+public class QuizContentExtension extends AbstractContentExtension<QuizContentExtensionController> {
     private static final Logger LOGGER = Logger.getLogger(QuizContentExtension.class.getName());
-
-    private QuizContentExtensionController controller;
 
     public QuizContentExtension() {
         super("QUIZ", null,
@@ -68,7 +66,7 @@ public class QuizContentExtension extends AbstractContentExtension {
 
     @Override
     public String buildDefaultContentString() {
-        final Quiz quiz = controller.getQuiz();
+        final Quiz quiz = this.getController().getQuiz();
 
         final String encodedQuiz = Base64.getEncoder().encodeToString(quiz.toJSONString().getBytes(getDefaultCharset()));
 
@@ -94,6 +92,6 @@ public class QuizContentExtension extends AbstractContentExtension {
 
     @Override
     public ReadOnlyBooleanProperty areInputsValid() {
-        return this.controller.areInputsValid();
+        return this.getController().areInputsValid();
     }
 }

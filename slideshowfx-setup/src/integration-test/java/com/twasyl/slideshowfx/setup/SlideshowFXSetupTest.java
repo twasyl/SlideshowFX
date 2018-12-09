@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.setup;
 
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.setup.app.SlideshowFXSetup;
 
 import java.io.File;
@@ -7,9 +8,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.jar.Attributes;
+import java.util.jar.Attributes.Name;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
+
+import static java.util.jar.Attributes.Name.MANIFEST_VERSION;
 
 /**
  * @author Thierry Wasylczenko
@@ -18,14 +22,23 @@ import java.util.zip.ZipEntry;
  */
 public class SlideshowFXSetupTest extends SlideshowFXSetup {
 
-    protected static final File basedir = new File("slideshowfx-setup/build/integration-tests", "package");
-    protected static final File pluginsDir = new File(basedir, "plugins");
-    protected static final File documentationDir = new File(basedir, "documentations");
-    protected static final File artifactFile = new File(basedir, "SlideshowFX");
+    private static final File integrationTestsDir = new File("slideshowfx-setup/build", "integration-tests");
+    private static final File applicationDir = new File(integrationTestsDir, "SFXInstallation");
+    private static final File packageDir = new File(integrationTestsDir, "package");
+    private static final File pluginsDir = new File(packageDir, "plugins");
+    private static final File documentationDir = new File(packageDir, "documentations");
+    private static final File artifactFile = new File(packageDir, "SlideshowFX");
 
-    protected static void initializeResources() {
-        if (!basedir.exists()) {
-            basedir.mkdirs();
+    private static void initializeResources() {
+        if (!integrationTestsDir.exists()) {
+            integrationTestsDir.mkdirs();
+        }
+
+        GlobalConfiguration.createApplicationDirectory();
+        GlobalConfiguration.createPluginsDirectory();
+
+        if (!packageDir.exists()) {
+            packageDir.mkdirs();
         }
 
         if (!pluginsDir.exists()) {
@@ -67,19 +80,24 @@ public class SlideshowFXSetupTest extends SlideshowFXSetup {
             }
         }
 
-        createDummyPluginJar(markupsDir, "slideshowfx-markdown", "Alert");
-        createDummyPluginJar(executorsDir, "slideshowfx-java-executor", "Java executor");
-        createDummyPluginJar(extensionsDir, "slideshowfx-code-extension", "Code extension");
-        createDummyPluginJar(hostingConnectorsDir, "slideshowfx-box-connector", "Box hosting connector");
+        createDummyPluginJar(GlobalConfiguration.getPluginsDirectory(), "slideshowfx-markdown", "Alert", "1.0");
+        createDummyPluginJar(GlobalConfiguration.getPluginsDirectory(), "slideshowfx-java-executor", "Java executor", "1.0");
+        createDummyPluginJar(GlobalConfiguration.getPluginsDirectory(), "slideshowfx-code-extension", "Code extension", "2.0");
+
+        createDummyPluginJar(markupsDir, "slideshowfx-markdown", "Alert", "2.0");
+        createDummyPluginJar(executorsDir, "slideshowfx-java-executor", "Java executor", "1.0");
+        createDummyPluginJar(extensionsDir, "slideshowfx-code-extension", "Code extension", "1.0");
+        createDummyPluginJar(hostingConnectorsDir, "slideshowfx-box-connector", "Box hosting connector", "1.0");
     }
 
-    private static void createDummyPluginJar(File dir, final String name, String label) {
+    private static void createDummyPluginJar(File dir, final String name, String label, String version) {
         final Manifest manifest = new Manifest();
-        Attributes attributes = manifest.getMainAttributes();
-        attributes.putValue("Bundle-Version", "1.0");
-        attributes.putValue("Bundle-Description", "This is a dummy plugin + " + System.currentTimeMillis());
-        attributes.putValue("Setup-Wizard-Label", label);
-        attributes.putValue("Setup-Wizard-Icon-Name", "EXCLAMATION_TRIANGLE");
+        final Attributes attributes = manifest.getMainAttributes();
+        attributes.put(MANIFEST_VERSION, "1.0.0");
+        attributes.put(new Name("Bundle-Version"), version);
+        attributes.put(new Name("Bundle-Description"), "This is a dummy plugin + " + System.currentTimeMillis());
+        attributes.put(new Name("Setup-Wizard-Label"), label);
+        attributes.put(new Name("Setup-Wizard-Icon-Name"), "EXCLAMATION_TRIANGLE");
 
         final File jar = new File(dir, name + ".jar");
         try (final FileOutputStream fos = new FileOutputStream(jar);
@@ -109,14 +127,14 @@ public class SlideshowFXSetupTest extends SlideshowFXSetup {
     }
 
     public static void main(String[] args) {
-        initializeResources();
-
+        System.setProperty("application.dir", applicationDir.getAbsolutePath());
         System.setProperty("setup.plugins.directory", pluginsDir.getAbsolutePath());
         System.setProperty("setup.documentations.directory", documentationDir.getAbsolutePath());
         System.setProperty("setup.application.artifact", artifactFile.getAbsolutePath());
         System.setProperty("setup.application.name", "SlideshowFX");
         System.setProperty("setup.application.version", "TEST-VERSION");
 
+        initializeResources();
         launch(args);
     }
 }

@@ -15,8 +15,8 @@ import java.util.logging.StreamHandler;
  * Each time a new log message is received by this implementation, a change event is raised on the property {@code latestLog}.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0
  * @version 1.0
+ * @since SlideshowFX 1.0
  */
 public class SlideshowFXHandler extends StreamHandler {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXHandler.class.getName());
@@ -36,7 +36,13 @@ public class SlideshowFXHandler extends StreamHandler {
         singleton = this;
     }
 
-    public static SlideshowFXHandler getSingleton() { return singleton; }
+    public synchronized static SlideshowFXHandler getSingleton() {
+        if (singleton == null) {
+            new SlideshowFXHandler();
+        }
+
+        return singleton;
+    }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         this.propertyChangeSupport.addPropertyChangeListener(listener);
@@ -48,9 +54,12 @@ public class SlideshowFXHandler extends StreamHandler {
 
     /**
      * Get the latest log message received by this handler.
+     *
      * @return The latest log or {@code null} if none.
      */
-    public String getLatestLog() { return latestLog; }
+    public String getLatestLog() {
+        return latestLog;
+    }
 
     protected void setLatestLog(String latestLog) {
         final String previousMessage = this.latestLog;
@@ -60,6 +69,7 @@ public class SlideshowFXHandler extends StreamHandler {
 
     /**
      * Get all logs that this handler has received.
+     *
      * @return All logs formatted as string.
      */
     public String getAllLogs() {
@@ -74,9 +84,9 @@ public class SlideshowFXHandler extends StreamHandler {
 
     @Override
     public synchronized void publish(LogRecord record) {
-        if(super.isLoggable(record)) {
+        if (super.isLoggable(record)) {
             final String message = super.getFormatter().format(record);
-            if(message != null) this.setLatestLog(message);
+            if (message != null) this.setLatestLog(message);
         }
         super.publish(record);
     }

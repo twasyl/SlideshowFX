@@ -39,7 +39,6 @@ public class QuizContentExtension extends AbstractContentExtension<QuizContentEx
                 "Insert a quiz");
 
         // Add URL
-        this.putResource(CSS_FILE, String.format("quiz/font-awesome/%s/css/%s", getFontAwesomeVersion(), getFontAwesomeCSSFilename()), getFontAwesomeCSSFile());
         this.putResource(JAVASCRIPT_FILE, String.format("quiz/font-awesome/%s/js/%s", getFontAwesomeVersion(), getFontAwesomeJSFilename()), getFontAwesomeJSFile());
     }
 

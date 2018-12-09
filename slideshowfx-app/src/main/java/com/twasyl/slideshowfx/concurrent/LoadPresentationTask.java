@@ -58,6 +58,7 @@ public class LoadPresentationTask extends SlideshowFXTask<PresentationEngine> {
         super.succeeded();
         this.updateMessage("Presentation loaded");
         this.updateProgress(0, 0);
+        LOGGER.info("Presentation loaded: " + this.dataFile.getAbsolutePath());
     }
 
     @Override
@@ -80,5 +81,6 @@ public class LoadPresentationTask extends SlideshowFXTask<PresentationEngine> {
         super.cancelled();
         this.updateMessage("Cancelled presentation loading");
         this.updateProgress(0, 0);
+        LOGGER.info("Presentation loading cancelled: " + this.dataFile.getAbsolutePath());
     }
 }

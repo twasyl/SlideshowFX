@@ -224,7 +224,7 @@ public class DialogHelper {
      * @param dialog The dialog to style.
      */
     private static void styleDialog(final Dialog dialog) {
-        if (dialog != null) {
+        if (dialog != null && DialogHelper.class.getResource("/com/twasyl/slideshowfx/css/Default.css") != null) {
             dialog.getDialogPane().getStylesheets().add("/com/twasyl/slideshowfx/css/Default.css");
             Themes.applyTheme(dialog.getDialogPane(), GlobalConfiguration.getThemeName());
         }

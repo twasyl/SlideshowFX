@@ -1,16 +1,29 @@
 .root {
-    -app-color-dark-green: #449d44;
-    -app-color-light-green: #5cb85c;
-
-    -app-color-dark-red: #a82525;
-    -app-color-light-red: #d63939;
+    sfx-invalid-color: #a82525;
 }
+
+.plugin-file-button .icon.font-awesome {
+    -fx-icon-color: black;
+    -fx-icon-size: 50px;
+}
+
+.plugin-file-button .font-awesome.badge {
+    -fx-icon-color: #449d44;
+    -fx-icon-size: 20px;
+    -fx-effect: dropshadow(gaussian, #5cb85c, 10, 0, 0, 0);
+}
+
 .plugin-file-button:selected {
-     -fx-background-color: linear-gradient(from 50% 0% to 50% 100%, -app-color-dark-green 0%, -app-color-light-green 100%);
+     -fx-background-color: linear-gradient(from 50% 0% to 50% 100%, #449d44 0%, #5cb85c 100%);
+}
+
+.plugin-file-button:selected .font-awesome.badge {
+    -fx-icon-color: yellow;
+    -fx-effect: dropshadow(gaussian, yellow, 10, 0, 0, 0);
 }
 
 .titled-pane:invalid > .title {
-    -fx-background-color: linear-gradient(from 50% 0% to 50% 100%, -app-color-light-red 0%, -app-color-dark-red 100%);
+    -fx-background-color: linear-gradient(from 50% 0% to 50% 100%, #d63939 0%, sfx-invalid-color 100%);
 }
 
 .titled-pane:invalid > .title .text,
@@ -30,5 +43,5 @@
 }
 
 .titled-pane:invalid > .content {
-    -fx-border-color: -app-color-dark-red;
+    -fx-border-color: sfx-invalid-color;
 }

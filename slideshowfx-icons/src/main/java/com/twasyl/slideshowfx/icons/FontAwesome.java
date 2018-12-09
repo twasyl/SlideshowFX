@@ -53,7 +53,7 @@ public class FontAwesome extends Text {
 
     private static final Logger LOGGER = Logger.getLogger(FontAwesome.class.getName());
     private static final StyleablePropertyFactory<FontAwesome> FACTORY = new StyleablePropertyFactory<>(Text.getClassCssMetaData());
-    private static final String FONTAWESOME_VERSION = "5.0.13";
+    private static final String FONTAWESOME_VERSION = "5.5.0";
     private static final String FONTAWESOME_ROOT = "/com/twasyl/slideshowfx/icons/fontawesome/" + FONTAWESOME_VERSION.replaceAll("\\.", "_") + "/";
     private static final Map<FontCacheKey, Font> FONT_CACHE = new HashMap<>();
 
@@ -63,7 +63,6 @@ public class FontAwesome extends Text {
             FACTORY.createStyleablePaintProperty(this, "iconColor", "-fx-icon-color", s -> s.iconColor, Color.WHITE);
     private final StyleableDoubleProperty iconSize = new SimpleStyleableDoubleProperty(
             FACTORY.createSizeCssMetaData("-fx-icon-size", s -> s.iconSize, 10d), this, "iconSize");
-
 
     public FontAwesome() {
         getStyleClass().add("font-awesome");
@@ -182,24 +181,6 @@ public class FontAwesome extends Text {
     }
 
     /**
-     * Get the CSS file of FontAwesome.
-     *
-     * @return The {@link InputStream} of the CSS font file.
-     */
-    public static URL getFontAwesomeCSSFile() {
-        return getFontAwesomeFile("css/" + getFontAwesomeCSSFilename());
-    }
-
-    /**
-     * Get the name of the FontAwesome CSS file. The returned named doesn't contain any path.
-     *
-     * @return The name of the FontAwesome CSS file.
-     */
-    public static String getFontAwesomeCSSFilename() {
-        return "fa-svg-with-js.css";
-    }
-
-    /**
      * Get the JavaScript file of FontAwesome.
      *
      * @return The {@link URL} of the JavaScript font file.
@@ -214,7 +195,7 @@ public class FontAwesome extends Text {
      * @return The name of the FontAwesome JavaScript file.
      */
     public static String getFontAwesomeJSFilename() {
-        return "fontawesome-all.min.js";
+        return "all.min.js";
     }
 
     /**

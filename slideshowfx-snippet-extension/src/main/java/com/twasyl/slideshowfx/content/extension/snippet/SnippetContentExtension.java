@@ -40,7 +40,6 @@ public class SnippetContentExtension extends AbstractContentExtension<SnippetCon
         final String baseURL = "snippet-executor/";
 
         // Add URL
-        this.putResource(CSS_FILE, String.format("%sfont-awesome/%s/css/%s", baseURL, getFontAwesomeVersion(), getFontAwesomeCSSFilename()), getFontAwesomeCSSFile());
         this.putResource(CSS_FILE, baseURL.concat("prism/1.15.0/prism.css"));
         this.putResource(JAVASCRIPT_FILE, String.format("%sfont-awesome/%s/js/%s", baseURL, getFontAwesomeVersion(), getFontAwesomeJSFilename()), getFontAwesomeJSFile());
         this.putResource(JAVASCRIPT_FILE, baseURL.concat("prism/1.15.0/prism.js"));

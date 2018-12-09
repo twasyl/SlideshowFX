@@ -9,8 +9,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
@@ -18,6 +18,8 @@ import java.io.*;
 import java.util.jar.JarEntry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static javafx.geometry.Pos.TOP_RIGHT;
 
 /**
  * Implementation of a {@link ToggleButton} representing a file of a plugin. The button has a CSS class named
@@ -36,6 +38,8 @@ public class PluginFileButton extends ToggleButton {
     private final String label;
     private final String version;
     private final String description;
+    private boolean hasBadge = false;
+    private String badgeDescription;
 
     public PluginFileButton(final File pluginFile) {
         try {
@@ -96,6 +100,10 @@ public class PluginFileButton extends ToggleButton {
             text.append("Will not be installed");
         }
 
+        if (hasBadge) {
+            text.append("\n").append(badgeDescription);
+        }
+
         tooltip.setText(text.toString());
     }
 
@@ -133,6 +141,35 @@ public class PluginFileButton extends ToggleButton {
      */
     public String getLabel() {
         return this.label;
+    }
+
+    /**
+     * Append the given {@link Icon} as badge on the top right corner of the button. The badge will have a CSS class
+     * named {@code badge}.
+     *
+     * @param badge The icon to set as badge.
+     */
+    public void appendBadge(final Icon badge, final String badgeDescription) {
+        if (!hasBadge) {
+            final VBox graphic = (VBox) getGraphic();
+            final Node currentIcon = graphic.getChildren().get(0);
+
+            final FontAwesome icon = new FontAwesome(badge);
+            icon.getStyleClass().add("badge");
+
+            final StackPane stack = new StackPane();
+            stack.setAlignment(TOP_RIGHT);
+            stack.getChildren().addAll(currentIcon, icon);
+
+            graphic.getChildren().set(0, stack);
+
+            this.hasBadge = true;
+            this.badgeDescription = badgeDescription;
+
+            setTooltipText();
+        } else {
+            LOGGER.info("A badge has already been set");
+        }
     }
 
     /**

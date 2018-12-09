@@ -35,6 +35,8 @@ import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 import static java.util.logging.Level.SEVERE;
+import static javafx.print.PageOrientation.LANDSCAPE;
+import static javafx.print.Paper.A4;
 
 /**
  * A browser that displays a presentation and provides methods for interacting with the presentation (like go to a given
@@ -400,7 +402,7 @@ public final class PresentationBrowser extends StackPane {
                 }
 
                 job.getJobSettings().setPrintQuality(PrintQuality.HIGH);
-                job.getJobSettings().setPageLayout(job.getPrinter().createPageLayout(Paper.A4, PageOrientation.LANDSCAPE, 0, 0, 0, 0));
+                job.getJobSettings().setPageLayout(job.getPrinter().createPageLayout(A4, LANDSCAPE, 0, 0, 0, 0));
 
                 this.internalBrowser.getEngine().print(job);
                 job.endJob();

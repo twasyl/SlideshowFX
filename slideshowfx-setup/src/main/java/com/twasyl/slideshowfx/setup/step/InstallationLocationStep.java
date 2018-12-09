@@ -145,26 +145,26 @@ public class InstallationLocationStep extends AbstractSetupStep {
 
         final List<String> lines = new ArrayList<>();
 
-        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(cfgFile)))) {
-            lines.addAll(reader.lines().collect(Collectors.toList()));
-
-        } catch (IOException e) {
-            throw new SetupStepException("Can not read configuration file to patch", e);
-        }
-
-        try (final PrintWriter writer = new PrintWriter(cfgFile)) {
-            for (String line : lines) {
-                if (line.contains("@@LOGGING_CONFIGURATION_FILE@@")) {
-                    line = line.replace("@@LOGGING_CONFIGURATION_FILE@@", GlobalConfiguration.getLoggingConfigFile().getAbsolutePath());
-                }
-
-                writer.println(line);
-            }
-
-            writer.flush();
-        } catch (IOException e) {
-            throw new SetupStepException("Can not path the configuration file", e);
-        }
+//        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(cfgFile)))) {
+//            lines.addAll(reader.lines().collect(Collectors.toList()));
+//
+//        } catch (IOException e) {
+//            throw new SetupStepException("Can not read configuration file to patch", e);
+//        }
+//
+//        try (final PrintWriter writer = new PrintWriter(cfgFile)) {
+//            for (String line : lines) {
+//                if (line.contains("@@LOGGING_CONFIGURATION_FILE@@")) {
+//                    line = line.replace("@@LOGGING_CONFIGURATION_FILE@@", GlobalConfiguration.getLoggingConfigFile().getAbsolutePath());
+//                }
+//
+//                writer.println(line);
+//            }
+//
+//            writer.flush();
+//        } catch (IOException e) {
+//            throw new SetupStepException("Can not path the configuration file", e);
+//        }
     }
 
     protected void createApplicationConfigurationFile() {

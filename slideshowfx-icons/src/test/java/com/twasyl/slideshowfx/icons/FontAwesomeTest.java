@@ -51,22 +51,12 @@ public class FontAwesomeTest {
     }
 
     @Test
-    public void obtainCSSFontFile() throws URISyntaxException {
-        assertFontAwesomeUrl(FontAwesome.getFontAwesomeCSSFile());
-    }
-
-    @Test
     public void obtainJavaScriptFontFile() throws URISyntaxException {
         assertFontAwesomeUrl(FontAwesome.getFontAwesomeJSFile());
     }
 
     @Test
     public void obtainJavaScriptFileFromRelativePath() throws URISyntaxException {
-        assertFontAwesomeUrl(FontAwesome.getFontAwesomeFile("js/fontawesome-all.min.js"));
-    }
-
-    @Test
-    public void obtainCSSFileFromRelativePath() throws URISyntaxException {
-        assertFontAwesomeUrl(FontAwesome.getFontAwesomeFile("css/fa-svg-with-js.css"));
+        assertFontAwesomeUrl(FontAwesome.getFontAwesomeFile("js/all.min.js"));
     }
 }

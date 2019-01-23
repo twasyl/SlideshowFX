@@ -171,7 +171,7 @@ public class SlideshowFXServer {
 
             this.router = Router.router(this.vertx);
             this.buildRouter();
-            this.httpServer.requestHandler(this.router::accept);
+            this.httpServer.requestHandler(this.router);
 
             if (services != null && services.length > 0) {
                 Arrays.stream(services).forEach(service -> this.vertx.deployVerticle(service.getName()));

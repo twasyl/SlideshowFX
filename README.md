@@ -37,7 +37,7 @@ With SlideshowFX, bring your presentation to the next level of interactivity.
 
 As SlideshowFX is a still young project, you will need to build it manually in order to test it. In order to do so, you will need:
 
-* A JDK 8 update 191 ;
+* A JDK 8 update 201 ;
 * The `JAVA_HOME` system variable set to point to your JDK installation.
 
 Then in order to build the application:

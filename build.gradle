@@ -100,10 +100,10 @@ ext.os = [
 ]
 
 ext.dependencies = [
-        asciidoctorj: [version: '1.5.8.1'],
-        box         : [version: '2.24.0'],
-        drive       : [version: 'v3-rev20181101-1.27.0'],
-        dropbox     : [version: '3.0.10'],
+        asciidoctorj: [version: '1.6.0'],
+        box         : [version: '2.26.0'],
+        drive       : [version: 'v3-rev20181213-1.28.0'],
+        dropbox     : [version: '3.0.11'],
         felix       : [version: '6.0.1'],
         freemarker  : [version: '2.3.28'],
         jsoup       : [version: '1.11.3'],
@@ -112,8 +112,8 @@ ext.dependencies = [
         mockito     : [version: '2.23.4'],
         monocle     : [version: '8u76-b04'],
         testfx      : [version: '4.0.15-alpha'],
-        vertx       : [version: '3.6.0'],
-        wikitext    : [version: '3.0.28'],
+        vertx       : [version: '3.6.2'],
+        wikitext    : [version: '3.0.29'],
         zxing       : [version: '3.3.3']
 ]
 

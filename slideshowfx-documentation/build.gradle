@@ -13,7 +13,7 @@ description = 'SlideshowFX documentation to be included within the application a
 version = '1.0'
 
 asciidoctorj {
-    version = '1.5.8.1'
+    version = '1.6.0'
 }
 asciidoctor {
     backends = ['html5', 'pdf']
@@ -28,9 +28,9 @@ asciidoctor {
             'linkcss'                      : 'false',
             'slideshowfx_version'          : "${rootProject.version}",
             'asciidoctor-source'           : "${project.projectDir}/src/asciidoc",
-            'javafx-version'               : '8 update 191',
-            'jdk-version'                  : '8 update 191',
-            'gradle-version'               : '4.10.2',
+            'javafx-version'               : '8 update 201',
+            'jdk-version'                  : '8 update 201',
+            'gradle-version'               : '5.1.1',
             'asciidoctorj-version'         : "${rootProject.ext.dependencies.asciidoctorj.version}",
             'apache-felix-version'         : "${rootProject.ext.dependencies.felix.version}",
             'freemarker-version'           : "${rootProject.ext.dependencies.freemarker.version}",
@@ -42,7 +42,7 @@ asciidoctor {
             'box-version'                  : "${rootProject.ext.dependencies.box.version}",
             'drive-version'                : "${rootProject.ext.dependencies.drive.version}",
             'dropbox-version'              : "${rootProject.ext.dependencies.dropbox.version}",
-            'ace-version'                  : '1.4.1'
+            'ace-version'                  : '1.4.2'
     ]
 }
 

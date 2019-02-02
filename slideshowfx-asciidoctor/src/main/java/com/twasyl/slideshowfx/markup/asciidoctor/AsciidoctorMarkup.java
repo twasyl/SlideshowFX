@@ -9,6 +9,8 @@ import org.jruby.javasupport.JavaEmbedUtils;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import static java.util.Arrays.asList;
+
 /**
  * This class implements the asciidoctor syntax.
  * This markup language is identified byt the code {@code ASCIIDOCTOR} which is returned by {@link com.twasyl.slideshowfx.markup.IMarkup#getCode()}.
@@ -25,9 +27,7 @@ public class AsciidoctorMarkup extends AbstractMarkup {
     public AsciidoctorMarkup() {
         super("ASCIIDOCTOR", "asciidoctor", "ace/mode/asciidoc");
 
-        JavaEmbedUtils.initialize(Arrays.asList("uri:classloader:/gems/asciidoctor-1.5.8/lib"));
-
-        this.asciidoctor = Asciidoctor.Factory.create(AsciidoctorMarkup.class.getClassLoader());
+        this.asciidoctor = Asciidoctor.Factory.create(asList("uri:classloader:/gems/asciidoctor-1.5.8/lib"));
     }
 
     @Override

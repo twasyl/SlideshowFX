@@ -13,7 +13,7 @@ description = 'SlideshowFX documentation to be included within the application a
 version = '1.0'
 
 asciidoctorj {
-    version = '1.6.0'
+    version = '1.6.1'
 }
 asciidoctor {
     backends = ['html5', 'pdf']

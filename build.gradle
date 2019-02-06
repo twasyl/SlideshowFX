@@ -112,7 +112,7 @@ ext.dependencies = [
         mockito     : [version: '2.23.4'],
         monocle     : [version: '8u76-b04'],
         testfx      : [version: '4.0.15-alpha'],
-        vertx       : [version: '3.6.2'],
+        vertx       : [version: '3.6.3'],
         wikitext    : [version: '3.0.29'],
         zxing       : [version: '3.3.3']
 ]

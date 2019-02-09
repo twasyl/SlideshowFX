@@ -9,7 +9,7 @@
 <?import java.net.URL?>
 <BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.InternalBrowserController">
     <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
+        <URL value="@/com/twasyl/slideshowfx/css/application.css" />
     </stylesheets>
 
     <top>

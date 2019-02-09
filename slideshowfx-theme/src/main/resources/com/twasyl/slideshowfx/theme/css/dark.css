@@ -176,6 +176,8 @@
 
     /* Colors for the collapsible tool pane */
     sfx-collapsible-tool-pane-icon-color: #FF8000;
+    sfx-collapsible-tool-pane-button-hover-color: rgba(128,128,128,0.8);
+    sfx-collapsible-tool-pane-button-border-selected-color: orange;
 
     /* Colors for the server button */
     sfx-server-button-start-server-color: green;
@@ -204,4 +206,21 @@
     /* Colors for the information pane */
     sfx-information-pane-background-color: sfx-application-background-color;
     sfx-information-pane-text-color: sfx-text-fill;
+
+    /* Colors for the chat panel */
+    sfx-chat-panel-chat-bubble-background-color: rgba(128, 128, 128, 0.8);
+    sfx-chat-panel-chat-bubble-answered-background-color: rgba(208, 245, 169, 0.8);
+    sfx-chat-panel-message-author-text-color: white;
+    sfx-chat-panel-message-author-answered-text-color: black;
+    sfx-chat-panel-message-content-text-color: white;
+    sfx-chat-panel-message-content-answered-text-color: black;
+
+    /* Colors for the quiz panel */
+    sfx-quiz-panel-chart-background-color: rgba(128, 128, 128, 0.8);
+    sfx-quiz-panel-chart-title-text-color: white;
+    sfx-quiz-panel-chart-title-background-color: white;
+
+    /* Colors for the QRCode panel */
+    sfx-qrcode-panel-background-color: rgba(128, 128, 128, 0.8);
+    sfx-qrcode-panel-panel-text-text-color: white;
 }

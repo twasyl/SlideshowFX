@@ -12,7 +12,7 @@
             fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController"
             minWidth="1024" minHeight="768">
     <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/Default.css"/>
+        <URL value="@/com/twasyl/slideshowfx/css/application.css"/>
     </stylesheets>
 
     <fx:define>

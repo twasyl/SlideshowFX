@@ -13,7 +13,7 @@
            onMouseClicked="#exitByClick" style="-fx-background-color: transparent">
 
     <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/Default.css" />
+        <URL value="@/com/twasyl/slideshowfx/css/application.css" />
     </stylesheets>
 
     <fx:define>

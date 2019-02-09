@@ -1,5 +1,7 @@
 package com.twasyl.slideshowfx.controls;
 
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.theme.Themes;
 import javafx.animation.FadeTransition;
 import javafx.beans.property.*;
 import javafx.css.PseudoClass;
@@ -40,7 +42,9 @@ public class CollapsibleToolPane extends Region {
 
     public CollapsibleToolPane() {
         this.getStyleClass().add("collapsible-tool-pane");
-        this.getStylesheets().add(CollapsibleToolPane.class.getResource("/com/twasyl/slideshowfx/css/collapsible-tool-pane.css").toExternalForm());
+        this.getStylesheets().addAll(
+                CollapsibleToolPane.class.getResource("/com/twasyl/slideshowfx/css/application.css").toExternalForm(),
+                Themes.getByName(GlobalConfiguration.getThemeName()).getCssFile().toExternalForm());
 
         ((SimpleDoubleProperty) this.toolbarWidth).bind(this.toolbar.widthProperty());
 

@@ -8,7 +8,7 @@
             fx:controller="com.twasyl.slideshowfx.controllers.LogsController"
             minWidth="500" minHeight="400">
     <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/Default.css"/>
+        <URL value="@/com/twasyl/slideshowfx/css/application.css"/>
     </stylesheets>
 
     <fx:define>

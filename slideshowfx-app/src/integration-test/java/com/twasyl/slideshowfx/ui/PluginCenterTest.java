@@ -35,7 +35,7 @@ public class PluginCenterTest extends Application {
 
         Themes.applyTheme(root, "Dark");
         final Scene scene = new Scene(root);
-        scene.getStylesheets().add("/com/twasyl/slideshowfx/css/Default.css");
+        scene.getStylesheets().add("/com/twasyl/slideshowfx/css/application.css");
 
         primaryStage.setScene(scene);
         primaryStage.show();

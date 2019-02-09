@@ -519,6 +519,29 @@
     -fx-icon-size: 15px;
 }
 
+.collapsible-tool-pane .toggle-button:left {
+    -fx-border-width: 0 2px 0 0;
+}
+
+.collapsible-tool-pane .toggle-button:right {
+    -fx-border-width: 0 0 0 2px;
+}
+
+.collapsible-tool-pane .toggle-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-style: solid;
+    -fx-background-radius: 0;
+}
+
+.collapsible-tool-pane .toggle-button:hover {
+    -fx-background-color: sfx-collapsible-tool-pane-button-hover-color;
+}
+
+.collapsible-tool-pane .toggle-button:selected {
+    -fx-border-color: sfx-collapsible-tool-pane-button-border-selected-color;
+}
+
 .slideshow-pane .collapsible-tool-pane .font-awesome {
     -fx-icon-color: sfx-collapsible-tool-pane-icon-color;
     -fx-icon-size: 32px;
@@ -553,6 +576,77 @@
 
 .about-stage {
     -fx-background-color: transparent;
+}
+
+.chat-panel {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.chat-panel .chat-bubble {
+    -fx-background-color: sfx-chat-panel-chat-bubble-background-color;
+    -fx-background-radius: 5px;
+
+}
+
+.chat-panel .chat-bubble:answered {
+    -fx-background-color: sfx-chat-panel-chat-bubble-answered-background-color;
+}
+
+.chat-panel .chat-bubble .message-author {
+    -fx-text-fill: sfx-chat-panel-message-author-text-color;
+    -fx-color: -fx-text-fill;
+    -fx-fill: -fx-text-fill;
+    -fx-font-weight: bold;
+    -fx-text-alignment: left;
+    -fx-padding: 5px 0 0 5px;
+}
+
+.chat-panel .chat-bubble .message-author:answered {
+    -fx-text-fill: sfx-chat-panel-message-author-answered-text-color;
+    -fx-color: -fx-text-fill;
+    -fx-fill: -fx-text-fill;
+}
+
+.chat-panel .chat-bubble .message-content {
+    -fx-text-fill: sfx-chat-panel-message-content-text-color;
+    -fx-color: -fx-text-fill;
+    -fx-fill: -fx-text-fill;
+    -fx-text-alignment: justify;
+    -fx-padding: 5px 0 0 15px;
+}
+
+.chat-panel .chat-bubble .message-content:answered {
+    -fx-text-fill: sfx-chat-panel-message-content-answered-text-color;
+    -fx-color: -fx-text-fill;
+    -fx-fill: -fx-text-fill;
+}
+
+.quiz-panel .default-color0.chart-pie { -fx-pie-color: #adff2f; }
+.quiz-panel .default-color1.chart-pie { -fx-pie-color: #ff5700; }
+
+.quiz-panel .chart {
+    -fx-background-color: sfx-quiz-panel-chart-background-color;
+    -fx-background-radius: 5px;
+}
+
+.quiz-panel .chart-title {
+    -fx-text-fill: sfx-quiz-panel-chart-title-text-color;
+    -fx-background-color: sfx-quiz-panel-chart-title-background-color;
+    -fx-background-radius: 5px;
+    -fx-padding: 0 20px 0 20px;
+}
+
+.qrcode-panel {
+    -fx-background-color: sfx-qrcode-panel-background-color;
+    -fx-background-radius: 5px;
+}
+
+.qrcode-panel .panel-text {
+    -fx-text-fill: sfx-qrcode-panel-panel-text-text-color;
+    -fx-fill: -fx-text-fill;
+    -fx-color: -fx-text-fill;
+    -fx-font-size: 15pt;
 }
 
 /* CSS for elements identified by their ID */

@@ -8,7 +8,7 @@
 <?import java.net.URL?>
 <StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.HelpViewController">
     <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/Default.css"/>
+        <URL value="@/com/twasyl/slideshowfx/css/application.css"/>
     </stylesheets>
 
     <fx:define>

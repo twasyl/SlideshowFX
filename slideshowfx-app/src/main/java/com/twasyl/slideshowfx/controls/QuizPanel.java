@@ -1,6 +1,8 @@
 package com.twasyl.slideshowfx.controls;
 
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.server.beans.quiz.QuizResult;
+import com.twasyl.slideshowfx.theme.Themes;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -13,7 +15,7 @@ import javafx.scene.layout.Region;
  * This panel should be used in a {@link com.twasyl.slideshowfx.controls.slideshow.SlideshowPane}.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class QuizPanel extends Region {
@@ -25,7 +27,10 @@ public class QuizPanel extends Region {
      * Creates the {@link QuizPanel} and initialize the chart that is displayed into it.
      */
     public QuizPanel() {
-        this.getStylesheets().add(QuizPanel.class.getResource("/com/twasyl/slideshowfx/css/quiz-panel.css").toExternalForm());
+        this.getStyleClass().add("quiz-panel");
+        this.getStylesheets().addAll(
+                CollapsibleToolPane.class.getResource("/com/twasyl/slideshowfx/css/application.css").toExternalForm(),
+                Themes.getByName(GlobalConfiguration.getThemeName()).getCssFile().toExternalForm());
 
         this.chart.set(new PieChart());
 

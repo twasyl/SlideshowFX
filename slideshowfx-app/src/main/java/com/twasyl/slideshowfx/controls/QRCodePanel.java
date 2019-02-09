@@ -5,7 +5,9 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
+import com.twasyl.slideshowfx.theme.Themes;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -22,7 +24,7 @@ import java.util.logging.Logger;
  * This panel is used to display the QR code that redirect the "flasher" to the web app of SlideshowFX.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2
  * @since SlideshowFX 1.0
  */
 public class QRCodePanel extends VBox {
@@ -32,8 +34,10 @@ public class QRCodePanel extends VBox {
     public QRCodePanel() {
         super(20);
 
-        this.getStylesheets().add(QRCodePanel.class.getResource("/com/twasyl/slideshowfx/css/qrcode-panel.css").toExternalForm());
         this.getStyleClass().add("qrcode-panel");
+        this.getStylesheets().addAll(
+                CollapsibleToolPane.class.getResource("/com/twasyl/slideshowfx/css/application.css").toExternalForm(),
+                Themes.getByName(GlobalConfiguration.getThemeName()).getCssFile().toExternalForm());
 
         this.setPrefWidth(300);
         this.setMinWidth(300);

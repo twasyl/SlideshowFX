@@ -39,10 +39,10 @@ public class PluginsViewController implements Initializable {
     private static Logger LOGGER = Logger.getLogger(PluginsViewController.class.getName());
     protected static final PseudoClass INVALID_STATE = PseudoClass.getPseudoClass("invalid");
 
-    protected final String MARKUP_PLUGINS_DIRECTORY_NAME = "markups";
-    protected final String SNIPPET_EXECUTORS_PLUGINS_DIRECTORY_NAME = "executors";
-    protected final String CONTENT_EXTENSION_PLUGINS_DIRECTORY_NAME = "extensions";
-    protected final String HOSTING_CONNECTOR_PLUGINS_DIRECTORY_NAME = "hostingConnectors";
+    protected static final String MARKUP_PLUGINS_DIRECTORY_NAME = "markups";
+    protected static final String SNIPPET_EXECUTORS_PLUGINS_DIRECTORY_NAME = "executors";
+    protected static  final String CONTENT_EXTENSION_PLUGINS_DIRECTORY_NAME = "extensions";
+    protected static final String HOSTING_CONNECTOR_PLUGINS_DIRECTORY_NAME = "hostingConnectors";
 
     @FXML
     private TitledPane markupPluginsContainer;
@@ -279,8 +279,7 @@ public class PluginsViewController implements Initializable {
      * @return {@code true} if the plugin is already installed, {@code false} otherwise.
      */
     private boolean isEarlierPluginVersionInstalled(final File plugin) {
-        try {
-            final Jar jar = new Jar(plugin);
+        try (final Jar jar = new Jar(plugin)) {
             final String pluginLabel = jar.getManifestAttributeValue("Setup-Wizard-Label", "");
             final String pluginVersion = jar.getManifestAttributeValue("Bundle-Version", "");
 

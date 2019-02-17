@@ -1,12 +1,19 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+    id 'com.jfrog.bintray'
+}
+
 description = 'Extension allowing to define slide\'s content using the markdown syntax'
 version = '1.0'
-
-apply plugin: 'java-library'
 
 dependencies {
     implementation project(':slideshowfx-markup')
 
     compile "com.github.rjeschke:txtmark:${rootProject.ext.dependencies.markdown.version}"
+
+    integrationTestImplementation project(':slideshowfx-osgi')
+    integrationTestImplementation project(':slideshowfx-plugin').sourceSets.integrationTest.output
 }
 
 ext.isPlugin = true

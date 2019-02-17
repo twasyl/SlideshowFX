@@ -21,7 +21,6 @@ import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.utils.DialogHelper;
-import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.beans.Pair;
 import com.twasyl.slideshowfx.utils.beans.binding.FilenameBinding;
 import javafx.beans.binding.DoubleBinding;
@@ -32,7 +31,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -40,7 +38,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Paint;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -53,6 +50,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.twasyl.slideshowfx.utils.PlatformHelper.run;
 import static java.lang.Double.NaN;
 import static java.util.logging.Level.SEVERE;
 
@@ -93,7 +91,7 @@ public class PresentationViewController implements ThemeAwareController {
     private TextArea speakerNotes;
     @FXML
     public CollapsibleToolPane presentationOutlinePane;
-    public PresentationOutline presentationOutline;
+    private PresentationOutline presentationOutline;
 
     /* All methods called by the FXML */
 
@@ -163,9 +161,9 @@ public class PresentationViewController implements ThemeAwareController {
             TaskDAO.getInstance().startTask(new ReloadPresentationViewAndGoToTask(this, slide.getId()));
         } catch (IOException e) {
             LOGGER.log(SEVERE, "Error when adding a slide", e);
-        } finally {
-            return slide;
         }
+
+        return slide;
     }
 
     /**
@@ -380,18 +378,17 @@ public class PresentationViewController implements ThemeAwareController {
                 final CodeSnippet codeSnippetDecoded = CodeSnippet.toObject(decodedString);
                 final ObservableList<String> consoleOutput = snippetExecutor.get().execute(codeSnippetDecoded);
 
-                consoleOutput.addListener((ListChangeListener<String>) change -> {
-                    // Push the execution result to the presentation.
-                    PlatformHelper.run(() -> {
-                        while (change.next()) {
-                            if (change.wasAdded()) {
-                                change.getAddedSubList()
-                                        .forEach(line -> this.browser.updateCodeSnippetConsole(consoleOutputId, line));
+                consoleOutput.addListener((ListChangeListener<String>) change ->
+                        // Push the execution result to the presentation.
+                        run(() -> {
+                            while (change.next()) {
+                                if (change.wasAdded()) {
+                                    change.getAddedSubList()
+                                            .forEach(line -> this.browser.updateCodeSnippetConsole(consoleOutputId, line));
+                                }
                             }
-                        }
-                        change.reset();
-                    });
-                });
+                            change.reset();
+                        }));
             }
         }
     }
@@ -622,9 +619,8 @@ public class PresentationViewController implements ThemeAwareController {
             });
 
             // Initial position
-            this.presentationOutlinePane.toolbarWidthProperty().addListener((widthValue, oldWidth, newWidth) -> {
-                divider.setPosition(newWidth.doubleValue() / this.root.getWidth());
-            });
+            this.presentationOutlinePane.toolbarWidthProperty().addListener((widthValue, oldWidth, newWidth) ->
+                    divider.setPosition(newWidth.doubleValue() / this.root.getWidth()));
         }
     }
 
@@ -650,9 +646,7 @@ public class PresentationViewController implements ThemeAwareController {
             TaskDAO.getInstance().startTask(task);
         });
 
-        this.presentationOutline.setOnSlideDeletionRequested(event -> {
-            this.deleteSlide(event.getSourceSlideId());
-        });
+        this.presentationOutline.setOnSlideDeletionRequested(event -> this.deleteSlide(event.getSourceSlideId()));
 
         this.presentationOutline.getSelectionModel().selectedIndexProperty().addListener((value, oldIndex, newIndex) -> {
             if (newIndex != null) {
@@ -667,7 +661,7 @@ public class PresentationViewController implements ThemeAwareController {
         this.presentationOutline.disableProperty().bind(this.presentationOutline.loadingProperty());
         this.presentationOutlinePane.addContent("Outline", this.presentationOutline);
 
-        final Thread thread = new Thread(() -> PlatformHelper.run(() -> this.presentationOutline.setPresentation(this.presentationEngine)));
+        final Thread thread = new Thread(() -> run(() -> this.presentationOutline.setPresentation(this.presentationEngine)));
 
         thread.setName("filling-slides-preview");
         thread.start();
@@ -737,14 +731,13 @@ public class PresentationViewController implements ThemeAwareController {
      * @return The slide number of the current displayed slide or {@code null} if no slide is displayed.
      */
     public String getCurrentSlideNumber() {
-        String slideNumber = null;
         final String slideId = this.getCurrentSlideId();
 
         if (slideId != null && !slideId.isEmpty()) {
-            slideNumber = slideId.substring(this.presentationEngine.getTemplateConfiguration().getSlideIdPrefix().length());
+            return slideId.substring(this.presentationEngine.getTemplateConfiguration().getSlideIdPrefix().length());
         }
 
-        return slideNumber;
+        return null;
     }
 
     /**

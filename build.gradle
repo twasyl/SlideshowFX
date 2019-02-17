@@ -2,9 +2,10 @@ buildscript {
     repositories {
         jcenter()
     }
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
-    }
+}
+
+plugins {
+    id 'org.sonarqube'
 }
 
 allprojects {
@@ -107,7 +108,7 @@ ext.dependencies = [
         felix       : [version: '6.0.1'],
         freemarker  : [version: '2.3.28'],
         jsoup       : [version: '1.11.3'],
-        junit       : [version: '5.3.2'],
+        junit       : [version: '5.4.0'],
         markdown    : [version: '0.13'],
         mockito     : [version: '2.23.4'],
         monocle     : [version: '8u76-b04'],
@@ -118,41 +119,96 @@ ext.dependencies = [
 ]
 
 subprojects {
+
+    def javaCallback = {
+        compileJava {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
+        }
+
+        sourceSets {
+            integrationTest {
+                compileClasspath += sourceSets.main.output
+                runtimeClasspath += sourceSets.main.output
+            }
+        }
+
+        configurations {
+            integrationTestImplementation.extendsFrom implementation
+            integrationTestRuntimeOnly.extendsFrom runtimeOnly
+        }
+
+        dependencies {
+            testImplementation "org.junit.jupiter:junit-jupiter-api:${rootProject.ext.dependencies.junit.version}"
+            testImplementation "org.junit.jupiter:junit-jupiter-params:${rootProject.ext.dependencies.junit.version}"
+            testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${rootProject.ext.dependencies.junit.version}"
+
+            integrationTestImplementation "org.junit.jupiter:junit-jupiter-api:${rootProject.ext.dependencies.junit.version}"
+            integrationTestImplementation "org.junit.jupiter:junit-jupiter-params:${rootProject.ext.dependencies.junit.version}"
+            integrationTestRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${rootProject.ext.dependencies.junit.version}"
+        }
+
+        test {
+            useJUnitPlatform()
+        }
+
+        task integrationTest(type: Test) {
+            description = 'Runs integration tests.'
+            group = 'verification'
+
+            testClassesDirs = sourceSets.integrationTest.output.classesDirs
+            classpath = sourceSets.integrationTest.runtimeClasspath
+        }
+
+        integrationTest.dependsOn jar
+        check.dependsOn integrationTest
+
+        integrationTest {
+            useJUnitPlatform()
+        }
+    }
+
+    def bintrayCallback = {
+        bintray {
+            user = System.properties['bintrayUserName'] ?: System.env['BINTRAY_USER_NAME']
+            key = System.properties['bintrayApiKey'] ?: System.env['BINTRAY_API_KEY']
+
+            configurations = ['archives']
+
+            pkg {
+                repo = 'SlideshowFX'
+                name = project.name
+                websiteUrl = 'https://slideshowfx.github.io'
+                issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
+                vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
+
+                desc = project.description
+
+                licenses = ['Apache-2.0']
+
+                githubRepo = 'twasyl/SlideshowFX'
+                githubReleaseNotesFile = 'CHANGELOG.textile'
+
+                version {
+                    name = rootProject.stripProjectVersion(project.version)
+                    desc = project.description
+                    released = new Date()
+                    vcsTag = "v${rootProject.stripProjectVersion(project.version)}"
+                }
+            }
+        }
+
+        bintrayUpload.enabled = System.properties["${project.name}.publish"] ?: false
+    }
+
+    plugins.withType(JavaPlugin, javaCallback)
+    plugins.withId('com.jfrog.bintray', bintrayCallback)
+
     afterEvaluate { project ->
         def isJavaProject = project.pluginManager.hasPlugin('java') || project.pluginManager.hasPlugin('java-library')
         def isProjectPlugin = rootProject.isPlugin(project)
 
         if (isJavaProject) {
-
-            sourceSets {
-                integrationTest {
-                    java.srcDir file("${project.projectDir.absolutePath}/src/integration-test/java")
-                    resources.srcDir file("${project.projectDir.absolutePath}/src/integration-test/resources")
-                    compileClasspath += sourceSets.main.output + configurations.testRuntime
-                    runtimeClasspath += output + compileClasspath
-                }
-            }
-
-            configurations {
-                integrationTestImplementation.extendsFrom implementation
-                integrationTestRuntimeOnly.extendsFrom runtimeOnly
-            }
-
-            dependencies {
-                testImplementation "org.junit.jupiter:junit-jupiter-api:${rootProject.ext.dependencies.junit.version}"
-                testImplementation "org.junit.jupiter:junit-jupiter-params:${rootProject.ext.dependencies.junit.version}"
-                testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${rootProject.ext.dependencies.junit.version}"
-            }
-
-            test {
-                useJUnitPlatform()
-            }
-
-            compileJava {
-                sourceCompatibility = JavaVersion.VERSION_1_8
-                targetCompatibility = JavaVersion.VERSION_1_8
-            }
-
             Map<String, ?> manifestAttributes = ['Implementation-Vendor': 'Thierry Wasylczenko']
 
             if (rootProject.isPlugin(project)) {
@@ -182,41 +238,6 @@ subprojects {
             }
         }
 
-        if (isProjectPlugin || project.name.equals('slideshowfx-setup')) {
-            project.pluginManager.apply('com.jfrog.bintray')
-
-            bintray {
-                user = System.properties['bintrayUserName'] ?: System.env['BINTRAY_USER_NAME']
-                key = System.properties['bintrayApiKey'] ?: System.env['BINTRAY_API_KEY']
-
-                configurations = ['archives']
-
-                pkg {
-                    repo = 'SlideshowFX'
-                    name = project.name
-                    websiteUrl = 'https://slideshowfx.github.io'
-                    issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
-                    vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
-
-                    desc = project.description
-
-                    licenses = ['Apache-2.0']
-
-                    githubRepo = 'twasyl/SlideshowFX'
-                    githubReleaseNotesFile = 'CHANGELOG.textile'
-
-                    version {
-                        name = rootProject.stripProjectVersion(project.version)
-                        desc = project.description
-                        released = new Date()
-                        vcsTag = "v${rootProject.stripProjectVersion(project.version)}"
-                    }
-                }
-            }
-
-            bintrayUpload.enabled = System.properties["${project.name}.publish"] ?: false
-        }
-
         if (isProjectPlugin) {
 
             dependencies {
@@ -230,6 +251,15 @@ subprojects {
 
             installPlugin.dependsOn jar
         }
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.host.url", System.properties['sonar.host.url'] ?: System.env['SONAR_HOST_URL']
+        property "sonar.login", System.properties['sonar.login'] ?: System.env['SONAR_LOGIN']
+        property "sonar.projectKey", System.properties['sonar.projectKey'] ?: System.env['SONAR_PROJECT_KEY']
+        property "sonar.organization", System.properties['sonar.organization'] ?: System.env['SONAR_ORGANIZATION']
     }
 }
 

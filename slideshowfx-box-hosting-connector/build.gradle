@@ -1,7 +1,11 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+    id 'com.jfrog.bintray'
+}
+
 description = 'Hosting connector allowing to open and save presentations from and to Box'
 version = '1.3-SNAPSHOT'
-
-apply plugin: 'java-library'
 
 dependencies {
     compile "com.box:box-java-sdk:${rootProject.ext.dependencies.box.version}"

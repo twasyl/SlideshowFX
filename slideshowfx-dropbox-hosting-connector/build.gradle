@@ -1,7 +1,11 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+    id 'com.jfrog.bintray'
+}
+
 description = 'Hosting connector allowing to open and save presentations from and to Dropbox'
 version = '1.3-SNAPSHOT'
-
-apply plugin: 'java-library'
 
 dependencies {
     compile "com.dropbox.core:dropbox-core-sdk:${rootProject.ext.dependencies.dropbox.version}"

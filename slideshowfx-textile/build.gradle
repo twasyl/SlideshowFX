@@ -1,12 +1,19 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+    id 'com.jfrog.bintray'
+}
+
 description = 'Extension allowing to define slide\'s content using the textile syntax'
 version = '1.3-SNAPSHOT'
-
-apply plugin: 'java-library'
 
 dependencies {
     implementation project(':slideshowfx-markup')
 
     compile "org.eclipse.mylyn.docs:org.eclipse.mylyn.wikitext.textile:${rootProject.ext.dependencies.wikitext.version}"
+    
+    integrationTestImplementation project(':slideshowfx-osgi')
+    integrationTestImplementation project(':slideshowfx-plugin').sourceSets.integrationTest.output
 }
 
 ext.isPlugin = true
@@ -21,8 +28,26 @@ ext.bundle = [
         setupWizardLabel: 'Textile'
 ]
 
+jacoco {
+    toolVersion = "0.8.3"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.enabled true
+    }
+}
+
 jar {
     from(configurations.compile.resolve().collect()) {
         include '*'
+    }
+}
+
+task plop {
+    doLast {
+        println project.property("plugins.sonarqube.version")
     }
 }

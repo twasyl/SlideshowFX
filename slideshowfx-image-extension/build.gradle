@@ -1,7 +1,11 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+    id 'com.jfrog.bintray'
+}
+
 description = 'Extension allowing to insert images inside a SlideshowFX presentation'
 version = '1.4-SNAPSHOT'
-
-apply plugin: 'java-library'
 
 dependencies {
     api project(':slideshowfx-content-extension')

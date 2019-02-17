@@ -1,3 +1,8 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+}
+
 description = 'Module allowing to insert icons in the UI'
 version = '1.1-SNAPSHOT'
 

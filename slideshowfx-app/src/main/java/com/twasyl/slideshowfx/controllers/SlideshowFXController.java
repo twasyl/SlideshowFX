@@ -267,7 +267,7 @@ public class SlideshowFXController implements ThemeAwareController {
     public void closeAllPresentations(final boolean waitToFinish) {
         PlatformHelper.run(() -> {
             this.openedPresentationsTabPane.getTabs()
-                    .filtered(tab -> tab.getUserData() != null && tab.getUserData() instanceof PresentationViewController)
+                    .filtered(tab -> tab.getUserData() instanceof PresentationViewController)
                     .forEach(tab -> {
                         final PresentationEngine presentation = ((PresentationViewController) tab.getUserData()).getPresentation();
                         this.closePresentation(presentation, waitToFinish);
@@ -288,18 +288,16 @@ public class SlideshowFXController implements ThemeAwareController {
         boolean dragSuccess = false;
 
         if (board.hasFiles()) {
-            Optional<File> slideshowFXFile = board.getFiles().stream()
+            final Optional<File> slideshowFXFile = board.getFiles().stream()
                     .filter(file -> file.getName().endsWith(PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)
                             || file.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION))
                     .findFirst();
 
-            if (slideshowFXFile != null && slideshowFXFile.isPresent()) {
+            if (slideshowFXFile.isPresent()) {
                 try {
                     SlideshowFXController.this.openTemplateOrPresentation(slideshowFXFile.get());
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                } catch (IllegalAccessException | FileNotFoundException e) {
+                    LOGGER.log(SEVERE, "Can not open file {0}", slideshowFXFile.get().getAbsolutePath());
                 }
 
                 dragSuccess = true;
@@ -331,7 +329,7 @@ public class SlideshowFXController implements ThemeAwareController {
                             || file.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION))
                     .findFirst();
 
-            final boolean isDragValid = slideshowFXFile != null && slideshowFXFile.isPresent();
+            final boolean isDragValid = slideshowFXFile.isPresent();
             if (isDragValid) {
                 dragEvent.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
@@ -394,13 +392,11 @@ public class SlideshowFXController implements ThemeAwareController {
         if (presentation != null) {
             final File workingDir = presentation.getWorkingDirectory();
 
-            if (workingDir != null && workingDir.exists()) {
-                if (Desktop.isDesktopSupported()) {
-                    try {
-                        Desktop.getDesktop().open(workingDir);
-                    } catch (IOException e) {
-                        LOGGER.log(SEVERE, "Can not open working directory", e);
-                    }
+            if (workingDir != null && workingDir.exists() && Desktop.isDesktopSupported()) {
+                try {
+                    Desktop.getDesktop().open(workingDir);
+                } catch (IOException e) {
+                    LOGGER.log(SEVERE, "Can not open working directory", e);
                 }
             }
         }
@@ -450,8 +446,8 @@ public class SlideshowFXController implements ThemeAwareController {
     @FXML
     private void displayInternalBrowser(ActionEvent event) {
         try {
-            final Parent root = FXMLLoader.load(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/InternalBrowser.fxml"));
-            final Tab tab = new Tab("Internal browser", root);
+            final Parent browser = FXMLLoader.load(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/InternalBrowser.fxml"));
+            final Tab tab = new Tab("Internal browser", browser);
 
             this.openedPresentationsTabPane.getTabs().addAll(tab);
             this.openedPresentationsTabPane.getSelectionModel().select(tab);
@@ -463,8 +459,8 @@ public class SlideshowFXController implements ThemeAwareController {
     @FXML
     private void displayWebApplication(final ActionEvent event) {
         try {
-            final Parent root = FXMLLoader.load(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/SlideshowFXWebApplication.fxml"));
-            final Tab tab = new Tab("Web application", root);
+            final Parent webapp = FXMLLoader.load(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/SlideshowFXWebApplication.fxml"));
+            final Tab tab = new Tab("Web application", webapp);
 
             this.openedPresentationsTabPane.getTabs().addAll(tab);
             this.openedPresentationsTabPane.getSelectionModel().select(tab);
@@ -502,17 +498,17 @@ public class SlideshowFXController implements ThemeAwareController {
     private void displayPluginCenter(final ActionEvent event) {
         FXMLLoader loader = new FXMLLoader(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/PluginCenter.fxml"));
         try {
-            final Parent root = loader.load();
+            final Parent pluginCenter = loader.load();
             final PluginCenterController controller = loader.getController();
 
-            final ButtonType response = DialogHelper.showCancellableDialog("Plugin center", root);
+            final ButtonType response = DialogHelper.showCancellableDialog("Plugin center", pluginCenter);
 
             if (response.equals(ButtonType.OK)) {
                 controller.validatePluginsConfiguration();
 
                 this.openedPresentationsTabPane.getTabs()
                         .stream()
-                        .filter(tab -> tab.getUserData() != null && tab.getUserData() instanceof PresentationViewController)
+                        .filter(tab -> tab.getUserData() instanceof PresentationViewController)
                         .forEach(tab -> {
                             ((PresentationViewController) tab.getUserData()).refreshMarkupSyntax();
                             ((PresentationViewController) tab.getUserData()).refreshContentExtensions();
@@ -728,11 +724,11 @@ public class SlideshowFXController implements ThemeAwareController {
     private void showOptionsDialog(ActionEvent event) {
         FXMLLoader loader = new FXMLLoader(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/OptionsView.fxml"));
         try {
-            final Parent root = loader.load();
-            Themes.applyTheme(root, GlobalConfiguration.getThemeName());
+            final Parent optionsView = loader.load();
+            Themes.applyTheme(optionsView, GlobalConfiguration.getThemeName());
             final OptionsViewController controller = loader.getController();
 
-            final ButtonType response = DialogHelper.showCancellableDialog("Options", root);
+            final ButtonType response = DialogHelper.showCancellableDialog("Options", optionsView);
 
             if (response != null && response == ButtonType.OK) {
                 controller.saveOptions();
@@ -799,7 +795,7 @@ public class SlideshowFXController implements ThemeAwareController {
 
                         final AutoSavingService autoSavingService = new AutoSavingService(loadingTask.getValue());
                         if (GlobalConfiguration.isAutoSavingEnabled()) {
-                            PlatformHelper.run(() -> autoSavingService.start());
+                            PlatformHelper.run(autoSavingService::start);
                         }
                     } catch (IOException e) {
                         LOGGER.log(SEVERE, "Can not load the view", e);
@@ -873,7 +869,7 @@ public class SlideshowFXController implements ThemeAwareController {
 
                 final AutoSavingService autoSavingService = new AutoSavingService(presentation);
                 if (GlobalConfiguration.isAutoSavingEnabled()) {
-                    PlatformHelper.run(() -> autoSavingService.start());
+                    PlatformHelper.run(autoSavingService::start);
                 }
             } else presentationArchive = presentation.getArchive();
 
@@ -926,7 +922,8 @@ public class SlideshowFXController implements ThemeAwareController {
     private void startServer() {
         FontAwesome icon;
         final Tooltip tooltip = new Tooltip();
-        final PseudoClass stateToEnable, stateToDisable;
+        final PseudoClass stateToEnable;
+        final PseudoClass stateToDisable;
 
         if (SlideshowFXServer.getSingleton() != null) {
             SlideshowFXServer.getSingleton().stop();
@@ -1044,35 +1041,33 @@ public class SlideshowFXController implements ThemeAwareController {
         final MenuItem uploaderMenuItem = new MenuItem(hostingConnector.getName());
         uploaderMenuItem.setUserData(hostingConnector);
 
-        uploaderMenuItem.setOnAction(event -> {
-            PlatformHelper.run(() -> {
-                if (!hostingConnector.isAuthenticated()) {
-                    try {
-                        hostingConnector.authenticate();
-                    } catch (HostingConnectorException e) {
-                        final Pair<String, String> pair = e.getTitleAndMessage();
-                        DialogHelper.showError(pair.getKey(), pair.getValue());
-                    }
+        uploaderMenuItem.setOnAction(event -> PlatformHelper.run(() -> {
+            if (!hostingConnector.isAuthenticated()) {
+                try {
+                    hostingConnector.authenticate();
+                } catch (HostingConnectorException e) {
+                    final Pair<String, String> pair = e.getTitleAndMessage();
+                    DialogHelper.showError(pair.getKey(), pair.getValue());
                 }
+            }
 
-                if (hostingConnector.isAuthenticated()) {
-                    // Prompts the user where to upload the presentation
-                    final RemoteFile destination;
-                    try {
-                        destination = hostingConnector.chooseFile(true, false);
+            if (hostingConnector.isAuthenticated()) {
+                // Prompts the user where to upload the presentation
+                final RemoteFile destination;
+                try {
+                    destination = hostingConnector.chooseFile(true, false);
 
-                        if (destination != null) {
-                            final UploadPresentationTask task = new UploadPresentationTask(Presentations.getCurrentDisplayedPresentation(),
-                                    hostingConnector, destination);
-                            TaskDAO.getInstance().startTask(task);
-                        }
-                    } catch (HostingConnectorException e) {
-                        final Pair<String, String> pair = e.getTitleAndMessage();
-                        DialogHelper.showError(pair.getKey(), pair.getValue());
+                    if (destination != null) {
+                        final UploadPresentationTask task = new UploadPresentationTask(Presentations.getCurrentDisplayedPresentation(),
+                                hostingConnector, destination);
+                        TaskDAO.getInstance().startTask(task);
                     }
+                } catch (HostingConnectorException e) {
+                    final Pair<String, String> pair = e.getTitleAndMessage();
+                    DialogHelper.showError(pair.getKey(), pair.getValue());
                 }
-            });
-        });
+            }
+        }));
 
         this.uploadersMenu.getItems().add(uploaderMenuItem);
 
@@ -1090,55 +1085,53 @@ public class SlideshowFXController implements ThemeAwareController {
         final MenuItem downloaderMenuItem = new MenuItem(hostingConnector.getName());
         downloaderMenuItem.setUserData(hostingConnector);
 
-        downloaderMenuItem.setOnAction(event -> {
-            PlatformHelper.run(() -> {
-                if (!hostingConnector.isAuthenticated()) {
-                    try {
-                        hostingConnector.authenticate();
-                    } catch (HostingConnectorException e) {
-                        final Pair<String, String> pair = e.getTitleAndMessage();
-                        DialogHelper.showError(pair.getKey(), pair.getValue());
-                    }
+        downloaderMenuItem.setOnAction(event -> PlatformHelper.run(() -> {
+            if (!hostingConnector.isAuthenticated()) {
+                try {
+                    hostingConnector.authenticate();
+                } catch (HostingConnectorException e) {
+                    final Pair<String, String> pair = e.getTitleAndMessage();
+                    DialogHelper.showError(pair.getKey(), pair.getValue());
                 }
+            }
 
-                if (hostingConnector.isAuthenticated()) {
-                    // Prompts the user which file to download
-                    try {
-                        final RemoteFile presentationFile = hostingConnector.chooseFile(true, true);
+            if (hostingConnector.isAuthenticated()) {
+                // Prompts the user which file to download
+                try {
+                    final RemoteFile presentationFile = hostingConnector.chooseFile(true, true);
 
-                        if (presentationFile != null) {
-                            // Prompts the user where the file should be downloaded
-                            final DirectoryChooser chooser = new DirectoryChooser();
-                            chooser.setTitle("Choose directory");
+                    if (presentationFile != null) {
+                        // Prompts the user where the file should be downloaded
+                        final DirectoryChooser chooser = new DirectoryChooser();
+                        chooser.setTitle("Choose directory");
 
-                            final File directory = chooser.showDialog(null);
+                        final File directory = chooser.showDialog(null);
 
-                            if (directory != null) {
-                                final DownloadPresentationTask task = new DownloadPresentationTask(
-                                        hostingConnector, directory, presentationFile);
-                                task.stateProperty().addListener((value, oldState, newState) -> {
-                                    if (newState == Worker.State.SUCCEEDED && task.getValue() != null) {
-                                        ButtonType response = DialogHelper.showConfirmationAlert("Open file?", String.format("Do you want to open '%1$s' ?", task.getValue()));
+                        if (directory != null) {
+                            final DownloadPresentationTask task = new DownloadPresentationTask(
+                                    hostingConnector, directory, presentationFile);
+                            task.stateProperty().addListener((value, oldState, newState) -> {
+                                if (newState == Worker.State.SUCCEEDED && task.getValue() != null) {
+                                    ButtonType response = DialogHelper.showConfirmationAlert("Open file?", String.format("Do you want to open '%1$s' ?", task.getValue()));
 
-                                        if (response != null && response == ButtonType.YES) {
-                                            try {
-                                                this.openTemplateOrPresentation(task.getValue());
-                                            } catch (IOException | IllegalAccessException e) {
-                                                LOGGER.log(SEVERE, "Error when opening file", e);
-                                            }
+                                    if (response != null && response == ButtonType.YES) {
+                                        try {
+                                            this.openTemplateOrPresentation(task.getValue());
+                                        } catch (IOException | IllegalAccessException e) {
+                                            LOGGER.log(SEVERE, "Error when opening file", e);
                                         }
                                     }
-                                });
-                                TaskDAO.getInstance().startTask(task);
-                            }
+                                }
+                            });
+                            TaskDAO.getInstance().startTask(task);
                         }
-                    } catch (HostingConnectorException e) {
-                        final Pair<String, String> pair = e.getTitleAndMessage();
-                        DialogHelper.showError(pair.getKey(), pair.getValue());
                     }
+                } catch (HostingConnectorException e) {
+                    final Pair<String, String> pair = e.getTitleAndMessage();
+                    DialogHelper.showError(pair.getKey(), pair.getValue());
                 }
-            });
-        });
+            }
+        }));
 
         this.downloadersMenu.getItems().add(downloaderMenuItem);
 
@@ -1158,7 +1151,7 @@ public class SlideshowFXController implements ThemeAwareController {
 
         if (selectedTab != null) {
             final Object userData = selectedTab.getUserData();
-            if (userData != null && userData instanceof PresentationViewController) {
+            if (userData instanceof PresentationViewController) {
                 view = (PresentationViewController) userData;
             }
         }
@@ -1215,9 +1208,7 @@ public class SlideshowFXController implements ThemeAwareController {
                 setDisable.invoke(element, true);
             } catch (NoSuchMethodException e) {
                 LOGGER.log(Level.FINE, "No setDisableMethod found", e);
-            } catch (InvocationTargetException e) {
-                LOGGER.log(WARNING, "Can not disable element", e);
-            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException | IllegalAccessException e) {
                 LOGGER.log(WARNING, "Can not disable element", e);
             }
         };
@@ -1232,7 +1223,7 @@ public class SlideshowFXController implements ThemeAwareController {
             if (newSelection != null) {
                 final Object userData = newSelection.getUserData();
 
-                if (userData != null && userData instanceof PresentationViewController) {
+                if (userData instanceof PresentationViewController) {
                     final PresentationViewController view = (PresentationViewController) userData;
                     view.setAsCurrentPresentation();
 

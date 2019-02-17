@@ -16,16 +16,15 @@ import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 public class GoogleFile extends RemoteFile {
 
     private String id;
-    private boolean directory = false;
-    private GoogleFile parent = null;
     private String downloadUrl;
 
     /**
      * Constructs a GoogleFile according the given parameters. The {@code name} corresponds to the name of the file on
      * Google Drive and the {@code id} to the ID that identifies the file on Google Drive.
+     *
      * @param parent The parent of this Google File.
-     * @param name The name of the file on GoogleDrive.
-     * @param id The unique ID of the file on Google Drive.
+     * @param name   The name of the file on GoogleDrive.
+     * @param id     The unique ID of the file on Google Drive.
      */
     public GoogleFile(GoogleFile parent, String name, String id) {
         super(parent, name);
@@ -35,8 +34,9 @@ public class GoogleFile extends RemoteFile {
     /**
      * Constructs a GoogleFile with a name and an ID. The parent will be null and the file is considered to be at the
      * root of Google Drive.
+     *
      * @param name The name of the file
-     * @param id The ID of the file on Google Drive.
+     * @param id   The ID of the file on Google Drive.
      */
     public GoogleFile(String name, String id) {
         this(null, name, id);
@@ -48,15 +48,16 @@ public class GoogleFile extends RemoteFile {
      */
     public GoogleFile() {
         super("root");
-        this.directory = true;
     }
 
     public String getId() {
-        if(isRoot() && this.id == null) return "root";
+        if (isRoot() && this.id == null) return "root";
         else return id;
     }
 
-    public void setId(String id) { this.id = id; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
 
     /**
@@ -66,12 +67,17 @@ public class GoogleFile extends RemoteFile {
      * @return {@code true} if this GoogleFile is the root on Drive, {@code false} otherwise.
      */
     @Override
-    public boolean isRoot() { return "root".equals(this.getName()); }
+    public boolean isRoot() {
+        return "root".equals(this.getName());
+    }
 
-    public String getDownloadUrl() { return downloadUrl; }
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
 
     /**
      * Set the download URL for this file.
+     *
      * @param downloadUrl The new download URL.
      * @return This instance of GoogleFile.
      */

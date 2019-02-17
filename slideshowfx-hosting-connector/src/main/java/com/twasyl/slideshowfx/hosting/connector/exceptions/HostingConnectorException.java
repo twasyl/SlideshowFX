@@ -53,9 +53,11 @@ public class HostingConnectorException extends Exception {
             case MISSING_CONFIGURATION:
                 pair.setKey("Missing configuration");
                 pair.setValue("A configuration is missing in order to interact with the service");
+                break;
             case DESTINATION_NOT_FOUND:
                 pair.setKey("Destination not found");
                 pair.setValue("The remote destination is not found");
+                break;
             case UNKNOWN_ERROR:
             default:
                 pair.setKey("Unknown error");

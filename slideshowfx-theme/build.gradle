@@ -1,7 +1,10 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+}
+
 description = 'Module defining themes to be used within the SlideshowFX app'
 version = '1.0-SNAPSHOT'
-
-apply plugin: 'java-library'
 
 dependencies {
     testCompile "org.testfx:testfx-core:${rootProject.ext.dependencies.testfx.version}"

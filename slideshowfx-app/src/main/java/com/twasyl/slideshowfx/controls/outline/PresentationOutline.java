@@ -256,16 +256,14 @@ public class PresentationOutline extends ListView<ImageView> {
      * @return The slide ID at the given index or {@code null} if the index is invalid.
      */
     public String getSlideIdAtIndex(final int index) {
-        String slideId = null;
-
         try {
             final ImageView preview = this.getItems().get(index);
-            slideId = (String) preview.getUserData();
+            return (String) preview.getUserData();
         } catch (IndexOutOfBoundsException e) {
             LOGGER.log(Level.INFO, "Invalid index for getting the slide ID", e);
-        } finally {
-            return slideId;
         }
+
+        return null;
     }
 
     private void reset() {

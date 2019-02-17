@@ -37,13 +37,11 @@ public class DownloadPresentationTask extends SlideshowFXTask<File> {
     @Override
     protected File call() throws Exception {
 
-        if(!this.hostingConnector.isAuthenticated()) {
+        if (!this.hostingConnector.isAuthenticated()) {
             throw new HostingConnectorException(HostingConnectorException.NOT_AUTHENTICATED);
         }
 
-        final File result = this.hostingConnector.download(this.destination, this.file);
-
-        return result;
+        return this.hostingConnector.download(this.destination, this.file);
     }
 
     @Override

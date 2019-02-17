@@ -1,7 +1,10 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+}
+
 description = 'Module defining a snippet executor'
 version = '1.0'
-
-apply plugin: 'java-library'
 
 dependencies {
     implementation project(':slideshowfx-global-configuration')

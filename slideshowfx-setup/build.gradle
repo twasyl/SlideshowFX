@@ -1,8 +1,12 @@
+plugins {
+    id 'java'
+    id 'distribution'
+    id 'jacoco'
+    id 'com.jfrog.bintray'
+}
+
 description = 'Module for the installer of SlideshowFX'
 version = '@@NEXT_VERSION@@'
-
-apply plugin: 'java'
-apply plugin: 'distribution'
 
 dependencies {
     compile project(':slideshowfx-global-configuration')

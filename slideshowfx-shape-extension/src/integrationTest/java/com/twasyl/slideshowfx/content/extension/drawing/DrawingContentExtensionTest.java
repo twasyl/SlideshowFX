@@ -1,4 +1,4 @@
-package com.twasyl.slideshowfx.condent.extension.drawing;
+package com.twasyl.slideshowfx.content.extension.drawing;
 
 import com.twasyl.slideshowfx.content.extension.shape.ShapeContentExtension;
 import javafx.application.Application;

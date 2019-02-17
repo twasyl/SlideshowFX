@@ -1,4 +1,11 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+}
+
 description = "Module defining a markup"
 version = '1.0'
 
-apply plugin: 'java'
+dependencies {
+    integrationTestImplementation project(':slideshowfx-osgi')
+}

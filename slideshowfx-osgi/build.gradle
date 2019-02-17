@@ -1,7 +1,10 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+}
+
 description = 'Module allowing to add OSGi support in the application'
 version = '1.2'
-
-apply plugin: 'java-library'
 
 dependencies {
     implementation project(':slideshowfx-engines')

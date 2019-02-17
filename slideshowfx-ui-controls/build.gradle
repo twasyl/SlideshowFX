@@ -1,7 +1,10 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+}
+
 description = 'Module defining controls to be used within the SlideshowFX app'
 version = '1.3'
-
-apply plugin: 'java-library'
 
 dependencies {
     compile project(':slideshowfx-icons')

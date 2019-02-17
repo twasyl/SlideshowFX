@@ -35,7 +35,7 @@ public class TextileMarkup extends AbstractMarkup {
      * @throws IllegalArgumentException If {@code markupString} is null, this exception is thrown.
      */
     @Override
-    public String convertAsHtml(String markupString) throws IllegalArgumentException {
+    public String convertAsHtml(String markupString) {
         if (markupString == null)
             throw new IllegalArgumentException("Can not convert " + getName() + " to HTML : the String is null");
 

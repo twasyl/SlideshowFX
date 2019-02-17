@@ -1,7 +1,10 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+}
+
 description = 'Module representing the server used within SlideshowFX'
 version = '1.2-SNAPSHOT'
-
-apply plugin: 'java-library'
 
 dependencies {
     implementation project(':slideshowfx-engines')

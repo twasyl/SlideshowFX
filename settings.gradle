@@ -1,3 +1,15 @@
+pluginManagement {
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == 'org.sonarqube') {
+                useVersion "${pluginSonarqubeVersion}"
+            } else if (requested.id.id == 'com.jfrog.bintray') {
+                useVersion "${pluginBintrayVersion}"
+            }
+        }
+    }
+}
+
 rootProject.name = 'slideshowfx'
 
 include 'slideshowfx-app',

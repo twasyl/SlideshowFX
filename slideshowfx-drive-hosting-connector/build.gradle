@@ -1,7 +1,11 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+    id 'com.jfrog.bintray'
+}
+
 description = 'Hosting connector allowing to open and save presentations from and to Google Drive'
 version = '1.4-SNAPSHOT'
-
-apply plugin: 'java-library'
 
 dependencies {
     compile "com.google.apis:google-api-services-drive:${rootProject.ext.dependencies.drive.version}"

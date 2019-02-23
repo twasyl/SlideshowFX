@@ -92,7 +92,7 @@ public class GroovySnippetExecutorTest {
     public void mustNotBeWrappedInMethodRunner() {
         final CodeSnippet snippet = new CodeSnippet();
 
-        assertFalse(snippetExecutor.mustBeWrappedInMethodRunner(snippet));
+        assertFalse(snippetExecutor.mustBeWrappedIn(snippet, WRAP_IN_METHOD_RUNNER));
     }
 
     @Test
@@ -100,7 +100,7 @@ public class GroovySnippetExecutorTest {
         final CodeSnippet snippet = new CodeSnippet();
         snippet.getProperties().put(WRAP_IN_METHOD_RUNNER, "false");
 
-        assertFalse(snippetExecutor.mustBeWrappedInMethodRunner(snippet));
+        assertFalse(snippetExecutor.mustBeWrappedIn(snippet, WRAP_IN_METHOD_RUNNER));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class GroovySnippetExecutorTest {
         final CodeSnippet snippet = new CodeSnippet();
         snippet.getProperties().put(WRAP_IN_METHOD_RUNNER, "true");
 
-        assertTrue(snippetExecutor.mustBeWrappedInMethodRunner(snippet));
+        assertTrue(snippetExecutor.mustBeWrappedIn(snippet, WRAP_IN_METHOD_RUNNER));
     }
 
     @Test

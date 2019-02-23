@@ -4,10 +4,7 @@ import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.theme.Themes;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
+import javafx.scene.control.*;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -24,6 +21,9 @@ import java.util.logging.Logger;
  */
 public class DialogHelper {
     private static final Logger LOGGER = Logger.getLogger(DialogHelper.class.getName());
+
+    private DialogHelper() {
+    }
 
     /**
      * Show a confirmation alert with the given {@code title} and {@code text}. The method returns the answer of the
@@ -100,8 +100,11 @@ public class DialogHelper {
         final Dialog dialog = buildDialog(title, content, ButtonType.CANCEL, ButtonType.OK);
 
         if (validationProperty != null) {
-            final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-            okButton.disableProperty().bind(validationProperty.not());
+            final DialogPane pane = dialog.getDialogPane();
+            if (pane != null) {
+                final Button okButton = (Button) pane.lookupButton(ButtonType.OK);
+                okButton.disableProperty().bind(validationProperty.not());
+            }
         }
 
         return displayDialog(dialog);
@@ -177,8 +180,11 @@ public class DialogHelper {
         Alert alert = null;
         try {
             alert = future.get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (ExecutionException e) {
             LOGGER.log(Level.SEVERE, "Can not build an alert", e);
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.SEVERE, "Can not build an alert", e);
+            Thread.currentThread().interrupt();
         }
 
         return alert;
@@ -211,8 +217,11 @@ public class DialogHelper {
         Dialog dialog = null;
         try {
             dialog = future.get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (ExecutionException e) {
             LOGGER.log(Level.SEVERE, "Can not build a Dialog", e);
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.SEVERE, "Can not build a Dialog", e);
+            Thread.currentThread().interrupt();
         }
 
         return dialog;
@@ -238,18 +247,21 @@ public class DialogHelper {
      * @return The answer of the user or {@code null} if no answer has been made.
      */
     private static ButtonType displayDialog(Dialog<ButtonType> dialog) {
-        Optional<ButtonType> response = null;
+        Optional<ButtonType> response = Optional.empty();
 
         if (dialog != null) {
-            final FutureTask<Optional<ButtonType>> future = new FutureTask<>(() -> dialog.showAndWait());
+            final FutureTask<Optional<ButtonType>> future = new FutureTask<>(dialog::showAndWait);
             PlatformHelper.run(future);
             try {
                 response = future.get();
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (ExecutionException e) {
                 LOGGER.log(Level.SEVERE, "Can not show dialog", e);
+            } catch (InterruptedException e) {
+                LOGGER.log(Level.SEVERE, "Can not show dialog", e);
+                Thread.currentThread().interrupt();
             }
         }
 
-        return response != null && response.isPresent() ? response.get() : null;
+        return response.isPresent() ? response.get() : null;
     }
 }

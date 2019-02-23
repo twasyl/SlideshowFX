@@ -4,7 +4,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Side;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -18,6 +17,9 @@ import javafx.scene.web.WebView;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.WARNING;
 
 /**
  * The controller class for the internal browser view.
@@ -27,6 +29,7 @@ import java.util.ResourceBundle;
  * @since SlideshowFX 1.0
  */
 public class InternalBrowserController implements ThemeAwareController {
+    private static final Logger LOGGER = Logger.getLogger(InternalBrowserController.class.getName());
 
     @FXML
     private BorderPane root;
@@ -119,7 +122,7 @@ public class InternalBrowserController implements ThemeAwareController {
 
                     if (entry.getUrl().toLowerCase().startsWith(lowerCasePartialAddress) ||
                             (url.getAuthority() != null && (url.getAuthority().startsWith(lowerCasePartialAddress) ||
-                                    (url.getAuthority().startsWith("www.") && url.getAuthority().substring(4).startsWith(lowerCasePartialAddress)))) ||
+                                    (url.getAuthority().startsWith("www.") && url.getAuthority().startsWith(lowerCasePartialAddress, 4)))) ||
                             (entry.getTitle() != null && entry.getTitle().toLowerCase().startsWith(lowerCasePartialAddress))) {
                         final MenuItem menuItem = new Menu(entry.getUrl());
                         menuItem.setOnAction(event -> {
@@ -131,7 +134,7 @@ public class InternalBrowserController implements ThemeAwareController {
                         this.browsingHistoryContextMenu.getItems().add(menuItem);
                     }
                 } catch (MalformedURLException e) {
-                    e.printStackTrace();
+                    LOGGER.log(WARNING, "Invalid URL", e);
                 }
 
             });
@@ -154,9 +157,7 @@ public class InternalBrowserController implements ThemeAwareController {
         this.browsingHistoryContextMenu.setAutoFix(true);
         this.browsingHistoryContextMenu.setHideOnEscape(true);
 
-        this.addressBar.textProperty().addListener((textValue, oldText, newText) -> {
-            this.displayBrowsingHistorySuggestion(newText);
-        });
+        this.addressBar.textProperty().addListener((textValue, oldText, newText) -> this.displayBrowsingHistorySuggestion(newText));
 
         this.browser.getEngine().load(InternalBrowserController.class.getResource("/com/twasyl/slideshowfx/html/empty-webview.html").toExternalForm());
 

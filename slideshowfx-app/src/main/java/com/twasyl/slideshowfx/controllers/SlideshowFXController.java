@@ -26,10 +26,7 @@ import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.plugin.IPlugin;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
-import com.twasyl.slideshowfx.server.service.AttendeeChatService;
-import com.twasyl.slideshowfx.server.service.PresenterChatService;
-import com.twasyl.slideshowfx.server.service.QuizService;
-import com.twasyl.slideshowfx.server.service.TwitterService;
+import com.twasyl.slideshowfx.server.service.*;
 import com.twasyl.slideshowfx.services.AutoSavingService;
 import com.twasyl.slideshowfx.theme.Themes;
 import com.twasyl.slideshowfx.utils.DialogHelper;
@@ -749,14 +746,19 @@ public class SlideshowFXController implements ThemeAwareController {
      * @throws FileNotFoundException    If dataFile does not exist.
      * @throws IllegalAccessException   If the file can not be accessed.
      */
-    public void openTemplateOrPresentation(final File dataFile) throws IllegalArgumentException, IllegalAccessException, FileNotFoundException {
+    public void openTemplateOrPresentation(final File dataFile) throws IllegalAccessException, FileNotFoundException {
         if (dataFile == null) throw new IllegalArgumentException("The dataFile can not be null");
         if (!dataFile.exists()) throw new FileNotFoundException("The dataFile does not exist");
         if (!dataFile.canRead()) throw new IllegalAccessException("The dataFile can not be accessed");
 
-        final SlideshowFXTask<PresentationEngine> loadingTask = dataFile.getName().endsWith(PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)
-                ? new LoadPresentationTask(dataFile) : dataFile.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION) ?
-                new LoadTemplateTask(dataFile) : null;
+        final SlideshowFXTask<PresentationEngine> loadingTask;
+        if (dataFile.getName().endsWith(PresentationEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)) {
+            loadingTask = new LoadPresentationTask(dataFile);
+        } else if (dataFile.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)) {
+            loadingTask = new LoadTemplateTask(dataFile);
+        } else {
+            loadingTask = null;
+        }
 
         if (loadingTask != null) {
             TaskAction.forTask(loadingTask)
@@ -954,6 +956,7 @@ public class SlideshowFXController implements ThemeAwareController {
             this.serverPort.setText(port + "");
 
             SlideshowFXServer.create(ip, port, this.twitterHashtag.getText()).start(
+                    WebappService.class,
                     AttendeeChatService.class,
                     PresenterChatService.class,
                     QuizService.class,

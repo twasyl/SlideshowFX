@@ -13,6 +13,8 @@ import javafx.scene.layout.Pane;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -100,7 +102,7 @@ public class TemplateFileButton extends ToggleButton {
                     try {
                         this.removeExtractedContent();
                         if (this.getTemplateFile().exists()) {
-                            this.getTemplateFile().delete();
+                            Files.delete(this.getTemplateFile().toPath());
                         }
 
                         ((Pane) this.getParent()).getChildren().remove(this);
@@ -209,13 +211,12 @@ public class TemplateFileButton extends ToggleButton {
 
         try (final ZipFile zip = new ZipFile(getTemplateFile(), OPEN_READ)) {
 
-            final ZipEntry templateConfigEntry = zip.stream()
+            final Optional<? extends ZipEntry> templateConfigEntry = zip.stream()
                     .filter(entry -> DEFAULT_CONFIGURATION_FILE_NAME.equals(entry.getName()))
-                    .findAny()
-                    .orElseGet(null);
+                    .findAny();
 
-            if (templateConfigEntry != null) {
-                try (final InputStreamReader input = new InputStreamReader(zip.getInputStream(templateConfigEntry))) {
+            if (templateConfigEntry.isPresent()) {
+                try (final InputStreamReader input = new InputStreamReader(zip.getInputStream(templateConfigEntry.get()))) {
                     jsonConfig = JSONHelper.readFromReader(input);
                 }
             } else {

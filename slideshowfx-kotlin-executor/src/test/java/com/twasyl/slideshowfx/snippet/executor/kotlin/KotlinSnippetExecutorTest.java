@@ -69,7 +69,7 @@ public class KotlinSnippetExecutorTest {
     public void mustNotBeWrappedInMain() {
         final CodeSnippet snippet = new CodeSnippet();
 
-        assertFalse(snippetExecutor.mustBeWrappedInMain(snippet));
+        assertFalse(snippetExecutor.mustBeWrappedIn(snippet, WRAP_IN_MAIN_PROPERTY));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class KotlinSnippetExecutorTest {
         final CodeSnippet snippet = new CodeSnippet();
         snippet.getProperties().put(WRAP_IN_MAIN_PROPERTY, "false");
 
-        assertFalse(snippetExecutor.mustBeWrappedInMain(snippet));
+        assertFalse(snippetExecutor.mustBeWrappedIn(snippet, WRAP_IN_MAIN_PROPERTY));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class KotlinSnippetExecutorTest {
         final CodeSnippet snippet = new CodeSnippet();
         snippet.getProperties().put(WRAP_IN_MAIN_PROPERTY, "true");
 
-        assertTrue(snippetExecutor.mustBeWrappedInMain(snippet));
+        assertTrue(snippetExecutor.mustBeWrappedIn(snippet, WRAP_IN_MAIN_PROPERTY));
     }
 
     @Test

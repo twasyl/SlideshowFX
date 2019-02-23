@@ -85,12 +85,10 @@ public class AbstractSlideshowFXService extends AbstractVerticle implements ISli
      * @return The JSON structure that can be send by a service caller.
      */
     protected JsonObject buildResponse(final String serviceEndpoint, final int responseCode, final Object responseContent) {
-        final JsonObject response = new JsonObject()
+        return new JsonObject()
                 .put(JSON_KEY_SERVICE, serviceEndpoint)
                 .put(JSON_KEY_CODE, responseCode)
                 .put(JSON_KEY_CONTENT, responseContent);
-
-        return response;
     }
 
     /**

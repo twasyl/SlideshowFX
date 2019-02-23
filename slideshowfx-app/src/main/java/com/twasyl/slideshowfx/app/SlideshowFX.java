@@ -59,19 +59,67 @@ public class SlideshowFX extends Application {
         GlobalConfiguration.createApplicationDirectory();
         GlobalConfiguration.createTemplateLibraryDirectory();
 
-        if (GlobalConfiguration.createConfigurationFile()) {
-            GlobalConfiguration.fillConfigurationWithDefaultValue();
-        } else {
-            GlobalConfiguration.fillConfigurationWithDefaultValue();
-        }
+        prepareApplicationConfiguration();
 
-        if (GlobalConfiguration.createLoggingConfigurationFile()) {
-            GlobalConfiguration.fillLoggingConfigurationFileWithDefaultValue();
-        }
+        prepareLoggingConfiguration();
 
         // Start the MarkupManager
         LOGGER.info("Starting Felix");
         OSGiManager.getInstance().startAndDeploy();
+
+        resolveFilesToOpenAtStartup();
+    }
+
+    /**
+     * Ensure the configuration file of the application exists and fill it with default value.
+     */
+    private void prepareApplicationConfiguration() {
+        if (!GlobalConfiguration.configurationFileExists() && GlobalConfiguration.createConfigurationFile()) {
+            LOGGER.severe("The configuration file can not be created");
+        }
+
+        GlobalConfiguration.fillConfigurationWithDefaultValue();
+    }
+
+    /**
+     * Ensure the logging configuration fie exists and fill it with default value.
+     */
+    private void prepareLoggingConfiguration() {
+        if (GlobalConfiguration.createLoggingConfigurationFile()) {
+            GlobalConfiguration.fillLoggingConfigurationFileWithDefaultValue();
+        }
+    }
+
+    /**
+     * Resolve files to be opened at the startup of the application and passed as parameters at launch.
+     */
+    private void resolveFilesToOpenAtStartup() {
+        resolveFilesToOpenAtStartupByNamedParameters();
+        resolveFilesToOpenAtStartupByUnnamedParameters();
+    }
+
+    /**
+     * Resolve files to be opened at the startup of the application and passed as named parameters.
+     */
+    private void resolveFilesToOpenAtStartupByUnnamedParameters() {
+        final List<String> unnamedParams = getParameters().getUnnamed();
+        if (unnamedParams != null && !unnamedParams.isEmpty()) {
+            unnamedParams.forEach(param -> {
+                final File file = new File(param);
+
+                if ((file.getName().endsWith(TemplateEngine.DEFAULT_ARCHIVE_EXTENSION) ||
+                        file.getName().endsWith(PresentationEngine.DEFAULT_ARCHIVE_EXTENSION))
+                        && file.exists() && file.canRead() && file.canWrite() && !this.filesToOpen.contains(file)) {
+                    this.filesToOpen.add(file);
+                }
+            });
+        }
+    }
+
+    /**
+     * Resolve files to be opened at the startup of the application and passed as unnamed parameters.
+     */
+    private void resolveFilesToOpenAtStartupByNamedParameters() {
         // Retrieve the files to open at startup
         final Map<String, String> params = getParameters().getNamed();
         if (params != null && !params.isEmpty()) {
@@ -87,20 +135,6 @@ public class SlideshowFX extends Application {
                     if (file.exists() && file.canRead() && file.canWrite() && !this.filesToOpen.contains(file)) {
                         this.filesToOpen.add(file);
                     }
-                }
-            });
-        }
-
-        // Try to load parameters that are passed dynamically with just a value
-        final List<String> unnamedParams = getParameters().getUnnamed();
-        if (unnamedParams != null && !unnamedParams.isEmpty()) {
-            unnamedParams.forEach(param -> {
-                final File file = new File(param);
-
-                if ((file.getName().endsWith(TemplateEngine.DEFAULT_ARCHIVE_EXTENSION) ||
-                        file.getName().endsWith(PresentationEngine.DEFAULT_ARCHIVE_EXTENSION))
-                        && file.exists() && file.canRead() && file.canWrite() && !this.filesToOpen.contains(file)) {
-                    this.filesToOpen.add(file);
                 }
             });
         }
@@ -209,7 +243,7 @@ public class SlideshowFX extends Application {
 
         if (!connectors.isEmpty()) {
             LOGGER.info("Disconnecting from all hosting connectors");
-            connectors.forEach(hostingConnector -> hostingConnector.disconnect());
+            connectors.forEach(IHostingConnector::disconnect);
         }
     }
 

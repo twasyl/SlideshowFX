@@ -9,6 +9,7 @@
         <script type="text/javascript" src="/slideshowfx/font-awesome/js/all.min.js"></script>
         <script type="text/javascript" src="/slideshowfx/chat/js/chatService.js"></script>
         <script type="text/javascript" src="/slideshowfx/quiz/js/quizService.js"></script>
+        <link rel="stylesheet" href="/slideshowfx/css/slideshowfx.css">
 
         <script type="text/javascript">
             var socket;
@@ -145,197 +146,6 @@
                 };
             };
         </script>
-
-        <style type="text/css">
-
-            /* GLOBAL STYLES */
-            body {
-                width: 100%;
-                margin: auto;
-            }
-
-            .hide { display: none; }
-
-            .show { display: block; }
-
-            .custom-button {
-                height: 30px;
-                border-radius: 8px;
-                border: 2px solid gray;
-                color: gray;
-                background-color: #EFEFEF;
-                cursor: pointer;
-            }
-
-            .header-background {
-                background: whitesmoke;
-                color: gray;
-            }
-
-            .width-to-container {
-                width: 100%;
-                box-sizing: border-box;
-                -webkit-box-sizing: border-box;
-                -moz-box-sizing: border-box;
-            }
-
-            #page {
-                width: 700px;
-                margin: auto;
-            }
-
-            /* HEADER STYLE */
-            #header {
-                width: 100%;
-                height: 64px;
-
-                margin: 0;
-                padding: 0px;
-                overflow: hidden;
-
-                position: fixed;
-                z-index: 2;
-            }
-
-            #header div:first-child {
-                float: left;
-                padding: 10 px;
-                margin-left: 5px;
-            }
-
-            /* MENU STYLE */
-            #menu {
-                padding-top: 15px;
-                padding-right: 15px;
-                height: 100%;
-                text-align: right;
-            }
-
-            #menu i {
-                padding-left: 2px;
-                padding-right: 2px;
-                border-bottom-style: none;
-                border-bottom-width: 0;
-            }
-
-            #menu span.active,
-            #menu span:hover {
-                border-bottom-style: solid;
-                border-bottom-width: 5px;
-                padding-bottom: 12px;
-                cursor: pointer;
-            }
-
-            /* CONTENT STYLE */
-            #content {
-                width: 700px;
-                margin: auto;
-
-                position: relative;
-                display: block;
-
-                top: 64px;
-                bottom: 0px;
-
-                padding: 10px;
-
-                background-color: white;
-                border-bottom-left-radius: 8px;
-                border-bottom-right-radius: 8px;
-            }
-
-            /* CONNECTION FORM STYLE */
-            #connection-form { text-align: center; }
-
-            #attendee-name-text, #attendee-name-text:focus {
-                border-radius: 8px;
-                color: black;
-                border: 1px solid gray;
-                padding: 8px;
-                background-color: #EFEFEF;
-            }
-
-            #attendee-name-text, #attendee-name-text:focus { color: black; }
-
-            #attendee-name-text::-webkit-input-placeholder {
-                color:    gray;
-                font-weight: bold;
-                font-style: italic;
-            }
-            #attendee-name-text:-moz-placeholder {
-                color:    gray;
-                font-weight: bold;
-                font-style: italic;
-            }
-            #attendee-name-text:-ms-input-placeholder{
-                color:    gray;
-                font-weight: bold;
-                font-style: italic;
-            }
-            #attendee-name-text::-moz-placeholder {
-                color:    gray;
-                font-weight: bold;
-                font-style: italic;
-            }
-
-            .connect-button {
-                margin-top: 10px;
-            }
-
-            /* CHAT STYLE */
-            #chat-messages { margin-bottom: 5px; }
-
-            #send-message-button { margin-top: 10px; }
-
-            .chat-message {
-                background-color: #EFEFEF;
-                padding: 5px;
-                margin: 3px;
-            }
-
-            .question-answered { background-color: #D0F5A9; }
-
-            .author { font-weight: bold; }
-
-            .message-content { font-style: italic; }
-
-            .chat-ended {
-                font-style: italic;
-                text-align: center;
-            }
-
-            /* QUIZ STYLE */
-            #answer-quiz-button {
-                margin-top: 10px;
-            }
-
-            @media screen and (-webkit-min-device-pixel-ratio: 1.0) and (min-resolution: 2.0dppx),
-            screen and (-webkit-min-device-pixel-ratio: 1.3),
-            screen and (-webkit-min-device-pixel-ratio: 1.5),
-            screen and (-webkit-min-device-pixel-ratio: 2.0),
-            screen and (-webkit-min-device-pixel-ratio: 3.0) {
-                body {
-                    width: 100%;
-                    height: 100%;
-                    margin: auto;
-                    background-color: white;
-                }
-
-                #page {
-                    width: 100%;
-                    margin: auto;
-                }
-
-                #header { width: 100%; }
-
-                #content {
-                    width: 95%;
-                    margin: auto;
-                    border: 0px;
-                    border-radius: 0;
-                }
-            }
-        </style>
     </head>
     <body>
         <div id="page">
@@ -345,7 +155,6 @@
                     <span id="chat-container-menu-entry" onclick="javascript:displayContent('chat-container');"><i class="far fa-comments fa-2x fa-fw"></i></span>
                     <span id="quiz-container-menu-entry" onclick="javascript:displayContent('quiz-container');"><i class="fas fa-question fa-2x fa-fw"></i></span>
                     <span id="logout-menu-entry" onclick="javascript:logout();"><i class="fas fa-sign-out-alt fa-2x fa-fw"></i></span>
-                    </article>
                 </div>
             </div>
 
@@ -366,7 +175,10 @@
                 </section>
 
                 <section id="quiz-container" class="hide">
-                    No quiz currently active
+                    <span id="no-quiz-container" class="width-to-container fa-stack fa-2x">
+                        <i class="fas fa-question fa-stack-1x fa-fw"></i>
+                        <i class="fas fa-ban fa-stack-2x fa-fw"></i>
+                    </span>
                 </section>
             </div>
         </div>

@@ -12,9 +12,9 @@ import javafx.event.Event;
 import javafx.event.EventType;
 
 public class PresentationOutlineEvent extends Event {
-    public static EventType<PresentationOutlineEvent> SLIDE_MOVED = new EventType<>(Event.ANY, "SLIDE_MOVED");
-    public static EventType<PresentationOutlineEvent> SLIDE_DELETED = new EventType<>(Event.ANY, "SLIDE_DELETED");
-    public static EventType<PresentationOutlineEvent> SLIDE_DELETION_REQUESTED = new EventType<>(Event.ANY, "SLIDE_DELETION_REQUESTED");
+    public static final EventType<PresentationOutlineEvent> SLIDE_MOVED = new EventType<>(Event.ANY, "SLIDE_MOVED");
+    public static final EventType<PresentationOutlineEvent> SLIDE_DELETED = new EventType<>(Event.ANY, "SLIDE_DELETED");
+    public static final EventType<PresentationOutlineEvent> SLIDE_DELETION_REQUESTED = new EventType<>(Event.ANY, "SLIDE_DELETION_REQUESTED");
 
     private String sourceSlideId;
     private String targetSlideId;

@@ -14,29 +14,29 @@ import static java.lang.Math.*;
  * An implementation allowing to create octagons.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 2.0
  */
 public class Octagon extends AbstractShape {
-    private ExtendedTextField x;
-    private ExtendedTextField y;
-    private ExtendedTextField diameter;
+    private ExtendedTextField xField;
+    private ExtendedTextField yField;
+    private ExtendedTextField diameterField;
 
     public Octagon() {
-        this.x = new ExtendedTextField("X", true, 3);
-        this.x.setValidator(isInteger());
+        this.xField = new ExtendedTextField("X", true, 3);
+        this.xField.setValidator(isInteger());
 
-        this.y = new ExtendedTextField("Y", true, 3);
-        this.y.setValidator(isInteger());
+        this.yField = new ExtendedTextField("Y", true, 3);
+        this.yField.setValidator(isInteger());
 
-        this.diameter = new ExtendedTextField("Diameter", true, 3);
-        this.diameter.setValidator(isInteger());
+        this.diameterField = new ExtendedTextField("Diameter", true, 3);
+        this.diameterField.setValidator(isInteger());
     }
 
     @Override
     public Node getUI() {
         final HBox container = new HBox(10);
-        container.getChildren().addAll(this.x, this.y, this.diameter);
+        container.getChildren().addAll(this.xField, this.yField, this.diameterField);
 
         final FlowPane attributes = new FlowPane(10, 10);
         attributes.getChildren().addAll(this.getCommonAttributes());
@@ -46,10 +46,10 @@ public class Octagon extends AbstractShape {
 
     @Override
     public String buildCreatingInstruction(String paper) {
-        final int x = parseInt(this.x.getText());
-        final int y = parseInt(this.y.getText());
-        final int diameter = parseInt(this.diameter.getText());
-        final double radius = diameter / 2;
+        final int x = parseInt(this.xField.getText());
+        final int y = parseInt(this.yField.getText());
+        final int diameter = parseInt(this.diameterField.getText());
+        final double radius = diameter / 2d;
         final double centerX = x + radius;
         final double centerY = y + radius;
         final double angleRadians = toRadians(45);
@@ -57,18 +57,18 @@ public class Octagon extends AbstractShape {
         final double sine = sin(angleRadians);
 
         final double x1 = centerX;
-        final double y1 = y;
+        final int y1 = y;
         final double x2 = centerX + radius * cosine;
         final double y2 = centerY - radius * sine;
-        final double x3 = x + diameter;
+        final int x3 = x + diameter;
         final double y3 = y + radius;
         final double x4 = x2;
         final double y4 = centerY + radius * sine;
         final double x5 = centerX;
-        final double y5 = y + diameter;
+        final int y5 = y + diameter;
         final double x6 = centerX - radius * cosine;
         final double y6 = y4;
-        final double x7 = x;
+        final int x7 = x;
         final double y7 = y3;
         final double x8 = centerX - radius * cosine;
         final double y8 = y2;

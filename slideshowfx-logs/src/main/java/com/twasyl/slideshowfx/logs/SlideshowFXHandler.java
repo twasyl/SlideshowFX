@@ -27,18 +27,16 @@ public class SlideshowFXHandler extends StreamHandler {
     protected String latestLog;
     protected volatile ByteArrayOutputStream byteOutput;
 
-    public SlideshowFXHandler() {
+    private SlideshowFXHandler() {
         super();
         this.latestLog = null;
         this.byteOutput = new ByteArrayOutputStream();
         super.setOutputStream(this.byteOutput);
-
-        singleton = this;
     }
 
-    public synchronized static SlideshowFXHandler getSingleton() {
+    public static synchronized SlideshowFXHandler getSingleton() {
         if (singleton == null) {
-            new SlideshowFXHandler();
+            singleton = new SlideshowFXHandler();
         }
 
         return singleton;

@@ -41,7 +41,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
         this.setOptions(new JavaSnippetExecutorOptions());
 
         final String javaHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(JAVA_HOME_PROPERTY_SUFFIX));
-        if(javaHome != null) {
+        if (javaHome != null) {
             try {
                 this.getOptions().setJavaHome(new File(javaHome));
             } catch (FileNotFoundException e) {
@@ -57,14 +57,14 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
         classTextField.setPrefColumnCount(10);
         classTextField.setTooltip(new Tooltip("The class name of this code snippet"));
         classTextField.textProperty().addListener((textValue, oldText, newText) -> {
-            if(newText == null || newText.isEmpty()) codeSnippet.putProperty(CLASS_NAME_PROPERTY, null);
+            if (newText == null || newText.isEmpty()) codeSnippet.putProperty(CLASS_NAME_PROPERTY, null);
             else codeSnippet.putProperty(CLASS_NAME_PROPERTY, newText);
         });
 
         final CheckBox wrapInMain = new CheckBox("Wrap code snippet in main");
         wrapInMain.setTooltip(new Tooltip("Wrap the provided code snippet in a Java main method"));
         wrapInMain.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {
-            if(newSelected != null) codeSnippet.putProperty(WRAP_IN_MAIN_PROPERTY, newSelected.toString());
+            if (newSelected != null) codeSnippet.putProperty(WRAP_IN_MAIN_PROPERTY, newSelected.toString());
         });
 
         final TextArea imports = new TextArea();
@@ -73,7 +73,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
         imports.setPrefRowCount(15);
         imports.setWrapText(true);
         imports.textProperty().addListener((textValue, oldText, newText) -> {
-            if(newText.isEmpty()) codeSnippet.putProperty(IMPORTS_PROPERTY, null);
+            if (newText.isEmpty()) codeSnippet.putProperty(IMPORTS_PROPERTY, null);
             else codeSnippet.putProperty(IMPORTS_PROPERTY, newText);
         });
 
@@ -116,10 +116,10 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
 
     @Override
     public void saveNewOptions() {
-        if(this.getNewOptions() != null) {
+        if (this.getNewOptions() != null) {
             this.setOptions(this.getNewOptions());
 
-            if(this.getOptions().getJavaHome() != null) {
+            if (this.getOptions().getJavaHome() != null) {
                 GlobalConfiguration.setProperty(this.getConfigurationBaseName().concat(JAVA_HOME_PROPERTY_SUFFIX),
                         this.getOptions().getJavaHome().getAbsolutePath().replaceAll("\\\\", "/"));
             }
@@ -136,7 +136,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
                 codeFile = createSourceCodeFile(codeSnippet);
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not write code to snippet file", e);
-                consoleOutput.add("ERROR: ".concat(e.getMessage()));
+                appendErrorMessageToConsole(consoleOutput, e);
             }
 
             // Compile the Java class
@@ -153,25 +153,19 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
                         .start();
 
                 try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                    errorStream.lines().forEach(line -> consoleOutput.add(line));
+                    errorStream.lines().forEach(consoleOutput::add);
                 }
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not execute code snippet", e);
-                consoleOutput.add("ERROR: ".concat(e.getMessage()));
+                appendErrorMessageToConsole(consoleOutput, e);
             } finally {
-                if(process != null) {
-                    try {
-                        process.waitFor();
-                    } catch (InterruptedException e) {
-                        LOGGER.log(Level.SEVERE, "Can not wait for process to end", e);
-                    }
-                }
+                waitForProcess(process);
             }
 
-            codeFile.delete();
+            deleteGeneratedFile(codeFile);
 
             // Execute the class only if the compilation was successful
-            if(process != null && process.exitValue() == 0) {
+            if (process != null && process.exitValue() == 0) {
 
                 final File javaExecutable = new File(this.getOptions().getJavaHome(), "bin/java");
                 final String[] executionCommand = {javaExecutable.getAbsolutePath(), determineClassName(codeSnippet)};
@@ -184,23 +178,16 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
                             .start();
 
                     try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                        inputStream.lines().forEach(line -> consoleOutput.add(line));
+                        inputStream.lines().forEach(consoleOutput::add);
                     }
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE, "Can not execute code snippet", e);
-                    consoleOutput.add("ERROR: ".concat(e.getMessage()));
+                    appendErrorMessageToConsole(consoleOutput, e);
                 } finally {
-                    if(process != null) {
-                        try {
-                            process.waitFor();
-                        } catch (InterruptedException e) {
-                            LOGGER.log(Level.SEVERE, "Can not wait for process to end", e);
-                        }
-                    }
+                    waitForProcess(process);
                 }
 
-                final File classFile = new File(this.getTemporaryDirectory(), determineClassName(codeSnippet));
-                classFile.delete();
+                deleteGeneratedFile(new File(this.getTemporaryDirectory(), determineClassName(codeSnippet)));
             }
         });
         snippetThread.start();
@@ -210,6 +197,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
 
     /**
      * Create the source code file for the given code snippet.
+     *
      * @param codeSnippet The code snippet.
      * @return The file created and containing the source code.
      */
@@ -224,30 +212,30 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
     }
 
     /**
-     *
      * Build code file content according properties. The source code can then be written properly inside a file in order
      * to be compiled and then executed.
+     *
      * @param codeSnippet The code snippet to build the source code for.
      * @return The content of the source code file.
      */
     protected String buildSourceCode(final CodeSnippet codeSnippet) throws IOException {
         final StringBuilder sourceCode = new StringBuilder();
 
-        if(hasImports(codeSnippet)) {
+        if (hasImports(codeSnippet)) {
             sourceCode.append(getImports(codeSnippet)).append("\n\n");
         }
 
         sourceCode.append(getStartClassDefinition(codeSnippet)).append("\n");
 
-        if(mustBeWrappedInMain(codeSnippet)) {
-            sourceCode.append("\t").append(getStartMainMethod()).append("\n")
+        if (mustBeWrappedIn(codeSnippet, WRAP_IN_MAIN_PROPERTY)) {
+            sourceCode.append("\tpublic static void main(String ... args) {\n")
                     .append(codeSnippet.getCode())
-                    .append("\n\t").append(getEndMainMethod());
+                    .append("\n\t}");
         } else {
             sourceCode.append(codeSnippet.getCode());
         }
 
-        sourceCode.append("\n").append(getEndClassDefinition(codeSnippet));
+        sourceCode.append("\n}");
 
         return sourceCode.toString();
     }
@@ -255,6 +243,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
     /**
      * Check if the imports have been defined for the given code snippet. In order to determine it, the {@link #IMPORTS_PROPERTY}
      * property.
+     *
      * @param codeSnippet The code snippet.
      * @return {@code true} if imports have been defined, {@code false} otherwise.
      */
@@ -286,6 +275,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
 
     /**
      * Format an import line by make sure it starts with the {@code import} keyword.
+     *
      * @param importLine The import line to format.
      * @return A well formatted import line.
      */
@@ -295,13 +285,13 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
 
         String formattedImportLine;
 
-        if(importLine.startsWith(importLineBeginning)) {
+        if (importLine.startsWith(importLineBeginning)) {
             formattedImportLine = importLine;
         } else {
             formattedImportLine = importLineBeginning.concat(importLine);
         }
 
-        if(!importLine.endsWith(importLineEnding)) {
+        if (!importLine.endsWith(importLineEnding)) {
             formattedImportLine = formattedImportLine.concat(importLineEnding);
         }
 
@@ -310,6 +300,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
 
     /**
      * Get the definition of the class.
+     *
      * @param codeSnippet The code snippet.
      */
     protected String getStartClassDefinition(final CodeSnippet codeSnippet) {
@@ -319,49 +310,13 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
     /**
      * Determine the class name of the code snippet. It looks inside the code snippet's properties and check the value
      * of the {@link #CLASS_NAME_PROPERTY} property. If {@code null} or empty, {@code Snippet} will be returned.
+     *
      * @param codeSnippet The code snippet.
      * @return The class name of the code snippet.
      */
     protected String determineClassName(final CodeSnippet codeSnippet) {
         String className = codeSnippet.getProperties().get(CLASS_NAME_PROPERTY);
-        if(className == null || className.isEmpty()) className = "Snippet";
+        if (className == null || className.isEmpty()) className = "Snippet";
         return className;
-    }
-
-    /**
-     * Determine if the code snippet must be wrapped inside a main method. It is determined by the presence and value of
-     * the {@link #WRAP_IN_MAIN_PROPERTY} property.
-     * @param codeSnippet The code snippet.
-     * @return {@code true} if the snippet must be wrapped in main, {@code false} otherwhise.
-     */
-    protected boolean mustBeWrappedInMain(final CodeSnippet codeSnippet) {
-        final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_MAIN_PROPERTY) ?
-                Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_MAIN_PROPERTY)) :
-                false;
-        return wrapInMain;
-    }
-
-    /**
-     * Get the start of the declaration of the main method.
-     * @return The start of the main method.
-     */
-    protected String getStartMainMethod() {
-        return "public static void main(String ... args) {";
-    }
-
-    /**
-     * Get the end of the declaration of the main method.
-     * @return The end of the main method.
-     */
-    protected String getEndMainMethod() {
-        return "}";
-    }
-
-    /**
-     * Get the end of the definition of the class.
-     * @param codeSnippet The code snippet.
-     */
-    protected String getEndClassDefinition(final CodeSnippet codeSnippet) {
-        return "}";
     }
 }

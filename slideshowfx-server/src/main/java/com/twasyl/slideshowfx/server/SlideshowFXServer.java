@@ -1,17 +1,9 @@
 package com.twasyl.slideshowfx.server;
 
-import com.twasyl.slideshowfx.server.service.AbstractSlideshowFXService;
 import com.twasyl.slideshowfx.server.service.ISlideshowFXServices;
-import com.twasyl.slideshowfx.utils.TemplateProcessor;
 import com.twasyl.slideshowfx.utils.beans.Wrapper;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.ServerWebSocket;
@@ -21,15 +13,18 @@ import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.server.service.AbstractSlideshowFXService.JSON_KEY_DATA;
 import static com.twasyl.slideshowfx.server.service.AbstractSlideshowFXService.JSON_KEY_SERVICE;
+import static java.util.logging.Level.SEVERE;
+import static java.util.stream.Collectors.toList;
 
 /**
  * This class represents an embedded server which is provided in SlideshowFX.
@@ -43,6 +38,7 @@ public class SlideshowFXServer {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXServer.class.getName());
 
     private static volatile SlideshowFXServer singleton;
+    private static final Object singletonLock = new Object();
 
     private Vertx vertx;
     private HttpServer httpServer;
@@ -77,25 +73,6 @@ public class SlideshowFXServer {
         this.host = host;
         this.port = port;
         this.twitterHashtag = twitterHashtag;
-    }
-
-    /**
-     * Deploy a {@link io.vertx.core.Verticle} identified by the given class.
-     *
-     * @param clazz The class of the Verticle to deploy.
-     */
-    public void deploy(Class<? extends AbstractVerticle> clazz) {
-        try {
-            this.vertx.deployVerticle(clazz.newInstance(), result -> {
-                if (result.succeeded()) {
-                    LOGGER.log(Level.FINE, "Verticle has been deployed successfully. Result: " + result.result());
-                } else if (result.failed()) {
-                    LOGGER.log(Level.WARNING, "Verticle hasn't been deployed properly. Result: " + result.result(), result.cause());
-                }
-            });
-        } catch (InstantiationException | IllegalAccessException e) {
-            LOGGER.log(Level.SEVERE, "Verticle hasn't been deployed properly.", e);
-        }
     }
 
     /**
@@ -152,8 +129,9 @@ public class SlideshowFXServer {
      *
      * @param services List of classes extending {@link ISlideshowFXServices} that have to be started with the
      *                 server
+     * @return
      */
-    public void start(Class<? extends ISlideshowFXServices>... services) {
+    public CompletableFuture<Void> start(Class<? extends ISlideshowFXServices>... services) {
 
         if (this.vertx == null) {
             this.vertx = Vertx.vertx();
@@ -167,35 +145,58 @@ public class SlideshowFXServer {
             templateTokens.put(SHARED_DATA_SERVER_PORT_TOKEN, "slideshowfx_server_port");
 
             this.httpServer = this.vertx.createHttpServer();
-            this.httpServer.websocketHandler(this.buildWebSocketHandler());
 
             this.router = Router.router(this.vertx);
             this.buildRouter();
             this.httpServer.requestHandler(this.router);
 
-            if (services != null && services.length > 0) {
-                Arrays.stream(services).forEach(service -> this.vertx.deployVerticle(service.getName()));
-            }
-
-            this.httpServer.listen(SlideshowFXServer.getSingleton().getPort(), SlideshowFXServer.getSingleton().getHost());
+            return deployServices(services).thenRunAsync(() -> this.httpServer.listen(SlideshowFXServer.getSingleton().getPort(), SlideshowFXServer.getSingleton().getHost()));
         } else {
             LOGGER.log(Level.INFO, "Server already started");
+            return CompletableFuture.completedFuture(null);
         }
+    }
+
+    private CompletableFuture<Void> deployServices(Class<? extends ISlideshowFXServices>... services) {
+        if (services != null && services.length > 0) {
+            final List<CompletableFuture<Void>> allDeployments = Arrays.stream(services).map(this::deployService).collect(toList());
+
+            return CompletableFuture.allOf(allDeployments.toArray(new CompletableFuture[0]));
+        } else {
+            return CompletableFuture.completedFuture(null);
+        }
+    }
+
+    private CompletableFuture<Void> deployService(final Class<? extends ISlideshowFXServices> service) {
+        final ServiceDeploymentHandler handler = new ServiceDeploymentHandler(service);
+        this.vertx.deployVerticle(service.getName(), handler);
+        return handler.future();
     }
 
     /**
      * Stops the embedded server.
+     *
+     * @return A {@link CompletableFuture} representing the stopping process.
      */
-    public void stop() {
-        if (this.vertx != null) {
-            this.vertx.close();
-        }
-        this.vertx = null;
-        this.httpServer = null;
-        this.router = null;
-        this.websockets.clear();
+    public CompletableFuture<Void> stop() {
+        final CompletableFuture<Void> stoppingTask = new CompletableFuture<>();
 
-        singleton = null;
+        if (this.vertx != null) {
+            this.vertx.close(event -> {
+                if (event.succeeded()) {
+                    this.vertx = null;
+                    this.httpServer = null;
+                    this.router = null;
+                    this.websockets.clear();
+                    resetSingleton();
+                    stoppingTask.complete(null);
+                } else {
+                    stoppingTask.completeExceptionally(event.cause());
+                }
+            });
+        }
+
+        return stoppingTask;
     }
 
     /**
@@ -215,7 +216,7 @@ public class SlideshowFXServer {
      * @return The response corresponding to the request.
      * @throws java.lang.IllegalArgumentException If the request is invalid.
      */
-    public JsonObject callService(String request) throws IllegalArgumentException {
+    public JsonObject callService(String request) {
         final Wrapper<JsonObject> response = new Wrapper<>();
 
         try {
@@ -244,7 +245,8 @@ public class SlideshowFXServer {
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
-                            LOGGER.log(Level.SEVERE, "Can not wait result when calling a service", e);
+                            LOGGER.log(SEVERE, "Can not wait result when calling a service", e);
+                            Thread.currentThread().interrupt();
                         }
                     }
                 }
@@ -255,9 +257,10 @@ public class SlideshowFXServer {
         } catch (DecodeException e) {
             throw new IllegalArgumentException("The request is invalid", e);
         } catch (ClassCastException e) {
-            LOGGER.log(Level.SEVERE, "An error occurred", e);
+            LOGGER.log(SEVERE, "An error occurred", e);
         } catch (InterruptedException e) {
-            LOGGER.log(Level.SEVERE, "An error occurred", e);
+            LOGGER.log(SEVERE, "An error occurred", e);
+            Thread.currentThread().interrupt();
         }
 
         return response.getValue();
@@ -270,96 +273,6 @@ public class SlideshowFXServer {
         final BodyHandler handler = BodyHandler.create();
         handler.setMergeFormAttributes(false);
         router.route().handler(handler);
-
-        // Get the main page
-        router.get(CONTEXT_PATH).handler(routingContext -> {
-            final LocalMap<String, String> templateTokens = this.vertx.sharedData().getLocalMap(SlideshowFXServer.SHARED_DATA_TEMPLATE_TOKENS);
-
-            final Configuration configuration = TemplateProcessor.getHtmlConfiguration(SlideshowFXServer.class);
-
-            final Map tokenValues = new HashMap();
-            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_HOST_TOKEN), this.getHost());
-            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_PORT_TOKEN), this.getPort() + "");
-
-            try (final StringWriter writer = new StringWriter()) {
-                final Template template = configuration.getTemplate("slideshowfx.html");
-                template.process(tokenValues, writer);
-
-                writer.flush();
-
-                routingContext.response().setStatusCode(200).setChunked(true).write(writer.toString()).end();
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Error when a client tried to access the chat", e);
-
-                routingContext.response().setStatusCode(500).end();
-            } catch (TemplateException e) {
-                LOGGER.log(Level.WARNING, "Error when processing the chat template", e);
-                routingContext.response().setStatusCode(500).end();
-            }
-        });
-        router.get(CONTEXT_PATH.concat("/images/logo.svg")).handler(routingContext -> {
-            try (final InputStream in = SlideshowFXServer.class.getResourceAsStream("/com/twasyl/slideshowfx/server/webapp/images/logo.svg")) {
-
-                byte[] imageBuffer = new byte[1028];
-                int numberOfBytesRead;
-                Buffer buffer = Buffer.buffer();
-
-                while ((numberOfBytesRead = in.read(imageBuffer)) != -1) {
-                    buffer.appendBytes(imageBuffer, 0, numberOfBytesRead);
-                }
-
-                routingContext.response().headers().set("Content-Type", "image/svg+xml");
-                routingContext.response().setChunked(true).write(buffer).end();
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Can not send check images", e);
-            }
-        });
-    }
-
-    /**
-     * Build the WebSocket handler for handling shared WebSocket calls.
-     *
-     * @return
-     */
-    private Handler<ServerWebSocket> buildWebSocketHandler() {
-        final Handler<ServerWebSocket> handler = serverWebSocket -> {
-            if (CONTEXT_PATH.equals(serverWebSocket.path())) {
-                // Add the textHandlerID to the list of WebSocket clients
-                this.websockets.add(serverWebSocket);
-
-                // When the socket is closed, remove it from the list of clients
-                serverWebSocket.endHandler(event -> {
-                    this.websockets.remove(serverWebSocket);
-                });
-
-                /*
-                 * When data are received, get the content which is expected to be a JSON object with two fields:
-                 * <ul>
-                 *     <li>service: representing the service to call using the EventBus</li>
-                 *     <li>data: representing a JSON object containing the data that is expected by the service.</li>
-                 * </ul>
-                 */
-                serverWebSocket.handler(buffer -> {
-                    final String bufferString = new String(buffer.getBytes());
-                    final JsonObject request = new JsonObject(bufferString);
-
-                    // Inject source caller so the service, if it needs to, can send something to all WebSocket clients
-                    // but exclude the "sender"
-                    final JsonObject data = request.getJsonObject(AbstractSlideshowFXService.JSON_KEY_DATA);
-                    data.put(AbstractSlideshowFXService.JSON_KEY_ORIGIN, serverWebSocket.textHandlerID());
-
-                    this.vertx.eventBus().send(request.getString(JSON_KEY_SERVICE), data, asyncResult -> {
-                        final JsonObject json = (JsonObject) asyncResult.result().body();
-
-                        serverWebSocket.write(Buffer.buffer(json.encode()));
-                    });
-                });
-            } else {
-                serverWebSocket.reject();
-            }
-        };
-
-        return handler;
     }
 
     /**
@@ -368,7 +281,18 @@ public class SlideshowFXServer {
      * @return The latest created server or null if no server was created.
      */
     public static SlideshowFXServer getSingleton() {
-        return singleton;
+        synchronized (singletonLock) {
+            return singleton;
+        }
+    }
+
+    /**
+     * Reset the singleton instance of the server.
+     */
+    private static void resetSingleton() {
+        synchronized (singletonLock) {
+            singleton = null;
+        }
     }
 
     /**
@@ -382,12 +306,14 @@ public class SlideshowFXServer {
      * @return The instance of the {@link SlideshowFXServer} that has been created.
      */
     public static SlideshowFXServer create(final String host, final int port, final String twitterHashtag) {
-        if (singleton != null && singleton.vertx != null) {
-            singleton.stop();
+        synchronized (singletonLock) {
+            if (singleton != null && singleton.vertx != null) {
+                singleton.stop();
+            }
+
+            singleton = new SlideshowFXServer(host, port, twitterHashtag);
+
+            return singleton;
         }
-
-        singleton = new SlideshowFXServer(host, port, twitterHashtag);
-
-        return singleton;
     }
 }

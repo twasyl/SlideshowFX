@@ -1,5 +1,9 @@
 package com.twasyl.slideshowfx.server;
 
+import com.twasyl.slideshowfx.server.service.AttendeeChatService;
+import com.twasyl.slideshowfx.server.service.PresenterChatService;
+import com.twasyl.slideshowfx.server.service.QuizService;
+import com.twasyl.slideshowfx.server.service.WebappService;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -7,9 +11,12 @@ import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Thierry Wasylczenko
@@ -22,8 +29,15 @@ public class SlideshowFXServerTest {
     static Document WEBPAGE;
 
     @BeforeAll
-    static void before() throws IOException {
-        SlideshowFXServer.create(SERVER_HOST, SERVER_PORT, null).start();
+    static void before() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        SlideshowFXServer.create(SERVER_HOST, SERVER_PORT, null)
+                .start(WebappService.class)
+                .exceptionally(error -> {
+                    fail(error);
+                    return null;
+                }).get(10, SECONDS);
+
+
         WEBPAGE = Jsoup.parse(new URL("http://" + SERVER_HOST + ":" + SERVER_PORT + "/slideshowfx"), 5000);
     }
 

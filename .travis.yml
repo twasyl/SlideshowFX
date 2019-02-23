@@ -34,6 +34,7 @@ install: true
 
 script:
   - if [[ "$TRAVIS_TAG" == "" ]]; then ./gradlew clean build; else ./gradlew clean build bintrayUpload; fi
+  - if [[ "$TRAVIS_OS_NAME" == linux && "$TRAVIS_TAG" == "" ]]; then ./gradlew sonarqube; fi
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

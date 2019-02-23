@@ -7,14 +7,20 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
 
 public class DOMUtils {
+    private static final Logger LOGGER = Logger.getLogger(DOMUtils.class.getName());
+
+    private DOMUtils() {
+    }
 
     public static String convertElementToText(Element element) {
-        if(element == null) throw new IllegalArgumentException("Element can not be null");
+        if (element == null) throw new IllegalArgumentException("Element can not be null");
 
         return element.outerHtml();
     }
@@ -23,7 +29,7 @@ public class DOMUtils {
         Element result = null;
 
         org.jsoup.nodes.Document document = Jsoup.parse(text);
-        if(document != null) {
+        if (document != null) {
             result = document.body().child(0);
         }
 
@@ -39,16 +45,12 @@ public class DOMUtils {
     }
 
     public static void saveDocument(Document document, File file) {
-        String result = null;
-
         document.outputSettings().prettyPrint(true);
 
-        try(final Writer output = new DefaultCharsetWriter(file)) {
+        try (final Writer output = new DefaultCharsetWriter(file)) {
             output.write(document.outerHtml());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(SEVERE, "Can not save document", e);
         }
     }
 }

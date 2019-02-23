@@ -1,9 +1,15 @@
 package com.twasyl.slideshowfx.snippet.executor;
 
 import com.twasyl.slideshowfx.plugin.AbstractPlugin;
+import javafx.collections.ObservableList;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 /**
  * Abstract implementation of a {@link com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor}. It takes care of
@@ -76,5 +82,59 @@ public abstract class AbstractSnippetExecutor<T extends ISnippetExecutorOptions>
             return file.getAbsolutePath().replaceAll("\\\\", "/");
         }
         return null;
+    }
+
+    /**
+     * Appends the exception as an error message to the given console output.
+     *
+     * @param consoleOutput The console output.
+     * @param e             The exception to add as output.
+     */
+    protected void appendErrorMessageToConsole(final ObservableList<String> consoleOutput, final Exception e) {
+        consoleOutput.add("ERROR: ".concat(e.getMessage()));
+    }
+
+    /**
+     * Wait for the process to finish. If the process is {@code null}, nothing is performed.
+     *
+     * @param process The process to wait for.
+     */
+    protected void waitForProcess(final Process process) {
+        if (process != null) {
+            try {
+                process.waitFor();
+            } catch (InterruptedException e) {
+                LOGGER.log(SEVERE, "Can not wait for process to end", e);
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    /**
+     * Deletes the generated file.
+     *
+     * @param file The file to be deleted.
+     */
+    protected void deleteGeneratedFile(final File file) {
+        try {
+            Files.delete(file.toPath());
+        } catch (IOException e) {
+            LOGGER.log(WARNING, "Can not delete generated file " + file.getAbsolutePath(), e);
+        }
+    }
+
+    /**
+     * Determine if the code snippet must be wrapped inside a block. It is determined by the presence and value of
+     * the {@code propertyName} property.
+     *
+     * @param codeSnippet The code snippet.
+     * @return {@code true} if the snippet must be wrapped in a block, {@code false} otherwise.
+     */
+    public boolean mustBeWrappedIn(final CodeSnippet codeSnippet, final String propertyName) {
+        if (codeSnippet.getProperties().containsKey(propertyName)) {
+            return Boolean.parseBoolean(codeSnippet.getProperties().get(propertyName));
+        } else {
+            return false;
+        }
     }
 }

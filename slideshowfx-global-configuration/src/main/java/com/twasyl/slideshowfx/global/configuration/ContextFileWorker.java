@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD;
+import static javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET;
 import static javax.xml.xpath.XPathConstants.NODE;
 
 /**
@@ -40,7 +42,7 @@ import static javax.xml.xpath.XPathConstants.NODE;
 public class ContextFileWorker {
     private static final Logger LOGGER = Logger.getLogger(ContextFileWorker.class.getName());
     private static DocumentBuilder DOCUMENT_BUILDER;
-    private static XPath XPATH;
+    private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
 
     static {
         final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -49,9 +51,6 @@ public class ContextFileWorker {
         } catch (ParserConfigurationException e) {
             LOGGER.log(Level.SEVERE, "Can not create a document builder instance", e);
         }
-
-        final XPathFactory xPathFactory = XPathFactory.newInstance();
-        XPATH = xPathFactory.newXPath();
     }
 
     protected static final String ROOT_TAG = "slideshowfx";
@@ -61,6 +60,23 @@ public class ContextFileWorker {
     protected static final String FILE_TAG = "file";
     protected static final String OPENED_DATE_TIME_TAG = "openedDateTime";
 
+    private ContextFileWorker() {
+    }
+
+    private static XPath xpath() {
+        return XPATH_FACTORY.newXPath();
+    }
+
+    /**
+     * Check if the given {@code contextFile} is valid. For now it means the context file is not {@code null}.
+     *
+     * @param contextFile The context file to check.
+     * @throws NullPointerException If the given context file is {@code null}.
+     */
+    private static void checkContextFileValidity(final File contextFile) {
+        if (contextFile == null) throw new NullPointerException("The context file can not be null");
+    }
+
     /**
      * Determine from the given {@code contextFile} the recent presentations that have been opened by SlideshowFX.
      *
@@ -69,7 +85,7 @@ public class ContextFileWorker {
      * @throws ContextFileException If the given {@code contextFile} is {@code null}.
      */
     public static Set<RecentPresentation> readRecentPresentationFromFile(final File contextFile) throws ContextFileException {
-        if (contextFile == null) throw new NullPointerException("The context file can not be null");
+        checkContextFileValidity(contextFile);
 
         final InputStream input;
         try {
@@ -87,21 +103,18 @@ public class ContextFileWorker {
      *
      * @param contextFile        The context file to write to.
      * @param recentPresentation The presentation to add.
-     * @throws ContextFileException
+     * @throws ContextFileException If something went wrong when saving recent presentation to a file.
      */
     public static void saveRecentPresentationToFile(final File contextFile, final RecentPresentation recentPresentation) throws ContextFileException {
-        if (contextFile == null) throw new NullPointerException("The context file can not be null");
+        checkContextFileValidity(contextFile);
 
-        final InputStream input;
-        final OutputStream output;
-        try {
-            input = getInputStreamForFile(contextFile);
-            output = new FileOutputStream(contextFile);
+
+        try (final InputStream input = getInputStreamForFile(contextFile);
+             final OutputStream output = new FileOutputStream(contextFile)) {
+            saveRecentPresentation(input, output, recentPresentation);
         } catch (IOException e) {
             throw new ContextFileException(e);
         }
-
-        saveRecentPresentation(input, output, recentPresentation);
     }
 
     /**
@@ -110,21 +123,17 @@ public class ContextFileWorker {
      *
      * @param contextFile        The context file to write to.
      * @param recentPresentation The presentation to add.
-     * @throws ContextFileException
+     * @throws ContextFileException If something went wrong when updating the recent presentation in the file.
      */
     public static void updateRecentPresentationInFile(final File contextFile, final RecentPresentation recentPresentation) throws ContextFileException {
-        if (contextFile == null) throw new NullPointerException("The context file can not be null");
+        checkContextFileValidity(contextFile);
 
-        final InputStream input;
-        final OutputStream output;
-        try {
-            input = getInputStreamForFile(contextFile);
-            output = new FileOutputStream(contextFile);
+        try (final InputStream input = getInputStreamForFile(contextFile);
+             final OutputStream output = new FileOutputStream(contextFile)) {
+            updateRecentPresentation(input, output, recentPresentation);
         } catch (IOException e) {
             throw new ContextFileException(e);
         }
-
-        updateRecentPresentation(input, output, recentPresentation);
     }
 
     /**
@@ -135,7 +144,7 @@ public class ContextFileWorker {
      * @return {@code true} if the presentation has been found in the document, {@code false} otherwise.
      */
     public static boolean recentPresentationAlreadyPresent(final File contextFile, final RecentPresentation recentPresentation) throws ContextFileException {
-        if (contextFile == null) throw new NullPointerException("The context file can not be null");
+        checkContextFileValidity(contextFile);
 
         final InputStream input;
         try {
@@ -154,23 +163,20 @@ public class ContextFileWorker {
      * @param contextFile                       The document to purge from.
      * @param numberOfRecentPresentationsToKeep The number of recent presentations to keep.
      * @return The recent presentations that are now stored in the context file.
-     * @throws ContextFileException
+     * @throws ContextFileException If something went wrong when purging recent presentations.
      */
-    public static Set<RecentPresentation> purgeRecentPresentations(final File contextFile, final long numberOfRecentPresentationsToKeep) throws ContextFileException {
-        if (contextFile == null) throw new NullPointerException("The context file can not be null");
+    static Set<RecentPresentation> purgeRecentPresentations(final File contextFile, final long numberOfRecentPresentationsToKeep) throws ContextFileException {
+        checkContextFileValidity(contextFile);
         if (numberOfRecentPresentationsToKeep < 0)
             throw new IllegalArgumentException("The number of recent presentations to keep can not be negative");
 
-        final InputStream input;
-        final OutputStream output;
-        try {
-            input = getInputStreamForFile(contextFile);
-            output = new FileOutputStream(contextFile);
+
+        try (final InputStream input = getInputStreamForFile(contextFile);
+             final OutputStream output = new FileOutputStream(contextFile)) {
+            return purgeRecentPresentations(input, output, numberOfRecentPresentationsToKeep);
         } catch (IOException e) {
             throw new ContextFileException(e);
         }
-
-        return purgeRecentPresentations(input, output, numberOfRecentPresentationsToKeep);
     }
 
     /**
@@ -183,7 +189,7 @@ public class ContextFileWorker {
      * @param input              The document to which append the presentation.
      * @param output             The document where the result of the appending will be persisted.
      * @param recentPresentation The presentation to add.
-     * @throws ContextFileException
+     * @throws ContextFileException If something went wrong when saving the presentation.
      */
     protected static void saveRecentPresentation(final InputStream input, final OutputStream output,
                                                  final RecentPresentation recentPresentation) throws ContextFileException {
@@ -196,7 +202,6 @@ public class ContextFileWorker {
 
         if (recentPresentationNode != null) {
             recentPresentationsNode.appendChild(recentPresentationNode);
-
             writeDocument(document, output);
         }
     }
@@ -210,7 +215,7 @@ public class ContextFileWorker {
      * @param input              The document to which update the presentation.
      * @param output             The document where the result of the update will be persisted.
      * @param recentPresentation The presentation to update.
-     * @throws ContextFileException
+     * @throws ContextFileException If something went wrong in {@link #createDocumentFromInput(InputStream)}.
      */
     protected static void updateRecentPresentation(final InputStream input, final OutputStream output,
                                                    final RecentPresentation recentPresentation) throws ContextFileException {
@@ -296,7 +301,7 @@ public class ContextFileWorker {
      * @param output                            The document to write to.
      * @param numberOfRecentPresentationsToKeep The number of recent presentations to keep.
      * @return The recent presentations that are now stored in the document.
-     * @throws ContextFileException
+     * @throws ContextFileException If something went wrong in {@link #createDocumentFromInput(InputStream)}.
      */
     public static Set<RecentPresentation> purgeRecentPresentations(final InputStream input, final OutputStream output, final long numberOfRecentPresentationsToKeep) throws ContextFileException {
         Set<RecentPresentation> presentations = readRecentPresentationFromStream(input);
@@ -339,17 +344,38 @@ public class ContextFileWorker {
     }
 
     /**
+     * Get the root element of the document with the name {@value ROOT_TAG}. If the root element doesn't exist, it will
+     * be created and added to the document.
+     *
+     * @param document The document to get the root element from.
+     * @return The root element of the document.
+     */
+    private static Node getRootNode(final Document document) {
+        final NodeList list = document.getElementsByTagName(ROOT_TAG);
+        if (list != null && list.getLength() > 0) {
+            return list.item(0);
+        } else {
+            final Element root = document.createElement(ROOT_TAG);
+            document.appendChild(root);
+            return root;
+        }
+    }
+
+    /**
      * Get the node that contains all recent presentations, which is named {@value #RECENT_PRESENTATIONS_TAG}.
      *
      * @param document The document from which read the recent presentations.
      * @return The node containing all recent presentations or {@code null} if not found.
      */
     protected static Node getRecentPresentationsNode(final Document document) {
-        Node recentPresentationsNode = null;
+        Node recentPresentationsNode;
 
         final NodeList list = document.getElementsByTagName(RECENT_PRESENTATIONS_TAG);
         if (list != null && list.getLength() > 0) {
             recentPresentationsNode = list.item(0);
+        } else {
+            recentPresentationsNode = document.createElement(RECENT_PRESENTATIONS_TAG);
+            getRootNode(document).appendChild(recentPresentationsNode);
         }
 
         return recentPresentationsNode;
@@ -435,9 +461,8 @@ public class ContextFileWorker {
         }
 
         try {
-            final StringBuilder expression = new StringBuilder("/").append(ROOT_TAG)
-                    .append("/").append(RECENT_PRESENTATIONS_TAG).append("[1]");
-            Node recentPresentationsNode = (Node) XPATH.evaluate(expression.toString(), root, NODE);
+            final String expression = "/" + ROOT_TAG + "/" + RECENT_PRESENTATIONS_TAG + "[1]";
+            Node recentPresentationsNode = (Node) xpath().evaluate(expression, root, NODE);
 
             if (recentPresentationsNode == null) {
                 recentPresentationsNode = document.createElement(RECENT_PRESENTATIONS_TAG);
@@ -458,7 +483,7 @@ public class ContextFileWorker {
      */
     protected static Node createNodeFromRecentPresentation(final Document document, final RecentPresentation recentPresentation) {
         if (recentPresentation == null || recentPresentation.getOpenedDateTime() == null
-                || recentPresentation.getAbsolutePath() == null || recentPresentation.getAbsolutePath().trim().isEmpty()) {
+                || recentPresentation.getAbsolutePath().trim().isEmpty()) {
             return null;
         }
 
@@ -494,7 +519,7 @@ public class ContextFileWorker {
                 .append("'][1]");
 
         try {
-            return (Node) XPATH.evaluate(expression.toString(), document.getDocumentElement(), NODE);
+            return (Node) xpath().evaluate(expression.toString(), document.getDocumentElement(), NODE);
         } catch (XPathExpressionException e) {
             throw new ContextFileException(e);
         }
@@ -506,8 +531,11 @@ public class ContextFileWorker {
      * @param document The document to write.
      * @param output   The output where to write the document.
      */
-    protected static void writeDocument(Document document, OutputStream output) {
+    private static void writeDocument(Document document, OutputStream output) {
         final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setAttribute(ACCESS_EXTERNAL_DTD, "");
+        transformerFactory.setAttribute(ACCESS_EXTERNAL_STYLESHEET, "");
+
         try {
             final Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.ENCODING, UTF_8.displayName());
@@ -525,12 +553,11 @@ public class ContextFileWorker {
      *
      * @return An {@link InputStream} with the default body of the XML document.
      */
-    protected static InputStream createDefaultDocumentBodyInputStream() {
-        final StringBuilder body = new StringBuilder("<").append(ROOT_TAG).append(">")
-                .append("<").append(RECENT_PRESENTATIONS_TAG).append("></").append(RECENT_PRESENTATIONS_TAG).append(">")
-                .append("</").append(ROOT_TAG).append(">");
-
-        return new ByteArrayInputStream(body.toString().getBytes(getDefaultCharset()));
+    private static InputStream createDefaultDocumentBodyInputStream() {
+        final String body = "<" + ROOT_TAG + ">" +
+                "<" + RECENT_PRESENTATIONS_TAG + "></" + RECENT_PRESENTATIONS_TAG + ">" +
+                "</" + ROOT_TAG + ">";
+        return new ByteArrayInputStream(body.getBytes(getDefaultCharset()));
     }
 
     /**
@@ -541,7 +568,7 @@ public class ContextFileWorker {
      * @return An {@link InputStream} for the given context file.
      * @throws IOException If an error occurs when reading the context file.
      */
-    protected static InputStream getInputStreamForFile(File contextFile) throws IOException {
+    private static InputStream getInputStreamForFile(File contextFile) throws IOException {
         return contextFile.exists() ? new ByteArrayInputStream(Files.readAllBytes(contextFile.toPath())) : createDefaultDocumentBodyInputStream();
     }
 
@@ -552,9 +579,9 @@ public class ContextFileWorker {
      *
      * @param input The input to create the document from.
      * @return An instance of {@link Document}.
-     * @throws ContextFileException
+     * @throws ContextFileException If an {@link IOException} or {@link SAXException} is raised.
      */
-    protected static Document createDocumentFromInput(InputStream input) throws ContextFileException {
+    private static Document createDocumentFromInput(InputStream input) throws ContextFileException {
         Document document;
         try {
             if (input == null || input.available() == 0) {

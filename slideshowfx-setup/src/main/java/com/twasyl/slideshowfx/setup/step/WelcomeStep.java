@@ -5,6 +5,9 @@ import com.twasyl.slideshowfx.setup.exceptions.SetupStepException;
 import javafx.fxml.FXMLLoader;
 
 import java.io.IOException;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
 
 /**
  * A step displaying a welcome screen.
@@ -14,6 +17,7 @@ import java.io.IOException;
  * @since SlideshowFX 1.0
  */
 public class WelcomeStep extends AbstractSetupStep {
+    private static final Logger LOGGER = Logger.getLogger(WelcomeStep.class.getName());
 
     /**
      * Create an instance of the step.
@@ -35,15 +39,17 @@ public class WelcomeStep extends AbstractSetupStep {
 
             this.validProperty().set(true);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(SEVERE, "Can not find FXML", e);
         }
     }
 
     @Override
     public void execute() throws SetupStepException {
+        // This step doesn't perform any operation
     }
 
     @Override
     public void rollback() throws SetupStepException {
+        // This step doesn't perform any operation
     }
 }

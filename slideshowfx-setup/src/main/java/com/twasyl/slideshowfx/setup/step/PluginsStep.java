@@ -79,9 +79,13 @@ public class PluginsStep extends AbstractSetupStep {
         final List<File> pluginsToInstall = ((PluginsViewController) this.controller).getPluginsToInstall();
 
         if (!pluginsToInstall.isEmpty()) {
-            pluginsToInstall.forEach(plugin -> {
-                plugin.delete();
-            });
+            for (File plugin : pluginsToInstall) {
+                try {
+                    Files.delete(plugin.toPath());
+                } catch (IOException e) {
+                    throw new SetupStepException("Can not delete plugin " + plugin.getAbsolutePath(), e);
+                }
+            }
 
             if (this.pluginsDirectoryCreatedDuringSetup) {
                 try {

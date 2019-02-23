@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.logging.Level.WARNING;
 
 /**
  * This class provides methods for accessing configuration properties.
@@ -42,8 +43,9 @@ public class GlobalConfiguration {
     private static File CONFIG_FILE = null;
     private static File LOGGING_CONFIG_FILE = null;
     private static Set<RecentPresentation> RECENT_PRESENTATIONS = null;
+    private static final Object RECENT_PRESENTATIONS_LOCK = new Object();
 
-    private static GlobalConfigurationObservable OBSERVABLE = new GlobalConfigurationObservable();
+    private static final GlobalConfigurationObservable OBSERVABLE = new GlobalConfigurationObservable();
 
     /**
      * Name of the parameter used to specify if auto saving files is enabled. The value of the parameter is a boolean.
@@ -140,6 +142,9 @@ public class GlobalConfiguration {
         OBSERVABLE.addObserver(observer);
     }
 
+    private GlobalConfiguration() {
+    }
+
     /**
      * Get the application directory used to store the plugins and the configuration. The method will determine the
      * directory by checking if there is a system property named {@value #APPLICATION_DIRECTORY_PROPERTY} that defines
@@ -148,7 +153,7 @@ public class GlobalConfiguration {
      *
      * @return The application directory.
      */
-    public synchronized static File getApplicationDirectory() {
+    public static synchronized File getApplicationDirectory() {
         if (APPLICATION_DIRECTORY == null) {
             final Properties properties = System.getProperties();
 
@@ -170,7 +175,7 @@ public class GlobalConfiguration {
      *
      * @return The plugins directory.
      */
-    public synchronized static File getPluginsDirectory() {
+    public static synchronized File getPluginsDirectory() {
         if (PLUGINS_DIRECTORY == null) {
             final Properties properties = System.getProperties();
 
@@ -191,7 +196,7 @@ public class GlobalConfiguration {
      *
      * @return The template's library directory.
      */
-    public synchronized static File getTemplateLibraryDirectory() {
+    public static synchronized File getTemplateLibraryDirectory() {
         if (TEMPLATE_LIBRARY_DIRECTORY == null) {
             final Properties properties = System.getProperties();
 
@@ -210,12 +215,21 @@ public class GlobalConfiguration {
      *
      * @return The configuration file.
      */
-    public synchronized static File getConfigurationFile() {
+    public static synchronized File getConfigurationFile() {
         if (CONFIG_FILE == null) {
             CONFIG_FILE = new File(getApplicationDirectory(), SLIDESHOWFX_CONFIGURATION_FILE);
         }
 
         return CONFIG_FILE;
+    }
+
+    /**
+     * Checks if the configuration returned by the {@link #getConfigurationFile()} exists.
+     *
+     * @return {@code true} if the file exists, {@code false} otherwise
+     */
+    public static synchronized boolean configurationFileExists() {
+        return getConfigurationFile().exists();
     }
 
     /**
@@ -225,7 +239,7 @@ public class GlobalConfiguration {
      *
      * @return The logging configuration file.
      */
-    public synchronized static File getLoggingConfigFile() {
+    public static synchronized File getLoggingConfigFile() {
         if (LOGGING_CONFIG_FILE == null) {
             final Properties properties = System.getProperties();
 
@@ -245,7 +259,7 @@ public class GlobalConfiguration {
      *
      * @return {@code true} if the application directory has been created by this method, {@code false} otherwise.
      */
-    public synchronized static boolean createApplicationDirectory() {
+    public static synchronized boolean createApplicationDirectory() {
         boolean created = false;
 
         if (!getApplicationDirectory().exists()) {
@@ -262,7 +276,7 @@ public class GlobalConfiguration {
      *
      * @return {@code true} if the plugins directory has been created by this method, {@code false} otherwise.
      */
-    public synchronized static boolean createPluginsDirectory() {
+    public static synchronized boolean createPluginsDirectory() {
         boolean created = false;
 
         if (!getPluginsDirectory().exists()) {
@@ -279,7 +293,7 @@ public class GlobalConfiguration {
      *
      * @return {@code true} if the template library directory has been created by this method, {@code false} otherwise.
      */
-    public synchronized static boolean createTemplateLibraryDirectory() {
+    public static synchronized boolean createTemplateLibraryDirectory() {
         boolean created = false;
 
         if (!getTemplateLibraryDirectory().exists()) {
@@ -295,10 +309,10 @@ public class GlobalConfiguration {
      *
      * @return {@code true} if the configuration file has been created by this method, {@code false} otherwise.
      */
-    public synchronized static boolean createConfigurationFile() {
+    public static synchronized boolean createConfigurationFile() {
         boolean created = false;
 
-        if (!getConfigurationFile().exists()) {
+        if (!configurationFileExists()) {
             try {
                 created = getConfigurationFile().createNewFile();
             } catch (IOException e) {
@@ -315,7 +329,7 @@ public class GlobalConfiguration {
      *
      * @return {@code true} if the logging configuration file has been created by this method, {@code false} otherwise.
      */
-    public synchronized static boolean createLoggingConfigurationFile() {
+    public static synchronized boolean createLoggingConfigurationFile() {
         boolean created = false;
 
         if (!getLoggingConfigFile().exists()) {
@@ -335,7 +349,7 @@ public class GlobalConfiguration {
      *
      * @return {@code true} if the logging configuration file has been created by this method, {@code false} otherwise.
      */
-    public synchronized static boolean createLoggingConfigurationFile(final File loggingConfigFile) {
+    public static synchronized boolean createLoggingConfigurationFile(final File loggingConfigFile) {
         boolean created = false;
 
         if (!loggingConfigFile.exists()) {
@@ -354,8 +368,8 @@ public class GlobalConfiguration {
     /**
      * Fill the configuration file with default values if it exists.
      */
-    public synchronized static void fillConfigurationWithDefaultValue() {
-        if (getConfigurationFile().exists()) {
+    public static synchronized void fillConfigurationWithDefaultValue() {
+        if (configurationFileExists()) {
             final Properties properties = readAllPropertiesFromConfigurationFile(getConfigurationFile());
 
             if (!properties.containsKey(TEMPORARY_FILES_DELETION_ON_EXIT_PARAMETER))
@@ -366,7 +380,7 @@ public class GlobalConfiguration {
         }
     }
 
-    public synchronized static void fillLoggingConfigurationFileWithDefaultValue() {
+    public static synchronized void fillLoggingConfigurationFileWithDefaultValue() {
         if (getLoggingConfigFile().exists()) {
             final Properties properties = readAllPropertiesFromConfigurationFile(getLoggingConfigFile());
 
@@ -395,10 +409,10 @@ public class GlobalConfiguration {
      * @return {@code true} if the temporary files can be deleted, {@code false} otherwise.
      */
     public static boolean canDeleteTemporaryFiles() {
-        final Boolean deleteTemporaryFilesOnExist = getBooleanProperty(TEMPORARY_FILES_DELETION_ON_EXIT_PARAMETER);
+        final boolean deleteTemporaryFilesOnExist = getBooleanProperty(TEMPORARY_FILES_DELETION_ON_EXIT_PARAMETER, false);
         final Long maxAge = getLongProperty(TEMPORARY_FILES_MAX_AGE_PARAMETER);
 
-        return deleteTemporaryFilesOnExist != null && deleteTemporaryFilesOnExist && maxAge != null;
+        return deleteTemporaryFilesOnExist && maxAge != null;
     }
 
     /**
@@ -407,7 +421,7 @@ public class GlobalConfiguration {
      *
      * @return The properties stored in the configuration file.
      */
-    protected synchronized static Properties readAllPropertiesFromConfigurationFile(final File file) {
+    protected static synchronized Properties readAllPropertiesFromConfigurationFile(final File file) {
         final Properties properties = new Properties();
 
         if (file.exists()) {
@@ -428,7 +442,7 @@ public class GlobalConfiguration {
      * @param file       The file in which the properties will be written.
      * @param properties The properties to write to the configuration file.
      */
-    private synchronized static void writeAllPropertiesToConfigurationFile(final File file, final Properties properties) {
+    private static synchronized void writeAllPropertiesToConfigurationFile(final File file, final Properties properties) {
         if (properties != null) {
             try (final Writer writer = new FileWriter(file)) {
                 properties.store(writer, "");
@@ -448,7 +462,7 @@ public class GlobalConfiguration {
      * @throws NullPointerException     If the property name is null.
      * @throws IllegalArgumentException If the property name is empty.
      */
-    public synchronized static String getProperty(final String propertyName) {
+    public static synchronized String getProperty(final String propertyName) {
         return getProperty(getConfigurationFile(), propertyName);
     }
 
@@ -462,7 +476,7 @@ public class GlobalConfiguration {
      * @throws NullPointerException     If the property name is null.
      * @throws IllegalArgumentException If the property name is empty.
      */
-    public synchronized static String getProperty(final File file, final String propertyName) {
+    public static synchronized String getProperty(final File file, final String propertyName) {
         checkPropertyName(propertyName);
 
         String value = null;
@@ -483,7 +497,7 @@ public class GlobalConfiguration {
      * @throws NullPointerException     If the name or value of the property is null.
      * @throws IllegalArgumentException If the name or value of the property is empty.
      */
-    public synchronized static void setProperty(final String propertyName, final String propertyValue) {
+    public static synchronized void setProperty(final String propertyName, final String propertyValue) {
         setProperty(getConfigurationFile(), propertyName, propertyValue);
     }
 
@@ -496,7 +510,7 @@ public class GlobalConfiguration {
      * @throws NullPointerException     If the name or value of the property is null.
      * @throws IllegalArgumentException If the name or value of the property is empty.
      */
-    private synchronized static void setProperty(final File file, final String propertyName, final String propertyValue) {
+    private static synchronized void setProperty(final File file, final String propertyName, final String propertyValue) {
         checkPropertyName(propertyName);
         checkPropertyValue(propertyValue);
 
@@ -510,7 +524,7 @@ public class GlobalConfiguration {
      *
      * @param propertyName The name of the property to remove.
      */
-    public synchronized static void removeProperty(final String propertyName) {
+    public static synchronized void removeProperty(final String propertyName) {
         removeProperty(getConfigurationFile(), propertyName);
     }
 
@@ -520,7 +534,7 @@ public class GlobalConfiguration {
      * @param file         The file from which the property will be removed.
      * @param propertyName The name of the property to remove.
      */
-    public synchronized static void removeProperty(final File file, final String propertyName) {
+    public static synchronized void removeProperty(final File file, final String propertyName) {
         checkPropertyName(propertyName);
 
         final Properties properties = readAllPropertiesFromConfigurationFile(file);
@@ -582,7 +596,7 @@ public class GlobalConfiguration {
             try {
                 value = Long.parseLong(retrievedProperty);
             } catch (NumberFormatException ex) {
-                LOGGER.log(Level.WARNING, "The value of the property '" + propertyName + "' can not be parsed", ex);
+                LOGGER.log(WARNING, "The value of the property '" + propertyName + "' can not be parsed", ex);
             }
         }
 
@@ -593,10 +607,17 @@ public class GlobalConfiguration {
      * Get the value of a property as a {@link Boolean}.
      *
      * @param propertyName The name of the property to get.
+     * @param defaultValue
      * @return The value of the property or {@code null} if it is not present or can not be parsed.
      */
-    public static Boolean getBooleanProperty(final String propertyName) {
-        return getBooleanProperty(getConfigurationFile(), propertyName);
+    public static Boolean getBooleanProperty(final String propertyName, boolean defaultValue) {
+        final Boolean property = getBooleanProperty(getConfigurationFile(), propertyName);
+
+        if (property == null) {
+            return defaultValue;
+        } else {
+            return property;
+        }
     }
 
     /**
@@ -614,7 +635,7 @@ public class GlobalConfiguration {
             try {
                 value = Boolean.parseBoolean(retrievedProperty);
             } catch (NumberFormatException ex) {
-                LOGGER.log(Level.WARNING, "The value of the property '" + propertyName + "' can not be parsed", ex);
+                LOGGER.log(WARNING, "The value of the property '" + propertyName + "' can not be parsed", ex);
             }
         }
 
@@ -627,8 +648,7 @@ public class GlobalConfiguration {
      * @return {@code true} if the auto saving is enabled, {@code false} otherwise.
      */
     public static boolean isAutoSavingEnabled() {
-        final Boolean autoSave = getBooleanProperty(AUTO_SAVING_ENABLED_PARAMETER);
-        return autoSave == null ? Boolean.FALSE : autoSave;
+        return getBooleanProperty(AUTO_SAVING_ENABLED_PARAMETER, false);
     }
 
     /**
@@ -672,8 +692,7 @@ public class GlobalConfiguration {
      * @return {@code true} if the deletion is enabled, {@code false} otherwise.
      */
     public static boolean isTemporaryFilesDeletionOnExitEnabled() {
-        final Boolean deleteTemporaryFiles = getBooleanProperty(TEMPORARY_FILES_DELETION_ON_EXIT_PARAMETER);
-        return deleteTemporaryFiles == null ? false : deleteTemporaryFiles;
+        return getBooleanProperty(TEMPORARY_FILES_DELETION_ON_EXIT_PARAMETER, false);
     }
 
     /**
@@ -925,23 +944,23 @@ public class GlobalConfiguration {
      *
      * @return The collection of presentations opened recently.
      */
-    public synchronized static Set<RecentPresentation> getRecentPresentations() {
+    public static synchronized Set<RecentPresentation> getRecentPresentations() {
         if (RECENT_PRESENTATIONS == null) {
             try {
                 RECENT_PRESENTATIONS = ContextFileWorker.readRecentPresentationFromFile(new File(getApplicationDirectory(), SLIDESHOWFX_CONTEXT_FILE_NAME));
             } catch (ContextFileException e) {
-                LOGGER.log(Level.WARNING, "Can not read the recent opened presentations", e);
+                LOGGER.log(WARNING, "Can not read the recent opened presentations", e);
             }
         }
         final Long maxRecentPresentations = getMaxRecentPresentations();
 
-        synchronized (RECENT_PRESENTATIONS) {
+        synchronized (RECENT_PRESENTATIONS_LOCK) {
             if (RECENT_PRESENTATIONS.size() > maxRecentPresentations) {
                 final File contextFile = new File(getApplicationDirectory(), SLIDESHOWFX_CONTEXT_FILE_NAME);
                 try {
                     RECENT_PRESENTATIONS = ContextFileWorker.purgeRecentPresentations(contextFile, maxRecentPresentations);
                 } catch (ContextFileException e) {
-                    LOGGER.log(Level.WARNING, "Can not purge recent presentations", e);
+                    LOGGER.log(WARNING, "Can not purge recent presentations", e);
                 }
             }
         }
@@ -954,7 +973,7 @@ public class GlobalConfiguration {
      *
      * @param recentPresentation The presentation to save as recently opened.
      */
-    public synchronized static void saveRecentPresentation(final RecentPresentation recentPresentation) {
+    public static synchronized void saveRecentPresentation(final RecentPresentation recentPresentation) {
         if (recentPresentation != null) {
             final File contextFile = new File(getApplicationDirectory(), SLIDESHOWFX_CONTEXT_FILE_NAME);
             boolean presentationAlreadyPresent = false;
@@ -962,7 +981,7 @@ public class GlobalConfiguration {
             try {
                 presentationAlreadyPresent = ContextFileWorker.recentPresentationAlreadyPresent(contextFile, recentPresentation);
             } catch (ContextFileException e) {
-                LOGGER.log(Level.WARNING, "Context file seems to not exist", e);
+                LOGGER.log(WARNING, "Context file seems to not exist", e);
             }
 
             synchronized (RECENT_PRESENTATIONS) {
@@ -978,7 +997,7 @@ public class GlobalConfiguration {
                         RECENT_PRESENTATIONS.add(recentPresentation);
                     }
                 } catch (ContextFileException e) {
-                    LOGGER.log(Level.WARNING, "Can not update recently opened presentation", e);
+                    LOGGER.log(WARNING, "Can not update recently opened presentation", e);
                 }
             } else {
                 try {
@@ -987,17 +1006,17 @@ public class GlobalConfiguration {
                         RECENT_PRESENTATIONS.add(recentPresentation);
                     }
                 } catch (ContextFileException e) {
-                    LOGGER.log(Level.WARNING, "The recent presentation couldn't be saved", e);
+                    LOGGER.log(WARNING, "The recent presentation couldn't be saved", e);
                 }
             }
 
-            synchronized (RECENT_PRESENTATIONS) {
+            synchronized (RECENT_PRESENTATIONS_LOCK) {
                 final Long maxRecentPresentations = getMaxRecentPresentations();
                 if (RECENT_PRESENTATIONS.size() > maxRecentPresentations) {
                     try {
                         RECENT_PRESENTATIONS = ContextFileWorker.purgeRecentPresentations(contextFile, maxRecentPresentations);
                     } catch (ContextFileException e) {
-                        LOGGER.log(Level.WARNING, "Can not purge recent presentations", e);
+                        LOGGER.log(WARNING, "Can not purge recent presentations", e);
                     }
                 }
             }

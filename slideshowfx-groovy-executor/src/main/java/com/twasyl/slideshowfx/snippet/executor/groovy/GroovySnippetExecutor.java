@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since SlideshowFX 1.0
  */
-public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippetExecutorOptions> {
+public class GroovySnippetExecutor extends AbstractSnippetExecutor<GroovySnippetExecutorOptions> {
 
     private static final Logger LOGGER = Logger.getLogger(GroovySnippetExecutor.class.getName());
 
@@ -49,7 +49,7 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
         this.setOptions(new GroovySnippetExecutorOptions());
 
         final String groovyHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(GROOVY_HOME_PROPERTY_SUFFIX));
-        if(groovyHome != null) {
+        if (groovyHome != null) {
             try {
                 this.getOptions().setGroovyHome(new File(groovyHome));
             } catch (FileNotFoundException e) {
@@ -78,15 +78,15 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
         wrapInMethodRunner.textProperty().bind(new SimpleStringProperty("Wrap code snippet in ").concat(codeEncapsulationType));
         wrapInMethodRunner.setTooltip(wrapInTooltip);
         wrapInMethodRunner.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {
-            if(newSelected != null) codeSnippet.putProperty(WRAP_IN_METHOD_RUNNER, newSelected.toString());
+            if (newSelected != null) codeSnippet.putProperty(WRAP_IN_METHOD_RUNNER, newSelected.toString());
         });
 
         final CheckBox makeScript = new CheckBox("Make Groovy Script");
         makeScript.setTooltip(new Tooltip("Create a Groovy Script instead of a Groovy class"));
         makeScript.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {
-            if(newSelected != null) codeSnippet.putProperty(MAKE_SCRIPT, newSelected.toString());
+            if (newSelected != null) codeSnippet.putProperty(MAKE_SCRIPT, newSelected.toString());
 
-            if(newSelected != null && newSelected) codeEncapsulationType.set("script");
+            if (newSelected != null && newSelected) codeEncapsulationType.set("script");
             else codeEncapsulationType.set("main");
         });
 
@@ -96,7 +96,7 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
         imports.setPrefRowCount(15);
         imports.setWrapText(true);
         imports.textProperty().addListener((textValue, oldText, newText) -> {
-            if(newText.isEmpty()) codeSnippet.putProperty(IMPORTS_PROPERTY, null);
+            if (newText.isEmpty()) codeSnippet.putProperty(IMPORTS_PROPERTY, null);
             else codeSnippet.putProperty(IMPORTS_PROPERTY, newText);
         });
 
@@ -125,7 +125,7 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
         browse.setOnAction(event -> {
             final DirectoryChooser chooser = new DirectoryChooser();
             final File sdkHomeDir = chooser.showDialog(null);
-            if(sdkHomeDir != null) {
+            if (sdkHomeDir != null) {
                 javaHomeField.setText(sdkHomeDir.getAbsolutePath());
             }
 
@@ -139,10 +139,10 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
 
     @Override
     public void saveNewOptions() {
-        if(this.getNewOptions() != null) {
+        if (this.getNewOptions() != null) {
             this.setOptions(this.getNewOptions());
 
-            if(this.getOptions().getGroovyHome() != null) {
+            if (this.getOptions().getGroovyHome() != null) {
                 GlobalConfiguration.setProperty(this.getConfigurationBaseName().concat(GROOVY_HOME_PROPERTY_SUFFIX),
                         this.getOptions().getGroovyHome().getAbsolutePath().replaceAll("\\\\", "/"));
             }
@@ -177,22 +177,16 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
                         .directory(this.getTemporaryDirectory())
                         .start();
                 try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                    inputStream.lines().forEach(line -> consoleOutput.add(line));
+                    inputStream.lines().forEach(consoleOutput::add);
                 }
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not execute code snippet", e);
                 consoleOutput.add("ERROR: ".concat(e.getMessage()));
             } finally {
-                if(process != null) {
-                    try {
-                        process.waitFor();
-                    } catch (InterruptedException e) {
-                        LOGGER.log(Level.SEVERE, "Can not wait for process to end", e);
-                    }
-                }
+                waitForProcess(process);
             }
 
-            codeFile.delete();
+            deleteGeneratedFile(codeFile);
         });
         snippetThread.start();
 
@@ -201,6 +195,7 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
 
     /**
      * Create the source code file for the given code snippet.
+     *
      * @param codeSnippet The code snippet.
      * @return The file created and containing the source code.
      */
@@ -215,9 +210,9 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
     }
 
     /**
-     *
      * Build code file content according properties. The source code can then be written properly inside a file in order
      * to be compiled and then executed.
+     *
      * @param codeSnippet The code snippet to build the source code for.
      * @return The content of the source code file.
      */
@@ -226,29 +221,29 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
 
         boolean someImportsPresent = false;
 
-        if(makeScript(codeSnippet)) {
+        if (makeScript(codeSnippet)) {
             sourceCode.append(getScriptImport()).append("\n");
             someImportsPresent = true;
         }
 
-        if(hasImports(codeSnippet)) {
+        if (hasImports(codeSnippet)) {
             sourceCode.append(getImports(codeSnippet)).append("\n");
             someImportsPresent = true;
         }
 
-        if(someImportsPresent) sourceCode.append("\n");
+        if (someImportsPresent) sourceCode.append("\n");
 
         sourceCode.append(getStartClassDefinition(codeSnippet)).append("\n");
 
-        if(mustBeWrappedInMethodRunner(codeSnippet)) {
+        if (mustBeWrappedIn(codeSnippet, WRAP_IN_METHOD_RUNNER)) {
             sourceCode.append("\t").append(getStartMainMethod(codeSnippet)).append("\n")
                     .append(codeSnippet.getCode())
-                    .append("\n\t").append(getEndMainMethod());
+                    .append("\n\t}");
         } else {
             sourceCode.append(codeSnippet.getCode());
         }
 
-        sourceCode.append("\n").append(getEndClassDefinition(codeSnippet));
+        sourceCode.append("\n}");
 
         return sourceCode.toString();
     }
@@ -256,18 +251,21 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
     /**
      * Determine if the code snippet must make a groovy scriptr. It is determined by the presence and value of
      * the {@link #MAKE_SCRIPT} property.
+     *
      * @param codeSnippet The code snippet.
      * @return {@code true} if the snippet must be created as a groovy script, {@code false} otherwise.
      */
     protected boolean makeScript(final CodeSnippet codeSnippet) {
-        final Boolean makeScript = codeSnippet.getProperties().containsKey(MAKE_SCRIPT) ?
-                Boolean.parseBoolean(codeSnippet.getProperties().get(MAKE_SCRIPT)) :
-                false;
-        return makeScript;
+        if (codeSnippet.getProperties().containsKey(MAKE_SCRIPT)) {
+            return Boolean.parseBoolean(codeSnippet.getProperties().get(MAKE_SCRIPT));
+        } else {
+            return false;
+        }
     }
 
     /**
      * Get the necessary import to create a groovy script.
+     *
      * @return The well formatted import to create a groovy script.
      */
     protected String getScriptImport() {
@@ -276,6 +274,7 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
 
     /**
      * Get the imports to be added to the source code.
+     *
      * @param codeSnippet The code snippet.
      */
     protected boolean hasImports(final CodeSnippet codeSnippet) {
@@ -306,6 +305,7 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
 
     /**
      * Format an import line by make sure it starts with the {@code import} keyword.
+     *
      * @param importLine The import line to format.
      * @return A well formatted import line.
      */
@@ -314,7 +314,7 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
 
         String formattedImportLine;
 
-        if(importLine.startsWith(importLineBeginning)) {
+        if (importLine.startsWith(importLineBeginning)) {
             formattedImportLine = importLine;
         } else {
             formattedImportLine = importLineBeginning.concat(importLine);
@@ -325,13 +325,14 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
 
     /**
      * Get the definition of the class.
+     *
      * @param codeSnippet The code snippet.
      */
     protected String getStartClassDefinition(final CodeSnippet codeSnippet) {
         final StringBuilder startClassDefinition = new StringBuilder("class ")
-                                                    .append(determineClassName(codeSnippet));
+                .append(determineClassName(codeSnippet));
 
-        if(makeScript(codeSnippet)) {
+        if (makeScript(codeSnippet)) {
             startClassDefinition.append(" extends Script");
         }
 
@@ -343,50 +344,23 @@ public class GroovySnippetExecutor  extends AbstractSnippetExecutor<GroovySnippe
     /**
      * Determine the class name of the code snippet. It looks inside the code snippet's properties and check the value
      * of the {@link #CLASS_NAME_PROPERTY} property. If {@code null} or empty, {@code Snippet} will be returned.
+     *
      * @param codeSnippet The code snippet.
      * @return The class name of the code snippet.
      */
     protected String determineClassName(final CodeSnippet codeSnippet) {
         String className = codeSnippet.getProperties().get(CLASS_NAME_PROPERTY);
-        if(className == null || className.isEmpty()) className = "Snippet";
+        if (className == null || className.isEmpty()) className = "Snippet";
         return className;
     }
 
     /**
-     * Determine if the code snippet must be wrapped inside a method runner. It is determined by the presence and value of
-     * the {@link #WRAP_IN_METHOD_RUNNER} property.
-     * @param codeSnippet The code snippet.
-     * @return {@code true} if the snippet must be wrapped in main, {@code false} otherwise.
-     */
-    protected boolean mustBeWrappedInMethodRunner(final CodeSnippet codeSnippet) {
-        final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_METHOD_RUNNER) ?
-                Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_METHOD_RUNNER)) :
-                false;
-        return wrapInMain;
-    }
-
-    /**
      * Get the start of the declaration of the main method.
+     *
      * @return The start of the main method.
      */
     protected String getStartMainMethod(final CodeSnippet codeSnippet) {
-        if(makeScript(codeSnippet)) return "def run() {";
+        if (makeScript(codeSnippet)) return "def run() {";
         else return "def static main(String ... args) {";
-    }
-
-    /**
-     * Get the end of the declaration of the main method.
-     * @return The end of the main method.
-     */
-    protected String getEndMainMethod() {
-        return "}";
-    }
-
-    /**
-     * Get the end of the definition of the class.
-     * @param codeSnippet The code snippet.
-     */
-    protected String getEndClassDefinition(final CodeSnippet codeSnippet) {
-        return "}";
     }
 }

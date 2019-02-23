@@ -22,7 +22,7 @@ public class EventBus {
     /**
      * Private constructor of the EventBus in order to implement the singleton pattern.
      *
-     * @see {@link #getInstance()}
+     * @see #getInstance()
      */
     private EventBus() {
     }
@@ -32,7 +32,7 @@ public class EventBus {
      *
      * @return The singleton instance of the {@link EventBus}.
      */
-    public synchronized static EventBus getInstance() {
+    public static synchronized EventBus getInstance() {
         if (singleton == null) {
             singleton = new EventBus();
         }
@@ -122,9 +122,7 @@ public class EventBus {
         checkEndPointIsValid(endPoint);
 
         final String trimmedEndPoint = endPoint.trim();
-        if (endPointsAndActorsMapping.containsKey(trimmedEndPoint)) {
-            endPointsAndActorsMapping.remove(trimmedEndPoint);
-        }
+        endPointsAndActorsMapping.remove(trimmedEndPoint);
 
         return this;
     }

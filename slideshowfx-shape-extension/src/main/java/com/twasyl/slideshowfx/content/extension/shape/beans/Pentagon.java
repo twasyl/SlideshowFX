@@ -18,25 +18,25 @@ import static java.lang.Math.*;
  * @since SlideshowFX 2.0
  */
 public class Pentagon extends AbstractShape {
-    private ExtendedTextField x;
-    private ExtendedTextField y;
-    private ExtendedTextField diameter;
+    private ExtendedTextField xField;
+    private ExtendedTextField yField;
+    private ExtendedTextField diameterField;
 
     public Pentagon() {
-        this.x = new ExtendedTextField("X", true, 3);
-        this.x.setValidator(isInteger());
+        this.xField = new ExtendedTextField("X", true, 3);
+        this.xField.setValidator(isInteger());
 
-        this.y = new ExtendedTextField("Y", true, 3);
-        this.y.setValidator(isInteger());
+        this.yField = new ExtendedTextField("Y", true, 3);
+        this.yField.setValidator(isInteger());
 
-        this.diameter = new ExtendedTextField("Diameter", true, 3);
-        this.diameter.setValidator(isInteger());
+        this.diameterField = new ExtendedTextField("Diameter", true, 3);
+        this.diameterField.setValidator(isInteger());
     }
 
     @Override
     public Node getUI() {
         final HBox container = new HBox(10);
-        container.getChildren().addAll(this.x, this.y, this.diameter);
+        container.getChildren().addAll(this.xField, this.yField, this.diameterField);
 
         final FlowPane attributes = new FlowPane(10, 10);
         attributes.getChildren().addAll(this.getCommonAttributes());
@@ -46,24 +46,24 @@ public class Pentagon extends AbstractShape {
 
     @Override
     public String buildCreatingInstruction(String paper) {
-        final int x = parseInt(this.x.getText());
-        final int y = parseInt(this.y.getText());
-        final int diameter = parseInt(this.diameter.getText());
-        final double radius = diameter / 2;
+        final int x = parseInt(this.xField.getText());
+        final int y = parseInt(this.yField.getText());
+        final int diameter = parseInt(this.diameterField.getText());
+        final double radius = diameter / 2d;
         final double centerX = x + radius;
         final double centerY = y + radius;
-        final double angle = 72;
+        final int angle = 72;
 
-        final double x1 = x + diameter;
+        final int x1 = x + diameter;
         final double y1 = y + radius;
         final double x2 = centerX + radius * cos(toRadians(angle));
         final double y2 = centerY + radius * sin(toRadians(angle));
-        final double x3 = centerX + radius * cos(toRadians(angle * 2));
-        final double y3 = centerY + radius * sin(toRadians(angle * 2));
-        final double x4 = centerX + radius * cos(toRadians(angle * 3));
-        final double y4 = centerY + radius * sin(toRadians(angle * 3));
-        final double x5 = centerX + radius * cos(toRadians(angle * 4));
-        final double y5 = centerY + radius * sin(toRadians(angle * 4));
+        final double y3 = centerY + radius * sin(toRadians(angle * 2d));
+        final double x3 = centerX + radius * cos(toRadians(angle * 2d));
+        final double x4 = centerX + radius * cos(toRadians(angle * 3d));
+        final double y4 = centerY + radius * sin(toRadians(angle * 3d));
+        final double x5 = centerX + radius * cos(toRadians(angle * 4d));
+        final double y5 = centerY + radius * sin(toRadians(angle * 4d));
 
         final StringBuilder builder = new StringBuilder(paper)
                 .append(".polyline([")

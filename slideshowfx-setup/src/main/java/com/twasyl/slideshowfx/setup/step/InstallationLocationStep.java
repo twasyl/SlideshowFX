@@ -13,7 +13,10 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static java.util.logging.Level.SEVERE;
 
 /**
  * A step allowing to choose the installation location of the application.
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
  * @since SlideshowFX 1.0
  */
 public class InstallationLocationStep extends AbstractSetupStep {
+    private static final Logger LOGGER = Logger.getLogger(InstallationLocationStep.class.getName());
 
     private boolean applicationDirectoryCreatedDuringSetup = false;
     private boolean configurationFileCreatedDuringSetup = false;
@@ -62,7 +66,7 @@ public class InstallationLocationStep extends AbstractSetupStep {
 
             this.validProperty().set(true);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(SEVERE, "Can not find FXML", e);
         }
     }
 
@@ -187,11 +191,19 @@ public class InstallationLocationStep extends AbstractSetupStep {
 
         final File applicationFolder = this.getApplicationFolderSetup();
         if (applicationFolder.list().length == 0) {
-            applicationFolder.delete();
+            try {
+                Files.delete(applicationFolder.toPath());
+            } catch (IOException e) {
+                throw new SetupStepException("Can not delete the application installation directory", e);
+            }
         }
 
         if (this.configurationFileCreatedDuringSetup) {
-            GlobalConfiguration.getConfigurationFile().delete();
+            try {
+                Files.delete(GlobalConfiguration.getConfigurationFile().toPath());
+            } catch (IOException e) {
+                throw new SetupStepException("Can not delete the application configuration file", e);
+            }
         }
 
         if (this.applicationDirectoryCreatedDuringSetup) {

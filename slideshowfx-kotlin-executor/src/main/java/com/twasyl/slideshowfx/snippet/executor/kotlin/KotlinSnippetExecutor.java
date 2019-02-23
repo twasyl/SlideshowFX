@@ -137,7 +137,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
                 codeFile = createSourceCodeFile(codeSnippet);
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not write code to snippet file", e);
-                consoleOutput.add("ERROR: ".concat(e.getMessage()));
+                appendErrorMessageToConsole(consoleOutput, e);
             }
 
             // Compile the Kotlin class
@@ -159,22 +159,16 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
                         .start();
 
                 try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                    errorStream.lines().forEach(line -> consoleOutput.add(line));
+                    errorStream.lines().forEach(consoleOutput::add);
                 }
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not execute code snippet", e);
-                consoleOutput.add("ERROR: ".concat(e.getMessage()));
+                appendErrorMessageToConsole(consoleOutput, e);
             } finally {
-                if(process != null) {
-                    try {
-                        process.waitFor();
-                    } catch (InterruptedException e) {
-                        LOGGER.log(Level.SEVERE, "Can not wait for process to end", e);
-                    }
-                }
+                waitForProcess(process);
             }
 
-            codeFile.delete();
+            deleteGeneratedFile(codeFile);
 
             // Execute the Kotlin class only if the compilation was successful
             if(process != null && process.exitValue() == 0) {
@@ -193,23 +187,16 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
                             .start();
 
                     try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                        inputStream.lines().forEach(line -> consoleOutput.add(line));
+                        inputStream.lines().forEach(consoleOutput::add);
                     }
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE, "Can not execute code snippet", e);
-                    consoleOutput.add("ERROR: ".concat(e.getMessage()));
+                    appendErrorMessageToConsole(consoleOutput, e);
                 } finally {
-                    if(process != null) {
-                        try {
-                            process.waitFor();
-                        } catch (InterruptedException e) {
-                            LOGGER.log(Level.SEVERE, "Can not wait for process to end", e);
-                        }
-                    }
+                    waitForProcess(process);
                 }
 
-                final File classFile = new File(this.getTemporaryDirectory(), jarFile);
-                classFile.delete();
+                deleteGeneratedFile(new File(this.getTemporaryDirectory(), jarFile));
             }
         });
         snippetThread.start();
@@ -250,10 +237,10 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
             sourceCode.append(getImports(codeSnippet)).append("\n\n");
         }
 
-        if(mustBeWrappedInMain(codeSnippet)) {
-            sourceCode.append(getStartMainMethod()).append("\n")
+        if(mustBeWrappedIn(codeSnippet, WRAP_IN_MAIN_PROPERTY)) {
+            sourceCode.append("fun main(args: Array<String>) {\n")
                     .append(codeSnippet.getCode())
-                    .append("\n").append(getEndMainMethod());
+                    .append("\n}");
         } else {
             sourceCode.append(codeSnippet.getCode());
         }
@@ -346,34 +333,5 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
         }
 
         return formattedImportLine;
-    }
-
-    /**
-     * Determine if the code snippet must be wrapped inside a main method. It is determined by the presence and value of
-     * the {@link #WRAP_IN_MAIN_PROPERTY} property.
-     * @param codeSnippet The code snippet.
-     * @return {@code true} if the snippet must be wrapped in main, {@code false} otherwhise.
-     */
-    protected boolean mustBeWrappedInMain(final CodeSnippet codeSnippet) {
-        final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_MAIN_PROPERTY) ?
-                Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_MAIN_PROPERTY)) :
-                false;
-        return wrapInMain;
-    }
-
-    /**
-     * Get the start of the declaration of the main method.
-     * @return The start of the main method.
-     */
-    protected String getStartMainMethod() {
-        return "fun main(args: Array<String>) {";
-    }
-
-    /**
-     * Get the end of the declaration of the main method.
-     * @return The end of the main method.
-     */
-    protected String getEndMainMethod() {
-        return "}";
     }
 }

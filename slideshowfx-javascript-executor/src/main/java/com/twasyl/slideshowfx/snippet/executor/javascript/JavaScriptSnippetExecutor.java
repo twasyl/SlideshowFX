@@ -11,7 +11,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.StringWriter;
-import java.util.logging.Logger;
 
 /**
  * An implementation of
@@ -24,8 +23,6 @@ import java.util.logging.Logger;
  * @since SlideshowFX 1.0
  */
 public class JavaScriptSnippetExecutor extends AbstractSnippetExecutor<JavaScriptSnippetExecutorOptions> {
-
-    private static final Logger LOGGER = Logger.getLogger(JavaScriptSnippetExecutor.class.getName());
 
     public JavaScriptSnippetExecutor() {
         super("JAVASCRIPT", "JavaScript", "language-javascript");
@@ -44,6 +41,7 @@ public class JavaScriptSnippetExecutor extends AbstractSnippetExecutor<JavaScrip
 
     @Override
     public void saveNewOptions() {
+        // No options relative to the JavaScript executor
     }
 
     @Override

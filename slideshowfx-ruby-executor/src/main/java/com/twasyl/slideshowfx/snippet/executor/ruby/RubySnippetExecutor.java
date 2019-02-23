@@ -40,12 +40,7 @@ public class RubySnippetExecutor extends AbstractSnippetExecutor<RubySnippetExec
         super("RUBY", "Ruby", "language-ruby");
         this.setOptions(new RubySnippetExecutorOptions());
 
-        final Boolean useRubyInPath = GlobalConfiguration.getBooleanProperty(this.getConfigurationBaseName().concat(USE_RUBY_IN_PATH_PROPERTY_SUFFIX));
-        if (useRubyInPath != null) {
-            this.getOptions().setUseRubyInPath(useRubyInPath.booleanValue());
-        } else {
-            this.getOptions().setUseRubyInPath(true);
-        }
+        this.getOptions().setUseRubyInPath(GlobalConfiguration.getBooleanProperty(this.getConfigurationBaseName().concat(USE_RUBY_IN_PATH_PROPERTY_SUFFIX), true));
 
         final String rubyHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(RUBY_HOME_PROPERTY_SUFFIX));
         if (rubyHome != null) {
@@ -141,22 +136,16 @@ public class RubySnippetExecutor extends AbstractSnippetExecutor<RubySnippetExec
                         .start();
 
                 try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                    inputStream.lines().forEach(line -> consoleOutput.add(line));
+                    inputStream.lines().forEach(consoleOutput::add);
                 }
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not execute code snippet", e);
                 consoleOutput.add("ERROR: ".concat(e.getMessage()));
             } finally {
-                if (process != null) {
-                    try {
-                        process.waitFor();
-                    } catch (InterruptedException e) {
-                        LOGGER.log(Level.SEVERE, "Can not wait for process to end", e);
-                    }
-                }
+                waitForProcess(process);
             }
 
-            codeFile.delete();
+            deleteGeneratedFile(codeFile);
         });
         snippetThread.start();
 
@@ -198,7 +187,7 @@ public class RubySnippetExecutor extends AbstractSnippetExecutor<RubySnippetExec
      * @param codeSnippet The code snippet to build the source code for.
      * @return The content of the source code file.
      */
-    private String buildSourceCode(final CodeSnippet codeSnippet) throws IOException {
+    private String buildSourceCode(final CodeSnippet codeSnippet) {
         return codeSnippet.getCode();
     }
 }

@@ -41,7 +41,7 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
         this.setOptions(new ScalaSnippetExecutorOptions());
 
         final String scalaHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(SCALA_HOME_PROPERTY_SUFFIX));
-        if(scalaHome != null) {
+        if (scalaHome != null) {
             try {
                 this.getOptions().setScalaHome(new File(scalaHome));
             } catch (FileNotFoundException e) {
@@ -57,14 +57,14 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
         classTextField.setPrefColumnCount(10);
         classTextField.setTooltip(new Tooltip("The class name of this code snippet"));
         classTextField.textProperty().addListener((textValue, oldText, newText) -> {
-            if(newText == null || newText.isEmpty()) codeSnippet.putProperty(CLASS_NAME_PROPERTY, null);
+            if (newText == null || newText.isEmpty()) codeSnippet.putProperty(CLASS_NAME_PROPERTY, null);
             else codeSnippet.putProperty(CLASS_NAME_PROPERTY, newText);
         });
 
         final CheckBox wrapInMain = new CheckBox("Wrap code snippet in main");
         wrapInMain.setTooltip(new Tooltip("Wrap the provided code snippet in a Scala main method"));
         wrapInMain.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {
-            if(newSelected != null) codeSnippet.putProperty(WRAP_IN_MAIN_PROPERTY, newSelected.toString());
+            if (newSelected != null) codeSnippet.putProperty(WRAP_IN_MAIN_PROPERTY, newSelected.toString());
         });
 
         final TextArea imports = new TextArea();
@@ -73,7 +73,7 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
         imports.setPrefRowCount(15);
         imports.setWrapText(true);
         imports.textProperty().addListener((textValue, oldText, newText) -> {
-            if(newText.isEmpty()) codeSnippet.putProperty(IMPORTS_PROPERTY, null);
+            if (newText.isEmpty()) codeSnippet.putProperty(IMPORTS_PROPERTY, null);
             else codeSnippet.putProperty(IMPORTS_PROPERTY, newText);
         });
 
@@ -116,10 +116,10 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
 
     @Override
     public void saveNewOptions() {
-        if(this.getNewOptions() != null) {
+        if (this.getNewOptions() != null) {
             this.setOptions(this.getNewOptions());
 
-            if(this.getOptions().getScalaHome() != null) {
+            if (this.getOptions().getScalaHome() != null) {
                 GlobalConfiguration.setProperty(this.getConfigurationBaseName().concat(SCALA_HOME_PROPERTY_SUFFIX),
                         this.getOptions().getScalaHome().getAbsolutePath().replaceAll("\\\\", "/"));
             }
@@ -147,60 +147,47 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
             Process process = null;
             try {
                 process = new ProcessBuilder()
-                            .redirectErrorStream(true)
-                            .command(compilationCommand)
-                            .directory(this.getTemporaryDirectory())
-                            .start();
+                        .redirectErrorStream(true)
+                        .command(compilationCommand)
+                        .directory(this.getTemporaryDirectory())
+                        .start();
 
                 try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                    errorStream.lines().forEach(line -> consoleOutput.add(line));
+                    errorStream.lines().forEach(consoleOutput::add);
                 }
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can not execute code snippet", e);
-                consoleOutput.add("ERROR: ".concat(e.getMessage()));
+                appendErrorMessageToConsole(consoleOutput, e);
             } finally {
-                if(process != null) {
-                    try {
-                        process.waitFor();
-                    } catch (InterruptedException e) {
-                        LOGGER.log(Level.SEVERE, "Can not wait for process to end", e);
-                    }
-                }
+                waitForProcess(process);
             }
 
-            codeFile.delete();
+            deleteGeneratedFile(codeFile);
 
             // Execute the class only if the compilation was successful
-            if(process != null && process.exitValue() == 0) {
+            if (process != null && process.exitValue() == 0) {
 
                 final File scalaExecutable = new File(this.getOptions().getScalaHome(), "bin/scala");
                 final String[] executionCommand = {scalaExecutable.getAbsolutePath(), determineClassName(codeSnippet)};
 
                 try {
                     process = new ProcessBuilder()
-                                .redirectErrorStream(true)
-                                .command(executionCommand)
-                                .directory(this.getTemporaryDirectory())
-                                .start();
+                            .redirectErrorStream(true)
+                            .command(executionCommand)
+                            .directory(this.getTemporaryDirectory())
+                            .start();
 
                     try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                        inputStream.lines().forEach(line -> consoleOutput.add(line));
+                        inputStream.lines().forEach(consoleOutput::add);
                     }
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE, "Can not execute code snippet", e);
-                    consoleOutput.add("ERROR: ".concat(e.getMessage()));
+                    appendErrorMessageToConsole(consoleOutput, e);
                 } finally {
-                    if(process != null) {
-                        try {
-                            process.waitFor();
-                        } catch (InterruptedException e) {
-                            LOGGER.log(Level.SEVERE, "Can not wait for process to end", e);
-                        }
-                    }
+                    waitForProcess(process);
                 }
 
-                final File classFile = new File(this.getTemporaryDirectory(), determineClassName(codeSnippet));
-                classFile.delete();
+                deleteGeneratedFile(new File(this.getTemporaryDirectory(), determineClassName(codeSnippet)));
             }
         });
         snippetThread.start();
@@ -210,6 +197,7 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
 
     /**
      * Create the source code file for the given code snippet.
+     *
      * @param codeSnippet The code snippet.
      * @return The file created and containing the source code.
      */
@@ -224,36 +212,37 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
     }
 
     /**
-     *
      * Build code file content according properties. The source code can then be written properly inside a file in order
      * to be compiled and then executed.
+     *
      * @param codeSnippet The code snippet to build the source code for.
      * @return The content of the source code file.
      */
     protected String buildSourceCode(final CodeSnippet codeSnippet) throws IOException {
         final StringBuilder sourceCode = new StringBuilder();
 
-        if(hasImports(codeSnippet)) {
+        if (hasImports(codeSnippet)) {
             sourceCode.append(getImports(codeSnippet)).append("\n\n");
         }
 
         sourceCode.append(getStartClassDefinition(codeSnippet)).append("\n");
 
-        if(mustBeWrappedInMain(codeSnippet)) {
-            sourceCode.append("\t").append(getStartMainMethod()).append("\n")
-                       .append(codeSnippet.getCode())
-                       .append("\n\t").append(getEndMainMethod());
+        if (mustBeWrappedIn(codeSnippet, WRAP_IN_MAIN_PROPERTY)) {
+            sourceCode.append("\tdef main(args: Array[String]) {\n")
+                    .append(codeSnippet.getCode())
+                    .append("\n\t}");
         } else {
             sourceCode.append(codeSnippet.getCode());
         }
 
-        sourceCode.append("\n").append(getEndClassDefinition(codeSnippet));
+        sourceCode.append("\n}");
 
         return sourceCode.toString();
     }
 
     /**
      * Get the imports to be added to the source code.
+     *
      * @param codeSnippet The code snippet.
      */
     protected boolean hasImports(final CodeSnippet codeSnippet) {
@@ -275,8 +264,8 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
              final BufferedReader reader = new DefaultCharsetReader(stringReader)) {
 
             reader.lines()
-                   .filter(line -> !line.trim().isEmpty())
-                   .forEach(line -> imports.add(formatImportLine(line)));
+                    .filter(line -> !line.trim().isEmpty())
+                    .forEach(line -> imports.add(formatImportLine(line)));
         }
 
         return imports.toString();
@@ -284,6 +273,7 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
 
     /**
      * Format an import line by make sure it starts with the {@code import} keyword.
+     *
      * @param importLine The import line to format.
      * @return A well formatted import line.
      */
@@ -291,7 +281,7 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
         final String importLineBeginning = "import ";
         String formattedImportLine;
 
-        if(importLine.startsWith(importLineBeginning)) {
+        if (importLine.startsWith(importLineBeginning)) {
             formattedImportLine = importLine;
         } else {
             formattedImportLine = importLineBeginning.concat(importLine);
@@ -302,6 +292,7 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
 
     /**
      * Get the definition of the class.
+     *
      * @param codeSnippet The code snippet.
      */
     protected String getStartClassDefinition(final CodeSnippet codeSnippet) {
@@ -311,49 +302,13 @@ public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetEx
     /**
      * Determine the class name of the code snippet. It looks inside the code snippet's properties and check the value
      * of the {@link #CLASS_NAME_PROPERTY} property. If {@code null} or empty, {@code Snippet} will be returned.
+     *
      * @param codeSnippet The code snippet.
      * @return The class name of the code snippet.
      */
     protected String determineClassName(final CodeSnippet codeSnippet) {
         String className = codeSnippet.getProperties().get(CLASS_NAME_PROPERTY);
-        if(className == null || className.isEmpty()) className = "Snippet";
+        if (className == null || className.isEmpty()) className = "Snippet";
         return className;
-    }
-
-    /**
-     * Determine if the code snippet must be wrapped inside a main method. It is determined by the presence and value of
-     * the {@link #WRAP_IN_MAIN_PROPERTY} property.
-     * @param codeSnippet The code snippet.
-     * @return {@code true} if the snippet must be wrapped in main, {@code false} otherwhise.
-     */
-    protected boolean mustBeWrappedInMain(final CodeSnippet codeSnippet) {
-        final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_MAIN_PROPERTY) ?
-                Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_MAIN_PROPERTY)) :
-                false;
-        return wrapInMain;
-    }
-
-    /**
-     * Get the start of the declaration of the main method.
-     * @return The start of the main method.
-     */
-    protected String getStartMainMethod() {
-        return "def main(args: Array[String]) {";
-    }
-
-    /**
-     * Get the end of the declaration of the main method.
-     * @return The end of the main method.
-     */
-    protected String getEndMainMethod() {
-        return "}";
-    }
-
-    /**
-     * Get the end of the definition of the class.
-     * @param codeSnippet The code snippet.
-     */
-    protected String getEndClassDefinition(final CodeSnippet codeSnippet) {
-        return "}";
     }
 }

@@ -1,6 +1,5 @@
 package com.twasyl.slideshowfx.server.service;
 
-import com.twasyl.slideshowfx.icons.FontAwesome;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.server.beans.chat.ChatMessage;
 import com.twasyl.slideshowfx.server.beans.chat.ChatMessageAction;
@@ -18,14 +17,14 @@ import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.web.Router;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.twasyl.slideshowfx.server.SlideshowFXServer.*;
 import static com.twasyl.slideshowfx.server.service.IServicesCode.*;
+import static java.util.logging.Level.WARNING;
 
 /**
  * This class represents the attendee part of the internal SlideshowFX chat.
@@ -58,35 +57,15 @@ public class AttendeeChatService extends AbstractSlideshowFXService {
         final SlideshowFXServer singleton = SlideshowFXServer.getSingleton();
         final Router router = singleton.getRouter();
 
-        // Route that get the image of an answered message
-        final String FONT_AWESOME_PREFIX = "/slideshowfx/font-awesome/";
-        router.get(FONT_AWESOME_PREFIX.concat("*")).handler(routingContext -> {
-            final String file = routingContext.request().path().substring(FONT_AWESOME_PREFIX.length());
-
-            try (final InputStream in = FontAwesome.getFontAwesomeFile(file).openStream()) {
-
-                byte[] imageBuffer = new byte[1028];
-                int numberOfBytesRead;
-                Buffer buffer = Buffer.buffer();
-
-                while ((numberOfBytesRead = in.read(imageBuffer)) != -1) {
-                    buffer.appendBytes(imageBuffer, 0, numberOfBytesRead);
-                }
-
-                routingContext.response().setChunked(true).write(buffer).end();
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Can not send the font awesome file", e);
-            }
-        });
         // Get the JavaScript resources
         router.get("/slideshowfx/chat/js/chatService.js").handler(request -> {
-            final LocalMap templateTokens = this.vertx.sharedData().getLocalMap(SlideshowFXServer.SHARED_DATA_TEMPLATE_TOKENS);
+            final LocalMap templateTokens = this.vertx.sharedData().getLocalMap(SHARED_DATA_TEMPLATE_TOKENS);
 
             final Configuration configuration = TemplateProcessor.getJsConfiguration(AttendeeChatService.class);
 
             final Map tokenValues = new HashMap();
-            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_HOST_TOKEN).toString(), singleton.getHost());
-            tokenValues.put(templateTokens.get(SlideshowFXServer.SHARED_DATA_SERVER_PORT_TOKEN).toString(), singleton.getPort() + "");
+            tokenValues.put(templateTokens.get(SHARED_DATA_SERVER_HOST_TOKEN).toString(), singleton.getHost());
+            tokenValues.put(templateTokens.get(SHARED_DATA_SERVER_PORT_TOKEN).toString(), singleton.getPort() + "");
 
             try (final StringWriter writer = new StringWriter()) {
                 final Template template = configuration.getTemplate("chatService.js");
@@ -96,18 +75,18 @@ public class AttendeeChatService extends AbstractSlideshowFXService {
 
                 request.response().putHeader("Content-Type", "application/javascript").setStatusCode(200).setChunked(true).write(Buffer.buffer(writer.toString())).end();
             } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Error when a client tried to access the chat", e);
+                LOGGER.log(WARNING, "Error when a client tried to access the chat", e);
 
                 request.response().setStatusCode(500).end();
             } catch (TemplateException e) {
-                LOGGER.log(Level.WARNING, "Error when processing the chat template", e);
+                LOGGER.log(WARNING, "Error when processing the chat template", e);
                 request.response().setStatusCode(500).end();
             }
         });
     }
 
     private Handler<Message<JsonObject>> buildUpdateMessageHandler() {
-        final Handler<Message<JsonObject>> handler = message -> {
+        return message -> {
             final String messageId = message.body().getJsonObject(JSON_KEY_MESSAGE).getString(JSON_KEY_MESSAGE_ID);
             final ChatMessage chatMessage = this.chatHistory.get(messageId);
 
@@ -139,12 +118,10 @@ public class AttendeeChatService extends AbstractSlideshowFXService {
 
             message.reply(this.buildResponse(SERVICE_CHAT_ATTENDEE_MESSAGE_UPDATE, responseCode, responseContent));
         };
-
-        return handler;
     }
 
     private Handler<Message<JsonObject>> buildAddMessageHandler() {
-        final Handler<Message<JsonObject>> handler = message -> {
+        return message -> {
             final ChatMessage chatMessage = ChatMessage.build(message.body().encode(), null);
             chatMessage.setId("msg-" + System.currentTimeMillis());
             this.chatHistory.put(chatMessage.getId(), chatMessage);
@@ -157,12 +134,10 @@ public class AttendeeChatService extends AbstractSlideshowFXService {
             this.vertx.eventBus().send(SERVICE_CHAT_PRESENTER_MESSAGE_ADD, chatMessage.toJSON());
             message.reply(object);
         };
-
-        return handler;
     }
 
     private Handler<Message<JsonObject>> buildHistoryMessageHandler() {
-        final Handler<Message<JsonObject>> handler = message -> {
+        return message -> {
             final JsonArray array = new JsonArray();
 
             for (ChatMessage chatMessage : this.chatHistory.values()) {
@@ -171,7 +146,5 @@ public class AttendeeChatService extends AbstractSlideshowFXService {
 
             message.reply(this.buildResponse(SERVICE_CHAT_ATTENDEE_HISTORY, RESPONSE_CODE_OK, array));
         };
-
-        return handler;
     }
 }

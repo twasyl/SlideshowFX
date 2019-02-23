@@ -6,6 +6,9 @@ import javafx.scene.image.ImageView;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.WARNING;
 
 /**
  * This class is an editor that is used to display images.
@@ -15,6 +18,7 @@ import java.net.MalformedURLException;
  * @since SlideshowFX 1.0
  */
 public class ImageFileEditor extends AbstractFileEditor<ImageView> {
+    private static final Logger LOGGER = Logger.getLogger(ImageFileEditor.class.getName());
 
     public ImageFileEditor() {
         super();
@@ -33,14 +37,14 @@ public class ImageFileEditor extends AbstractFileEditor<ImageView> {
 
     @Override
     public void updateFileContent() {
-        if(getFile() == null) throw new NullPointerException("The fileProperty is null");
+        if (getFile() == null) throw new NullPointerException("The fileProperty is null");
 
         final Image image;
         try {
             image = new Image(this.getFile().toURI().toURL().toExternalForm());
             this.getFileContent().setImage(image);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.log(WARNING, "Invalid image URL", e);
         }
     }
 
@@ -49,5 +53,6 @@ public class ImageFileEditor extends AbstractFileEditor<ImageView> {
      */
     @Override
     public void saveContent() {
+        // An image can not be edited
     }
 }

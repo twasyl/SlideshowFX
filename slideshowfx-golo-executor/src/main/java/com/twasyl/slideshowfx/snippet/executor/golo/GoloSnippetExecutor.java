@@ -20,6 +20,8 @@ import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.SEVERE;
+
 /**
  * An implementation of {@link com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor} that allows to execute
  * Golo code snippets.
@@ -42,11 +44,11 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
         this.setOptions(new GoloSnippetExecutorOptions());
 
         final String goloHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(GOLO_HOME_PROPERTY_SUFFIX));
-        if(goloHome != null) {
+        if (goloHome != null) {
             try {
                 this.getOptions().setGoloHome(new File(goloHome));
             } catch (FileNotFoundException e) {
-                LOGGER.log(Level.SEVERE, "Can not set the GOLO_HOME", e);
+                LOGGER.log(SEVERE, "Can not set the GOLO_HOME", e);
             }
         }
     }
@@ -58,14 +60,14 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
         moduleTextField.setPrefColumnCount(10);
         moduleTextField.setTooltip(new Tooltip("The module name of this code snippet"));
         moduleTextField.textProperty().addListener((textValue, oldText, newText) -> {
-            if(newText == null || newText.isEmpty()) codeSnippet.putProperty(MODULE_NAME_PROPERTY, null);
+            if (newText == null || newText.isEmpty()) codeSnippet.putProperty(MODULE_NAME_PROPERTY, null);
             else codeSnippet.putProperty(MODULE_NAME_PROPERTY, newText);
         });
 
         final CheckBox wrapInMain = new CheckBox("Wrap code snippet in main");
         wrapInMain.setTooltip(new Tooltip("Wrap the provided code snippet in a Golo main method"));
         wrapInMain.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {
-            if(newSelected != null) codeSnippet.putProperty(WRAP_IN_MAIN_PROPERTY, newSelected.toString());
+            if (newSelected != null) codeSnippet.putProperty(WRAP_IN_MAIN_PROPERTY, newSelected.toString());
         });
 
         final TextArea imports = new TextArea();
@@ -74,7 +76,7 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
         imports.setPrefRowCount(15);
         imports.setWrapText(true);
         imports.textProperty().addListener((textValue, oldText, newText) -> {
-            if(newText.isEmpty()) codeSnippet.putProperty(IMPORTS_PROPERTY, null);
+            if (newText.isEmpty()) codeSnippet.putProperty(IMPORTS_PROPERTY, null);
             else codeSnippet.putProperty(IMPORTS_PROPERTY, newText);
         });
 
@@ -103,7 +105,7 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
         browse.setOnAction(event -> {
             final DirectoryChooser chooser = new DirectoryChooser();
             final File sdkHomeDir = chooser.showDialog(null);
-            if(sdkHomeDir != null) {
+            if (sdkHomeDir != null) {
                 javaHomeField.setText(sdkHomeDir.getAbsolutePath());
             }
 
@@ -117,10 +119,10 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
 
     @Override
     public void saveNewOptions() {
-        if(this.getNewOptions() != null) {
+        if (this.getNewOptions() != null) {
             this.setOptions(this.getNewOptions());
 
-            if(this.getOptions().getGoloHome() != null) {
+            if (this.getOptions().getGoloHome() != null) {
                 GlobalConfiguration.setProperty(this.getConfigurationBaseName().concat(GOLO_HOME_PROPERTY_SUFFIX),
                         this.getOptions().getGoloHome().getAbsolutePath().replaceAll("\\\\", "/"));
             }
@@ -137,7 +139,7 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
             try {
                 codeFile = createSourceCodeFile(codeSnippet);
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Can not write code to snippet file", e);
+                LOGGER.log(SEVERE, "Can not write code to snippet file", e);
                 consoleOutput.add("ERROR: ".concat(e.getMessage()));
             }
 
@@ -152,22 +154,16 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
                 process = new ProcessBuilder().redirectErrorStream(true).command(command).start();
 
                 try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                    inputStream.lines().forEach(line -> consoleOutput.add(line));
+                    inputStream.lines().forEach(consoleOutput::add);
                 }
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Can not execute code snippet", e);
+                LOGGER.log(SEVERE, "Can not execute code snippet", e);
                 consoleOutput.add("ERROR: ".concat(e.getMessage()));
             } finally {
-                if(process != null) {
-                    try {
-                        process.waitFor();
-                    } catch (InterruptedException e) {
-                        LOGGER.log(Level.SEVERE, "Can not wait for process to end", e);
-                    }
-                }
+                waitForProcess(process);
             }
 
-            codeFile.delete();
+            deleteGeneratedFile(codeFile);
         });
         snippetThread.start();
 
@@ -176,6 +172,7 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
 
     /**
      * Create the source code file for the given code snippet.
+     *
      * @param codeSnippet The code snippet.
      * @return The file created and containing the source code.
      */
@@ -190,9 +187,9 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
     }
 
     /**
-     *
      * Build code file content according properties. The source code can then be written properly inside a file in order
      * to be compiled and then executed.
+     *
      * @param codeSnippet The code snippet to build the source code for.
      * @return The content of the source code file.
      */
@@ -201,25 +198,26 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
 
         sourceCode.append(getStartModuleDefinition(codeSnippet)).append("\n\n");
 
-        if(hasImports(codeSnippet)) {
+        if (hasImports(codeSnippet)) {
             sourceCode.append(getImports(codeSnippet)).append("\n\n");
         }
 
-        if(mustBeWrappedInMain(codeSnippet)) {
-            sourceCode.append(getStartMainMethod()).append("\n")
+        if (mustBeWrappedIn(codeSnippet, WRAP_IN_MAIN_PROPERTY)) {
+            sourceCode.append("function main = |args| {\n")
                     .append(codeSnippet.getCode())
-                    .append("\n").append(getEndMainMethod());
+                    .append("\n}");
         } else {
             sourceCode.append(codeSnippet.getCode());
         }
 
-        sourceCode.append("\n").append(getEndModuleDefinition(codeSnippet));
+        sourceCode.append("\n");
 
         return sourceCode.toString();
     }
 
     /**
      * Get the imports to be added to the source code.
+     *
      * @param codeSnippet The code snippet.
      */
     protected boolean hasImports(final CodeSnippet codeSnippet) {
@@ -250,6 +248,7 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
 
     /**
      * Format an import line by make sure it starts with the {@code import} keyword.
+     *
      * @param importLine The import line to format.
      * @return A well formatted import line.
      */
@@ -258,7 +257,7 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
 
         String formattedImportLine;
 
-        if(importLine.startsWith(importLineBeginning)) {
+        if (importLine.startsWith(importLineBeginning)) {
             formattedImportLine = importLine;
         } else {
             formattedImportLine = importLineBeginning.concat(importLine);
@@ -269,6 +268,7 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
 
     /**
      * Get the definition of the class.
+     *
      * @param codeSnippet The code snippet.
      */
     protected String getStartModuleDefinition(final CodeSnippet codeSnippet) {
@@ -278,49 +278,13 @@ public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExec
     /**
      * Determine the module name of the code snippet. It looks inside the code snippet's properties and check the value
      * of the {@link #MODULE_NAME_PROPERTY} property. If {@code null} or empty, {@code Snippet} will be returned.
+     *
      * @param codeSnippet The code snippet.
      * @return The module name of the code snippet.
      */
     protected String determineModuleName(final CodeSnippet codeSnippet) {
         String moduleName = codeSnippet.getProperties().get(MODULE_NAME_PROPERTY);
-        if(moduleName == null || moduleName.isEmpty()) moduleName = "slideshowfx.Snippet";
+        if (moduleName == null || moduleName.isEmpty()) moduleName = "slideshowfx.Snippet";
         return moduleName;
-    }
-
-    /**
-     * Determine if the code snippet must be wrapped inside a main method. It is determined by the presence and value of
-     * the {@link #WRAP_IN_MAIN_PROPERTY} property.
-     * @param codeSnippet The code snippet.
-     * @return {@code true} if the snippet must be wrapped in main, {@code false} otherwhise.
-     */
-    protected boolean mustBeWrappedInMain(final CodeSnippet codeSnippet) {
-        final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_MAIN_PROPERTY) ?
-                Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_MAIN_PROPERTY)) :
-                false;
-        return wrapInMain;
-    }
-
-    /**
-     * Get the start of the declaration of the main method.
-     * @return The start of the main method.
-     */
-    protected String getStartMainMethod() {
-        return "function main = |args| {";
-    }
-
-    /**
-     * Get the end of the declaration of the main method.
-     * @return The end of the main method.
-     */
-    protected String getEndMainMethod() {
-        return "}";
-    }
-
-    /**
-     * Get the end of the definition of the class.
-     * @param codeSnippet The code snippet.
-     */
-    protected String getEndModuleDefinition(final CodeSnippet codeSnippet) {
-        return "";
     }
 }

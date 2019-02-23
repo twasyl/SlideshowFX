@@ -82,14 +82,14 @@ public class OptionsViewController implements Initializable {
             AutoSavingService.resumeAll();
         }
 
-        final String autoSavingInterval = this.autoSavingInterval.getText();
+        final String autoSavingIntervalValue = this.autoSavingInterval.getText();
 
-        if (autoSavingInterval != null) {
+        if (autoSavingIntervalValue != null) {
             try {
-                final Long newAutoSavingInterval = Long.valueOf(autoSavingInterval);
-                GlobalConfiguration.setAutoSavingInterval(newAutoSavingInterval);
+                final Long newAutoSavingIntervalValue = Long.valueOf(autoSavingIntervalValue);
+                GlobalConfiguration.setAutoSavingInterval(newAutoSavingIntervalValue);
 
-                AutoSavingService.setDelayForAllServices(newAutoSavingInterval);
+                AutoSavingService.setDelayForAllServices(newAutoSavingIntervalValue);
             } catch (NumberFormatException ex) {
                 LOGGER.log(Level.WARNING, "Invalid auto saving interval", ex);
                 GlobalConfiguration.removeAutoSavingInterval();
@@ -105,11 +105,11 @@ public class OptionsViewController implements Initializable {
     private void saveTemporaryFilesDeletion() {
         GlobalConfiguration.enableTemporaryFilesDeletionOnExit(this.enableTemporaryFilesDeletion.isSelected());
 
-        final String temporaryFilesMaxAge = this.temporaryFilesMaxAge.getText();
+        final String temporaryFilesMaxAgeValue = this.temporaryFilesMaxAge.getText();
 
-        if (temporaryFilesMaxAge != null) {
+        if (temporaryFilesMaxAgeValue != null) {
             try {
-                GlobalConfiguration.setTemporaryFilesMaxAge(Long.parseLong(temporaryFilesMaxAge));
+                GlobalConfiguration.setTemporaryFilesMaxAge(Long.parseLong(temporaryFilesMaxAgeValue));
             } catch (NumberFormatException ex) {
                 LOGGER.log(Level.WARNING, "Invalid temporary files max age", ex);
                 GlobalConfiguration.removeTemporaryFilesMaxAge();
@@ -123,11 +123,11 @@ public class OptionsViewController implements Initializable {
      * Saves the option for the maximum recent presentations to display.
      */
     private void saveMaxRecentPresentations() {
-        final String maxRecentPresentations = this.maxRecentPresentations.getText();
+        final String maxRecentPresentationsValue = this.maxRecentPresentations.getText();
 
-        if (maxRecentPresentations != null) {
+        if (maxRecentPresentationsValue != null) {
             try {
-                GlobalConfiguration.setMaxRecentPresentations(Long.parseLong(maxRecentPresentations));
+                GlobalConfiguration.setMaxRecentPresentations(Long.parseLong(maxRecentPresentationsValue));
             } catch (NumberFormatException ex) {
                 LOGGER.log(Level.WARNING, "Invalid max recent presentations", ex);
                 GlobalConfiguration.setMaxRecentPresentations(GlobalConfiguration.getDefaultMaxRecentPresentations());
@@ -143,11 +143,11 @@ public class OptionsViewController implements Initializable {
      * Saves the option for the cascading snapshot delay.
      */
     private void saveSnapshotDelay() {
-        final String snapshotDelay = this.snapshotDelay.getText();
+        final String snapshotDelayValue = this.snapshotDelay.getText();
 
-        if (snapshotDelay != null) {
+        if (snapshotDelayValue != null) {
             try {
-                GlobalConfiguration.setSnapshotDelay(Long.parseLong(snapshotDelay));
+                GlobalConfiguration.setSnapshotDelay(Long.parseLong(snapshotDelayValue));
             } catch (NumberFormatException ex) {
                 LOGGER.log(Level.WARNING, "Invalid snapshot delay", ex);
                 GlobalConfiguration.setSnapshotDelay(GlobalConfiguration.getDefaultSnapshotDelay());
@@ -231,13 +231,13 @@ public class OptionsViewController implements Initializable {
      * Initialize the UI for elements addressing the max recent presentations.
      */
     private void initializeMaxRecentPresentations() {
-        final Long maxRecentPresentations = GlobalConfiguration.getMaxRecentPresentations();
-        this.maxRecentPresentations.setText(String.valueOf(maxRecentPresentations));
+        final Long maxRecentPresentationsValue = GlobalConfiguration.getMaxRecentPresentations();
+        this.maxRecentPresentations.setText(String.valueOf(maxRecentPresentationsValue));
     }
 
     private void initializeSnapshotDelay() {
-        final Long snapshotDelay = GlobalConfiguration.getSnapshotDelay();
-        this.snapshotDelay.setText(String.valueOf(snapshotDelay));
+        final Long snapshotDelayValue = GlobalConfiguration.getSnapshotDelay();
+        this.snapshotDelay.setText(String.valueOf(snapshotDelayValue));
     }
 
     private void initializeThemes() {

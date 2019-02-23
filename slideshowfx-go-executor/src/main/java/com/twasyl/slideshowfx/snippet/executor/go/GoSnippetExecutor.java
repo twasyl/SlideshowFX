@@ -20,6 +20,8 @@ import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.SEVERE;
+
 /**
  * An implementation of {@link com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor} that allows to execute
  * Go code snippets.
@@ -42,11 +44,11 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
         this.setOptions(new GoSnippetExecutorOptions());
 
         final String goHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(GO_HOME_PROPERTY_SUFFIX));
-        if(goHome != null) {
+        if (goHome != null) {
             try {
                 this.getOptions().setGoHome(new File(goHome));
             } catch (FileNotFoundException e) {
-                LOGGER.log(Level.SEVERE, "Can not set the GO_HOME", e);
+                LOGGER.log(SEVERE, "Can not set the GO_HOME", e);
             }
         }
     }
@@ -58,14 +60,14 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
         packageTextField.setPrefColumnCount(10);
         packageTextField.setTooltip(new Tooltip("The package name of this code snippet"));
         packageTextField.textProperty().addListener((textValue, oldText, newText) -> {
-            if(newText == null || newText.isEmpty()) codeSnippet.putProperty(PACKAGE_NAME_PROPERTY, null);
+            if (newText == null || newText.isEmpty()) codeSnippet.putProperty(PACKAGE_NAME_PROPERTY, null);
             else codeSnippet.putProperty(PACKAGE_NAME_PROPERTY, newText);
         });
 
         final CheckBox wrapInMain = new CheckBox("Wrap code snippet in main");
         wrapInMain.setTooltip(new Tooltip("Wrap the provided code snippet in a Go main method"));
         wrapInMain.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {
-            if(newSelected != null) codeSnippet.putProperty(WRAP_IN_MAIN_PROPERTY, newSelected.toString());
+            if (newSelected != null) codeSnippet.putProperty(WRAP_IN_MAIN_PROPERTY, newSelected.toString());
         });
 
         final TextArea imports = new TextArea();
@@ -75,7 +77,7 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
         imports.setPrefRowCount(15);
         imports.setWrapText(true);
         imports.textProperty().addListener((textValue, oldText, newText) -> {
-            if(newText.isEmpty()) codeSnippet.putProperty(IMPORTS_PROPERTY, null);
+            if (newText.isEmpty()) codeSnippet.putProperty(IMPORTS_PROPERTY, null);
             else codeSnippet.putProperty(IMPORTS_PROPERTY, newText);
         });
 
@@ -118,10 +120,10 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
 
     @Override
     public void saveNewOptions() {
-        if(this.getNewOptions() != null) {
+        if (this.getNewOptions() != null) {
             this.setOptions(this.getNewOptions());
 
-            if(this.getOptions().getGoHome() != null) {
+            if (this.getOptions().getGoHome() != null) {
                 GlobalConfiguration.setProperty(this.getConfigurationBaseName().concat(GO_HOME_PROPERTY_SUFFIX),
                         this.getOptions().getGoHome().getAbsolutePath().replaceAll("\\\\", "/"));
             }
@@ -138,7 +140,7 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
             try {
                 codeFile = createSourceCodeFile(codeSnippet);
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Can not write code to snippet file", e);
+                LOGGER.log(SEVERE, "Can not write code to snippet file", e);
                 consoleOutput.add("ERROR: ".concat(e.getMessage()));
             }
 
@@ -158,22 +160,16 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
                         .start();
 
                 try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                    errorStream.lines().forEach(line -> consoleOutput.add(line));
+                    errorStream.lines().forEach(consoleOutput::add);
                 }
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Can not execute code snippet", e);
+                LOGGER.log(SEVERE, "Can not execute code snippet", e);
                 consoleOutput.add("ERROR: ".concat(e.getMessage()));
             } finally {
-                if(process != null) {
-                    try {
-                        process.waitFor();
-                    } catch (InterruptedException e) {
-                        LOGGER.log(Level.SEVERE, "Can not wait for process to end", e);
-                    }
-                }
+                waitForProcess(process);
             }
 
-            codeFile.delete();
+            deleteGeneratedFile(codeFile);
         });
         snippetThread.start();
 
@@ -182,6 +178,7 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
 
     /**
      * Create the source code file for the given code snippet.
+     *
      * @param codeSnippet The code snippet.
      * @return The file created and containing the source code.
      */
@@ -196,9 +193,9 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
     }
 
     /**
-     *
      * Build code file content according properties. The source code can then be written properly inside a file in order
      * to be compiled and then executed.
+     *
      * @param codeSnippet The code snippet to build the source code for.
      * @return The content of the source code file.
      */
@@ -207,25 +204,24 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
 
         sourceCode.append(getStartPackageDefinition(codeSnippet)).append("\n\n");
 
-        if(hasImports(codeSnippet)) {
+        if (hasImports(codeSnippet)) {
             sourceCode.append(getImports(codeSnippet)).append("\n\n");
         }
 
-        if(mustBeWrappedInMain(codeSnippet)) {
-            sourceCode.append(getStartMainMethod()).append("\n")
+        if (mustBeWrappedIn(codeSnippet, WRAP_IN_MAIN_PROPERTY)) {
+            sourceCode.append("func main() {\n")
                     .append(codeSnippet.getCode())
-                    .append("\n").append(getEndMainMethod());
+                    .append("\n}");
         } else {
             sourceCode.append(codeSnippet.getCode());
         }
-
-        sourceCode.append(getEndModuleDefinition(codeSnippet));
 
         return sourceCode.toString();
     }
 
     /**
      * Get the imports to be added to the source code.
+     *
      * @param codeSnippet The code snippet.
      */
     protected boolean hasImports(final CodeSnippet codeSnippet) {
@@ -256,6 +252,7 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
 
     /**
      * Format an import line by make sure it starts with the {@code import} keyword.
+     *
      * @param importLine The import line to format.
      * @return A well formatted import line.
      */
@@ -265,13 +262,13 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
 
         String formattedImportLine;
 
-        if(importLine.startsWith(importLineBeginning)) {
+        if (importLine.startsWith(importLineBeginning)) {
             formattedImportLine = importLine;
         } else {
             formattedImportLine = importLineBeginning.concat(importLine);
         }
 
-        if(!importLine.endsWith(importLineEnding)) {
+        if (!importLine.endsWith(importLineEnding)) {
             formattedImportLine = formattedImportLine.concat(importLineEnding);
         }
 
@@ -280,6 +277,7 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
 
     /**
      * Get the definition of the class.
+     *
      * @param codeSnippet The code snippet.
      */
     protected String getStartPackageDefinition(final CodeSnippet codeSnippet) {
@@ -289,49 +287,13 @@ public class GoSnippetExecutor extends AbstractSnippetExecutor<GoSnippetExecutor
     /**
      * Determine the package name of the code snippet. It looks inside the code snippet's properties and check the value
      * of the {@link #PACKAGE_NAME_PROPERTY} property. If {@code null} or empty, {@code Snippet} will be returned.
+     *
      * @param codeSnippet The code snippet.
      * @return The package name of the code snippet.
      */
     protected String determinePackageName(final CodeSnippet codeSnippet) {
         String packageName = codeSnippet.getProperties().get(PACKAGE_NAME_PROPERTY);
-        if(packageName == null || packageName.isEmpty()) packageName = "slideshowfx";
+        if (packageName == null || packageName.isEmpty()) packageName = "slideshowfx";
         return packageName;
-    }
-
-    /**
-     * Determine if the code snippet must be wrapped inside a main method. It is determined by the presence and value of
-     * the {@link #WRAP_IN_MAIN_PROPERTY} property.
-     * @param codeSnippet The code snippet.
-     * @return {@code true} if the snippet must be wrapped in main, {@code false} otherwhise.
-     */
-    protected boolean mustBeWrappedInMain(final CodeSnippet codeSnippet) {
-        final Boolean wrapInMain = codeSnippet.getProperties().containsKey(WRAP_IN_MAIN_PROPERTY) ?
-                Boolean.parseBoolean(codeSnippet.getProperties().get(WRAP_IN_MAIN_PROPERTY)) :
-                false;
-        return wrapInMain;
-    }
-
-    /**
-     * Get the start of the declaration of the main method.
-     * @return The start of the main method.
-     */
-    protected String getStartMainMethod() {
-        return "func main() {";
-    }
-
-    /**
-     * Get the end of the declaration of the main method.
-     * @return The end of the main method.
-     */
-    protected String getEndMainMethod() {
-        return "}";
-    }
-
-    /**
-     * Get the end of the definition of the class.
-     * @param codeSnippet The code snippet.
-     */
-    protected String getEndModuleDefinition(final CodeSnippet codeSnippet) {
-        return "";
     }
 }

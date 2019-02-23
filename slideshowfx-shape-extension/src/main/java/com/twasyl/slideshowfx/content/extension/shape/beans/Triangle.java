@@ -15,29 +15,29 @@ import static com.twasyl.slideshowfx.ui.controls.validators.Validators.isInteger
  * @since SlideshowFX 2.0
  */
 public class Triangle extends AbstractShape {
-    private ExtendedTextField x;
-    private ExtendedTextField y;
-    private ExtendedTextField width;
-    private ExtendedTextField height;
+    private ExtendedTextField xField;
+    private ExtendedTextField yField;
+    private ExtendedTextField widthField;
+    private ExtendedTextField heightField;
 
     public Triangle() {
-        this.x = new ExtendedTextField("X", true, 3);
-        this.x.setValidator(isInteger());
+        this.xField = new ExtendedTextField("X", true, 3);
+        this.xField.setValidator(isInteger());
 
-        this.y = new ExtendedTextField("Y", true, 3);
-        this.y.setValidator(isInteger());
+        this.yField = new ExtendedTextField("Y", true, 3);
+        this.yField.setValidator(isInteger());
 
-        this.width = new ExtendedTextField("Width", true, 3);
-        this.width.setValidator(isInteger());
+        this.widthField = new ExtendedTextField("Width", true, 3);
+        this.widthField.setValidator(isInteger());
 
-        this.height = new ExtendedTextField("Height", true, 3);
-        this.height.setValidator(isInteger());
+        this.heightField = new ExtendedTextField("Height", true, 3);
+        this.heightField.setValidator(isInteger());
     }
 
     @Override
     public Node getUI() {
         final FlowPane container = new FlowPane(10, 10);
-        container.getChildren().addAll(this.x, this.y, this.width, this.height);
+        container.getChildren().addAll(this.xField, this.yField, this.widthField, this.heightField);
 
         final FlowPane attributes = new FlowPane(10, 10);
         attributes.getChildren().addAll(this.getCommonAttributes());
@@ -47,10 +47,10 @@ public class Triangle extends AbstractShape {
 
     @Override
     public String buildCreatingInstruction(String paper) {
-        final double width = Double.parseDouble(this.width.getText());
-        final double height = Double.parseDouble(this.height.getText());
-        final double x = Double.parseDouble(this.x.getText());
-        final double y = Double.parseDouble(this.y.getText());
+        final double width = Double.parseDouble(this.widthField.getText());
+        final double height = Double.parseDouble(this.heightField.getText());
+        final double x = Double.parseDouble(this.xField.getText());
+        final double y = Double.parseDouble(this.yField.getText());
 
         double x1 = x + (width / 2);
         double y1 = y;

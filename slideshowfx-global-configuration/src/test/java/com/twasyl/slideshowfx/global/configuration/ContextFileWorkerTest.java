@@ -180,7 +180,8 @@ public class ContextFileWorkerTest {
 
         final Node recentPresentationsNode = ContextFileWorker.getRecentPresentationsNode(document);
 
-        assertNull(recentPresentationsNode);
+        assertNotNull(recentPresentationsNode);
+        assertEquals(RECENT_PRESENTATIONS_TAG, recentPresentationsNode.getNodeName());
     }
 
     @Test

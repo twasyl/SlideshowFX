@@ -249,11 +249,6 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                                 .put(SLIDE_DYNAMIC_ATTRIBUTES, new JsonArray())
                                 .put(SLIDE_ELEMENTS, new JsonArray());
 
-                       /* if(slideTemplate.getDynamicIds() != null && slideTemplate.getDynamicIds().length > 0) {
-                            final JsonArray array = jsonObject.getJsonArray("dynamic-ids");
-                            Arrays.stream(slideTemplate.getDynamicIds())
-                                    .forEach(id -> array.addString(id));
-                        } */
 
                         if(slideTemplate.getDynamicAttributes() != null && slideTemplate.getDynamicAttributes().length > 0) {
                             final JsonArray array = jsonObject.getJsonArray(SLIDE_DYNAMIC_ATTRIBUTES);

@@ -149,14 +149,6 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                         slideTemplate.setFile(new File(templateConfiguration.getSlidesTemplateDirectory(), ((JsonObject) slideJson).getString(SLIDE_FILE)));
                         LOGGER.fine("[Slide definition] file = " + slideTemplate.getFile().getAbsolutePath());
 
-                        /* final JsonArray dynamicIdsJson = ((JsonObject) slideJson).getJsonArray("dynamic-ids");
-                        if (dynamicIdsJson != null && dynamicIdsJson.size() > 0) {
-                            slideTemplate.setDynamicIds(new String[dynamicIdsJson.size()]);
-
-                            for (int index = 0; index < dynamicIdsJson.size(); index++) {
-                                slideTemplate.getDynamicIds()[index] = dynamicIdsJson.get(index);
-                            }
-                        }*/
 
                         final JsonArray dynamicAttributesJson = ((JsonObject) slideJson).getJsonArray(SLIDE_DYNAMIC_ATTRIBUTES);
                         if (dynamicAttributesJson != null && dynamicAttributesJson.size() > 0) {

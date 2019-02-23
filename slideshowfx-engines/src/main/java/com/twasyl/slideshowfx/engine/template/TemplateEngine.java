@@ -303,7 +303,6 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
         if(file == null) throw new NullPointerException("The destination archive can not be null");
         if(!file.getName().endsWith(this.getArchiveExtension())) throw new IllegalArgumentException("The file does not have the correct extension");
 
-//         this.writeConfiguration();
         ZipUtils.zip(this.getWorkingDirectory(), file);
     }
 }

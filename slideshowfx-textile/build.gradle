@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
 }
@@ -16,38 +16,22 @@ dependencies {
     integrationTestImplementation project(':slideshowfx-plugin').sourceSets.integrationTest.output
 }
 
-ext.isPlugin = true
-ext.isMarkupPlugin = true
-ext.bundle = [
-        name            : 'SlideshowFX Textile support',
-        symbolicName    : 'com.twasyl.slideshowfx.markup.textile',
-        description     : 'Support Textile for defining slide\'s content',
-        activator       : 'com.twasyl.slideshowfx.markup.textile.activator.TextileActivator',
-        classPath       : configurations.compile.resolve().collect { artifact -> artifact.name }.join(',').concat(',.'),
-        exportPackage   : 'com.twasyl.slideshowfx.markup.textile,com.twasyl.slideshowfx.markup.textile.activator',
-        setupWizardLabel: 'Textile'
-]
+sfxPlugin {
+    markupPlugin = true
 
-jacoco {
-    toolVersion = "0.8.3"
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled false
-        csv.enabled false
-        html.enabled true
+    bundle {
+        name = 'SlideshowFX Textile support'
+        symbolicName = 'com.twasyl.slideshowfx.markup.textile'
+        description = 'Support Textile for defining slide\'s content'
+        activator = 'com.twasyl.slideshowfx.markup.textile.activator.TextileActivator'
+        classpath = configurations.compile.resolve().collect { artifact -> artifact.name }.join(',').concat(',.')
+        exportPackage = 'com.twasyl.slideshowfx.markup.textile,com.twasyl.slideshowfx.markup.textile.activator'
+        setupWizardLabel = 'Textile'
     }
 }
 
 jar {
     from(configurations.compile.resolve().collect()) {
         include '*'
-    }
-}
-
-task plop {
-    doLast {
-        println project.property("plugins.sonarqube.version")
     }
 }

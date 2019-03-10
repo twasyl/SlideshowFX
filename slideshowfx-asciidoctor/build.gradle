@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
 }
@@ -16,17 +16,19 @@ dependencies {
     integrationTestImplementation project(':slideshowfx-plugin').sourceSets.integrationTest.output
 }
 
-ext.isPlugin = true
-ext.isMarkupPlugin = true
-ext.bundle = [
-        name            : 'SlideshowFX asciidoctor support',
-        symbolicName    : 'com.twasyl.slideshowfx.markup.asciidoctor',
-        description     : 'Support asciidoctor for defining slide\'s content',
-        activator       : 'com.twasyl.slideshowfx.markup.asciidoctor.activator.AsciidoctorActivator',
-        classPath       : configurations.compile.resolve().collect { artifact -> artifact.name }.join(',').concat(',.'),
-        exportPackage   : 'com.twasyl.slideshowfx.markup.asciidoctor,com.twasyl.slideshowfx.markup.asciidoctor.activator',
-        setupWizardLabel: 'Asciidoctor'
-]
+sfxPlugin {
+    markupPlugin = true
+
+    bundle {
+        name = 'SlideshowFX asciidoctor support'
+        symbolicName = 'com.twasyl.slideshowfx.markup.asciidoctor'
+        description = 'Support asciidoctor for defining slide\'s content'
+        activator = 'com.twasyl.slideshowfx.markup.asciidoctor.activator.AsciidoctorActivator'
+        classpath = configurations.compile.resolve().collect { artifact -> artifact.name }.join(',').concat(',.')
+        exportPackage = 'com.twasyl.slideshowfx.markup.asciidoctor,com.twasyl.slideshowfx.markup.asciidoctor.activator'
+        setupWizardLabel = 'Asciidoctor'
+    }
+}
 
 jar {
     from(configurations.compile.resolve().collect()) {

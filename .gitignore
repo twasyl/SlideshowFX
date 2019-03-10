@@ -1,22 +1,22 @@
 # IntelliJ IDEA files
-out
+out/
 .idea/
 *.iml
 **/*.iml
 
 # Application stuff
-felix-cache
-plugins
-.vertx
+felix-cache/
+.vertx/
 
 # gradle files
 .gradle/
-build
+build/
 **/build/
 
 # maven files
-target
+target/
 **/target/
 
 # Error files generated when JavaFX crashes
 hs_err_*
+java_pid*

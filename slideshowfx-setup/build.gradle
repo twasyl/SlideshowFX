@@ -17,8 +17,8 @@ dependencies {
 }
 
 ext.packaging = [
-        extension: rootProject.ext.os.MAC == rootProject.getPlatform() ? ".app" : "",
-        deployOutDir: new File("${buildDir}/bundle"),
+        extension         : rootProject.ext.os.MAC == rootProject.getPlatform() ? ".app" : "",
+        deployOutDir      : new File("${buildDir}/bundle"),
         deployResourcesDir: new File("${buildDir}/tmp/bundles")
 ]
 
@@ -56,25 +56,17 @@ task prepareBundle() {
             into "${buildDir}/tmp/bundles"
         }
 
-        rootProject.subprojects.each { project ->
-            String destination
-            if (rootProject.isMarkupPlugin(project)) {
-                destination = "${buildDir}/tmp/bundles/package/plugins/markups"
-            } else if (rootProject.isSnippetExecutorPlugin(project)) {
-                destination = "${buildDir}/tmp/bundles/package/plugins/executors"
-            } else if (rootProject.isHostingConnectorPlugin(project)) {
-                destination = "${buildDir}/tmp/bundles/package/plugins/hostingConnectors"
-            } else if (rootProject.isContentExtensionPlugin(project)) {
-                destination = "${buildDir}/tmp/bundles/package/plugins/extensions"
-            }
-
-            if (destination != null) {
-                copy {
-                    from project.jar
-                    into destination
+        rootProject.subprojects.findAll { it.getPluginManager().hasPlugin('sfx-plugin') }
+                .each { plugin ->
+                    File destination = plugin.sfxPlugin.getBundlePackageDestination(project)
+             
+                    if (destination != null) {
+                        copy {
+                            from plugin.jar
+                            into destination
+                        }
+                    }
                 }
-            }
-        }
 
         project(':slideshowfx-documentation').unzipDocumentationsIn("${buildDir}/tmp/bundles/package/documentations", true)
         project(':slideshowfx-documentation').unzipDocumentationsIn("${buildDir}/bundle/bundles/documentations", true)

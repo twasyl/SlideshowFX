@@ -4,12 +4,6 @@ import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.image.controllers.ImageContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.Pane;
-
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.icons.Icon.PICTURE_ALT;
 
@@ -19,33 +13,17 @@ import static com.twasyl.slideshowfx.icons.Icon.PICTURE_ALT;
  * This extension supports HTML and Textile markup languages.
  *
  * @author Thierry Wasylczenko
- * @version 1.3
+ * @version 1.4-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class ImageContentExtension extends AbstractContentExtension<ImageContentExtensionController> {
-    private static final Logger LOGGER = Logger.getLogger(ImageContentExtension.class.getName());
 
     public ImageContentExtension() {
-        super("IMAGE", null,
+        super("IMAGE",
+                ImageContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/image/fxml/ImageContentExtension.fxml"),
+                null,
                 PICTURE_ALT,
-                "Insert an image",
-                "Insert an image");
-    }
-
-    @Override
-    public Pane getUI() {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/image/fxml/ImageContentExtension.fxml"));
-        Pane root = null;
-
-        try {
-            loader.setClassLoader(getClass().getClassLoader());
-            root = loader.load();
-            this.controller = loader.getController();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not load UI for ImageContentExtension", e);
-        }
-
-        return root;
+                "Insert an image", "Insert an image");
     }
 
     @Override

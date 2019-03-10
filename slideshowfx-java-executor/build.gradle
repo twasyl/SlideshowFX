@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
 }
@@ -14,13 +14,15 @@ dependencies {
     implementation project(':slideshowfx-utils')
 }
 
-ext.isPlugin = true
-ext.isSnippetExecutor = true
-ext.bundle = [
-        name            : 'SlideshowFX Java executor',
-        symbolicName    : 'com.twasyl.slideshowfx.snippet.executor.java',
-        description     : 'Allow to execute Java code inside a presentation',
-        activator       : 'com.twasyl.slideshowfx.snippet.executor.java.activator.JavaSnippetExecutorActivator',
-        exportPackage   : 'com.twasyl.slideshowfx.snippet.executor.java,com.twasyl.slideshowfx.snippet.executor.java.activator',
-        setupWizardLabel: 'Java'
-]
+sfxPlugin {
+    snippetExecutor = true
+
+    bundle {
+        name = 'SlideshowFX Java executor'
+        symbolicName = 'com.twasyl.slideshowfx.snippet.executor.java'
+        description = 'Allow to execute Java code inside a presentation'
+        activator = 'com.twasyl.slideshowfx.snippet.executor.java.activator.JavaSnippetExecutorActivator'
+        exportPackage = 'com.twasyl.slideshowfx.snippet.executor.java,com.twasyl.slideshowfx.snippet.executor.java.activator'
+        setupWizardLabel = 'Java'
+    }
+}

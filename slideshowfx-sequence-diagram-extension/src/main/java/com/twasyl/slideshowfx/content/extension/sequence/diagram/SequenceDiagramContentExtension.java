@@ -5,12 +5,6 @@ import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.sequence.diagram.controllers.SequenceDiagramContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.Pane;
-
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.icons.Icon.SHARE_ALT_SQUARE;
 
@@ -20,18 +14,17 @@ import static com.twasyl.slideshowfx.icons.Icon.SHARE_ALT_SQUARE;
  * {@link #buildDefaultContentString()} and {@link #buildContentString(IMarkup)}.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class SequenceDiagramContentExtension extends AbstractContentExtension<SequenceDiagramContentExtensionController> {
-    private static final Logger LOGGER = Logger.getLogger(SequenceDiagramContentExtension.class.getName());
 
     public SequenceDiagramContentExtension() {
         super("SEQUENCE_DIAGRAM",
+                SequenceDiagramContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/sequence/diagram/fxml/SequenceDiagramContentExtension.fxml"),
                 SequenceDiagramContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/sequence/diagram/resources/jumly.zip"),
                 SHARE_ALT_SQUARE,
-                "Insert a sequence diagram",
-                "Insert a sequence diagram");
+                "Insert a sequence diagram", "Insert a sequence diagram");
 
         final String baseURL = "jumly/0.2.3/";
 
@@ -39,22 +32,6 @@ public class SequenceDiagramContentExtension extends AbstractContentExtension<Se
         this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("js/jquery-2.1.0.min.js"));
         this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("js/coffee-script-1.7.1.js"));
         this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("jumly.min.js"));
-    }
-
-    @Override
-    public Pane getUI() {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/sequence/diagram/fxml/SequenceDiagramContentExtension.fxml"));
-        Pane root = null;
-
-        try {
-            loader.setClassLoader(getClass().getClassLoader());
-            root = loader.load();
-            this.controller = loader.getController();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not load UI for SequenceDiagramContentExtension", e);
-        }
-
-        return root;
     }
 
     @Override

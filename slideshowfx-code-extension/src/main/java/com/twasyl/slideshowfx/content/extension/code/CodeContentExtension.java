@@ -5,13 +5,8 @@ import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.code.controllers.CodeContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.Pane;
 
-import java.io.IOException;
 import java.util.StringJoiner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,41 +20,24 @@ import static java.util.regex.Pattern.MULTILINE;
  * This extension supports HTML and Textile markup languages.
  *
  * @author Thierry Wasylczenko
- * @version 1.3
+ * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class CodeContentExtension extends AbstractContentExtension<CodeContentExtensionController> {
-    private static final Logger LOGGER = Logger.getLogger(CodeContentExtension.class.getName());
     protected static final String LINE_NUMBERS_CSS_CLASS = "line-numbers";
 
     public CodeContentExtension() {
         super("CODE",
+                CodeContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/code/fxml/CodeContentExtension.fxml"),
                 CodeContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/code/resources/prism.zip"),
                 CODE,
-                "Insert code",
-                "Insert code");
+                "Insert code", "Insert code");
 
         final String baseURL = "prism/1.15.0/";
 
         // Add URL
         this.putResource(ResourceType.CSS_FILE, baseURL.concat("prism.css"));
         this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("prism.js"));
-    }
-
-    @Override
-    public Pane getUI() {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/code/fxml/CodeContentExtension.fxml"));
-        Pane root = null;
-
-        try {
-            loader.setClassLoader(getClass().getClassLoader());
-            root = loader.load();
-            this.controller = loader.getController();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not load UI for CodeContentExtension", e);
-        }
-
-        return root;
     }
 
     @Override

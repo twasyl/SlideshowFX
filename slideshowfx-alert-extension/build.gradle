@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
 }
@@ -17,17 +17,19 @@ dependencies {
     testCompile "org.mockito:mockito-core:${rootProject.ext.dependencies.mockito.version}"
 }
 
-ext.isPlugin = true
-ext.isContentExtension = true
-ext.bundle = [
-        name               : 'SlideshowFX alert extension',
-        symbolicName       : 'com.twasyl.slideshowfx.content.extension.alert',
-        description        : 'Support for inserting alert in slides',
-        activator          : 'com.twasyl.slideshowfx.content.extension.alert.activator.AlertContentExtensionActivator',
-        exportPackage      : 'com.twasyl.slideshowfx.content.extension.alert.controllers,com.twasyl.slideshowfx.content.extension.alert,com.twasyl.slideshowfx.content.extension.alert.activator',
-        setupWizardLabel   : 'Alert',
-        setupWizardIconName: 'EXCLAMATION_TRIANGLE'
-]
+sfxPlugin {
+    contentExtension = true
+    
+    bundle {
+        name = 'SlideshowFX alert extension'
+        symbolicName = 'com.twasyl.slideshowfx.content.extension.alert'
+        description = 'Support for inserting alert in slides'
+        activator = 'com.twasyl.slideshowfx.content.extension.alert.activator.AlertContentExtensionActivator'
+        exportPackage = 'com.twasyl.slideshowfx.content.extension.alert.controllers,com.twasyl.slideshowfx.content.extension.alert,com.twasyl.slideshowfx.content.extension.alert.activator'
+        setupWizardLabel = 'Alert'
+        setupWizardIconName = 'EXCLAMATION_TRIANGLE'
+    }
+}
 
 task createSweetAlertPackage() {
     doLast {

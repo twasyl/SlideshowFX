@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+    id 'java-gradle-plugin'
+}
+
+gradlePlugin {
+    plugins {
+        create("SlideshowFXPlugins") {
+            id = "sfx-plugin"
+            implementationClass = "com.twasyl.slideshowfx.gradle.plugins.SlideshowFXPlugin"
+        }
+    }
+}

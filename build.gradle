@@ -49,39 +49,7 @@ def getPlatformAndArchitecture() {
 }
 
 def isPlugin(Project project) {
-    return project.findProperty('isPlugin') ?: false
-}
-
-def isMarkupPlugin(Project project) {
-    if (isPlugin(project)) {
-        return project.findProperty('isMarkupPlugin') ?: false
-    } else {
-        return false
-    }
-}
-
-def isSnippetExecutorPlugin(Project project) {
-    if (isPlugin(project)) {
-        return project.findProperty('isSnippetExecutor') ?: false
-    } else {
-        return false
-    }
-}
-
-def isHostingConnectorPlugin(Project project) {
-    if (isPlugin(project)) {
-        return project.findProperty('isHostingConnector') ?: false
-    } else {
-        return false
-    }
-}
-
-def isContentExtensionPlugin(Project project) {
-    if (isPlugin(project)) {
-        return project.findProperty('isContentExtension') ?: false
-    } else {
-        return false
-    }
+    return project.getPluginManager().hasPlugin('sfx-plugin')
 }
 
 /**
@@ -166,6 +134,26 @@ subprojects {
         integrationTest {
             useJUnitPlatform()
         }
+        
+        jar {
+            manifest {
+                attributes += [
+                    'Implementation-Vendor': 'Thierry Wasylczenko'
+                ]
+            }
+        }
+    }
+    
+    def sfxPluginCallback = {
+        sfxPlugin {
+            bundle {
+                vendor = "Thierry Wasylczenko"
+            }
+        }
+
+        dependencies {
+            implementation "org.apache.felix:org.apache.felix.framework:${rootProject.ext.dependencies.felix.version}"
+        }
     }
 
     def bintrayCallback = {
@@ -201,57 +189,24 @@ subprojects {
         bintrayUpload.enabled = System.properties["${project.name}.publish"] ?: false
     }
 
-    plugins.withType(JavaPlugin, javaCallback)
-    plugins.withId('com.jfrog.bintray', bintrayCallback)
-
-    afterEvaluate { project ->
-        def isJavaProject = project.pluginManager.hasPlugin('java') || project.pluginManager.hasPlugin('java-library')
-        def isProjectPlugin = rootProject.isPlugin(project)
-
-        if (isJavaProject) {
-            Map<String, ?> manifestAttributes = ['Implementation-Vendor': 'Thierry Wasylczenko']
-
-            if (rootProject.isPlugin(project)) {
-                manifestAttributes += [
-                        'Bundle-ManifestVersion': '2',
-                        'Bundle-Name'           : project.ext.bundle.name,
-                        'Bundle-SymbolicName'   : project.ext.bundle.symbolicName,
-                        'Bundle-Version'        : stripProjectVersion(project.version),
-                        'Bundle-Description'    : project.ext.bundle.description,
-                        'Bundle-Activator'      : project.ext.bundle.activator,
-                        'Bundle-ClassPath'      : project.ext.bundle.classPath ?: '.',
-                        'Bundle-Vendor'         : 'Thierry Wasylczenko',
-                        'Export-Package'        : project.ext.bundle.exportPackage,
-                        'Setup-Wizard-Label'    : project.ext.bundle.setupWizardLabel,
-                        'Import-Package'        : 'org.osgi.framework'
-                ]
-
-                if (project.ext.bundle.containsKey('setupWizardIconName')) {
-                    manifestAttributes += ['Setup-Wizard-Icon-Name': project.ext.bundle.setupWizardIconName]
-                }
-            }
-
-            jar {
-                manifest {
-                    attributes(manifestAttributes)
-                }
-            }
+    def jacocoCallback = {
+        jacoco {
+            toolVersion = "0.8.3"
         }
 
-        if (isProjectPlugin) {
-
-            dependencies {
-                implementation "org.apache.felix:org.apache.felix.framework:${rootProject.ext.dependencies.felix.version}"
+        jacocoTestReport {
+            reports {
+                csv.enabled false
+                html.enabled true
+                xml.enabled true
             }
-
-            task installPlugin(type: Copy) {
-                from project.jar
-                into "${System.properties['user.home']}/.SlideshowFX/plugins"
-            }
-
-            installPlugin.dependsOn jar
         }
     }
+    
+    plugins.withType(JavaPlugin, javaCallback)
+    plugins.withId('sfx-plugin', sfxPluginCallback)
+    plugins.withId('com.jfrog.bintray', bintrayCallback)
+    plugins.withId('jacoco', jacocoCallback)
 }
 
 sonarqube {

@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * The base class for implementing an {@link IHostingConnector}.
  *
  *  @author Thierry Wasylczenko
- *  @version 1.1
+ *  @version 1.2-SNAPSHOT
  *  @since SlideshowFX 1.0
  */
 public abstract class AbstractHostingConnector<T extends IHostingConnectorOptions> extends AbstractPlugin<T> implements IHostingConnector<T> {
@@ -124,18 +124,14 @@ public abstract class AbstractHostingConnector<T extends IHostingConnectorOption
          * Because the default implementation of a CellFactory calls the toString() method of the value, another
          * implementation is created in order to simply display the {@link RemoteFile#getName()}.
          */
-        treeView.setCellFactory(targetTreeView -> {
-            final TreeCell<RemoteFile> cell = new TreeCell<RemoteFile>() {
-                @Override
-                protected void updateItem(RemoteFile item, boolean empty) {
-                    super.updateItem(item, empty);
+        treeView.setCellFactory(targetTreeView -> new TreeCell<RemoteFile>() {
+            @Override
+            protected void updateItem(RemoteFile item, boolean empty) {
+                super.updateItem(item, empty);
 
-                    if(!empty && item != null) setText(item.isRoot() ? "/" : item.getName());
-                    else setText(null);
-                }
-            };
-
-            return cell;
+                if(!empty && item != null) setText(item.isRoot() ? "/" : item.getName());
+                else setText(null);
+            }
         });
         treeView.setPrefSize(500, 400);
 

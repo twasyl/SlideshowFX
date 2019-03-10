@@ -4,13 +4,8 @@ import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.snippet.controllers.SnippetContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.Pane;
 
-import java.io.IOException;
 import java.util.Base64;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.content.extension.ResourceType.CSS_FILE;
 import static com.twasyl.slideshowfx.content.extension.ResourceType.JAVASCRIPT_FILE;
@@ -24,18 +19,17 @@ import static com.twasyl.slideshowfx.icons.Icon.TERMINAL;
  * {@link #buildDefaultContentString()} and {@link #buildContentString(IMarkup)}.
  *
  * @author Thierry Wasylczenko
- * @version 1.2
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class SnippetContentExtension extends AbstractContentExtension<SnippetContentExtensionController> {
-    private static final Logger LOGGER = Logger.getLogger(SnippetContentExtension.class.getName());
 
     public SnippetContentExtension() {
         super("SNIPPET",
+                SnippetContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/snippet/fxml/SnippetContentExtension.fxml"),
                 SnippetContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/snippet/resources/snippet-executor.zip"),
                 TERMINAL,
-                "Insert an executable code snippet",
-                "Insert an executable code snippet");
+                "Insert an executable code snippet", "Insert an executable code snippet");
 
         final String baseURL = "snippet-executor/";
 
@@ -43,22 +37,6 @@ public class SnippetContentExtension extends AbstractContentExtension<SnippetCon
         this.putResource(CSS_FILE, baseURL.concat("prism/1.15.0/prism.css"));
         this.putResource(JAVASCRIPT_FILE, String.format("%sfont-awesome/%s/js/%s", baseURL, getFontAwesomeVersion(), getFontAwesomeJSFilename()), getFontAwesomeJSFile());
         this.putResource(JAVASCRIPT_FILE, baseURL.concat("prism/1.15.0/prism.js"));
-    }
-
-    @Override
-    public Pane getUI() {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/snippet/fxml/SnippetContentExtension.fxml"));
-        Pane root = null;
-
-        try {
-            loader.setClassLoader(getClass().getClassLoader());
-            root = loader.load();
-            this.controller = loader.getController();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not load UI for SnippetContentExtension", e);
-        }
-
-        return root;
     }
 
     @Override

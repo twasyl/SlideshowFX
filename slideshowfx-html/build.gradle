@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
 }
@@ -14,13 +14,15 @@ dependencies {
     integrationTestImplementation project(':slideshowfx-plugin').sourceSets.integrationTest.output
 }
 
-ext.isPlugin = true
-ext.isMarkupPlugin = true
-ext.bundle = [
-        name            : 'SlideshowFX HTML support',
-        symbolicName    : 'com.twasyl.slideshowfx.markup.html',
-        description     : 'Support HTML for defining slide\'s content',
-        activator       : 'com.twasyl.slideshowfx.markup.html.activator.HtmlActivator',
-        exportPackage   : 'com.twasyl.slideshowfx.markup.html,com.twasyl.slideshowfx.markup.html.activator',
-        setupWizardLabel: 'HTML'
-]
+sfxPlugin {
+    markupPlugin = true
+
+    bundle {
+        name = 'SlideshowFX HTML support'
+        symbolicName = 'com.twasyl.slideshowfx.markup.html'
+        description = 'Support HTML for defining slide\'s content'
+        activator = 'com.twasyl.slideshowfx.markup.html.activator.HtmlActivator'
+        exportPackage = 'com.twasyl.slideshowfx.markup.html,com.twasyl.slideshowfx.markup.html.activator'
+        setupWizardLabel = 'HTML'
+    }
+}

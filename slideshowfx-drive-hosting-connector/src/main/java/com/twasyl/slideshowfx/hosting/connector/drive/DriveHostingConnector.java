@@ -108,9 +108,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
         final HBox redirectUriBox = new HBox(5, redirectUriLabel, redirectUriTextField);
         redirectUriBox.setAlignment(Pos.BASELINE_LEFT);
 
-        final VBox container = new VBox(5, consumerKeyBox, consumerSecretBox, redirectUriBox);
-
-        return container;
+        return new VBox(5, consumerKeyBox, consumerSecretBox, redirectUriBox);
     }
 
     @Override
@@ -227,6 +225,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
 
     @Override
     public void disconnect() {
+        // Nothing particular to do when disconnecting
     }
 
     @Override
@@ -255,7 +254,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
                 body = this.buildFile(folder, engine);
 
                 if (this.fileExists(engine, folder)) {
-                    final String nameWithoutExtension = engine.getArchive().getName().substring(0, engine.getArchive().getName().lastIndexOf("."));
+                    final String nameWithoutExtension = engine.getArchive().getName().substring(0, engine.getArchive().getName().lastIndexOf('.'));
                     final Calendar calendar = Calendar.getInstance();
 
                     body.setName(String.format("%1$s %2$tF %2$tT.%3$s", nameWithoutExtension, calendar, engine.getArchiveExtension()));
@@ -360,9 +359,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
         if (!(destination instanceof GoogleFile))
             throw new IllegalArgumentException("The given destination must be a GoogleFile");
 
-        boolean exists = this.getRemoteFile(engine, destination) != null;
-
-        return exists;
+        return this.getRemoteFile(engine, destination) != null;
     }
 
     @Override

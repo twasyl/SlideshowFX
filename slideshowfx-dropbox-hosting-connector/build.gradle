@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
 }
@@ -15,17 +15,19 @@ dependencies {
     api project(':slideshowfx-plugin')
 }
 
-ext.isPlugin = true
-ext.isHostingConnector = true
-ext.bundle = [
-        name            : 'SlideshowFX Dropbox hosting connector',
-        symbolicName    : 'com.twasyl.slideshowfx.hosting.connector.dropbox',
-        description     : 'Support for connecting to Dropbox',
-        activator       : 'com.twasyl.slideshowfx.hosting.connector.dropbox.activator.DropboxHostingConnectorActivator',
-        classPath       : configurations.compile.resolve().collect { artifact -> artifact.name }.join(',').concat(',.'),
-        exportPackage   : 'com.twasyl.slideshowfx.hosting.connector.dropbox,com.twasyl.slideshowfx.hosting.connector.dropbox.activator',
-        setupWizardLabel: 'Dropbox'
-]
+sfxPlugin {
+    hostingConnector = true
+
+    bundle {
+        name = 'SlideshowFX Dropbox hosting connector'
+        symbolicName = 'com.twasyl.slideshowfx.hosting.connector.dropbox'
+        description = 'Support for connecting to Dropbox'
+        activator = 'com.twasyl.slideshowfx.hosting.connector.dropbox.activator.DropboxHostingConnectorActivator'
+        classpath = configurations.compile.resolve().collect { artifact -> artifact.name }.join(',').concat(',.')
+        exportPackage = 'com.twasyl.slideshowfx.hosting.connector.dropbox,com.twasyl.slideshowfx.hosting.connector.dropbox.activator'
+        setupWizardLabel = 'Dropbox'
+    }
+}
 
 jar {
     from(configurations.compile.resolve().collect()) {

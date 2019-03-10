@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
 }
@@ -20,14 +20,16 @@ dependencies {
     testCompile "org.mockito:mockito-core:${rootProject.ext.dependencies.mockito.version}"
 }
 
-ext.isPlugin = true
-ext.isContentExtension = true
-ext.bundle = [
-        name               : 'SlideshowFX link extension',
-        symbolicName       : 'com.twasyl.slideshowfx.content.extension.link',
-        description        : 'Support for inserting links in slides',
-        activator          : 'com.twasyl.slideshowfx.content.extension.link.activator.LinkContentExtensionActivator',
-        exportPackage      : 'com.twasyl.slideshowfx.content.extension.link.controllers,com.twasyl.slideshowfx.content.extension.link,com.twasyl.slideshowfx.content.extension.link.activator',
-        setupWizardLabel   : 'Link',
-        setupWizardIconName: 'LINK'
-]
+sfxPlugin {
+    contentExtension = true
+
+    bundle {
+        name = 'SlideshowFX link extension'
+        symbolicName = 'com.twasyl.slideshowfx.content.extension.link'
+        description = 'Support for inserting links in slides'
+        activator = 'com.twasyl.slideshowfx.content.extension.link.activator.LinkContentExtensionActivator'
+        exportPackage = 'com.twasyl.slideshowfx.content.extension.link.controllers,com.twasyl.slideshowfx.content.extension.link,com.twasyl.slideshowfx.content.extension.link.activator'
+        setupWizardLabel = 'Link'
+        setupWizardIconName = 'LINK'
+    }
+}

@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
 }
@@ -14,13 +14,15 @@ dependencies {
     implementation project(':slideshowfx-utils')
 }
 
-ext.isPlugin = true
-ext.isSnippetExecutor = true
-ext.bundle = [
-        name            : 'SlideshowFX Go executor',
-        symbolicName    : 'com.twasyl.slideshowfx.snippet.executor.go',
-        description     : 'Allow to execute Go code inside a presentation',
-        activator       : 'com.twasyl.slideshowfx.snippet.executor.go.activator.GoSnippetExecutorActivator',
-        exportPackage   : 'com.twasyl.slideshowfx.snippet.executor.go,com.twasyl.slideshowfx.snippet.executor.go.activator',
-        setupWizardLabel: 'Go'
-]
+sfxPlugin {
+    snippetExecutor = true
+    
+    bundle {
+        name = 'SlideshowFX Go executor'
+        symbolicName = 'com.twasyl.slideshowfx.snippet.executor.go'
+        description = 'Allow to execute Go code inside a presentation'
+        activator = 'com.twasyl.slideshowfx.snippet.executor.go.activator.GoSnippetExecutorActivator'
+        exportPackage = 'com.twasyl.slideshowfx.snippet.executor.go,com.twasyl.slideshowfx.snippet.executor.go.activator'
+        setupWizardLabel = 'Go'
+    }
+}

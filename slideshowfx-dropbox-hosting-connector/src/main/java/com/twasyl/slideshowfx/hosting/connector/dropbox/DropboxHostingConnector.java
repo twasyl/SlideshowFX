@@ -13,27 +13,15 @@ import javafx.concurrent.Worker;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +35,7 @@ import static com.twasyl.slideshowfx.engine.presentation.PresentationEngine.DEFA
  * This connector allows to interact with Dropbox.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class DropboxHostingConnector extends AbstractHostingConnector<BasicHostingConnectorOptions> {
@@ -120,9 +108,7 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
         final HBox redirectUriBox = new HBox(5, redirectUriLabel, redirectUriTextField);
         redirectUriBox.setAlignment(Pos.BASELINE_LEFT);
 
-        final VBox container = new VBox(5, consumerKeyBox, consumerSecretBox, redirectUriBox);
-
-        return container;
+        return new VBox(5, consumerKeyBox, consumerSecretBox, redirectUriBox);
     }
 
     @Override
@@ -226,6 +212,7 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
 
     @Override
     public void disconnect() {
+        // Nothing particular to do when disconnecting
     }
 
     @Override
@@ -363,9 +350,7 @@ public class DropboxHostingConnector extends AbstractHostingConnector<BasicHosti
         if (engine.getArchive() == null) throw new NullPointerException("The archive file can not be null");
         if (destination == null) throw new NullPointerException("The destination can not be null");
 
-        boolean exist = this.getRemoteFile(engine, destination) != null;
-
-        return exist;
+        return this.getRemoteFile(engine, destination) != null;
     }
 
     @Override

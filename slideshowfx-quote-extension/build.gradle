@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
 }
@@ -15,14 +15,16 @@ dependencies {
     api project(':slideshowfx-ui-controls')
 }
 
-ext.isPlugin = true
-ext.isContentExtension = true
-ext.bundle = [
-        name               : 'SlideshowFX quote extension',
-        symbolicName       : 'com.twasyl.slideshowfx.content.extension.quote',
-        description        : 'Support for inserting quote in slides',
-        activator          : 'com.twasyl.slideshowfx.content.extension.quote.activator.QuoteContentExtensionActivator',
-        exportPackage      : 'com.twasyl.slideshowfx.content.extension.quote.controllers,com.twasyl.slideshowfx.content.extension.quote,com.twasyl.slideshowfx.content.extension.quote.activator',
-        setupWizardLabel   : 'Quote',
-        setupWizardIconName: 'QUOTE_LEFT'
-]
+sfxPlugin {
+    contentExtension = true
+
+    bundle {
+        name = 'SlideshowFX quote extension'
+        symbolicName = 'com.twasyl.slideshowfx.content.extension.quote'
+        description = 'Support for inserting quote in slides'
+        activator = 'com.twasyl.slideshowfx.content.extension.quote.activator.QuoteContentExtensionActivator'
+        exportPackage = 'com.twasyl.slideshowfx.content.extension.quote.controllers,com.twasyl.slideshowfx.content.extension.quote,com.twasyl.slideshowfx.content.extension.quote.activator'
+        setupWizardLabel = 'Quote'
+        setupWizardIconName = 'QUOTE_LEFT'
+    }
+}

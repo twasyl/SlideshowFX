@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
 }
@@ -14,13 +14,15 @@ dependencies {
     implementation project(':slideshowfx-utils')
 }
 
-ext.isPlugin = true
-ext.isSnippetExecutor = true
-ext.bundle = [
-        name            : 'SlideshowFX Scala executor',
-        symbolicName    : 'com.twasyl.slideshowfx.snippet.executor.scala',
-        description     : 'Allow to execute Scala code inside a presentation',
-        activator       : 'com.twasyl.slideshowfx.snippet.executor.scala.activator.ScalaSnippetExecutorActivator',
-        exportPackage   : 'com.twasyl.slideshowfx.snippet.executor.scala,com.twasyl.slideshowfx.snippet.executor.scala.activator',
-        setupWizardLabel: 'Scala'
-]
+sfxPlugin {
+    snippetExecutor = true
+
+    bundle {
+        name = 'SlideshowFX Scala executor'
+        symbolicName = 'com.twasyl.slideshowfx.snippet.executor.scala'
+        description = 'Allow to execute Scala code inside a presentation'
+        activator = 'com.twasyl.slideshowfx.snippet.executor.scala.activator.ScalaSnippetExecutorActivator'
+        exportPackage = 'com.twasyl.slideshowfx.snippet.executor.scala,com.twasyl.slideshowfx.snippet.executor.scala.activator'
+        setupWizardLabel = 'Scala'
+    }
+}

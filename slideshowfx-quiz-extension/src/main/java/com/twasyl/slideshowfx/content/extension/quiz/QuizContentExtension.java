@@ -5,15 +5,9 @@ import com.twasyl.slideshowfx.content.extension.quiz.controllers.QuizContentExte
 import com.twasyl.slideshowfx.markup.IMarkup;
 import com.twasyl.slideshowfx.server.beans.quiz.Quiz;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.Pane;
 
-import java.io.IOException;
 import java.util.Base64;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import static com.twasyl.slideshowfx.content.extension.ResourceType.CSS_FILE;
 import static com.twasyl.slideshowfx.content.extension.ResourceType.JAVASCRIPT_FILE;
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 import static com.twasyl.slideshowfx.icons.FontAwesome.*;
@@ -26,36 +20,20 @@ import static com.twasyl.slideshowfx.icons.Icon.QUESTION;
  * This extension supports HTML markup language.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class QuizContentExtension extends AbstractContentExtension<QuizContentExtensionController> {
-    private static final Logger LOGGER = Logger.getLogger(QuizContentExtension.class.getName());
 
     public QuizContentExtension() {
-        super("QUIZ", null,
+        super("QUIZ",
+                QuizContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/quiz/fxml/QuizContentExtension.fxml"),
+                null,
                 QUESTION,
-                "Insert a quiz",
-                "Insert a quiz");
+                "Insert a quiz", "Insert a quiz");
 
         // Add URL
         this.putResource(JAVASCRIPT_FILE, String.format("quiz/font-awesome/%s/js/%s", getFontAwesomeVersion(), getFontAwesomeJSFilename()), getFontAwesomeJSFile());
-    }
-
-    @Override
-    public Pane getUI() {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/quiz/fxml/QuizContentExtension.fxml"));
-        Pane root = null;
-
-        try {
-            loader.setClassLoader(getClass().getClassLoader());
-            root = loader.load();
-            this.controller = loader.getController();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not load UI for QuizContentExtension", e);
-        }
-
-        return root;
     }
 
     @Override
@@ -80,9 +58,7 @@ public class QuizContentExtension extends AbstractContentExtension<QuizContentEx
                 .append(quiz.getQuestion().getText()).append("\n\t</span>\n");
         builder.append("\t<ul>");
 
-        quiz.getAnswers().forEach(answer -> {
-            builder.append("\n\t\t<li>").append(answer.getText()).append("</li>");
-        });
+        quiz.getAnswers().forEach(answer -> builder.append("\n\t\t<li>").append(answer.getText()).append("</li>"));
 
         builder.append("\n\t</ul>\n</div>");
 

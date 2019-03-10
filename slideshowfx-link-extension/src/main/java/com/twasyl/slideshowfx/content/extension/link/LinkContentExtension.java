@@ -4,12 +4,6 @@ import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.link.controllers.LinkContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.Pane;
-
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.icons.Icon.LINK;
 
@@ -20,33 +14,17 @@ import static com.twasyl.slideshowfx.icons.Icon.LINK;
  * This extension supports HTML and Textile markup languages.
  *
  * @author Thierry Wasylczenko
- * @version 1.2
+ * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class LinkContentExtension extends AbstractContentExtension<LinkContentExtensionController> {
-    private static final Logger LOGGER = Logger.getLogger(LinkContentExtension.class.getName());
 
     public LinkContentExtension() {
-        super("LINK", null,
+        super("LINK",
+                LinkContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/link/fxml/LinkContentExtension.fxml"),
+                null,
                 LINK,
-                "Insert a link",
-                "Insert a link");
-    }
-
-    @Override
-    public Pane getUI() {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/link/fxml/LinkContentExtension.fxml"));
-        Pane root = null;
-
-        try {
-            loader.setClassLoader(getClass().getClassLoader());
-            root = loader.load();
-            this.controller = loader.getController();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not load UI for LinkContentExtension", e);
-        }
-
-        return root;
+                "Insert a link", "Insert a link");
     }
 
     @Override

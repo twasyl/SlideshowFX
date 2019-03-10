@@ -3,6 +3,8 @@ package com.twasyl.slideshowfx.content.extension;
 import com.twasyl.slideshowfx.icons.Icon;
 import com.twasyl.slideshowfx.plugin.AbstractPlugin;
 import com.twasyl.slideshowfx.utils.ZipUtils;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.Pane;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,12 +17,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.content.extension.ResourceLocation.EXTERNAL;
+import static java.util.logging.Level.SEVERE;
 
 /**
  * This class defines the basic behavior of a content extension.
  *
  * @author Thierry Wasylczenko
- * @version 1.2
+ * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public abstract class AbstractContentExtension<T extends AbstractContentExtensionController> extends AbstractPlugin implements IContentExtension<T> {
@@ -32,12 +35,14 @@ public abstract class AbstractContentExtension<T extends AbstractContentExtensio
     protected final String title;
     protected final URL resourcesArchive;
     protected Set<Resource> resources = new LinkedHashSet<>();
+    protected URL fxmlURL;
     protected T controller;
 
     /**
      * Creates a new instance of the content extension.
      *
      * @param code             The code of the content extension. Can not be null or empty.
+     * @param fxmlURL
      * @param resourcesArchive The archive that contains all resources that will be extracted for the presentation.
      * @param icon             The icon for this content extension that will be used in the SlideshowFX's UI.
      * @param toolTip          The tooltip for this content extension that will be used in the SlideshowFX's UI.
@@ -45,14 +50,16 @@ public abstract class AbstractContentExtension<T extends AbstractContentExtensio
      * @throws NullPointerException     If the code is null.
      * @throws IllegalArgumentException If the code is empty.
      */
-    protected AbstractContentExtension(String code, URL resourcesArchive, Icon icon, String toolTip, String title) {
+    protected AbstractContentExtension(String code, URL fxmlURL, URL resourcesArchive, Icon icon, String toolTip, String title) {
         super(code);
 
         if (code == null) throw new NullPointerException("The code of the content extension is null");
-        if (code.trim().isEmpty())
-            throw new IllegalArgumentException("The code of the content extension can not be empty");
 
         this.code = code.trim();
+        if (this.code.isEmpty())
+            throw new IllegalArgumentException("The code of the content extension can not be empty");
+
+        this.fxmlURL = fxmlURL;
         this.resourcesArchive = resourcesArchive;
         this.icon = icon;
         this.toolTip = toolTip;
@@ -114,17 +121,15 @@ public abstract class AbstractContentExtension<T extends AbstractContentExtensio
         if (directory == null)
             throw new NullPointerException("The directory where to extract the resources can not be null");
 
-        if (!directory.exists()) {
-            if (!directory.mkdir()) {
-                LOGGER.log(Level.SEVERE, "Can not create the directory where the resources must be extracted");
-            }
+        if (!directory.exists() && !directory.mkdir()) {
+            LOGGER.log(SEVERE, "Can not create the directory where the resources must be extracted");
         }
 
         if (this.getResourcesArchive() != null && this.getResourcesArchive().getFile() != null) {
             try {
                 ZipUtils.unzip(this.getClass().getResourceAsStream(this.getResourcesArchive().getFile()), directory);
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Can not extract the resources", e);
+                LOGGER.log(SEVERE, "Can not extract the resources", e);
             }
         }
 
@@ -151,7 +156,7 @@ public abstract class AbstractContentExtension<T extends AbstractContentExtensio
 
                             output.flush();
                         } catch (IOException e) {
-                            LOGGER.log(Level.SEVERE, "Can't extract external resource: " + resourceFile.getAbsolutePath(), e);
+                            LOGGER.log(SEVERE, "Can't extract external resource: " + resourceFile.getAbsolutePath(), e);
                         }
                     } else {
                         LOGGER.severe("The destination directory for the external doesn't exist or can't be created: " + destinationDirectory.getAbsolutePath());
@@ -182,5 +187,21 @@ public abstract class AbstractContentExtension<T extends AbstractContentExtensio
                     + " is null. The getUI() method may not have been called or didn't initialize the controller");
         }
         return this.controller;
+    }
+
+    @Override
+    public Pane getUI() {
+        FXMLLoader loader = new FXMLLoader(this.fxmlURL);
+        Pane root = null;
+
+        try {
+            loader.setClassLoader(getClass().getClassLoader());
+            root = loader.load();
+            this.controller = loader.getController();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Can not load UI for " + getClass().getSimpleName(), e);
+        }
+
+        return root;
     }
 }

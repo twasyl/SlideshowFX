@@ -32,7 +32,7 @@ import static com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnect
  * This connector allows to interact with Box.
  *
  * @author Thierry Wasylczenko
- * @version 1.2
+ * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.1
  */
 public class BoxHostingConnector extends AbstractHostingConnector<BasicHostingConnectorOptions> {
@@ -118,9 +118,7 @@ public class BoxHostingConnector extends AbstractHostingConnector<BasicHostingCo
         final HBox redirectUriBox = new HBox(5, redirectUriLabel, redirectUriTextField);
         redirectUriBox.setAlignment(Pos.BASELINE_LEFT);
 
-        final VBox container = new VBox(5, consumerKeyBox, consumerSecretBox, redirectUriBox);
-
-        return container;
+        return new VBox(5, consumerKeyBox, consumerSecretBox, redirectUriBox);
     }
 
     @Override
@@ -226,6 +224,7 @@ public class BoxHostingConnector extends AbstractHostingConnector<BasicHostingCo
 
     @Override
     public void disconnect() {
+        // Nothing particular to do when disconnecting
     }
 
     @Override
@@ -248,7 +247,7 @@ public class BoxHostingConnector extends AbstractHostingConnector<BasicHostingCo
 
                 parameters.setName(engine.getArchive().getName());
             } else if (!overwrite && fileAlreadyExists) {
-                final String nameWithoutExtension = engine.getArchive().getName().substring(0, engine.getArchive().getName().lastIndexOf("."));
+                final String nameWithoutExtension = engine.getArchive().getName().substring(0, engine.getArchive().getName().lastIndexOf('.'));
                 final Calendar calendar = Calendar.getInstance();
 
                 parameters.setName(String.format("%1$s %2$tF %2$tT.%3$s", nameWithoutExtension, calendar, engine.getArchiveExtension()));
@@ -328,9 +327,7 @@ public class BoxHostingConnector extends AbstractHostingConnector<BasicHostingCo
         if (!(destination instanceof BoxFile))
             throw new IllegalArgumentException("The given destination must be a BoxFile");
 
-        boolean exist = getRemoteFile(engine, destination) != null;
-
-        return exist;
+        return getRemoteFile(engine, destination) != null;
     }
 
     /**
@@ -399,9 +396,9 @@ public class BoxHostingConnector extends AbstractHostingConnector<BasicHostingCo
 
         if (includeFolders && includePresentations) {
             canBeListed = isFolder(child) || (isFile(child) && isNameEndingWithSuffix(child, DEFAULT_DOTTED_ARCHIVE_EXTENSION));
-        } else if (includeFolders && !includePresentations) {
+        } else if (includeFolders) {
             canBeListed = isFolder(child);
-        } else if (!includeFolders && includePresentations) {
+        } else if (includePresentations) {
             canBeListed = isFolder(child) && isNameEndingWithSuffix(child, DEFAULT_DOTTED_ARCHIVE_EXTENSION);
         }
 

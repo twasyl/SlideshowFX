@@ -1,3 +1,7 @@
+function getNoQuizActiveHTML() {
+    return '<span id="no-quiz-container" class="width-to-container fa-stack fa-2x"><i class="fas fa-question fa-stack-1x fa-fw"></i><i class="fas fa-ban fa-stack-2x fa-fw"></i></span>';
+}
+
 function requestCurrentQuiz() {
     var request = "{ \"service\" : \"slideshowfx.quiz.current\", \"data\" : {} }";
     socket.send(request);
@@ -5,21 +9,19 @@ function requestCurrentQuiz() {
 
 function manageGetCurrentQuiz(data) {
 
-    var quizDiv = document.getElementById("quiz-container");
-
-    if(undefined != data) {
+    if (undefined != data) {
 
         var answerType = data.correctAnswers > 1 ? "checkbox" : "radio";
         var quizElement = "<div id=\"" + data.id + "\">";
         quizElement += "<p><strong>Question :</strong> <span class=\"quiz-question\">" + data.question.text + "</span></p>";
 
-        for(var answerJson in data.answers) {
+        for (var answerJson in data.answers) {
             answerJson = data.answers[answerJson];
             quizElement += "<input type=\"" + answerType + "\" value=\"" + answerJson.id + "\" name=\"answers\" class=\"quiz-answer\">" + answerJson.text + "</input><br />";
         }
 
         var cookieQuizAnswered = getCookie('quiz-' + data.id);
-        if(cookieQuizAnswered === "" && cookieQuizAnswered != 'answered') {
+        if (cookieQuizAnswered === "" && cookieQuizAnswered !== 'answered') {
             quizElement += "<button id=\"answer-quiz-button\" onclick=\"sendQuizAnswer();\" class=\"custom-button width-to-container\">Answer !</button>";
         } else {
             quizElement += "<button class=\"custom-button width-to-container\" onclick=\"javascript:alert('Do not try to cheat :)');\">You have already answered this quiz !</button>";
@@ -27,6 +29,7 @@ function manageGetCurrentQuiz(data) {
 
         quizElement += "</div>";
 
+        var quizDiv = document.getElementById("quiz-container");
         quizDiv.innerHTML = quizElement;
     }
 }
@@ -38,8 +41,8 @@ function sendQuizAnswer() {
     var json = '{ \"quizId\" : ' + quizId + ', \"answers\": [';
     var answersId = [];
 
-    for(var buttonIndex in answers) {
-        if(answers[buttonIndex].checked) {
+    for (var buttonIndex in answers) {
+        if (answers[buttonIndex].checked) {
             answersId[answersId.length] = Number(answers[buttonIndex].value);
         }
     }
@@ -51,9 +54,9 @@ function sendQuizAnswer() {
     var request = new XMLHttpRequest();
     request.onreadystatechange = function() {
         // The request is finished
-        if(request.readyState == 4) {
+        if (request.readyState == 4) {
             var quizDiv = document.getElementById('quiz-container');
-            if(request.status == 200) {
+            if (request.status == 200) {
                 quizDiv.innerHTML = 'Thank you for your participation';
 
                 // Add a cookie that indicates if the quiz has been answered
@@ -76,8 +79,5 @@ function manageQuizStarted(data) {
 
 function manageQuizStopped(data) {
     var quizDiv = document.getElementById("quiz-container");
-
-    if(undefined != data) {
-        quizDiv.innerHTML = data.message;
-    }
+    quizDiv.innerHTML = getNoQuizActiveHTML();
 }

@@ -1,8 +1,8 @@
 function quiz(src, encodedQuiz) {
-    if(sfxServer) {
+    if (sfxServer) {
         var quizIsStopped = src.className === 'start-quiz';
 
-        if(quizIsStopped) {
+        if (quizIsStopped) {
             var sibling = src.parentElement.querySelector("span.stop-quiz");
             var data = '{ "service" : "slideshowfx.quiz.start", "data" : { "encoded-quiz" : "' + encodedQuiz + '" } }';
             sfxServer.callService(data);

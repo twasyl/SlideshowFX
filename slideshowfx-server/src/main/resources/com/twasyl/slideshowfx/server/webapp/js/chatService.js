@@ -6,31 +6,33 @@ function requestChatHistory() {
  * data represents the JSON object corresponding to the chat message.
  */
  function manageNewChatMessage(data) {
-    var messagesDiv = document.getElementById("chat-messages");
+    var messagesContainer = document.getElementById("chat-messages");
 
-    var htmlMessage = "<div class=\"chat-message\" id=\"" + data.id + "\">"
-                + "<div id=\"" + data.id + "-check\" style=\"display: none; margin-right: 5px;\">"
-                + "<i class=\"far fa-check-circle fw\" style=\"color: green\"></i></div>"
+    var htmlMessage = "<li class=\"chat-message\" id=\"" + data.id + "\">"
+                + "<span id=\"" + data.id + "-check\" style=\"display: none; margin-right: 5px;\">"
+                + "<i class=\"far fa-check-circle fw\" style=\"color: green\"></i></span>"
                 + "<span class=\"author\">";
 
-    if( data.author == getAttendeeNameFromCookie()) {
-        htmlMessage += "I say";
+    if (data.author === getAttendeeNameFromCookie()) {
+        htmlMessage += "I";
     } else {
-        htmlMessage += data.author + " said";
+        htmlMessage += data.author;
     }
 
-    htmlMessage = htmlMessage + " :" + "</span><br />"
-                + "<span class=\"message-content\">" + decodeURIComponent(escape(window.atob(data.content))) + "</span></div>";
+    htmlMessage = htmlMessage + " said:" + "</span><br />"
+                + "<span class=\"message-content\">" + decodeURIComponent(escape(window.atob(data.content))) + "</span></li>";
 
-    messagesDiv.innerHTML = messagesDiv.innerHTML + htmlMessage;
+    messagesContainer.innerHTML = messagesContainer.innerHTML + htmlMessage;
 
-    if("answered" == data.status) {
+    if ("answered" === data.status) {
         htmlMessage = document.getElementById(data.id);
         htmlMessage.className += "  question-answered";
 
         var imageDiv = document.getElementById(data.id + "-check");
         imageDiv.style.display = "inline";
     }
+
+    scrollChatMessagesToBottom();
  }
 
 /*
@@ -39,7 +41,7 @@ function requestChatHistory() {
  function manageUpdateChatMessage(data) {
     var htmlMessage = document.getElementById(data.id);
 
-    if("answered" == data.status) {
+    if ("answered" == data.status) {
         htmlMessage.className += " question-answered";
 
         var imageDiv = document.getElementById(data.id + "-check");
@@ -50,12 +52,12 @@ function requestChatHistory() {
  function sendChatMessage() {
      var attendeeMessage = document.getElementById("attendee-message-textarea").value;
 
-     if(attendeeMessage === "") {
+     if (attendeeMessage === "") {
          alert("Enter a message");
      } else {
          var attendeeName = getAttendeeNameFromCookie();
 
-         if(attendeeName === "") {
+         if (attendeeName === "") {
              attendeeName = "somebody";
          }
 
@@ -69,7 +71,7 @@ function requestChatHistory() {
  }
 
  function displayChatHistory(data) {
-    for(index in data) {
+    for (index in data) {
         manageNewChatMessage(data[index]);
     }
  }

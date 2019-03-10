@@ -42,9 +42,14 @@
                     document.getElementById("connection-form").className = "hide";
                     document.getElementById("menu").className = "show";
                     document.getElementById("chat-container").className = "show";
+                    scrollChatMessagesToBottom();
                     document.getElementById("chat-container-menu-entry").className += " active";
                     document.getElementById("quiz-container").className = "hide";
                 }
+            }
+
+            function scrollChatMessagesToBottom() {
+                window.scrollTo(0, document.getElementById("chat-messages").scrollHeight);
             }
 
             function connectUser() {
@@ -70,6 +75,10 @@
                         var icon = document.getElementById(source + '-menu-entry');
                         if(icon !== null) {
                             icon.className = activeClassName;
+                        }
+
+                        if (source === 'chat-container') {
+                            scrollChatMessagesToBottom();
                         }
                     } else {
                         containers[index].className = "hide";
@@ -123,8 +132,7 @@
                     document.getElementById("send-form").style.display = "none";
 
                     var quizDiv = document.getElementById("quiz-container");
-
-                    quizDiv.innerHTML = "No quiz currently active";
+                    quizDiv.innerHTML = getNoQuizActiveHTML();
                 };
 
                 socket.onmessage = function(event) {
@@ -149,7 +157,7 @@
     </head>
     <body>
         <div id="page">
-            <div id="header" class="header-background">
+            <div id="header">
                 <div><img src="/slideshowfx/images/logo.svg" height="64" /></div>
                 <div id="menu" class="hide">
                     <span id="chat-container-menu-entry" onclick="javascript:displayContent('chat-container');"><i class="far fa-comments fa-2x fa-fw"></i></span>
@@ -165,12 +173,15 @@
                 </section>
 
                 <section id="chat-container" class="hide">
-                    <div id="chat-messages"></div>
-                    <div id="send-form">
-                        <p>
-                            <textarea id="attendee-message-textarea" class="width-to-container" rows="5" placeholder="Message"></textarea><br />
-                            <button onclick="javascript:sendChatMessage();" id="send-message-button" class="custom-button width-to-container">Send</button>
-                        </p>
+                    <div id="chat-layout">
+                        <ol id="chat-messages">
+                        </ol>
+                        <div id="send-form">
+                            <p>
+                                <textarea id="attendee-message-textarea" class="width-to-container" rows="5" placeholder="Message"></textarea><br />
+                                <button onclick="javascript:sendChatMessage();" id="send-message-button" class="custom-button width-to-container">Send</button>
+                            </p>
+                        </div>
                     </div>
                 </section>
 

@@ -39,7 +39,7 @@ public class QuizService extends AbstractSlideshowFXService {
 
     public static final String SERVICE_QUIZ_ON_RESULT = "service.quiz.onResult";
 
-    private final String url = "/slideshowfx/quiz";
+    private static final String URL = "/slideshowfx/quiz";
     private Quiz currentQuiz = null;
 
     /**
@@ -54,15 +54,15 @@ public class QuizService extends AbstractSlideshowFXService {
         this.updatedRouteMatcher();
 
         this.register(SERVICE_QUIZ_START, this.buildStartQuizHandler())
-            .register(SERVICE_QUIZ_STOP, this.buildStopQuizHandler())
-            .register(SERVICE_QUIZ_CURRENT, buildGetCurrentQuizHandler());
+                .register(SERVICE_QUIZ_STOP, this.buildStopQuizHandler())
+                .register(SERVICE_QUIZ_CURRENT, buildGetCurrentQuizHandler());
     }
 
     private void updatedRouteMatcher() {
         final Router router = SlideshowFXServer.getSingleton().getRouter();
 
         // URL for answering a quiz
-        router.post(this.url.concat("/:quizid/answer")).handler(routingContext -> {
+        router.post(URL.concat("/:quizid/answer")).handler(routingContext -> {
             int statusCode = 500;
 
             try {
@@ -125,21 +125,22 @@ public class QuizService extends AbstractSlideshowFXService {
 
     /**
      * Build a handler that will start the quiz.
+     *
      * @return The handler for starting a quiz.
      */
     private Handler<Message<JsonObject>> buildStartQuizHandler() {
-        final Handler<Message<JsonObject>> handler = message -> {
+        return message -> {
             final JsonObject object = message.body();
             final String quizString = new String(Base64.getDecoder().decode(object.getString("encoded-quiz")));
 
-            QuizService.this.currentQuiz = Quiz.build(quizString);
+            this.currentQuiz = Quiz.build(quizString);
 
             // Add the Quiz to the results. If the Quiz already exists, it won't be erased
-            if (!QuizService.this.results.containsKey(QuizService.this.currentQuiz.getId())) {
+            if (!this.results.containsKey(this.currentQuiz.getId())) {
                 final QuizResult quizResult = new QuizResult();
-                quizResult.setQuiz(QuizService.this.currentQuiz);
+                quizResult.setQuiz(this.currentQuiz);
 
-                QuizService.this.results.put(QuizService.this.currentQuiz.getId(), quizResult);
+                this.results.put(this.currentQuiz.getId(), quizResult);
             }
 
             final JsonObject encodedQuiz = new JsonObject()
@@ -147,23 +148,20 @@ public class QuizService extends AbstractSlideshowFXService {
             final JsonObject reply = this.buildResponse(SERVICE_QUIZ_START, RESPONSE_CODE_QUIZ_STARTED, encodedQuiz);
             this.sendResponseToWebSocketClients(reply);
 
-            EventBus.getInstance().broadcast(SERVICE_QUIZ_ON_RESULT, QuizService.this.results.get(QuizService.this.currentQuiz.getId()));
+            EventBus.getInstance().broadcast(SERVICE_QUIZ_ON_RESULT, this.results.get(this.currentQuiz.getId()));
 
             message.reply(reply);
         };
-
-        return handler;
     }
 
     private Handler<Message<JsonObject>> buildStopQuizHandler() {
-        final Handler<Message<JsonObject>> handler = message -> {
+        return message -> {
             final JsonObject object = message.body();
             final Long quizId = object.getLong("id");
 
             // Ensure the ID is equal to the current quiz
-            if(this.currentQuiz != null && this.currentQuiz.getId() == quizId) {
+            if (this.currentQuiz != null && this.currentQuiz.getId() == quizId) {
                 this.currentQuiz = null;
-
 
                 final JsonObject reply = this.buildResponse(SERVICE_QUIZ_STOP, RESPONSE_CODE_QUIZ_STOPPED, "The quiz has been stopped");
                 this.sendResponseToWebSocketClients(reply);
@@ -171,19 +169,15 @@ public class QuizService extends AbstractSlideshowFXService {
 
             message.reply(this.buildResponse(SERVICE_QUIZ_STOP, RESPONSE_CODE_QUIZ_STOPPED, "Quiz stopped"));
         };
-
-        return handler;
     }
 
     private Handler<Message<JsonObject>> buildGetCurrentQuizHandler() {
-        final Handler<Message<JsonObject>> handler = message -> {
-            if(this.currentQuiz != null) {
+        return message -> {
+            if (this.currentQuiz != null) {
                 message.reply(this.buildResponse(SERVICE_QUIZ_CURRENT, RESPONSE_CODE_QUIZ_RETRIEVED, this.currentQuiz.toJSON()));
             } else {
                 message.reply(this.buildResponse(SERVICE_QUIZ_CURRENT, RESPONSE_CODE_QUIZ_NOT_ACTIVE, "No quiz active"));
             }
         };
-
-        return handler;
     }
 }

@@ -27,27 +27,21 @@ body {
 #page {
     width: 700px;
     margin: auto;
-    display: flex;
-    flex-direction: column;
 }
 
 /* HEADER STYLE */
 #header {
-    background: whitesmoke;
-    color: gray;
-    width: 100%;
+    position: fixed;
+    width: 700px;
     height: 64px;
     margin: 0;
-    padding: 0px;
+    padding: 0;
+    top: 0;
+    background: whitesmoke;
+    color: gray;
     overflow: hidden;
     display: flex;
 }
-
-/* #header div:first-child {
-    float: left;
-    padding: 10 px;
-    margin-left: 5px;
-} */
 
 /* MENU STYLE */
 #menu {
@@ -79,6 +73,7 @@ body {
     background-color: white;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
+    margin-top: 70px;
 }
 
 /* CONNECTION FORM STYLE */
@@ -120,13 +115,18 @@ body {
 }
 
 /* CHAT STYLE */
-#chat-messages {
-    margin-bottom: 5px;
-    overflow-y: auto;
-    height: 200px;
+#chat-layout {
+    display: flex;
+    flex-direction: column;
 }
 
-#send-message-button { margin-top: 10px; }
+#chat-messages {
+    margin-bottom: 160px;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+    flex-grow: 1;
+}
 
 .chat-message {
     background-color: #EFEFEF;
@@ -145,13 +145,23 @@ body {
     text-align: center;
 }
 
+#send-form {
+    position: fixed;
+    width: 700px;
+    height: 150px;
+    bottom: 0;
+    background-color: white;
+}
+
+#send-message-button { margin-top: 10px; }
+
 /* QUIZ STYLE */
 #no-quiz-container {
     display: flex;
     justify-content: center;
 }
 
-#no-quiz-container .fa-question{
+#no-quiz-container .fa-question {
     color: gray;
 }
 
@@ -178,15 +188,18 @@ screen and (-webkit-min-device-pixel-ratio: 3.0) {
 
     #page {
         width: 100%;
-        margin: auto;
     }
 
     #header { width: 100%; }
 
     #content {
         width: 95%;
-        margin: auto;
+        margin: 70px auto 0 auto;
         border: 0px;
         border-radius: 0;
+    }
+
+    #send-form {
+        width: 95%;
     }
 }

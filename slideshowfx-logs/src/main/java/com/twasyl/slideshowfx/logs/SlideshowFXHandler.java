@@ -4,10 +4,13 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.logging.Level;
+import java.io.UnsupportedEncodingException;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.logging.Level.WARNING;
 
 /**
  * An implementation of the {@link StreamHandler} class that allows to store the logs into a {@link ByteArrayOutputStream}
@@ -21,25 +24,22 @@ import java.util.logging.StreamHandler;
 public class SlideshowFXHandler extends StreamHandler {
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXHandler.class.getName());
 
-    protected static volatile SlideshowFXHandler singleton = null;
-
     protected final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     protected String latestLog;
-    protected volatile ByteArrayOutputStream byteOutput;
+    protected ByteArrayOutputStream byteOutput;
 
-    private SlideshowFXHandler() {
+    public SlideshowFXHandler() {
         super();
         this.latestLog = null;
         this.byteOutput = new ByteArrayOutputStream();
-        super.setOutputStream(this.byteOutput);
-    }
 
-    public static synchronized SlideshowFXHandler getSingleton() {
-        if (singleton == null) {
-            singleton = new SlideshowFXHandler();
+        try {
+            this.setEncoding(UTF_8.displayName());
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.log(WARNING, "Encoding can not be set on handler", e);
         }
 
-        return singleton;
+        super.setOutputStream(this.byteOutput);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -70,21 +70,24 @@ public class SlideshowFXHandler extends StreamHandler {
      *
      * @return All logs formatted as string.
      */
-    public String getAllLogs() {
+    public synchronized String getAllLogs() {
+        String logs = "";
+
         try {
             super.flush();
-            return new String(this.byteOutput.toByteArray(), this.getEncoding());
+            logs = new String(this.byteOutput.toByteArray(), this.getEncoding());
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Error retrieving all logs", e);
+            LOGGER.log(WARNING, "Error retrieving all logs", e);
         }
-        return "";
+
+        return logs;
     }
 
     @Override
     public synchronized void publish(LogRecord record) {
         if (super.isLoggable(record)) {
             final String message = super.getFormatter().format(record);
-            if (message != null) this.setLatestLog(message);
+            this.setLatestLog(message);
         }
         super.publish(record);
     }

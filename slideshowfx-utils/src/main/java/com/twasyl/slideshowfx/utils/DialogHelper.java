@@ -99,7 +99,7 @@ public class DialogHelper {
     public static ButtonType showCancellableDialog(final String title, final Node content, final ReadOnlyBooleanProperty validationProperty) {
         final Dialog dialog = buildDialog(title, content, ButtonType.CANCEL, ButtonType.OK);
 
-        if (validationProperty != null) {
+        if (dialog != null && validationProperty != null) {
             final DialogPane pane = dialog.getDialogPane();
             if (pane != null) {
                 final Button okButton = (Button) pane.lookupButton(ButtonType.OK);
@@ -262,6 +262,6 @@ public class DialogHelper {
             }
         }
 
-        return response.isPresent() ? response.get() : null;
+        return response.orElse(null);
     }
 }

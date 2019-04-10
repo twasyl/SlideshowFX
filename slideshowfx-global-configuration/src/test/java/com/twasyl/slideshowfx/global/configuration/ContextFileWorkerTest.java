@@ -88,9 +88,13 @@ public class ContextFileWorkerTest {
         for (RecentPresentation recentPresentation : recentPresentations) {
             xml.append("<recentPresentation>")
                     .append("<id>").append(recentPresentation.getId()).append("</id>")
-                    .append("<file>").append(recentPresentation.getNormalizedPath()).append("</file>")
-                    .append("<openedDateTime>").append(recentPresentation.getOpenedDateTime()).append("</openedDateTime>")
-                    .append("</recentPresentation>");
+                    .append("<file>").append(recentPresentation.getNormalizedPath()).append("</file>");
+
+            if (recentPresentation.getOpenedDateTime() != null) {
+                xml.append("<openedDateTime>").append(recentPresentation.getOpenedDateTime()).append("</openedDateTime>");
+            }
+
+            xml.append("</recentPresentation>");
         }
 
         xml.append("</recentPresentations></slideshowfx>");
@@ -325,6 +329,39 @@ public class ContextFileWorkerTest {
     }
 
     @Test
+    public void saveWithoutOpenedPresentationDate() throws Exception {
+        final String path = "presentation.sfx";
+
+        final RecentPresentation recentPresentation = new RecentPresentation(path, null);
+        final ByteArrayInputStream input = new ByteArrayInputStream(new byte[0]);
+        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        ContextFileWorker.saveRecentPresentation(input, output, recentPresentation);
+
+        assertEquals(0, output.size());
+    }
+
+    @Test
+    public void readWithoutOpenedPresentationDate() {
+        final ByteArrayInputStream input = new ByteArrayInputStream("<slideshowfx><recentPresentations><recentPresentation><id>presentation01</id><file>/presentation01.sfx</file></recentPresentation></recentPresentations></slideshowfx>".getBytes());
+
+        final Set<RecentPresentation> recentPresentations = readRecentPresentationFromStream(input);
+
+        assertNotNull(recentPresentations);
+        assertEquals(0, recentPresentations.size());
+    }
+
+    @Test
+    public void readWithoutPath() {
+        final ByteArrayInputStream input = new ByteArrayInputStream(("<slideshowfx><recentPresentations><recentPresentation><id>presentation01</id><openedDateTime>" + LocalDateTime.now() + "</openedDateTime></recentPresentation></recentPresentations></slideshowfx>").getBytes());
+
+        final Set<RecentPresentation> recentPresentations = readRecentPresentationFromStream(input);
+
+        assertNotNull(recentPresentations);
+        assertEquals(0, recentPresentations.size());
+    }
+
+    @Test
     public void populateEmptyDocument() throws Exception {
         final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         final DocumentBuilder builder = factory.newDocumentBuilder();
@@ -453,8 +490,9 @@ public class ContextFileWorkerTest {
         final RecentPresentation recentPresentation1 = new RecentPresentation("presentation1.sfx", LocalDateTime.now());
         final RecentPresentation recentPresentation2 = new RecentPresentation("presentation2.sfx", recentPresentation1.getOpenedDateTime().plusDays(2));
         final RecentPresentation recentPresentation3 = new RecentPresentation("presentation3.sfx", recentPresentation2.getOpenedDateTime().plusDays(2));
+        final RecentPresentation recentPresentation4 = new RecentPresentation("presentation4.sfx", null);
 
-        final String xml = this.createXmlStringFromRecentPresentations(recentPresentation1, recentPresentation2, recentPresentation3);
+        final String xml = this.createXmlStringFromRecentPresentations(recentPresentation1, recentPresentation2, recentPresentation3, recentPresentation4);
 
         final ByteArrayInputStream input = new ByteArrayInputStream(xml.getBytes(UTF_8));
         final ByteArrayOutputStream output = new ByteArrayOutputStream();

@@ -31,7 +31,7 @@ import static org.osgi.framework.Constants.*;
  * as it can stop it properly.
  *
  * @author Thierry Wasylczenko
- * @version 1.2
+ * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class OSGiManager {
@@ -156,6 +156,15 @@ public class OSGiManager {
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    /**
+     * Indicates if the instance of the OSGi manager has been started.
+     *
+     * @return {@code true} if the manager is started, {@code false} otherwise.
+     */
+    public boolean isStarted() {
+        return this.osgiFramework != null && this.osgiFramework.getState() == Framework.ACTIVE;
     }
 
     /**

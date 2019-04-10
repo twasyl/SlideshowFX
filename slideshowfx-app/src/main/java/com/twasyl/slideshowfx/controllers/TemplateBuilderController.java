@@ -4,7 +4,6 @@ import com.twasyl.slideshowfx.controls.builder.editor.*;
 import com.twasyl.slideshowfx.controls.tree.FileTreeCell;
 import com.twasyl.slideshowfx.controls.tree.TemplateTreeView;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
-import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
 import com.twasyl.slideshowfx.utils.DialogHelper;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -28,11 +27,15 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.twasyl.slideshowfx.engine.template.TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION;
+import static com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter.TEMPLATE_FILTER;
+import static java.util.logging.Level.SEVERE;
+
 /**
  * Controller class used for the Template Builder.
  *
  * @author Thierry Wasylczenko
- * @version 1.2
+ * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class TemplateBuilderController implements Initializable {
@@ -108,21 +111,21 @@ public class TemplateBuilderController implements Initializable {
 
         if (destination == null) {
             FileChooser chooser = new FileChooser();
-            chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.TEMPLATE_FILTER);
+            chooser.getExtensionFilters().add(TEMPLATE_FILTER);
             destination = chooser.showSaveDialog(null);
-
-            // Manage if the file name doesn't end with the template extension.
-            if (!destination.getName().endsWith(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION)) {
-                destination = new File(destination.getAbsolutePath().concat(TemplateEngine.DEFAULT_DOTTED_ARCHIVE_EXTENSION));
-            }
         }
 
         if (destination != null) {
+            // Manage if the file name doesn't end with the template extension.
+            if (!destination.getName().endsWith(DEFAULT_DOTTED_ARCHIVE_EXTENSION)) {
+                destination = new File(destination.getAbsolutePath().concat(DEFAULT_DOTTED_ARCHIVE_EXTENSION));
+            }
+
             this.templateEngine.setArchive(destination);
             try {
                 this.templateEngine.saveArchive();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Can not save the template", e);
+                LOGGER.log(SEVERE, "Can not save the template", e);
             }
         }
     }
@@ -136,7 +139,7 @@ public class TemplateBuilderController implements Initializable {
     private void buildAsTemplateArchive(ActionEvent event) {
 
         FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.TEMPLATE_FILTER);
+        chooser.getExtensionFilters().add(TEMPLATE_FILTER);
         File destination = chooser.showSaveDialog(null);
 
         if (destination != null) {
@@ -144,7 +147,7 @@ public class TemplateBuilderController implements Initializable {
             try {
                 this.templateEngine.saveArchive();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Can not save the template", e);
+                LOGGER.log(SEVERE, "Can not save the template", e);
             }
         }
     }
@@ -174,7 +177,7 @@ public class TemplateBuilderController implements Initializable {
                 .stream()
                 .filter(tab -> tab instanceof IFileEditor)
                 .map(tab -> (IFileEditor) tab)
-                .forEach(editor -> editor.saveContent());
+                .forEach(IFileEditor::saveContent);
     }
 
     /**
@@ -272,56 +275,58 @@ public class TemplateBuilderController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Initialize the tree view
         this.templateContentTreeView.setOnItemClick(event -> {
-            if (event.getClickCount() == 2 && event.getButton().equals(MouseButton.PRIMARY)) {
-                if (event.getSource() instanceof FileTreeCell) {
-                    File file = ((FileTreeCell) event.getSource()).getItem();
+            final boolean consumeEvent = event.getClickCount() == 2
+                    && event.getButton().equals(MouseButton.PRIMARY)
+                    && event.getSource() instanceof FileTreeCell;
 
-                    if (file.isFile()) {
+            if (consumeEvent) {
+                File file = ((FileTreeCell) event.getSource()).getItem();
 
-                        /**
-                         * Check if the file is already opened and select it if it is,
-                         otherwise open it.
-                         */
-                        Optional<IFileEditor> editor = this.openedFiles.getTabs()
-                                .stream()
-                                .filter(tab -> tab instanceof IFileEditor)
-                                .map(tab -> (IFileEditor) tab)
-                                .filter(tab -> tab.getFile().equals(file))
-                                .findFirst();
+                if (file.isFile()) {
 
-                        if (editor.isPresent()) {
-                            this.openedFiles.getSelectionModel().select((Tab) editor.get());
+                    /**
+                     * Check if the file is already opened and select it if it is,
+                     otherwise open it.
+                     */
+                    Optional<IFileEditor> editor = this.openedFiles.getTabs()
+                            .stream()
+                            .filter(tab -> tab instanceof IFileEditor)
+                            .map(tab -> (IFileEditor) tab)
+                            .filter(tab -> tab.getFile().equals(file))
+                            .findFirst();
+
+                    if (editor.isPresent()) {
+                        this.openedFiles.getSelectionModel().select((Tab) editor.get());
+                    } else {
+
+                        // The type of editor has to be determined
+                        IFileEditor fileEditor;
+
+                        // The file is the configuration file
+                        if (file.equals(new File(this.templateEngine.getWorkingDirectory(), this.templateEngine.getConfigurationFilename()))) {
+                            fileEditor = new ConfigurationFileEditor(this.templateEngine.getWorkingDirectory().toPath(), file);
                         } else {
+                            /**
+                             * Try to determine the best file editor to use
+                             * by checking the MIME type
+                             */
+                            try {
+                                String mimeType = Files.probeContentType(file.toPath());
 
-                            // The type of editor has to be determined
-                            IFileEditor fileEditor;
+                                if (mimeType != null && mimeType.contains("image"))
+                                    fileEditor = new ImageFileEditor();
+                                else fileEditor = new ACEFileEditor();
 
-                            // The file is the configuration file
-                            if (file.equals(new File(this.templateEngine.getWorkingDirectory(), this.templateEngine.getConfigurationFilename()))) {
-                                fileEditor = new ConfigurationFileEditor(this.templateEngine.getWorkingDirectory().toPath(), file);
-                            } else {
-                                /**
-                                 * Try to determine the best file editor to use
-                                 * by checking the MIME type
-                                 */
-                                try {
-                                    String mimeType = Files.probeContentType(file.toPath());
-
-                                    if (mimeType != null && mimeType.contains("image"))
-                                        fileEditor = new ImageFileEditor();
-                                    else fileEditor = new ACEFileEditor();
-
-                                    fileEditor.setWorkingPath(this.templateEngine.getWorkingDirectory().toPath());
-                                    fileEditor.setFile(file);
-                                } catch (IOException e) {
-                                    LOGGER.log(Level.WARNING, "An error occurred while truing to determine the MIME type of the file to open", e);
-                                    fileEditor = new SimpleFileEditor();
-                                }
+                                fileEditor.setWorkingPath(this.templateEngine.getWorkingDirectory().toPath());
+                                fileEditor.setFile(file);
+                            } catch (IOException e) {
+                                LOGGER.log(Level.WARNING, "An error occurred while truing to determine the MIME type of the file to open", e);
+                                fileEditor = new SimpleFileEditor();
                             }
-
-                            this.openedFiles.getTabs().add((Tab) fileEditor);
-                            this.openedFiles.getSelectionModel().selectLast();
                         }
+
+                        this.openedFiles.getTabs().add((Tab) fileEditor);
+                        this.openedFiles.getSelectionModel().selectLast();
                     }
                 }
             }

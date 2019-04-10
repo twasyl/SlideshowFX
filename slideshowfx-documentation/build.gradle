@@ -1,3 +1,5 @@
+import org.gradle.util.GradleVersion
+
 buildscript {
     dependencies {
         classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.16'
@@ -30,7 +32,7 @@ asciidoctor {
             'asciidoctor-source'           : "${project.projectDir}/src/asciidoc",
             'javafx-version'               : '8 update 201',
             'jdk-version'                  : '8 update 201',
-            'gradle-version'               : '5.1.1',
+            'gradle-version'               : "${GradleVersion.current().version}",
             'asciidoctorj-version'         : "${rootProject.ext.dependencies.asciidoctorj.version}",
             'apache-felix-version'         : "${rootProject.ext.dependencies.felix.version}",
             'freemarker-version'           : "${rootProject.ext.dependencies.freemarker.version}",

@@ -2,6 +2,7 @@ plugins {
     id 'java-library'
     id 'jacoco'
     id 'com.jfrog.bintray'
+    id 'org.sonarqube'
 }
 
 description = 'Module defining utilities to be used in the SlideshowFX application'

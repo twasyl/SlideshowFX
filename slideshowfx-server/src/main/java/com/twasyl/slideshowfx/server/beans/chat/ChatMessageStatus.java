@@ -14,7 +14,7 @@ public enum ChatMessageStatus {
 
     private final String asString;
 
-    private ChatMessageStatus(String asString) { this.asString = asString; }
+    ChatMessageStatus(String asString) { this.asString = asString; }
 
     public String getAsString() { return asString; }
 

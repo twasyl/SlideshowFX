@@ -34,11 +34,11 @@ import static com.twasyl.slideshowfx.ui.controls.validators.Validators.isNotEmpt
  * In order to get the configuration as a string, the method {@link #getAsString()} must be used.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.3
  */
 public class TemplateConfigurationFilePane extends VBox {
-    private static Logger LOGGER = Logger.getLogger(TemplateConfigurationFilePane.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(TemplateConfigurationFilePane.class.getName());
 
     private Path workingPath;
 
@@ -58,7 +58,6 @@ public class TemplateConfigurationFilePane extends VBox {
     private ExtendedTextField slideIdPrefix = new ExtendedTextField("Slide ID prefix", true);
     private ExtendedTextField slidesTemplateDirectory = new ExtendedTextField("Template directory", true);
     private ExtendedTextField slidesPresentationDirectory = new ExtendedTextField("Presentation directory", true);
-    private ExtendedTextField slidesThumbnailDirectory = new ExtendedTextField("Thumbnails directory", true);
 
     // Slides definitions
     private List<SlideDefinition> slideDefinitions = new ArrayList<>();
@@ -79,7 +78,7 @@ public class TemplateConfigurationFilePane extends VBox {
                 this.prefWidthProperty().unbind();
             }
 
-            if (newParent != null && newParent instanceof Region) {
+            if (newParent instanceof Region) {
                 this.prefWidthProperty().bind(((Region) newParent).widthProperty());
             }
         });
@@ -98,7 +97,6 @@ public class TemplateConfigurationFilePane extends VBox {
         this.slideIdPrefix.setValidator(isNotEmpty());
         this.slidesPresentationDirectory.setValidator(isNotEmpty());
         this.slidesTemplateDirectory.setValidator(isNotEmpty());
-        this.slidesThumbnailDirectory.setValidator(isNotEmpty());
     }
 
     /**
@@ -135,13 +133,13 @@ public class TemplateConfigurationFilePane extends VBox {
 
     /**
      * Build the {@link TitledPane} that contains the UI elements for specifying the global slides' configuration as
-     * the slides' container, slide's ID prefix, presentation directory, template directory and thumbnails directory.
+     * the slides' container, slide's ID prefix, presentation directory and template directory.
      *
      * @return The properly initialized {@link TitledPane} containing the slides' global configuration UI elements.
      */
     private TitledPane getSlidesGlobalConfigurationPane() {
         final FlowPane internalContainer = new FlowPane(5, 5,
-                slidesContainer, slideIdPrefix, slidesPresentationDirectory, slidesTemplateDirectory, slidesThumbnailDirectory);
+                slidesContainer, slideIdPrefix, slidesPresentationDirectory, slidesTemplateDirectory);
 
         final TitledPane slidesGlobalConfigurationPane = new TitledPane("Slides global configuration", internalContainer);
         slidesGlobalConfigurationPane.setCollapsible(false);
@@ -253,7 +251,6 @@ public class TemplateConfigurationFilePane extends VBox {
         configuration.setSlideIdPrefix(this.slideIdPrefix.getText());
         configuration.setSlidesTemplateDirectory(new File(this.workingPath.toFile(), this.slidesTemplateDirectory.getText()));
         configuration.setSlidesPresentationDirectory(new File(this.workingPath.toFile(), this.slidesPresentationDirectory.getText()));
-        configuration.setSlidesThumbnailDirectory(new File(this.workingPath.toFile(), this.slidesThumbnailDirectory.getText()));
 
         configuration.setSlideTemplates(new ArrayList<>());
 
@@ -327,7 +324,6 @@ public class TemplateConfigurationFilePane extends VBox {
             this.slideIdPrefix.setText(configuration.getSlideIdPrefix());
             this.slidesTemplateDirectory.setText(this.getPathRelativeToWorkingPath(configuration.getSlidesTemplateDirectory()));
             this.slidesPresentationDirectory.setText(this.getPathRelativeToWorkingPath(configuration.getSlidesPresentationDirectory()));
-            this.slidesThumbnailDirectory.setText(this.getPathRelativeToWorkingPath(configuration.getSlidesThumbnailDirectory()));
 
             configuration.getSlideTemplates()
                     .forEach(template -> {
@@ -416,11 +412,6 @@ public class TemplateConfigurationFilePane extends VBox {
         }
 
         isValid = this.slidesTemplateDirectory.isValid();
-        if (globallyValid && !isValid) {
-            globallyValid = false;
-        }
-
-        isValid = this.slidesThumbnailDirectory.isValid();
         if (globallyValid && !isValid) {
             globallyValid = false;
         }

@@ -14,14 +14,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static com.twasyl.slideshowfx.engine.template.TemplateEngine.DEFAULT_CONFIGURATION_FILE_NAME;
-import static com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration.*;
+import static com.twasyl.slideshowfx.engine.template.configuration.TemplateConfigurationFields.*;
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.WARNING;
 import static java.util.zip.ZipFile.OPEN_READ;
 
 /**
@@ -29,11 +29,11 @@ import static java.util.zip.ZipFile.OPEN_READ;
  * {@code template-file-button}.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 2.0
  */
 public class TemplateFileButton extends ToggleButton {
-    private static Logger LOGGER = Logger.getLogger(TemplateFileButton.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(TemplateFileButton.class.getName());
 
     private static final double BUTTON_SIZE = 80;
 
@@ -107,7 +107,7 @@ public class TemplateFileButton extends ToggleButton {
 
                         ((Pane) this.getParent()).getChildren().remove(this);
                     } catch (IOException e) {
-                        LOGGER.log(Level.WARNING, "Can not remove the template", e);
+                        LOGGER.log(WARNING, "Can not remove the template", e);
                         DialogHelper.showError("Error", "Can not remove the template");
                     }
                 }
@@ -164,7 +164,7 @@ public class TemplateFileButton extends ToggleButton {
         final JsonObject jsonConfig = getJsonConfig();
 
         if (jsonConfig != null) {
-            name = jsonConfig.getJsonObject(TEMPLATE).getString(TEMPLATE_NAME);
+            name = jsonConfig.getJsonObject(TEMPLATE.getFieldName()).getString(TEMPLATE_NAME.getFieldName());
 
             if (name.trim().isEmpty()) {
                 name = getTemplateFile().getName();
@@ -187,7 +187,7 @@ public class TemplateFileButton extends ToggleButton {
         final JsonObject jsonConfig = getJsonConfig();
 
         if (jsonConfig != null) {
-            version = jsonConfig.getJsonObject(TEMPLATE).getString(TEMPLATE_VERSION, null);
+            version = jsonConfig.getJsonObject(TEMPLATE.getFieldName()).getString(TEMPLATE_VERSION.getFieldName(), null);
 
             if (version == null || version.trim().isEmpty()) {
                 version = "";
@@ -211,19 +211,19 @@ public class TemplateFileButton extends ToggleButton {
 
         try (final ZipFile zip = new ZipFile(getTemplateFile(), OPEN_READ)) {
 
-            final Optional<? extends ZipEntry> templateConfigEntry = zip.stream()
+            final ZipEntry templateConfigEntry = zip.stream()
                     .filter(entry -> DEFAULT_CONFIGURATION_FILE_NAME.equals(entry.getName()))
-                    .findAny();
+                    .findAny().orElse(null);
 
-            if (templateConfigEntry.isPresent()) {
-                try (final InputStreamReader input = new InputStreamReader(zip.getInputStream(templateConfigEntry.get()))) {
+            if (templateConfigEntry != null) {
+                try (final InputStreamReader input = new InputStreamReader(zip.getInputStream(templateConfigEntry))) {
                     jsonConfig = JSONHelper.readFromReader(input);
                 }
             } else {
-                LOGGER.log(Level.INFO, "No template-config.json file in the template");
+                LOGGER.log(INFO, "No template-config.json file in the template");
             }
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Can not determine template's name", e);
+            LOGGER.log(WARNING, "Can not determine template's name", e);
         }
         return jsonConfig;
     }

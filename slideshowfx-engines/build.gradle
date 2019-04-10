@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'jacoco'
+    id 'org.sonarqube'
 }
 
 description = 'Module defining engines used by SlideshowFX'
@@ -12,4 +13,6 @@ dependencies {
     compile project(':slideshowfx-utils')
 
     compile "org.freemarker:freemarker:${rootProject.ext.dependencies.freemarker.version}"
+
+    testCompile "org.mockito:mockito-core:${rootProject.ext.dependencies.mockito.version}"
 }

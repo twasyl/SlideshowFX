@@ -2,6 +2,7 @@ plugins {
     id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
+    id 'org.sonarqube'
 }
 
 description = 'Hosting connector allowing to open and save presentations from and to Box'

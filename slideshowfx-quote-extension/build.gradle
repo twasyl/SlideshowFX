@@ -2,6 +2,7 @@ plugins {
     id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
+    id 'org.sonarqube'
 }
 
 description = 'Extension allowing to insert quotes inside a SlideshowFX presentation'

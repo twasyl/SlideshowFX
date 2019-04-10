@@ -1,13 +1,5 @@
 package com.twasyl.slideshowfx.controls.outline;
 
-/*
- * Component holding an outline of a given {@link PresentationEngine}.
- *
- * @author Thierry Wasylczenko
- * @version 1.0
- * @since SlideshowFX @@NEXT-VERSION@@
- */
-
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.controls.PresentationBrowser;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
@@ -33,10 +25,11 @@ import static com.twasyl.slideshowfx.controls.outline.PresentationOutlineEvent.*
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getSnapshotDelay;
 import static java.util.logging.Level.SEVERE;
 
-/**
- * Component displaying the outline of a {@link PresentationEngine presentation}.
+/*
+ * Component holding an outline of a given {@link PresentationEngine}.
  *
  * @author Thierry Wasylczenko
+ * @version 1.0
  * @since SlideshowFX @@NEXT-VERSION@@
  */
 public class PresentationOutline extends ListView<ImageView> {

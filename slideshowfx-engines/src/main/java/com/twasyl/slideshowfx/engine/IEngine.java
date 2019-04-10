@@ -7,18 +7,10 @@ import java.io.*;
  * It will be useful for the Presentation engine as well as the template engine.
  *
  * @author Thierry Wasylczenko
- * @version 1.0.0
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public interface IEngine<T extends IConfiguration> {
-
-    /**
-     * This method checks if the configuration of the engine is valid or not.
-     * @return true if the configuration is valid, otherwise an exception should be thrown.
-     * @throws EngineException If an error is encountered, an exception will be raised. The exception
-     * should be a {@link EngineException} or a subclass of it.
-     */
-    boolean checkConfiguration() throws EngineException;
 
     /**
      * Get the name of the configuration file of this engine.
@@ -48,7 +40,7 @@ public interface IEngine<T extends IConfiguration> {
      * @throws IOException If the configuration is not found.
      * @throws IllegalAccessException If the configuration file can not be read.
      */
-    T readConfiguration() throws NullPointerException, IOException, IllegalAccessException;
+    T readConfiguration() throws IOException, IllegalAccessException;
 
     /**
      * Reads the configuration of the engine and store it in a {@link IConfiguration} object.
@@ -60,7 +52,7 @@ public interface IEngine<T extends IConfiguration> {
      * @throws FileNotFoundException If the configuration is not found.
      * @throws IllegalAccessException If the configuration file can not be read.
      */
-    T readConfiguration(File configurationFile) throws NullPointerException, IllegalArgumentException, IOException, IllegalAccessException;
+    T readConfiguration(File configurationFile) throws IOException, IllegalAccessException;
 
     /**
      * Reads the configuration of the engine and store it in a {@link IConfiguration} object.
@@ -70,7 +62,7 @@ public interface IEngine<T extends IConfiguration> {
      * @throws NullPointerException If the reader is {@code null}.
      * @throws IOException If an error occurs when reading the reader.
      */
-    T readConfiguration(Reader reader) throws NullPointerException, IOException;
+    T readConfiguration(Reader reader) throws IOException;
 
     /**
      * Write the configuration in the file that is stored in the working directory and named according the engine's implementation.
@@ -79,7 +71,7 @@ public interface IEngine<T extends IConfiguration> {
      * @throws NullPointerException If the given file is null.
      * @throws IOException If the configuration is not found.
      */
-    void writeConfiguration() throws NullPointerException, IOException;
+    void writeConfiguration() throws IOException;
 
     /**
      * Writes this engine's configuration into the given file.
@@ -88,7 +80,7 @@ public interface IEngine<T extends IConfiguration> {
      * @throws NullPointerException If the configurationFile is null.
      * @throws IOException If an error occurs while trying to write the configuration.
      */
-    void writeConfiguration(File configurationFile) throws NullPointerException, IOException;
+    void writeConfiguration(File configurationFile) throws IOException;
 
     /**
      * Writes this engine's configuration into the given instance of {@link Writer}. The {@link Writer}
@@ -98,7 +90,7 @@ public interface IEngine<T extends IConfiguration> {
      * @throws NullPointerException If the configurationFile is null.
      * @throws IOException If an error occurs while trying to write the configuration.
      */
-    void writeConfiguration(final Writer writer) throws NullPointerException, IOException;
+    void writeConfiguration(final Writer writer) throws IOException;
 
     /**
      * Generates a working directory for the given engine. The directory is located in the temporary folder of the system
@@ -129,7 +121,7 @@ public interface IEngine<T extends IConfiguration> {
      * @return The String representing the relative path from the working directory.
      * @throws NullPointerException If the given file or the working directory is null.
      */
-    String relativizeFromWorkingDirectory(File file) throws NullPointerException;
+    String relativizeFromWorkingDirectory(File file);
 
     /**
      * Get the archiveExtension an archive of this engine must have. For example this method will return
@@ -162,7 +154,7 @@ public interface IEngine<T extends IConfiguration> {
      * @throws IOException If the file is not found.
      * @throws IllegalAccessException If the file can not be read.
      */
-    void loadArchive() throws IllegalArgumentException, NullPointerException, IOException, IllegalAccessException;
+    void loadArchive() throws IOException, IllegalAccessException;
 
     /**
      * Load the content of the given archive file. The file must have the correct archiveExtension for this engine.
@@ -174,7 +166,7 @@ public interface IEngine<T extends IConfiguration> {
      * @throws FileNotFoundException If the file is not found.
      * @throws IllegalAccessException If the file can not be read.
      */
-    void loadArchive(File file) throws IllegalArgumentException, NullPointerException, IOException, IllegalAccessException;
+    void loadArchive(File file) throws IOException, IllegalAccessException;
 
     /**
      * Save the content in the archive file. The content is retrieved for the current working directory returned by {#getWorkingDirectory}.
@@ -184,7 +176,7 @@ public interface IEngine<T extends IConfiguration> {
      * @throws IllegalArgumentException If an error occurred when saving the archive.
      * @throws IOException If an error occurred when saving the archive.
      */
-    void saveArchive() throws IllegalArgumentException, IOException;
+    void saveArchive() throws IOException;
 
     /**
      * Save the content of the engine into an archive. The content is retrieved for the current working directory returned by {#getWorkingDirectory}.
@@ -195,5 +187,5 @@ public interface IEngine<T extends IConfiguration> {
      * @throws IllegalArgumentException If the given file has not the correct archiveExtension for this engine.
      * @throws IOException If an error occurred when saving the archive.
      */
-    void saveArchive(File file) throws IllegalArgumentException, IOException;
+    void saveArchive(File file) throws IOException;
 }

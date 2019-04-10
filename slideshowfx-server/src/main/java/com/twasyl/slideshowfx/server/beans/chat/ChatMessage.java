@@ -4,7 +4,6 @@ import io.vertx.core.json.JsonObject;
 
 import java.net.InetSocketAddress;
 import java.util.Base64;
-import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
 
@@ -12,11 +11,10 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
  * This class represents a message that can be sent over the internal chat of SlideshowFX.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class ChatMessage {
-    private static final Logger LOGGER = Logger.getLogger(ChatMessage.class.getName());
     private static final String JSON_MESSAGE_OBJECT = "message";
     private static final String JSON_MESSAGE_ID_ATTR = "id";
     private static final String JSON_MESSAGE_AUTHOR_ATTR = "author";
@@ -32,8 +30,6 @@ public class ChatMessage {
     private ChatMessageAction action;
     private ChatMessageStatus status;
     private InetSocketAddress ip;
-
-    public ChatMessage() {}
 
     public String getId() { return id; }
     public void setId(String id) {
@@ -91,7 +87,7 @@ public class ChatMessage {
      * @return A ChatMessage according the JSON representation.
      * @throws IllegalArgumentException If the JSON representation is {@code null} or empty.
      */
-    public static ChatMessage build(String json, InetSocketAddress ip) throws IllegalArgumentException {
+    public static ChatMessage build(String json, InetSocketAddress ip) {
         if(json == null) throw new IllegalArgumentException("The JSON can not be null");
         if(json.isEmpty()) throw new IllegalArgumentException("The JSON can not beb empty");
 

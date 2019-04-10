@@ -1,6 +1,6 @@
 package com.twasyl.slideshowfx.global.configuration;
 
-import com.twasyl.slideshowfx.global.configuration.GlobalConfigurationObservable.ThemeChangeEvent;
+import com.twasyl.slideshowfx.global.configuration.events.ThemeChangeEvent;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -23,7 +23,7 @@ public interface GlobalConfigurationObserver extends Observer {
 
     @Override
     default void update(Observable o, Object arg) {
-        if (arg != null && arg instanceof ThemeChangeEvent) {
+        if (arg instanceof ThemeChangeEvent) {
             ThemeChangeEvent event = (ThemeChangeEvent) arg;
             this.updateTheme(event.getOldTheme(), event.getNewTheme());
         }

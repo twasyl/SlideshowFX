@@ -2,6 +2,7 @@ plugins {
     id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
+    id 'org.sonarqube'
 }
 
 description = 'Extension allowing to insert executable code snippets inside a SlideshowFX presentation'
@@ -16,6 +17,10 @@ dependencies {
     api project(':slideshowfx-plugin')
     implementation project(':slideshowfx-snippet-executor')
     api project(':slideshowfx-ui-controls')
+
+    integrationTestCompile "org.testfx:testfx-core:${rootProject.ext.dependencies.testfx.version}"
+    integrationTestCompile "org.testfx:testfx-junit5:${rootProject.ext.dependencies.testfx.version}"
+    integrationTestCompile "org.testfx:openjfx-monocle:${rootProject.ext.dependencies.monocle.version}"
 }
 
 sfxPlugin {

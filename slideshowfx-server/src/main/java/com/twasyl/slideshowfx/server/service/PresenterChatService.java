@@ -27,7 +27,7 @@ public class PresenterChatService extends AbstractSlideshowFXService {
     public void stop() { this.unregisterAll(); }
 
     private Handler<Message<JsonObject>> buildMessageHandler() {
-        final Handler<Message<JsonObject>> handler = message -> {
+        return message -> {
             final JsonObject messageContent = message.body();
 
             final JsonObject broadcastMessage = new JsonObject()
@@ -37,7 +37,5 @@ public class PresenterChatService extends AbstractSlideshowFXService {
 
             message.reply(this.buildResponse(SERVICE_CHAT_PRESENTER_MESSAGE_ADD, RESPONSE_CODE_MESSAGE_ADDED, ""));
         };
-
-        return handler;
     }
 }

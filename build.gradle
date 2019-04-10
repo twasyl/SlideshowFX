@@ -78,10 +78,10 @@ ext.dependencies = [
         jsoup       : [version: '1.11.3'],
         junit       : [version: '5.4.0'],
         markdown    : [version: '0.13'],
-        mockito     : [version: '2.23.4'],
+        mockito     : [version: '2.26.0'],
         monocle     : [version: '8u76-b04'],
         testfx      : [version: '4.0.15-alpha'],
-        vertx       : [version: '3.6.3'],
+        vertx       : [version: '3.7.0'],
         wikitext    : [version: '3.0.29'],
         zxing       : [version: '3.3.3']
 ]
@@ -145,14 +145,19 @@ subprojects {
     }
     
     def sfxPluginCallback = {
+        evaluationDependsOn(':slideshowfx-plugin')
+        
         sfxPlugin {
             bundle {
                 vendor = "Thierry Wasylczenko"
             }
         }
-
+        
         dependencies {
             implementation "org.apache.felix:org.apache.felix.framework:${rootProject.ext.dependencies.felix.version}"
+
+            integrationTestImplementation project(':slideshowfx-osgi')
+            integrationTestImplementation project(':slideshowfx-plugin').sourceSets.integrationTest.output
         }
     }
 
@@ -195,6 +200,13 @@ subprojects {
         }
 
         jacocoTestReport {
+            
+            additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+            
+            executionData fileTree("$buildDir/jacoco").matching {
+                include "*.exec"
+            }
+            
             reports {
                 csv.enabled false
                 html.enabled true
@@ -202,11 +214,32 @@ subprojects {
             }
         }
     }
-    
+
+    def sonarqubeCallback = {
+        sonarqube {
+            properties {
+                def integrationTestsDirs = sourceSets.integrationTest.allSource.srcDirs.findAll { it.exists() }
+                def jacocoIntegrationTestResult = "$buildDir/jacoco/${sourceSets.integrationTest.name}.exec"
+                def junitIntegrationTestReport = "$buildDir/reports/tests/${sourceSets.integrationTest.name}"
+                
+                if (sourceSets.test.allJava.srcDirs.findAll { it.exists()}.isEmpty()) {
+                    properties["sonar.tests"] = integrationTestsDirs
+                    properties["sonar.jacoco.reportPaths"] = jacocoIntegrationTestResult
+                    properties["sonar.junit.reportPaths"] = junitIntegrationTestReport
+                } else {
+                    properties["sonar.tests"] += integrationTestsDirs
+                    properties["sonar.jacoco.reportPaths"] += jacocoIntegrationTestResult
+                    properties["sonar.junit.reportPaths"] += junitIntegrationTestReport
+                }
+            }
+        }
+    }
+
     plugins.withType(JavaPlugin, javaCallback)
     plugins.withId('sfx-plugin', sfxPluginCallback)
     plugins.withId('com.jfrog.bintray', bintrayCallback)
     plugins.withId('jacoco', jacocoCallback)
+    plugins.withId('org.sonarqube', sonarqubeCallback)
 }
 
 sonarqube {
@@ -216,6 +249,14 @@ sonarqube {
         property "sonar.projectKey", System.properties['sonar.projectKey'] ?: System.env['SONAR_PROJECT_KEY']
         property "sonar.organization", System.properties['sonar.organization'] ?: System.env['SONAR_ORGANIZATION']
     }
+}
+
+tasks.sonarqube.dependsOn {
+    subprojects.findAll { it.getPluginManager().hasPlugin('org.sonarqube') }.collect {
+        [
+                it.tasks.check
+        ]
+    }.flatten()
 }
 
 /**

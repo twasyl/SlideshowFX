@@ -23,16 +23,6 @@ public class RecentPresentation extends File implements Comparable<File> {
         this.openedDateTime = openedDateTime;
     }
 
-    public RecentPresentation(final String parent, final String child, final LocalDateTime openedDateTime) {
-        super(parent, child);
-        this.openedDateTime = openedDateTime;
-    }
-
-    public RecentPresentation(final File parent, final String child, final LocalDateTime openedDateTime) {
-        super(parent, child);
-        this.openedDateTime = openedDateTime;
-    }
-
     public LocalDateTime getOpenedDateTime() {
         return openedDateTime;
     }
@@ -77,7 +67,7 @@ public class RecentPresentation extends File implements Comparable<File> {
 
         final RecentPresentation that = (RecentPresentation) o;
 
-        return getNormalizedPath() != null ? getNormalizedPath().equals(that.getNormalizedPath()) : that.getNormalizedPath() == null;
+        return getNormalizedPath().equals(that.getNormalizedPath());
     }
 
     @Override
@@ -89,13 +79,11 @@ public class RecentPresentation extends File implements Comparable<File> {
 
     @Override
     public int compareTo(File o) {
-        if (o == null) {
-            return 1;
-        } else if (o instanceof RecentPresentation) {
+        if (o != null && o instanceof RecentPresentation) {
             final RecentPresentation other = (RecentPresentation) o;
             return this.getNormalizedPath().compareTo(other.getNormalizedPath());
-        } else {
-            return 0;
         }
+
+        return 1;
     }
 }

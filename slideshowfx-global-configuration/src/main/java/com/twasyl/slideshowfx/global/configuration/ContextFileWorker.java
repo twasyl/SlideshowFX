@@ -41,13 +41,13 @@ import static javax.xml.xpath.XPathConstants.NODE;
  */
 public class ContextFileWorker {
     private static final Logger LOGGER = Logger.getLogger(ContextFileWorker.class.getName());
-    private static DocumentBuilder DOCUMENT_BUILDER;
+    private static DocumentBuilder documentBuilder;
     private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
 
     static {
         final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         try {
-            DOCUMENT_BUILDER = factory.newDocumentBuilder();
+            documentBuilder = factory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             LOGGER.log(Level.SEVERE, "Can not create a document builder instance", e);
         }
@@ -253,7 +253,7 @@ public class ContextFileWorker {
         boolean presentationFound = false;
 
         try {
-            final Document document = DOCUMENT_BUILDER.parse(input);
+            final Document document = documentBuilder.parse(input);
 
             presentationFound = findRecentPresentationNodeFromID(document, recentPresentation) != null;
         } catch (ContextFileException | SAXException | IOException e) {
@@ -310,12 +310,12 @@ public class ContextFileWorker {
             final Comparator<RecentPresentation> byDateDesc = (rp1, rp2) -> {
                 int result;
 
-                if (rp1.getOpenedDateTime() == null && rp2.getNormalizedPath() != null) {
+                if (rp1.getOpenedDateTime() == null && rp2.getOpenedDateTime() != null) {
                     result = -1;
                 } else if (rp1.getOpenedDateTime() != null && rp2.getOpenedDateTime() == null) {
                     result = 1;
                 } else {
-                    result = -rp1.getOpenedDateTime().compareTo(rp2.getOpenedDateTime());
+                    result = rp2.getOpenedDateTime().compareTo(rp1.getOpenedDateTime());
                 }
 
                 return result;
@@ -488,16 +488,18 @@ public class ContextFileWorker {
         }
 
         final Element recentPresentationNode = document.createElement(RECENT_PRESENTATION_TAG);
+
         final Element idNode = document.createElement(ID_TAG);
-        final Element fileNode = document.createElement(FILE_TAG);
-        final Element openedDateTimeNode = document.createElement(OPENED_DATE_TIME_TAG);
-
         idNode.setTextContent(recentPresentation.getId());
-        fileNode.setTextContent(recentPresentation.getNormalizedPath());
-        openedDateTimeNode.setTextContent(recentPresentation.getOpenedDateTime().toString());
-
         recentPresentationNode.appendChild(idNode);
+
+
+        final Element fileNode = document.createElement(FILE_TAG);
+        fileNode.setTextContent(recentPresentation.getNormalizedPath());
         recentPresentationNode.appendChild(fileNode);
+
+        final Element openedDateTimeNode = document.createElement(OPENED_DATE_TIME_TAG);
+        openedDateTimeNode.setTextContent(recentPresentation.getOpenedDateTime().toString());
         recentPresentationNode.appendChild(openedDateTimeNode);
 
         return recentPresentationNode;
@@ -585,9 +587,9 @@ public class ContextFileWorker {
         Document document;
         try {
             if (input == null || input.available() == 0) {
-                document = DOCUMENT_BUILDER.parse(createDefaultDocumentBodyInputStream());
+                document = documentBuilder.parse(createDefaultDocumentBodyInputStream());
             } else {
-                document = DOCUMENT_BUILDER.parse(input);
+                document = documentBuilder.parse(input);
             }
         } catch (IOException | SAXException e) {
             throw new ContextFileException(e);

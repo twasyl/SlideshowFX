@@ -3,6 +3,7 @@ plugins {
     id 'distribution'
     id 'jacoco'
     id 'com.jfrog.bintray'
+    id 'org.sonarqube'
 }
 
 description = 'Module for the installer of SlideshowFX'

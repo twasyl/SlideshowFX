@@ -3,7 +3,6 @@ package com.twasyl.slideshowfx.engine.presentation;
 import com.twasyl.slideshowfx.content.extension.Resource;
 import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.engine.AbstractEngine;
-import com.twasyl.slideshowfx.engine.EngineException;
 import com.twasyl.slideshowfx.engine.presentation.configuration.PresentationConfiguration;
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElement;
@@ -20,18 +19,17 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.WritableImage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static com.twasyl.slideshowfx.engine.presentation.configuration.PresentationConfigurationFields.*;
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 /**
  * This class manages presentations operation done with SlideshowFX. It is used to open them as well as add, update an
@@ -39,7 +37,7 @@ import java.util.stream.Collectors;
  * The extension of a presentation is {@code sfx}.
  *
  * @author Thierry Wasylczenko
- * @version 1.4
+ * @version 1.5-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class PresentationEngine extends AbstractEngine<PresentationConfiguration> {
@@ -85,76 +83,70 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     }
 
     @Override
-    public boolean checkConfiguration() throws EngineException {
-        return false;
-    }
-
-    @Override
-    public PresentationConfiguration readConfiguration(Reader reader) throws NullPointerException, IllegalArgumentException, IOException {
+    public PresentationConfiguration readConfiguration(Reader reader) throws IOException {
         if (reader == null) throw new NullPointerException("The configuration reader can not be null");
 
         final PresentationConfiguration presentationConfiguration = new PresentationConfiguration();
-        presentationConfiguration.setPresentationFile(new File(this.getWorkingDirectory(), PresentationConfiguration.DEFAULT_PRESENTATION_FILENAME));
+        presentationConfiguration.setPresentationFile(new File(this.getWorkingDirectory(), DEFAULT_PRESENTATION_FILENAME.getFieldName()));
 
         JsonObject configurationJson = JSONHelper.readFromReader(reader);
-        JsonObject presentationJson = configurationJson.getJsonObject(PresentationConfiguration.PRESENTATION);
+        JsonObject presentationJson = configurationJson.getJsonObject(PRESENTATION.getFieldName());
 
-        presentationConfiguration.setId(presentationJson.getLong(PresentationConfiguration.PRESENTATION_ID, System.currentTimeMillis()));
+        presentationConfiguration.setId(presentationJson.getLong(PRESENTATION_ID.getFieldName(), System.currentTimeMillis()));
 
-        if (presentationJson.getJsonArray(PresentationConfiguration.PRESENTATION_CUSTOM_RESOURCES) != null) {
-            presentationJson.getJsonArray(PresentationConfiguration.PRESENTATION_CUSTOM_RESOURCES)
+        if (presentationJson.getJsonArray(PRESENTATION_CUSTOM_RESOURCES.getFieldName()) != null) {
+            presentationJson.getJsonArray(PRESENTATION_CUSTOM_RESOURCES.getFieldName())
+                    .stream()
+                    .map(resource -> (JsonObject) resource)
                     .forEach(customResource -> {
                         final Resource resource = new Resource(
-                                ResourceType.valueOf(((JsonObject) customResource).getString(PresentationConfiguration.CUSTOM_RESOURCE_TYPE)),
-                                new String(Base64.getDecoder().decode(((JsonObject) customResource).getString(PresentationConfiguration.CUSTOM_RESOURCE_CONTENT)))
+                                ResourceType.valueOf(customResource.getString(CUSTOM_RESOURCE_TYPE.getFieldName())),
+                                new String(Base64.getDecoder().decode(customResource.getString(CUSTOM_RESOURCE_CONTENT.getFieldName())))
                         );
 
                         presentationConfiguration.getCustomResources().add(resource);
                     });
         }
 
-        if (presentationJson.getJsonArray(PresentationConfiguration.PRESENTATION_VARIABLES) != null) {
-            presentationJson.getJsonArray(PresentationConfiguration.PRESENTATION_VARIABLES)
+        if (presentationJson.getJsonArray(PRESENTATION_VARIABLES.getFieldName()) != null) {
+            presentationJson.getJsonArray(PRESENTATION_VARIABLES.getFieldName())
+                    .stream()
+                    .map(variable -> (JsonObject) variable)
                     .forEach(variableJson -> {
                         final Pair<String, String> variable = new Pair<>();
-                        variable.setKey(((JsonObject) variableJson).getString(PresentationConfiguration.VARIABLE_NAME));
-                        variable.setValue(new String(Base64.getDecoder().decode(((JsonObject) variableJson).getString(PresentationConfiguration.VARIABLE_VALUE))));
+                        variable.setKey(variableJson.getString(VARIABLE_NAME.getFieldName()));
+                        variable.setValue(new String(Base64.getDecoder().decode(variableJson.getString(VARIABLE_VALUE.getFieldName()))));
                         presentationConfiguration.getVariables().add(variable);
                     });
         }
 
-        presentationJson.getJsonArray(PresentationConfiguration.SLIDES)
+        presentationJson.getJsonArray(SLIDES.getFieldName())
+                .stream()
+                .map(slide -> (JsonObject) slide)
                 .forEach(slideJson -> {
                     final Slide slide = new Slide();
 
-                    slide.setId(((JsonObject) slideJson).getString(PresentationConfiguration.SLIDE_ID));
-                    slide.setSlideNumber(((JsonObject) slideJson).getString(PresentationConfiguration.SLIDE_NUMBER));
-                    slide.setTemplate(this.templateEngine.getConfiguration().getSlideTemplate(((JsonObject) slideJson).getInteger(
-                            PresentationConfiguration.SLIDE_TEMPLATE_ID)));
+                    slide.setId(slideJson.getString(SLIDE_ID.getFieldName()));
+                    slide.setSlideNumber(slideJson.getString(SLIDE_NUMBER.getFieldName()));
+                    slide.setTemplate(this.templateEngine.getConfiguration().getSlideTemplate(slideJson.getInteger(
+                            SLIDE_TEMPLATE_ID.getFieldName())));
 
-                    final String speakerNotes = ((JsonObject) slideJson).getString(PresentationConfiguration.SLIDE_SPEAKER_NOTES);
+                    final String speakerNotes = slideJson.getString(SLIDE_SPEAKER_NOTES.getFieldName());
                     if (speakerNotes != null) {
                         slide.setSpeakerNotesAsBase64(speakerNotes);
                     }
 
-                    try {
-                        final File thumbnailFile = this.getThumbnailFile(slide);
-                        if (thumbnailFile.exists()) {
-                            slide.setThumbnail(this.getThumbnailImage(thumbnailFile));
-                        }
-                    } catch (IOException e) {
-                        LOGGER.log(Level.INFO, "Error setting the thumbnail", e);
-                    }
-
-                    ((JsonObject) slideJson).getJsonArray(PresentationConfiguration.SLIDE_ELEMENTS)
+                    slideJson.getJsonArray(SLIDE_ELEMENTS.getFieldName())
+                            .stream()
+                            .map(element -> (JsonObject) element)
                             .forEach(slideElementJson -> {
                                 final SlideElement slideElement = new SlideElement();
-                                slideElement.setTemplate(slide.getTemplate().getSlideElementTemplate(((JsonObject) slideElementJson).getInteger(
-                                        PresentationConfiguration.SLIDE_ELEMENT_TEMPLATE_ID)));
-                                slideElement.setId(((JsonObject) slideElementJson).getString(PresentationConfiguration.SLIDE_ELEMENT_ELEMENT_ID));
-                                slideElement.setOriginalContentCode(((JsonObject) slideElementJson).getString(PresentationConfiguration.SLIDE_ELEMENT_ORIGINAL_CONTENT_CODE));
-                                slideElement.setOriginalContentAsBase64(((JsonObject) slideElementJson).getString(PresentationConfiguration.SLIDE_ELEMENT_ORIGINAL_CONTENT));
-                                slideElement.setHtmlContentAsBase64(((JsonObject) slideElementJson).getString(PresentationConfiguration.SLIDE_ELEMENT_HTML_CONTENT));
+                                slideElement.setTemplate(slide.getTemplate().getSlideElementTemplate(slideElementJson.getInteger(
+                                        SLIDE_ELEMENT_TEMPLATE_ID.getFieldName())));
+                                slideElement.setId(slideElementJson.getString(SLIDE_ELEMENT_ELEMENT_ID.getFieldName()));
+                                slideElement.setOriginalContentCode(slideElementJson.getString(SLIDE_ELEMENT_ORIGINAL_CONTENT_CODE.getFieldName()));
+                                slideElement.setOriginalContentAsBase64(slideElementJson.getString(SLIDE_ELEMENT_ORIGINAL_CONTENT.getFieldName()));
+                                slideElement.setHtmlContentAsBase64(slideElementJson.getString(SLIDE_ELEMENT_HTML_CONTENT.getFieldName()));
 
                                 slide.getElements().add(slideElement);
                             });
@@ -165,34 +157,8 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         return presentationConfiguration;
     }
 
-    /**
-     * Get the thumbnail file for the given slide. This methods only creates a {@link File} without checking its existence.
-     * The file is supposed to be found in the {@link TemplateConfiguration#getSlidesThumbnailDirectory() thumbnail directory}
-     * of the template configuration of this presentation.
-     *
-     * @param slide The slide to get the thumbnail file for.
-     * @return The supposed file corresponding to the thumbnail.
-     */
-    private File getThumbnailFile(final Slide slide) {
-        final File thumbnailFile = new File(this.templateEngine.getConfiguration().getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png"));
-        return thumbnailFile;
-    }
-
-    /**
-     * Get the {@link WritableImage image} located in the {@link File thumbnail file}.
-     *
-     * @param thumbnailFile The file of the image.
-     * @return The thumbnail image.
-     * @throws IOException If something went wrong.
-     */
-    private WritableImage getThumbnailImage(final File thumbnailFile) throws IOException {
-        final BufferedImage bufferedImage = ImageIO.read(thumbnailFile);
-        final WritableImage image = SwingFXUtils.toFXImage(bufferedImage, null);
-        return image;
-    }
-
     @Override
-    public void writeConfiguration(Writer writer) throws NullPointerException, IOException {
+    public void writeConfiguration(Writer writer) throws IOException {
         if (writer == null) throw new NullPointerException("The configuration to write into can not be null");
 
         if (this.configuration != null) {
@@ -201,14 +167,13 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             final JsonArray customResourcesJson = new JsonArray();
             final JsonArray variablesJson = new JsonArray();
 
-            presentationJson.put(PresentationConfiguration.PRESENTATION_ID, this.configuration.getId());
+            presentationJson.put(PRESENTATION_ID.getFieldName(), this.configuration.getId());
 
             this.configuration.getCustomResources()
-                    .stream()
                     .forEach(resource -> {
                         final JsonObject resourceJson = new JsonObject()
-                                .put(PresentationConfiguration.CUSTOM_RESOURCE_TYPE, resource.getType().name())
-                                .put(PresentationConfiguration.CUSTOM_RESOURCE_CONTENT, Base64.getEncoder().encodeToString(resource.getContent().getBytes()));
+                                .put(CUSTOM_RESOURCE_TYPE.getFieldName(), resource.getType().name())
+                                .put(CUSTOM_RESOURCE_CONTENT.getFieldName(), Base64.getEncoder().encodeToString(resource.getContent().getBytes()));
 
                         customResourcesJson.add(resourceJson);
                     });
@@ -216,56 +181,54 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             this.configuration.getVariables()
                     .forEach(variable -> {
                         final JsonObject variableJson = new JsonObject()
-                                .put(PresentationConfiguration.VARIABLE_NAME, variable.getKey())
-                                .put(PresentationConfiguration.VARIABLE_VALUE, Base64.getEncoder().encodeToString(variable.getValue().getBytes()));
+                                .put(VARIABLE_NAME.getFieldName(), variable.getKey())
+                                .put(VARIABLE_VALUE.getFieldName(), Base64.getEncoder().encodeToString(variable.getValue().getBytes()));
 
                         variablesJson.add(variableJson);
                     });
 
             this.configuration.getSlides()
-                    .stream()
-                    .forEach(slide -> {
-                        final JsonArray elementsJson = new JsonArray();
-                        final JsonObject slideJson = new JsonObject();
+                .forEach(slide -> {
+                    final JsonArray elementsJson = new JsonArray();
+                    final JsonObject slideJson = new JsonObject();
 
-                        slideJson.put(PresentationConfiguration.SLIDE_TEMPLATE_ID, slide.getTemplate().getId())
-                                .put(PresentationConfiguration.SLIDE_ID, slide.getId())
-                                .put(PresentationConfiguration.SLIDE_NUMBER, slide.getSlideNumber());
+                    slideJson.put(SLIDE_TEMPLATE_ID.getFieldName(), slide.getTemplate().getId())
+                            .put(SLIDE_ID.getFieldName(), slide.getId())
+                            .put(SLIDE_NUMBER.getFieldName(), slide.getSlideNumber());
 
-                        if (slide.hasSpeakerNotes()) {
-                            slideJson.put(PresentationConfiguration.SLIDE_SPEAKER_NOTES, slide.getSpeakerNotesAsBase64());
-                        }
+                    if (slide.hasSpeakerNotes()) {
+                        slideJson.put(SLIDE_SPEAKER_NOTES.getFieldName(), slide.getSpeakerNotesAsBase64());
+                    }
 
-                        slide.getElements()
-                                .stream()
-                                .forEach(slideElement -> {
-                                    final JsonObject elementJson = new JsonObject();
-                                    elementJson.put(PresentationConfiguration.SLIDE_ELEMENT_TEMPLATE_ID, slideElement.getTemplate().getId())
-                                            .put(PresentationConfiguration.SLIDE_ELEMENT_ELEMENT_ID, slideElement.getId())
-                                            .put(PresentationConfiguration.SLIDE_ELEMENT_ORIGINAL_CONTENT_CODE, slideElement.getOriginalContentCode())
-                                            .put(PresentationConfiguration.SLIDE_ELEMENT_ORIGINAL_CONTENT, slideElement.getOriginalContentAsBase64())
-                                            .put(PresentationConfiguration.SLIDE_ELEMENT_HTML_CONTENT, slideElement.getHtmlContentAsBase64());
+                    slide.getElements()
+                        .forEach(slideElement -> {
+                            final JsonObject elementJson = new JsonObject();
+                            elementJson.put(SLIDE_ELEMENT_TEMPLATE_ID.getFieldName(), slideElement.getTemplate().getId())
+                                    .put(SLIDE_ELEMENT_ELEMENT_ID.getFieldName(), slideElement.getId())
+                                    .put(SLIDE_ELEMENT_ORIGINAL_CONTENT_CODE.getFieldName(), slideElement.getOriginalContentCode())
+                                    .put(SLIDE_ELEMENT_ORIGINAL_CONTENT.getFieldName(), slideElement.getOriginalContentAsBase64())
+                                    .put(SLIDE_ELEMENT_HTML_CONTENT.getFieldName(), slideElement.getHtmlContentAsBase64());
 
-                                    elementsJson.add(elementJson);
-                                });
+                            elementsJson.add(elementJson);
+                        });
 
-                        slideJson.put(PresentationConfiguration.SLIDE_ELEMENTS, elementsJson);
-                        slidesJson.add(slideJson);
-                    });
+                    slideJson.put(SLIDE_ELEMENTS.getFieldName(), elementsJson);
+                    slidesJson.add(slideJson);
+                });
 
-            presentationJson.put(PresentationConfiguration.PRESENTATION_CUSTOM_RESOURCES, customResourcesJson);
-            presentationJson.put(PresentationConfiguration.PRESENTATION_VARIABLES, variablesJson);
-            presentationJson.put(PresentationConfiguration.SLIDES, slidesJson);
+            presentationJson.put(PRESENTATION_CUSTOM_RESOURCES.getFieldName(), customResourcesJson);
+            presentationJson.put(PRESENTATION_VARIABLES.getFieldName(), variablesJson);
+            presentationJson.put(SLIDES.getFieldName(), slidesJson);
 
             final JsonObject finalObject = new JsonObject();
-            finalObject.put(PresentationConfiguration.PRESENTATION, presentationJson);
+            finalObject.put(PRESENTATION.getFieldName(), presentationJson);
 
             JSONHelper.writeObject(finalObject, writer);
         }
     }
 
     @Override
-    public void loadArchive(File file) throws IllegalArgumentException, NullPointerException, IOException, IllegalAccessException {
+    public void loadArchive(File file) throws IOException, IllegalAccessException {
         if (file == null) throw new NullPointerException("The archive file can not be null");
         if (!file.exists()) throw new FileNotFoundException("The archive file does not exist");
         if (!file.canRead()) throw new IllegalAccessException("The archive file can not be read");
@@ -309,7 +272,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
             this.savePresentationFile();
         } catch (TemplateException e) {
-            LOGGER.log(Level.SEVERE, "Can not parse template", e);
+            LOGGER.log(SEVERE, "Can not parse template", e);
         }
 
         LOGGER.fine("Building presentation file");
@@ -344,7 +307,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                                 .getElementById(element.getId())
                                 .html(element.getClearedHtmlContent(this.getConfiguration().getVariables())));
             } catch (IOException | TemplateException e) {
-                LOGGER.log(Level.SEVERE, "Can not read slide's template", e);
+                LOGGER.log(SEVERE, "Can not read slide's template", e);
             }
         }
 
@@ -352,34 +315,9 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     }
 
     @Override
-    public synchronized void saveArchive(File file) throws IllegalArgumentException, IOException {
+    public synchronized void saveArchive(File file) throws IOException {
 
         this.writeConfiguration();
-
-        LOGGER.fine("Create slides thumbnails");
-        if (!this.templateEngine.getConfiguration().getSlidesThumbnailDirectory().exists()) {
-            if (!this.templateEngine.getConfiguration().getSlidesThumbnailDirectory().mkdirs()) {
-                LOGGER.log(Level.SEVERE, "Can not create slides thumbnails directory");
-            }
-        } else {
-            Arrays.stream(this.templateEngine.getConfiguration().getSlidesThumbnailDirectory()
-                    .listFiles(f -> f.isFile()))
-                    .forEach(slideFile -> slideFile.delete());
-        }
-
-        this.configuration.getSlides()
-                .stream()
-                .filter(slide -> slide != null && slide.getThumbnail() != null)
-                .forEach(slide -> {
-                    LOGGER.fine("Creating thumbnail file: " + this.templateEngine.getConfiguration().getSlidesThumbnailDirectory().getAbsolutePath() + File.separator + slide.getSlideNumber() + ".png");
-                    try {
-                        ImageIO.write(SwingFXUtils.fromFXImage(slide.getThumbnail(), null), "png", new File(this.templateEngine.getConfiguration().getSlidesThumbnailDirectory(), slide.getSlideNumber().concat(".png")));
-                    } catch (IOException e) {
-                        LOGGER.log(Level.WARNING,
-                                String.format("Can not create thumbnail for slide number %1$s", slide.getSlideNumber()),
-                                e);
-                    }
-                });
 
         ZipUtils.zip(this.getWorkingDirectory(), file);
 
@@ -437,7 +375,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         this.setWorkingDirectory(this.templateEngine.getWorkingDirectory());
 
         this.configuration = new PresentationConfiguration();
-        this.configuration.setPresentationFile(new File(this.getWorkingDirectory(), PresentationConfiguration.DEFAULT_PRESENTATION_FILENAME));
+        this.configuration.setPresentationFile(new File(this.getWorkingDirectory(), DEFAULT_PRESENTATION_FILENAME.getFieldName()));
         this.configuration.getVariables().addAll(this.templateEngine.getConfiguration().getDefaultVariables());
 
         final Configuration templateConfiguration = TemplateProcessor.getDefaultConfiguration();
@@ -456,7 +394,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
 
             this.savePresentationFile();
         } catch (TemplateException e) {
-            LOGGER.log(Level.SEVERE, "Can not parse the template", e);
+            LOGGER.log(SEVERE, "Can not parse the template", e);
         }
     }
 
@@ -663,7 +601,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             writer.write(this.configuration.getDocument().html());
             writer.flush();
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not save presentation file", e);
+            LOGGER.log(SEVERE, "Can not save presentation file", e);
         }
     }
 
@@ -692,7 +630,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
      * @throws IOException          If an error occurs when parsing the template.
      * @throws NullPointerException If the given {@code template} is {@code null}.
      */
-    private Pair<Slide, Element> createSlide(final SlideTemplate template) throws NullPointerException, IOException {
+    private Pair<Slide, Element> createSlide(final SlideTemplate template) throws IOException {
         if (template == null) throw new NullPointerException("The template can not be null");
 
         this.setModifiedSinceLatestSave(true);
@@ -718,7 +656,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                             result.getKey().updateElement(writer.toString(), "HTML", element.getDefaultContent(), element.getDefaultContent())
                                     .setTemplate(element);
                         } catch (IOException | TemplateException e) {
-                            LOGGER.log(Level.WARNING, "Can not parse element", e);
+                            LOGGER.log(WARNING, "Can not parse element", e);
                         }
                     });
         }
@@ -757,7 +695,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             result.setValue(DOMUtils.convertToNode(writer.toString()));
             result.getKey().setId(result.getValue().id());
         } catch (TemplateException e) {
-            LOGGER.log(Level.WARNING, "Error when parsing the slide's template", e);
+            LOGGER.log(WARNING, "Error when parsing the slide's template", e);
         }
 
         return result;

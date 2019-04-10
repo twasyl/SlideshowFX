@@ -19,6 +19,6 @@ public class TextileActivator implements BundleActivator {
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-        // Nothing required when stopping this bundle
+        // Nothing to do when stopping the plugin
     }
 }

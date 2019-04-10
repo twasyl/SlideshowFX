@@ -1,7 +1,10 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'org.sonarqube'
+}
 description = 'The SlideshowFX application'
 version = '@@NEXT_VERSION@@'
-
-apply plugin: 'java'
 
 dependencies {
     compile project(':slideshowfx-content-extension')
@@ -96,8 +99,8 @@ task createBundle() {
 }
 
 task zipSlideContentEditor(type: Zip) {
-    archiveName = "sfx-slide-content-editor.zip"
-    destinationDir = file("${buildDir}/tmp")
+    archiveFileName = "sfx-slide-content-editor.zip"
+    destinationDirectory = file("${buildDir}/tmp")
     from("${buildDir}/tmp/sfx-slide-content-editor-update/sfx-slide-content-editor") {
         into "sfx-slide-content-editor"
     }

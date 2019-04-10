@@ -9,7 +9,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,9 +56,19 @@ public class LogsController implements Initializable {
         }
     }
 
+    private SlideshowFXHandler getHandler() {
+        final Handler[] handlers = LOGGER.getParent().getHandlers();
+
+        return Arrays.stream(handlers)
+                .filter(h -> h.getClass().equals(SlideshowFXHandler.class))
+                .map(h -> (SlideshowFXHandler) h)
+                .findAny()
+                .orElse(null);
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.handler = SlideshowFXHandler.getSingleton();
+        this.handler = getHandler();
         this.refreshLogs();
 
         try {

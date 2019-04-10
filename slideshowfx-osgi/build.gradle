@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'jacoco'
+    id 'org.sonarqube'
 }
 
 description = 'Module allowing to add OSGi support in the application'

@@ -2,6 +2,7 @@ plugins {
     id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
+    id 'org.sonarqube'
 }
 
 description = 'Extension allowing to insert alerts inside a SlideshowFX presentation'
@@ -19,7 +20,7 @@ dependencies {
 
 sfxPlugin {
     contentExtension = true
-    
+
     bundle {
         name = 'SlideshowFX alert extension'
         symbolicName = 'com.twasyl.slideshowfx.content.extension.alert'
@@ -31,50 +32,31 @@ sfxPlugin {
     }
 }
 
-task createSweetAlertPackage() {
-    doLast {
-        def sweetAlertVersion = project.findProperty('sweetAlertVersion') ?: ''
-        def binaryDir = new File("${buildDir}/tmp/sweetalert-update")
-        def binary = new File(binaryDir, "binary.zip")
-        def newPackageDir = new File("${binaryDir}/sweetalert2", sweetAlertVersion)
-        def unpackedBinary = new File("${binaryDir}/sweetalert2-${sweetAlertVersion}")
-        if (!binaryDir.exists()) {
-            binaryDir.mkdirs()
-        }
-
-        new URL("https://github.com/sweetalert2/sweetalert2/archive/v${sweetAlertVersion}.zip").withInputStream { i ->
-            binary.withOutputStream {
-                it << i
-            }
-        }
-
-        copy {
-            from zipTree(binary)
-            into binaryDir
-        }
-
-        binary.delete()
-
-        if (newPackageDir.exists()) {
-            newPackageDir.deleteDir()
-        }
-
-        copy {
-            from fileTree("${unpackedBinary}/dist")
-            include "sweetalert2.all.min.js"
-            into newPackageDir
-        }
-
-        unpackedBinary.deleteDir()
-    }
-}
-
 task zipSweetAlertPackage(type: Zip) {
-    archiveName = "sweetalert2.zip"
-    destinationDir = file("${buildDir}/tmp")
+    archiveFileName = "sweetalert2.zip"
+    destinationDirectory = file("${buildDir}/tmp")
     from("${buildDir}/tmp/sweetalert-update/sweetalert2") {
         into "sweetalert2"
     }
 }
 
-createSweetAlertPackage.finalizedBy zipSweetAlertPackage
+task createSweetAlertPackage() {
+    finalizedBy zipSweetAlertPackage
+
+    doLast {
+        def sweetAlertVersion = project.findProperty('sweetAlertVersion') ?: ''
+        def binaryDir = new File("${buildDir}/tmp/sweetalert-update")
+        def newPackageDir = new File("${binaryDir}/sweetalert2", sweetAlertVersion)
+        def binary = new File(newPackageDir, "sweetalert2.all.min.js")
+        
+        if (!newPackageDir.exists()) {
+            newPackageDir.mkdirs()
+        }
+        
+        new URL("https://cdn.jsdelivr.net/npm/sweetalert2@${sweetAlertVersion}/dist/sweetalert2.all.min.js").withInputStream { i ->
+            binary.withOutputStream {
+                it << i
+            }
+        }
+    }
+}

@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'jacoco'
+    id 'org.sonarqube'
 }
 
 description = 'Module defining themes to be used within the SlideshowFX app'

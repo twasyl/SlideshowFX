@@ -2,6 +2,7 @@ plugins {
     id 'sfx-plugin'
     id 'jacoco'
     id 'com.jfrog.bintray'
+    id 'org.sonarqube'
 }
 
 description = 'Snippet executor allowing to execute some Golo inside a SlideshowFX presentation'

@@ -21,6 +21,6 @@ public class MarkdownActivator implements BundleActivator {
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-
+        // Nothing to do when stopping the plugin
     }
 }

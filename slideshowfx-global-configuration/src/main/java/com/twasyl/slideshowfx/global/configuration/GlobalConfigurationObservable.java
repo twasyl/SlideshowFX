@@ -1,5 +1,7 @@
 package com.twasyl.slideshowfx.global.configuration;
 
+import com.twasyl.slideshowfx.global.configuration.events.ThemeChangeEvent;
+
 import java.util.Observable;
 import java.util.Observer;
 
@@ -10,26 +12,10 @@ import java.util.Observer;
  * @since SlideshowFX @@NEXT-VERSION@@
  */
 public class GlobalConfigurationObservable extends Observable {
-    protected static class ThemeChangeEvent {
-        private String oldTheme, newTheme;
-
-        public ThemeChangeEvent(String oldTheme, String newTheme) {
-            this.oldTheme = oldTheme;
-            this.newTheme = newTheme;
-        }
-
-        public String getOldTheme() {
-            return oldTheme;
-        }
-
-        public String getNewTheme() {
-            return newTheme;
-        }
-    }
 
     @Override
     public synchronized void addObserver(Observer o) {
-        if (o != null && o instanceof GlobalConfigurationObserver) {
+        if (o instanceof GlobalConfigurationObserver) {
             super.addObserver(o);
         }
     }

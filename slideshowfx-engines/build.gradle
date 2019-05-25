@@ -15,4 +15,8 @@ dependencies {
     compile "org.freemarker:freemarker:${rootProject.ext.dependencies.freemarker.version}"
 
     testCompile "org.mockito:mockito-core:${rootProject.ext.dependencies.mockito.version}"
+
+    gherkinTestCompile project(':slideshowfx-utils')
+    gherkinTestCompile "io.vertx:vertx-core:${rootProject.ext.dependencies.vertx.version}"
+    gherkinTestCompile "io.vertx:vertx-web:${rootProject.ext.dependencies.vertx.version}"
 }

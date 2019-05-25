@@ -2,7 +2,7 @@ package com.twasyl.slideshowfx.engine.presentation.configuration;
 
 import com.twasyl.slideshowfx.content.extension.Resource;
 import com.twasyl.slideshowfx.engine.IConfiguration;
-import com.twasyl.slideshowfx.utils.beans.Pair;
+import com.twasyl.slideshowfx.engine.Variable;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
@@ -23,7 +23,7 @@ public class PresentationConfiguration implements IConfiguration {
     private Document document;
     private File presentationFile;
     private Set<Resource> customResources = new LinkedHashSet<>();
-    private Set<Pair<String, String>> variables = new LinkedHashSet<>();
+    private Set<Variable> variables = new LinkedHashSet<>();
     private List<Slide> slides = new ArrayList<>();
 
     public long getId() {
@@ -71,11 +71,11 @@ public class PresentationConfiguration implements IConfiguration {
         return customResources;
     }
 
-    public Set<Pair<String, String>> getVariables() {
+    public Set<Variable> getVariables() {
         return this.variables;
     }
 
-    public void setVariables(Collection<Pair<String, String>> variables) {
+    public void setVariables(Collection<Variable> variables) {
         this.variables.clear();
         this.variables.addAll(variables);
     }

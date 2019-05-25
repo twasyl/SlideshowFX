@@ -81,7 +81,7 @@ ext.dependencies = [
         mockito     : [version: '2.26.0'],
         monocle     : [version: '8u76-b04'],
         testfx      : [version: '4.0.15-alpha'],
-        vertx       : [version: '3.7.0'],
+        vertx       : [version: '3.7.1'],
         wikitext    : [version: '3.0.29'],
         zxing       : [version: '3.3.3']
 ]
@@ -99,11 +99,18 @@ subprojects {
                 compileClasspath += sourceSets.main.output
                 runtimeClasspath += sourceSets.main.output
             }
+
+            gherkinTest {
+                compileClasspath += sourceSets.main.output
+                runtimeClasspath += sourceSets.main.output
+            }
         }
 
         configurations {
             integrationTestImplementation.extendsFrom implementation
             integrationTestRuntimeOnly.extendsFrom runtimeOnly
+            gherkinTestImplementation.extendsFrom implementation
+            gherkinTestRuntime.extendsFrom runtime
         }
 
         dependencies {
@@ -114,45 +121,72 @@ subprojects {
             integrationTestImplementation "org.junit.jupiter:junit-jupiter-api:${rootProject.ext.dependencies.junit.version}"
             integrationTestImplementation "org.junit.jupiter:junit-jupiter-params:${rootProject.ext.dependencies.junit.version}"
             integrationTestRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${rootProject.ext.dependencies.junit.version}"
+
+            gherkinTestImplementation "org.junit.jupiter:junit-jupiter-api:${rootProject.ext.dependencies.junit.version}"
+            gherkinTestImplementation "org.junit.jupiter:junit-jupiter-params:${rootProject.ext.dependencies.junit.version}"
+            gherkinTestRuntime "org.junit.jupiter:junit-jupiter-engine:${rootProject.ext.dependencies.junit.version}"
+            gherkinTestImplementation 'io.cucumber:cucumber-java8:4.3.1'
+            gherkinTestRuntime 'io.cucumber:cucumber-java8:4.3.1'
         }
 
         test {
             useJUnitPlatform()
         }
 
-        task integrationTest(type: Test) {
+        task integrationTest(type: Test, dependsOn: jar) {
             description = 'Runs integration tests.'
             group = 'verification'
 
             testClassesDirs = sourceSets.integrationTest.output.classesDirs
             classpath = sourceSets.integrationTest.runtimeClasspath
-        }
 
-        integrationTest.dependsOn jar
-        check.dependsOn integrationTest
-
-        integrationTest {
             useJUnitPlatform()
         }
-        
+
+        task gherkinTest(type: Test, dependsOn: [assemble, compileTestJava]) {
+            description = 'Runs gherkin tests.'
+            group = 'verification'
+
+            testClassesDirs = sourceSets.gherkinTest.output.classesDirs
+            classpath = sourceSets.gherkinTest.runtimeClasspath
+            
+            
+            doLast {
+                javaexec {
+                    def jacocoAgent = zipTree(configurations.jacocoAgent.singleFile).filter { it.name == "jacocoagent.jar" }.singleFile
+                    jvmArgs = ["-javaagent:$jacocoAgent=destfile=$buildDir/jacoco/${sourceSets.gherkinTest.name}.exec,append=false"]
+                    
+                    main = "cucumber.api.cli.Main"
+                    classpath = configurations.gherkinTestRuntime + sourceSets.main.output + sourceSets.test.output + sourceSets.gherkinTest.output
+                    args = ['--plugin', "html:${project.buildDir}/reports/tests/gherkinTest",
+                            '--plugin', "junit:${project.buildDir}/test-results/${sourceSets.gherkinTest.name}/TEST-gherkin.xml",
+                            '--strict',
+                            '--glue', 'gradle.cucumber',
+                            "src/${sourceSets.gherkinTest.name}/resources"]
+                }
+            }
+        }
+
+        check.dependsOn test, integrationTest, gherkinTest
+
         jar {
             manifest {
                 attributes += [
-                    'Implementation-Vendor': 'Thierry Wasylczenko'
+                        'Implementation-Vendor': 'Thierry Wasylczenko'
                 ]
             }
         }
     }
-    
+
     def sfxPluginCallback = {
         evaluationDependsOn(':slideshowfx-plugin')
-        
+
         sfxPlugin {
             bundle {
                 vendor = "Thierry Wasylczenko"
             }
         }
-        
+
         dependencies {
             implementation "org.apache.felix:org.apache.felix.framework:${rootProject.ext.dependencies.felix.version}"
 
@@ -196,22 +230,24 @@ subprojects {
 
     def jacocoCallback = {
         jacoco {
-            toolVersion = "0.8.3"
+            toolVersion = "0.8.4"
         }
 
         jacocoTestReport {
-            
-            additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
-            
-            executionData fileTree("$buildDir/jacoco").matching {
+
+            getAdditionalSourceDirs().from(sourceSets.integrationTest.allJava.srcDirs, sourceSets.gherkinTest.allJava.srcDirs)
+
+            getExecutionData().setFrom(fileTree("$buildDir/jacoco").matching {
                 include "*.exec"
-            }
-            
+            })
+
             reports {
                 csv.enabled false
                 html.enabled true
                 xml.enabled true
             }
+            
+            dependsOn test, integrationTest, gherkinTest
         }
     }
 
@@ -219,17 +255,22 @@ subprojects {
         sonarqube {
             properties {
                 def integrationTestsDirs = sourceSets.integrationTest.allSource.srcDirs.findAll { it.exists() }
-                def jacocoIntegrationTestResult = "$buildDir/jacoco/${sourceSets.integrationTest.name}.exec"
-                def junitIntegrationTestReport = "$buildDir/reports/tests/${sourceSets.integrationTest.name}"
+                def gherkinTestsDirs = sourceSets.gherkinTest.allSource.srcDirs.findAll { it.exists() }
                 
-                if (sourceSets.test.allJava.srcDirs.findAll { it.exists()}.isEmpty()) {
-                    properties["sonar.tests"] = integrationTestsDirs
-                    properties["sonar.jacoco.reportPaths"] = jacocoIntegrationTestResult
-                    properties["sonar.junit.reportPaths"] = junitIntegrationTestReport
+                def jacocoIntegrationTestResult = "$buildDir/jacoco/${sourceSets.integrationTest.name}.exec"
+                def jacocoGherkinTestResult = "$buildDir/jacoco/${sourceSets.gherkinTest.name}.exec"
+                
+                def junitIntegrationTestReport = "$buildDir/reports/tests/${sourceSets.integrationTest.name}"
+                def junitGherkinTestReport = "$buildDir/reports/tests/${sourceSets.gherkinTest.name}"
+
+                if (sourceSets.test.allJava.srcDirs.findAll { it.exists() }.isEmpty()) {
+                    properties["sonar.tests"] = integrationTestsDirs + gherkinTestsDirs
+                    properties["sonar.jacoco.reportPaths"] = jacocoIntegrationTestResult + jacocoGherkinTestResult
+                    properties["sonar.junit.reportPaths"] = junitIntegrationTestReport + junitGherkinTestReport
                 } else {
-                    properties["sonar.tests"] += integrationTestsDirs
-                    properties["sonar.jacoco.reportPaths"] += jacocoIntegrationTestResult
-                    properties["sonar.junit.reportPaths"] += junitIntegrationTestReport
+                    properties["sonar.tests"] += integrationTestsDirs + gherkinTestsDirs
+                    properties["sonar.jacoco.reportPaths"] += jacocoIntegrationTestResult + jacocoGherkinTestResult
+                    properties["sonar.junit.reportPaths"] += junitIntegrationTestReport + junitGherkinTestReport
                 }
             }
         }

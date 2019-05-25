@@ -256,3 +256,10 @@ task createSlideContentEditor {
 
 processResources.dependsOn project(':slideshowfx-documentation').distZip
 build.dependsOn createBundle
+
+
+test {
+    jacoco {
+        excludes = [ "com.twasyl.slideshowfx.controllers.*", "com.twasyl.slideshowfx.controls.*", "com.twasyl.slideshowfx.app.*"]
+    }
+}

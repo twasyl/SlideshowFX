@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.controls.builder.nodes;
 
+import com.twasyl.slideshowfx.engine.Variable;
 import com.twasyl.slideshowfx.icons.FontAwesome;
 import com.twasyl.slideshowfx.icons.Icon;
 import com.twasyl.slideshowfx.ui.controls.ExtendedTextField;

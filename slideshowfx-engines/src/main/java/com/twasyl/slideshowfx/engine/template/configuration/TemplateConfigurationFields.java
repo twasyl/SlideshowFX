@@ -20,7 +20,6 @@ public enum TemplateConfigurationFields {
     SLIDES("slides"),
     SLIDES_CONFIGURATION("configuration"),
     SLIDES_TEMPLATE_DIRECTORY("template-directory"),
-    SLIDES_PRESENTATION_DIRECTORY("presentation-directory"),
     SLIDE_ID_PREFIX("slide-id-prefix"),
     SLIDES_CONTAINER("slides-container"),
     SLIDES_DEFINITION("slides-definition"),
@@ -45,5 +44,21 @@ public enum TemplateConfigurationFields {
 
     public String getFieldName() {
         return fieldName;
+    }
+
+    /**
+     * Look for the enum value corresponding to the given {@link #fieldName field name}.
+     *
+     * @param fieldName The value of {@link #fieldName} to search for.
+     * @return The {@link TemplateConfigurationFields} corresponding to the field name, or {@code null} if not found.
+     */
+    public static TemplateConfigurationFields fromFieldName(final String fieldName) {
+        for (TemplateConfigurationFields field : values()) {
+            if (field.getFieldName().equals(fieldName)) {
+                return field;
+            }
+        }
+
+        return null;
     }
 }

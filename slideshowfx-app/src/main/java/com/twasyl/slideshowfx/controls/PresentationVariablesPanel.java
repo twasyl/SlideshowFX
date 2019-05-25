@@ -1,11 +1,13 @@
 package com.twasyl.slideshowfx.controls;
 
+import com.twasyl.slideshowfx.engine.Variable;
 import com.twasyl.slideshowfx.engine.presentation.configuration.PresentationConfiguration;
 import com.twasyl.slideshowfx.icons.FontAwesome;
 import com.twasyl.slideshowfx.icons.Icon;
 import com.twasyl.slideshowfx.icons.IconStack;
 import com.twasyl.slideshowfx.utils.DialogHelper;
-import com.twasyl.slideshowfx.utils.beans.Pair;
+import javafx.beans.property.adapter.JavaBeanObjectProperty;
+import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -13,8 +15,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,15 +63,15 @@ public class PresentationVariablesPanel extends BorderPane {
         this.setTop(toolbar);
         this.setCenter(this.variablesScrollPane);
 
-        this.configuration.getVariables().forEach(variable -> this.addVariable(variable.getKey(), variable.getValue()));
+        this.configuration.getVariables().forEach(variable -> this.addVariable(variable.getName(), variable.getValue()));
     }
 
     /**
      * This methods add the graphical components to this panel that allows to define a new variable to the configuration.
      */
     private void addVariable(String name, String value) {
-        final Pair<String, String> variable = new Pair<>();
-        if (name != null) variable.setKey(name);
+        final Variable variable = new Variable();
+        if (name != null) variable.setName(name);
         if (value != null) variable.setValue(value);
 
         final RadioButton radioButton = new RadioButton();
@@ -89,13 +89,13 @@ public class PresentationVariablesPanel extends BorderPane {
         final TextField variableName = new TextField();
         variableName.setPromptText("Variable's name");
         variableName.setPrefColumnCount(10);
-        variableName.textProperty().bindBidirectional(variable.keyProperty());
+        variableName.textProperty().bindBidirectional(buildVariableNameProperty(variable));
         variableName.setOnKeyPressed(addVariableByKeyboard);
 
         final TextField variableValue = new TextField();
         variableValue.setPromptText("Variable's value");
         variableValue.setPrefColumnCount(15);
-        variableValue.textProperty().bindBidirectional(variable.valueProperty());
+        variableValue.textProperty().bindBidirectional(buildVariableValueProperty(variable));
         variableValue.setOnKeyPressed(addVariableByKeyboard);
 
         final FontAwesome icon = new FontAwesome(Icon.TIMES_CIRCLE);
@@ -119,6 +119,32 @@ public class PresentationVariablesPanel extends BorderPane {
         this.variablesBox.getChildren().add(box);
     }
 
+    private JavaBeanObjectProperty buildVariableNameProperty(final Variable variable) {
+        try {
+            return new JavaBeanObjectPropertyBuilder<>()
+                    .bean(variable)
+                    .getter("getName")
+                    .setter("setName")
+                    .name("name")
+                    .build();
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    private JavaBeanObjectProperty buildVariableValueProperty(final Variable variable) {
+        try {
+            return new JavaBeanObjectPropertyBuilder<>()
+                    .bean(variable)
+                    .getter("getValue")
+                    .setter("setValue")
+                    .name("value")
+                    .build();
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
     /**
      * Get the property that has been selected in this panel. If no selection has been made, {@code null}
      * is returned.
@@ -126,13 +152,13 @@ public class PresentationVariablesPanel extends BorderPane {
      *
      * @return The selected property.
      */
-    public Pair<String, String> getSelectedVariable() {
+    public Variable getSelectedVariable() {
         final RadioButton selection = (RadioButton) this.variableGroup.getSelectedToggle();
 
         if (selection != null) {
-            final Pair<String, String> variable = (Pair<String, String>) selection.getUserData();
+            final Variable variable = (Variable) selection.getUserData();
 
-            if (variable.getKey() == null || variable.getKey().trim().isEmpty()) return null;
+            if (variable.getName() == null || variable.getName().trim().isEmpty()) return null;
             else {
                 this.normalizeVariable(variable);
                 return variable;
@@ -147,12 +173,12 @@ public class PresentationVariablesPanel extends BorderPane {
      *
      * @return The list of valid defined variables or an empty list if no variables are defined or valid.
      */
-    public List<Pair<String, String>> getVariables() {
-        final List<Pair<String, String>> variables = new ArrayList<>();
+    public List<Variable> getVariables() {
+        final List<Variable> variables = new ArrayList<>();
 
         variables.addAll(this.variableGroup.getToggles().stream()
-                .map(toggle -> (Pair<String, String>) toggle.getUserData())
-                .filter(data -> data.getKey() != null && !data.getKey().trim().isEmpty())
+                .map(toggle -> (Variable) toggle.getUserData())
+                .filter(data -> data.getName() != null && !data.getName().trim().isEmpty())
                 .collect(Collectors.toList()));
 
         variables.forEach(this::normalizeVariable);
@@ -165,7 +191,7 @@ public class PresentationVariablesPanel extends BorderPane {
      *
      * @param variable The variable to normalize.
      */
-    private void normalizeVariable(final Pair<String, String> variable) {
+    private void normalizeVariable(final Variable variable) {
         if (variable.getValue() == null) {
             variable.setValue("");
         }

@@ -1,12 +1,12 @@
 package com.twasyl.slideshowfx.engine.template;
 
 import com.twasyl.slideshowfx.engine.AbstractEngine;
+import com.twasyl.slideshowfx.engine.Variable;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideElementTemplate;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
 import com.twasyl.slideshowfx.utils.JSONHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
-import com.twasyl.slideshowfx.utils.beans.Pair;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -96,13 +96,12 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
         if (defaultVariablesJson != null) {
             LOGGER.fine("Reading default variables");
 
-            defaultVariablesJson.forEach(variable -> {
-                final JsonObject variableJson = (JsonObject) variable;
-                templateConfiguration.getDefaultVariables().add(
-                        new Pair<>(
-                                variableJson.getString(TEMPLATE_DEFAULT_VARIABLE_NAME.getFieldName()),
-                                new String(Base64.getDecoder().decode(variableJson.getString(TEMPLATE_DEFAULT_VARIABLE_VALUE.getFieldName())), getDefaultCharset())
-                        ));
+            defaultVariablesJson.forEach(defaultVariable -> {
+                final JsonObject variableJson = (JsonObject) defaultVariable;
+                final Variable variable = new Variable();
+                variable.setName(variableJson.getString(TEMPLATE_DEFAULT_VARIABLE_NAME.getFieldName()));
+                variable.setValueAsBase64(variableJson.getString(TEMPLATE_DEFAULT_VARIABLE_VALUE.getFieldName()));
+                templateConfiguration.getDefaultVariables().add(variable);
             });
         }
 
@@ -116,9 +115,6 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
 
             templateConfiguration.setSlidesTemplateDirectory(new File(this.getWorkingDirectory(), slidesConfigurationJson.getString(SLIDES_TEMPLATE_DIRECTORY.getFieldName())));
             LOGGER.fine("[Slide's configuration] templateConfiguration directory = " + templateConfiguration.getSlidesTemplateDirectory().getAbsolutePath());
-
-            templateConfiguration.setSlidesPresentationDirectory(new File(this.getWorkingDirectory(), slidesConfigurationJson.getString(SLIDES_PRESENTATION_DIRECTORY.getFieldName())));
-            LOGGER.fine("[Slide's configuration] presentation directory = " + templateConfiguration.getSlidesPresentationDirectory().getAbsolutePath());
 
             templateConfiguration.setSlideIdPrefix(slidesConfigurationJson.getString(SLIDE_ID_PREFIX.getFieldName()));
             LOGGER.fine("[Slide's configuration] slideIdPrefix = " + templateConfiguration.getSlideIdPrefix());
@@ -211,8 +207,7 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                                     .put(SLIDES_CONFIGURATION.getFieldName(), new JsonObject()
                                             .put(SLIDES_CONTAINER.getFieldName(), this.configuration.getSlidesContainer() == null ? "" : this.configuration.getSlidesContainer())
                                             .put(SLIDE_ID_PREFIX.getFieldName(), this.configuration.getSlideIdPrefix() == null ? "" : this.configuration.getSlideIdPrefix())
-                                            .put(SLIDES_TEMPLATE_DIRECTORY.getFieldName(), this.configuration.getSlidesTemplateDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getSlidesTemplateDirectory()))
-                                            .put(SLIDES_PRESENTATION_DIRECTORY.getFieldName(), this.configuration.getSlidesPresentationDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getSlidesTemplateDirectory())))
+                                            .put(SLIDES_TEMPLATE_DIRECTORY.getFieldName(), this.configuration.getSlidesTemplateDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getSlidesTemplateDirectory())))
                                     .put(SLIDES_DEFINITION.getFieldName(), new JsonArray())));
 
             final JsonArray defaultVariablesJson = configurationJson.getJsonObject(TEMPLATE.getFieldName())
@@ -220,7 +215,7 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
 
             this.configuration.getDefaultVariables()
                     .forEach(variable -> defaultVariablesJson.add(new JsonObject()
-                            .put(TEMPLATE_DEFAULT_VARIABLE_NAME.getFieldName(), variable.getKey())
+                            .put(TEMPLATE_DEFAULT_VARIABLE_NAME.getFieldName(), variable.getValue())
                             .put(TEMPLATE_DEFAULT_VARIABLE_VALUE.getFieldName(), Base64.getEncoder().encodeToString(variable.getValue().getBytes(getDefaultCharset())))));
 
             final JsonArray slidesDefinitionJson = configurationJson.getJsonObject(TEMPLATE.getFieldName())

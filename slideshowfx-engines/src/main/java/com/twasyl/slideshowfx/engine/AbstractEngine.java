@@ -66,7 +66,7 @@ public abstract class AbstractEngine<T extends IConfiguration> implements IEngin
     public void setArchive(File file) {
         final File oldFile = this.archiveFile;
         this.archiveFile = file;
-        PlatformHelper.run(() -> this.propertyChangeSupport.firePropertyChange("archiveFile", oldFile, this.archiveFile));
+        this.propertyChangeSupport.firePropertyChange("archiveFile", oldFile, this.archiveFile);
     }
 
     @Override

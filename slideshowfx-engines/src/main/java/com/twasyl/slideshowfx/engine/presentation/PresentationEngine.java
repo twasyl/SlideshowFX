@@ -3,6 +3,7 @@ package com.twasyl.slideshowfx.engine.presentation;
 import com.twasyl.slideshowfx.content.extension.Resource;
 import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.engine.AbstractEngine;
+import com.twasyl.slideshowfx.engine.Variable;
 import com.twasyl.slideshowfx.engine.presentation.configuration.PresentationConfiguration;
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.engine.presentation.configuration.SlideElement;
@@ -11,7 +12,10 @@ import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
-import com.twasyl.slideshowfx.utils.*;
+import com.twasyl.slideshowfx.utils.DOMUtils;
+import com.twasyl.slideshowfx.utils.JSONHelper;
+import com.twasyl.slideshowfx.utils.TemplateProcessor;
+import com.twasyl.slideshowfx.utils.ZipUtils;
 import com.twasyl.slideshowfx.utils.beans.Pair;
 import com.twasyl.slideshowfx.utils.io.IOUtils;
 import freemarker.template.Configuration;
@@ -113,9 +117,9 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
                     .stream()
                     .map(variable -> (JsonObject) variable)
                     .forEach(variableJson -> {
-                        final Pair<String, String> variable = new Pair<>();
-                        variable.setKey(variableJson.getString(VARIABLE_NAME.getFieldName()));
-                        variable.setValue(new String(Base64.getDecoder().decode(variableJson.getString(VARIABLE_VALUE.getFieldName()))));
+                        final Variable variable = new Variable();
+                        variable.setName(variableJson.getString(VARIABLE_NAME.getFieldName()));
+                        variable.setValueAsBase64(variableJson.getString(VARIABLE_VALUE.getFieldName()));
                         presentationConfiguration.getVariables().add(variable);
                     });
         }
@@ -181,40 +185,40 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
             this.configuration.getVariables()
                     .forEach(variable -> {
                         final JsonObject variableJson = new JsonObject()
-                                .put(VARIABLE_NAME.getFieldName(), variable.getKey())
-                                .put(VARIABLE_VALUE.getFieldName(), Base64.getEncoder().encodeToString(variable.getValue().getBytes()));
+                                .put(VARIABLE_NAME.getFieldName(), variable.getName())
+                                .put(VARIABLE_VALUE.getFieldName(), variable.getValueAsBase64());
 
                         variablesJson.add(variableJson);
                     });
 
             this.configuration.getSlides()
-                .forEach(slide -> {
-                    final JsonArray elementsJson = new JsonArray();
-                    final JsonObject slideJson = new JsonObject();
+                    .forEach(slide -> {
+                        final JsonArray elementsJson = new JsonArray();
+                        final JsonObject slideJson = new JsonObject();
 
-                    slideJson.put(SLIDE_TEMPLATE_ID.getFieldName(), slide.getTemplate().getId())
-                            .put(SLIDE_ID.getFieldName(), slide.getId())
-                            .put(SLIDE_NUMBER.getFieldName(), slide.getSlideNumber());
+                        slideJson.put(SLIDE_TEMPLATE_ID.getFieldName(), slide.getTemplate().getId())
+                                .put(SLIDE_ID.getFieldName(), slide.getId())
+                                .put(SLIDE_NUMBER.getFieldName(), slide.getSlideNumber());
 
-                    if (slide.hasSpeakerNotes()) {
-                        slideJson.put(SLIDE_SPEAKER_NOTES.getFieldName(), slide.getSpeakerNotesAsBase64());
-                    }
+                        if (slide.hasSpeakerNotes()) {
+                            slideJson.put(SLIDE_SPEAKER_NOTES.getFieldName(), slide.getSpeakerNotesAsBase64());
+                        }
 
-                    slide.getElements()
-                        .forEach(slideElement -> {
-                            final JsonObject elementJson = new JsonObject();
-                            elementJson.put(SLIDE_ELEMENT_TEMPLATE_ID.getFieldName(), slideElement.getTemplate().getId())
-                                    .put(SLIDE_ELEMENT_ELEMENT_ID.getFieldName(), slideElement.getId())
-                                    .put(SLIDE_ELEMENT_ORIGINAL_CONTENT_CODE.getFieldName(), slideElement.getOriginalContentCode())
-                                    .put(SLIDE_ELEMENT_ORIGINAL_CONTENT.getFieldName(), slideElement.getOriginalContentAsBase64())
-                                    .put(SLIDE_ELEMENT_HTML_CONTENT.getFieldName(), slideElement.getHtmlContentAsBase64());
+                        slide.getElements()
+                                .forEach(slideElement -> {
+                                    final JsonObject elementJson = new JsonObject();
+                                    elementJson.put(SLIDE_ELEMENT_TEMPLATE_ID.getFieldName(), slideElement.getTemplate().getId())
+                                            .put(SLIDE_ELEMENT_ELEMENT_ID.getFieldName(), slideElement.getId())
+                                            .put(SLIDE_ELEMENT_ORIGINAL_CONTENT_CODE.getFieldName(), slideElement.getOriginalContentCode())
+                                            .put(SLIDE_ELEMENT_ORIGINAL_CONTENT.getFieldName(), slideElement.getOriginalContentAsBase64())
+                                            .put(SLIDE_ELEMENT_HTML_CONTENT.getFieldName(), slideElement.getHtmlContentAsBase64());
 
-                            elementsJson.add(elementJson);
-                        });
+                                    elementsJson.add(elementJson);
+                                });
 
-                    slideJson.put(SLIDE_ELEMENTS.getFieldName(), elementsJson);
-                    slidesJson.add(slideJson);
-                });
+                        slideJson.put(SLIDE_ELEMENTS.getFieldName(), elementsJson);
+                        slidesJson.add(slideJson);
+                    });
 
             presentationJson.put(PRESENTATION_CUSTOM_RESOURCES.getFieldName(), customResourcesJson);
             presentationJson.put(PRESENTATION_VARIABLES.getFieldName(), variablesJson);
@@ -285,7 +289,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         tokens.clear();
         tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_CALL);
         tokens.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
-        tokens.putAll(this.configuration.getVariables().stream().collect(Collectors.toMap(Pair::getKey, Pair::getValue)));
+        tokens.putAll(this.configuration.getVariables().stream().collect(Collectors.toMap(Variable::getName, Variable::getValue)));
 
         for (Slide s : this.configuration.getSlides()) {
             templateConfiguration.setDirectoryForTemplateLoading(s.getTemplate().getFile().getParentFile());
@@ -353,7 +357,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
     public void setModifiedSinceLatestSave(boolean modifiedSinceLatestSave) {
         boolean oldValue = this.modifiedSinceLatestSave;
         this.modifiedSinceLatestSave = modifiedSinceLatestSave;
-        PlatformHelper.run(() -> this.propertyChangeSupport.firePropertyChange("modifiedSinceLatestSave", oldValue, modifiedSinceLatestSave));
+        this.propertyChangeSupport.firePropertyChange("modifiedSinceLatestSave", oldValue, modifiedSinceLatestSave);
     }
 
     /**
@@ -685,7 +689,7 @@ public class PresentationEngine extends AbstractEngine<PresentationConfiguration
         tokens.put(TEMPLATE_SLIDE_ID_PREFIX_TOKEN, this.templateEngine.getConfiguration().getSlideIdPrefix());
         tokens.put(TEMPLATE_SLIDE_NUMBER_TOKEN, result.getKey().getSlideNumber());
         tokens.put(TEMPLATE_SFX_CALLBACK_TOKEN, TEMPLATE_SFX_CALLBACK_CALL);
-        tokens.putAll(this.configuration.getVariables().stream().collect(Collectors.toMap(Pair::getKey, Pair::getValue)));
+        tokens.putAll(this.configuration.getVariables().stream().collect(Collectors.toMap(Variable::getName, Variable::getValue)));
 
         try (final StringWriter writer = new StringWriter()) {
             final Template slideTemplate = defaultConfiguration.getTemplate(template.getFile().getName());

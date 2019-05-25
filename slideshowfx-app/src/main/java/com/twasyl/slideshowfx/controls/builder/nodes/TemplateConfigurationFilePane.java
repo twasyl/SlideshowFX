@@ -1,12 +1,12 @@
 package com.twasyl.slideshowfx.controls.builder.nodes;
 
+import com.twasyl.slideshowfx.engine.Variable;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideElementTemplate;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
 import com.twasyl.slideshowfx.ui.controls.ExtendedTextField;
 import com.twasyl.slideshowfx.utils.DialogHelper;
-import com.twasyl.slideshowfx.utils.beans.Pair;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TitledPane;
@@ -244,7 +244,12 @@ public class TemplateConfigurationFilePane extends VBox {
         configuration.setDefaultVariables(
                 this.defaultVariables.stream()
                         .filter(TemplateVariable::isValid)
-                        .map(variable -> new Pair<>(variable.getName(), variable.getValue()))
+                        .map(variable -> {
+                            final Variable v = new Variable();
+                            v.setName(variable.getName());
+                            v.setValue(variable.getValue());
+                            return v;
+                        })
                         .collect(Collectors.toSet())
         );
         configuration.setSlidesContainer(this.slidesContainer.getText());
@@ -316,7 +321,7 @@ public class TemplateConfigurationFilePane extends VBox {
             configuration.getDefaultVariables()
                     .forEach(variable -> {
                         final TemplateVariable templateVariable = this.addDefaultTemplateVariable();
-                        templateVariable.setName(variable.getKey());
+                        templateVariable.setName(variable.getName());
                         templateVariable.setValue(variable.getValue());
                     });
 

@@ -180,7 +180,6 @@ The template configuration must be at the root of the archive and will contain a
         "slides-container" : "slideshowfx-slides-div",
         "slide-id-prefix" : "slide-",
         "template-directory" : "slides/template",
-        "presentation-directory" : "slides/presentation"
       },
       "slides-definition" : [
         {
@@ -268,7 +267,6 @@ The complete configuration is wrapped into a *template* JSON object. This object
 ** *configuration* : JSON object that will contain the configuration of the slides ;
 *** *slide-id-prefix* : is a prefix that will be placed in the ID attribute of an HTML slide element, prefixing the slide number ;
 *** *template-directory* : the directory that will contain the slide’s templates ;
-*** *presentation-directory* : the directory that will contain the slides of the presentation, created by the user ;
 ** *slides-definition* : a JSON array that will contain the definition of each slide template as a JSON object with the following structure:
 *** *id* : the ID of the slide ;
 *** *name* : the name of the slide that will be displayed in SlideshowFX in the lst of available slide’s type ;

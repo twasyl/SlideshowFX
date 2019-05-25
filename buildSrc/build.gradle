@@ -7,7 +7,7 @@ gradlePlugin {
     plugins {
         create("SlideshowFXPlugins") {
             id = "sfx-plugin"
-            implementationClass = "com.twasyl.slideshowfx.gradle.plugins.SlideshowFXPlugin"
+            implementationClass = "com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin"
         }
     }
 }

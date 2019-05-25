@@ -4,12 +4,13 @@ import com.twasyl.slideshowfx.engine.template.DynamicAttribute;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Optional;
 
 /**
  * Represents a slide defined by the template.
  *
  * @author Thierry Wasylczenko
+ * @version 1.1
+ * @since SlideshowFX 1.0
  */
 public class SlideTemplate {
     private int id;
@@ -53,10 +54,9 @@ public class SlideTemplate {
      * @return The SlideElementTemplate corresponding to the given ID, or {@code null} if it is not found.
      */
     public SlideElementTemplate getSlideElementTemplate(int id) {
-        Optional<SlideElementTemplate> result = Arrays.stream(this.elements).
-                filter(element -> element.getId() == id)
-                .findFirst();
-
-        return result.isPresent() ? result.get() : null;
+        return Arrays.stream(this.elements)
+                .filter(element -> element.getId() == id)
+                .findFirst()
+                .orElse(null);
     }
 }

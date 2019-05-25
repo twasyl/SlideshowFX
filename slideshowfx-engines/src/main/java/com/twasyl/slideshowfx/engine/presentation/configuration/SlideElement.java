@@ -1,9 +1,9 @@
 package com.twasyl.slideshowfx.engine.presentation.configuration;
 
 
+import com.twasyl.slideshowfx.engine.Variable;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideElementTemplate;
 import com.twasyl.slideshowfx.utils.TemplateProcessor;
-import com.twasyl.slideshowfx.utils.beans.Pair;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
@@ -13,11 +13,11 @@ import java.io.StringWriter;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
+import static java.util.logging.Level.SEVERE;
 
 /**
  * Represent an element of a slide that can be modified by the user. It is typically the title of a slide, it's content
@@ -59,11 +59,11 @@ public class SlideElement {
      *
      * @return A variable free HTML content.
      */
-    public String getClearedHtmlContent(Set<Pair<String, String>> variables) {
+    public String getClearedHtmlContent(Set<Variable> variables) {
         final StringBuilder builder = new StringBuilder();
 
         if (this.htmlContent != null && !this.htmlContent.isEmpty()) {
-            final Map<String, String> tokens = variables.stream().collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+            final Map<String, String> tokens = variables.stream().collect(Collectors.toMap(Variable::getName, Variable::getValue));
 
             try (StringWriter writer = new StringWriter()) {
                 final Template htmlContentTemplate = new Template("variable", new StringReader(this.getHtmlContent()), TemplateProcessor.getDefaultConfiguration());
@@ -72,7 +72,7 @@ public class SlideElement {
 
                 builder.append(writer.toString());
             } catch (IOException | TemplateException e) {
-                LOGGER.log(Level.SEVERE, "Can not get a variable free HTML content", e);
+                LOGGER.log(SEVERE, "Can not get a variable free HTML content", e);
             }
         }
         return builder.toString();

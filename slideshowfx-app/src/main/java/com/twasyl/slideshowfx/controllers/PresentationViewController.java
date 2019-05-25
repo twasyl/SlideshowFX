@@ -9,6 +9,7 @@ import com.twasyl.slideshowfx.controls.PresentationVariablesPanel;
 import com.twasyl.slideshowfx.controls.SlideContentEditor;
 import com.twasyl.slideshowfx.controls.outline.PresentationOutline;
 import com.twasyl.slideshowfx.dao.TaskDAO;
+import com.twasyl.slideshowfx.engine.Variable;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.presentation.Presentations;
 import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
@@ -21,7 +22,6 @@ import com.twasyl.slideshowfx.osgi.OSGiManager;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.utils.DialogHelper;
-import com.twasyl.slideshowfx.utils.beans.Pair;
 import com.twasyl.slideshowfx.utils.beans.binding.FilenameBinding;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.*;
@@ -126,10 +126,10 @@ public class PresentationViewController implements ThemeAwareController {
 
         // Insert the token inside the editor
         if (answer != null && answer == insert) {
-            final Pair<String, String> variable = variablesPanel.getSelectedVariable();
+            final Variable variable = variablesPanel.getSelectedVariable();
 
             if (variable != null)
-                this.contentEditor.appendContentEditorValue(String.format("${%1$s}", variable.getKey()));
+                this.contentEditor.appendContentEditorValue(String.format("${%1$s}", variable.getName()));
         }
 
         // If cancel wasn't clicked, updates all variables in the presentation and updates it the presentation file

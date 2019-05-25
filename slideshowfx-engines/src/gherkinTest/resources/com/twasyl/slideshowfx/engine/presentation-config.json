@@ -1,0 +1,61 @@
+{
+  "presentation": {
+    "id": 1,
+    "custom-resources": [
+      {
+        "type": "SCRIPT",
+        "content": "ZnVuY3Rpb24gaGVsbG8oKSB7IGNvbnNvbGUubG9nKCdIZWxsbycpOyB9"
+      }
+    ],
+    "variables": [
+      {
+        "name": "author",
+        "value": "U29tZW9uZQ=="
+      }
+    ],
+    "slides": [
+      {
+        "template-id": 1,
+        "id": "slide-01",
+        "number": "01",
+        "elements": [
+          {
+            "template-id": 1,
+            "element-id": "01-title",
+            "original-content-code": "HTML",
+            "original-content": "UHJlc2VudGF0aW9uIHRpdGxl",
+            "html-content": "UHJlc2VudGF0aW9uIHRpdGxl"
+          },
+          {
+            "template-id": 2,
+            "element-id": "01-subtitle",
+            "original-content-code": "HTML",
+            "original-content": "UHJlc2VudGF0aW9uIHN1YnRpdGxl",
+            "html-content": "UHJlc2VudGF0aW9uIHN1YnRpdGxl"
+          }
+        ]
+      },
+      {
+        "template-id": 2,
+        "id": "slide-02",
+        "number": "02",
+        "elements": [
+          {
+            "template-id": 1,
+            "element-id": "02-title",
+            "original-content-code": "HTML",
+            "original-content": "U2xpZGUgdGl0bGU=",
+            "html-content": "U2xpZGUgdGl0bGU="
+          },
+          {
+            "template-id": 2,
+            "element-id": "02-content",
+            "original-content-code": "HTML",
+            "original-content": "U2xpZGUgY29udGVudA==",
+            "html-content": "U2xpZGUgY29udGVudA=="
+          }
+        ]
+      }
+    ]
+  }
+}

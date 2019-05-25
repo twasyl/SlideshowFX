@@ -1,0 +1,57 @@
+{
+  "template": {
+    "name": "My template",
+    "version": "0.1",
+    "file": "template.html",
+    "js-object": "sfx",
+    "resources-directory": "resources",
+    "default-variables": [
+      {
+        "name": "author",
+        "value": "U29tZW9uZQ=="
+      }
+    ],
+    "slides": {
+      "configuration": {
+        "slides-container": "slides",
+        "slide-id-prefix": "slide-",
+        "template-directory": "slides/template",
+        "presentation-directory": "slides/presentation"
+      },
+      "slides-definition": [
+        {
+          "id": 1,
+          "name" : "Title",
+          "file" : "title.html",
+          "elements" : [
+            {
+              "id" : 1,
+              "html-id" : "${slideNumber}-title",
+              "default-content" : "Title"
+            }, {
+              "id" : 2,
+              "html-id" : "${slideNumber}-subtitle",
+              "default-content" : "Subtitle"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name" : "Regular slide",
+          "file" : "regular.html",
+          "elements" : [
+            {
+              "id" : 1,
+              "html-id" : "${slideNumber}-title",
+              "default-content" : "Title"
+            }, {
+              "id" : 2,
+              "html-id" : "${slideNumber}-content",
+              "default-content" : "Content"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

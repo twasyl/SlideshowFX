@@ -1,7 +1,7 @@
 language: java
 
 git:
-  depth: 5
+  depth: 1
 
 branches:
   only:
@@ -13,7 +13,7 @@ sudo: true
 matrix:
   include:
     - os: linux
-      dist: trusty
+      dist: xenial
       addons:
         apt:
           packages:
@@ -25,16 +25,33 @@ matrix:
       env:
         - _JAVA_OPTIONS="-Djava.awt.headless=true -Dtestfx.robot=glass -Dtestfx.headless=true -Dprism.order=sw -Dprism.verbose=true"
 
-before_install:
-  - if [[ "$TRAVIS_OS_NAME" == linux ]]; then export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export JAVA_HOME=$(/usr/libexec/java_home); else chmod +x travis.sh; ./travis.sh; export JAVA_HOME=~/jvm/current; fi;
-  - chmod +x gradlew
+before_install: |
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+  then
+    chmod +x travis.sh
+    ./travis.sh
+    export DISPLAY=:99.0
+    export JAVA_HOME=~/jvm/current
+    sh -e /etc/init.d/xvfb start
+  elif [[ "$TRAVIS_OS_NAME" == "osx" ]]
+  then
+    export JAVA_HOME=$(/usr/libexec/java_home)
+  fi
+  chmod +x gradlew
 
 install: true
 
-script:
-  - if [[ "$TRAVIS_TAG" == "" ]]; then ./gradlew clean build; else ./gradlew clean build bintrayUpload; fi
-  - if [[ "$TRAVIS_OS_NAME" == linux && "$TRAVIS_TAG" == "" ]]; then ./gradlew sonarqube; fi
+script: |
+  if [[ "$TRAVIS_TAG" == "" ]]
+  then
+    ./gradlew clean build
+  else
+    ./gradlew clean build bintrayUpload
+  fi
+  if [[ "$TRAVIS_OS_NAME" == "osx" && "$TRAVIS_TAG" == "" ]]
+  then
+    ./gradlew sonarqube
+  fi
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

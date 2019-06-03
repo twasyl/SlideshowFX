@@ -33,7 +33,7 @@ public class PresentationConfigurationTestContext extends AbstractConfigurationT
         assertDoesNotThrow(() -> {
             try (final ByteArrayInputStream bytes = new ByteArrayInputStream(expectedConfiguration.encode().getBytes());
                  final DefaultCharsetReader configurationInput = new DefaultCharsetReader(bytes)) {
-                configuration = engine.readConfiguration(configurationInput);
+                this.configuration = engine.readConfiguration(configurationInput);
             }
         });
 
@@ -57,6 +57,21 @@ public class PresentationConfigurationTestContext extends AbstractConfigurationT
                 () -> assertNotNull(this.slideElement),
                 () -> assertEquals(slideElementId, this.slideElement.getId()));
 
+        return this;
+    }
+
+    public PresentationConfigurationTestContext clearSlides() {
+        this.configuration.getSlides().clear();
+        return this;
+    }
+
+    public PresentationConfigurationTestContext assertHasNoSlides() {
+        assertFalse(this.configuration.hasSlides());
+        return this;
+    }
+
+    public PresentationConfigurationTestContext assertHasSlides() {
+        assertTrue(this.configuration.hasSlides());
         return this;
     }
 
@@ -95,6 +110,21 @@ public class PresentationConfigurationTestContext extends AbstractConfigurationT
         return this;
     }
 
+    public PresentationConfigurationTestContext assertSpeakerNotes(final String expectedSpeakerNotes) {
+        if (expectedSpeakerNotes == null) {
+            assertAll("Assertions for testing the absence of speaker notes for slide " + this.slide.getId() + " have failed",
+                    () -> assertNull(this.slide.getSpeakerNotes()),
+                    () -> assertFalse(this.slide.hasSpeakerNotes()));
+        } else {
+            assertAll("Assertions for testing the presence of speaker notes for slide " + this.slide.getId() + " have failed",
+                    () -> assertNotNull(this.slide.getSpeakerNotes()),
+                    () -> assertTrue(this.slide.hasSpeakerNotes()),
+                    () -> assertEquals(expectedSpeakerNotes, this.slide.getSpeakerNotes()));
+        }
+
+        return this;
+    }
+
     public PresentationConfigurationTestContext assertSlideElementTemplateId(final int expectedSlideElementTemplateId) {
         assertAll(
                 () -> assertNotNull(this.slideElement.getTemplate()),
@@ -126,12 +156,66 @@ public class PresentationConfigurationTestContext extends AbstractConfigurationT
         return this;
     }
 
+    public void assertNumberOfVariables(final int expectedNumber) {
+        assertAll(
+                () -> assertNotNull(this.configuration.getVariables()),
+                () -> assertEquals(expectedNumber, this.configuration.getVariables().size()));
+    }
+
     public PresentationConfigurationTestContext assertHasVariable(final Variable expectedVariable) {
         assertNotNull(this.configuration.getVariables()
                 .stream()
                 .filter(expectedVariable::equals)
                 .findFirst()
                 .orElse(null));
+        return this;
+    }
+
+    public PresentationConfigurationTestContext assertNextSlideIs(final String expectedSiblingSlideId) {
+        final Slide slideAfter = this.configuration.getSlideAfter(this.slide.getSlideNumber());
+
+        if ("none".equals(expectedSiblingSlideId)) {
+            assertNull(slideAfter, "The next slide of slide ID " + this.slide.getId() + " is not null");
+        } else {
+            assertNotNull(slideAfter, "The next slide of slide ID " + this.slide.getId() + " is null");
+            assertEquals(expectedSiblingSlideId, slideAfter.getId());
+        }
+        return this;
+    }
+
+    public PresentationConfigurationTestContext assertPreviousSlideIs(final String expectedSiblingSlideId) {
+        final Slide slideBefore = this.configuration.getSlideBefore(this.slide.getSlideNumber());
+
+        if ("none".equals(expectedSiblingSlideId)) {
+            assertNull(slideBefore, "The previous slide of slide ID " + this.slide.getId() + " is not null");
+        } else {
+            assertNotNull(slideBefore, "The previous slide of slide ID " + this.slide.getId() + " is null");
+            assertEquals(expectedSiblingSlideId, slideBefore.getId());
+        }
+        return this;
+    }
+
+    public PresentationConfigurationTestContext assertFirstSlide(final String expectedSlideId) {
+        final Slide firstSlide = this.configuration.getFirstSlide();
+
+        if ("none".equals(expectedSlideId)) {
+            assertNull(firstSlide, "The first slide is not null");
+        } else {
+            assertNotNull(firstSlide, "The first slide is null");
+            assertEquals(expectedSlideId, firstSlide.getId(), "The first slide doesn't have the ID " + expectedSlideId);
+        }
+        return this;
+    }
+
+    public PresentationConfigurationTestContext assertLastSlide(final String expectedSlideId) {
+        final Slide lastSlide = this.configuration.getLastSlide();
+
+        if ("none".equals(expectedSlideId)) {
+            assertNull(lastSlide, "The last slide is not null");
+        } else {
+            assertNotNull(lastSlide, "The last slide is null");
+            assertEquals(expectedSlideId, lastSlide.getId(), "The last slide doesn't have the ID " + expectedSlideId);
+        }
         return this;
     }
 }

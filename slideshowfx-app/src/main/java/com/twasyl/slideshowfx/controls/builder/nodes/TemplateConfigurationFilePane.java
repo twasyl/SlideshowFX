@@ -51,13 +51,12 @@ public class TemplateConfigurationFilePane extends VBox {
     private List<TemplateVariable> defaultVariables = new ArrayList<>();
 
     // Template default variables
-    final VBox defaultVariablesPane = new VBox(5);
+    final private VBox defaultVariablesPane = new VBox(5);
 
     // General slides configuration
     private ExtendedTextField slidesContainer = new ExtendedTextField("Slides' container", true);
     private ExtendedTextField slideIdPrefix = new ExtendedTextField("Slide ID prefix", true);
     private ExtendedTextField slidesTemplateDirectory = new ExtendedTextField("Template directory", true);
-    private ExtendedTextField slidesPresentationDirectory = new ExtendedTextField("Presentation directory", true);
 
     // Slides definitions
     private List<SlideDefinition> slideDefinitions = new ArrayList<>();
@@ -95,7 +94,6 @@ public class TemplateConfigurationFilePane extends VBox {
         this.jsObject.setValidator(isNotEmpty());
         this.slidesContainer.setValidator(isNotEmpty());
         this.slideIdPrefix.setValidator(isNotEmpty());
-        this.slidesPresentationDirectory.setValidator(isNotEmpty());
         this.slidesTemplateDirectory.setValidator(isNotEmpty());
     }
 
@@ -139,7 +137,7 @@ public class TemplateConfigurationFilePane extends VBox {
      */
     private TitledPane getSlidesGlobalConfigurationPane() {
         final FlowPane internalContainer = new FlowPane(5, 5,
-                slidesContainer, slideIdPrefix, slidesPresentationDirectory, slidesTemplateDirectory);
+                slidesContainer, slideIdPrefix, slidesTemplateDirectory);
 
         final TitledPane slidesGlobalConfigurationPane = new TitledPane("Slides global configuration", internalContainer);
         slidesGlobalConfigurationPane.setCollapsible(false);
@@ -255,8 +253,6 @@ public class TemplateConfigurationFilePane extends VBox {
         configuration.setSlidesContainer(this.slidesContainer.getText());
         configuration.setSlideIdPrefix(this.slideIdPrefix.getText());
         configuration.setSlidesTemplateDirectory(new File(this.workingPath.toFile(), this.slidesTemplateDirectory.getText()));
-        configuration.setSlidesPresentationDirectory(new File(this.workingPath.toFile(), this.slidesPresentationDirectory.getText()));
-
         configuration.setSlideTemplates(new ArrayList<>());
 
         configuration.setSlideTemplates(
@@ -328,7 +324,6 @@ public class TemplateConfigurationFilePane extends VBox {
             this.slidesContainer.setText(configuration.getSlidesContainer());
             this.slideIdPrefix.setText(configuration.getSlideIdPrefix());
             this.slidesTemplateDirectory.setText(this.getPathRelativeToWorkingPath(configuration.getSlidesTemplateDirectory()));
-            this.slidesPresentationDirectory.setText(this.getPathRelativeToWorkingPath(configuration.getSlidesPresentationDirectory()));
 
             configuration.getSlideTemplates()
                     .forEach(template -> {
@@ -407,11 +402,6 @@ public class TemplateConfigurationFilePane extends VBox {
         }
 
         isValid = this.slideIdPrefix.isValid();
-        if (globallyValid && !isValid) {
-            globallyValid = false;
-        }
-
-        isValid = this.slidesPresentationDirectory.isValid();
         if (globallyValid && !isValid) {
             globallyValid = false;
         }

@@ -24,8 +24,10 @@ public class TypeRegistryConfiguration implements TypeRegistryConfigurer {
     @Override
     public void configureTypeRegistry(TypeRegistry typeRegistry) {
         typeRegistry.defineDataTableType(CustomDataTableTypes.forSlides());
+        typeRegistry.defineDataTableType(CustomDataTableTypes.forSlideTemplates());
         typeRegistry.defineDataTableType(CustomDataTableTypes.forSlideElements());
         typeRegistry.defineDataTableType(CustomDataTableTypes.forSlidesAndSlideElementsMapping());
+        typeRegistry.defineDataTableType(CustomDataTableTypes.forSlideTemplatesAndSlideElementTemplatesMapping());
         typeRegistry.defineDataTableType(CustomDataTableTypes.forCustomResources());
         typeRegistry.defineDataTableType(CustomDataTableTypes.forVariables());
     }

@@ -1,15 +1,20 @@
 package gradle.cucumber;
 
+import com.twasyl.slideshowfx.engine.Variable;
 import com.twasyl.slideshowfx.engine.context.TemplateConfigurationTestContext;
-import cucumber.api.CucumberOptions;
+import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
-import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import gradle.cucumber.types.SlideTemplatesAndSlideElementTemplatesMapping;
 
-@CucumberOptions()
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 public class TemplateConfigurationTest extends AbstractConfigurationTest {
     TemplateConfigurationTestContext templateConfigurationTestContext;
 
@@ -35,62 +40,43 @@ public class TemplateConfigurationTest extends AbstractConfigurationTest {
         this.templateConfigurationTestContext.loadValidConfiguration();
     }
 
-    @Then("^the \"([^\"]*)\" is equal to \"([^\"]*)\" in the template configuration file$")
-    public void theFieldIsEqualTo(final String fieldName, final String expectedValue) {
-        templateConfigurationTestContext.assertFieldEquals(fieldName, expectedValue);
+    @Then("the following field(s) is/are defined in the template configuration file")
+    public void theFieldIsEqualTo(final Map<String, String> mapping) {
+        mapping.entrySet()
+                .stream()
+                .filter(entry -> !"Name".equals(entry.getKey()))
+                .forEach(entry -> this.templateConfigurationTestContext.assertFieldEquals(entry.getKey(), entry.getValue()));
     }
 
-    @Then("the template defines {int} default variable(s)")
-    public void checkNumberOfVariables(int numberOfVariables) {
-        this.templateConfigurationTestContext.assertNumberOfDefaultVariables(numberOfVariables);
+    @Then("this/these default variable(s) is/are defined")
+    public void theseDefaultVariablesAreDefined(final List<Variable> expectedDefaultVariables) {
+        this.templateConfigurationTestContext.assertNumberOfDefaultVariables(expectedDefaultVariables.size());
+        expectedDefaultVariables.forEach(this.templateConfigurationTestContext::assertHasDefaultVariable);
     }
 
-    @Then("^a default variable named \"([^\"]+)\" with the value \"([^\"]+)\" exists$")
-    public void checkDefaultVariable(final String variableName, final String expectedValue) {
-        this.templateConfigurationTestContext.assertDefaultVariable(variableName, expectedValue);
+    @Then("this/these slide template(s) exist(s)")
+    public void slideTemplatesExist(final List<SlideTemplate> slideTemplates) {
+        this.templateConfigurationTestContext.assertNumberOfSlideTemplates(slideTemplates.size());
+
+        slideTemplates.forEach(slideTemplate -> {
+            assertAll("Assertions of slide template " + slideTemplate.getId() + " have failed",
+                    () -> this.templateConfigurationTestContext.withSlideTemplateId(slideTemplate.getId()),
+                    () -> this.templateConfigurationTestContext.assertSlideTemplateName(slideTemplate.getName()),
+                    () -> this.templateConfigurationTestContext.assertSlideTemplateFile(slideTemplate.getFile()));
+        });
     }
 
-    @Then("the template defines {int} slide(s)")
-    public void checkNumberOfSlides(int numberOfSlides) {
-        this.templateConfigurationTestContext.assertNumberOfSlideTemplates(numberOfSlides);
-    }
+    @Then("the slide template(s) has/have the following element(s)")
+    public void slideTemplateHasSlideElementTemplates(final SlideTemplatesAndSlideElementTemplatesMapping mapping) {
+        mapping.keySet().forEach(slideTemplateId -> {
+            this.templateConfigurationTestContext.withSlideTemplateId(slideTemplateId)
+                    .assertNumberOfSlideElementTemplates(mapping.get(slideTemplateId).size());
 
-    @Then("there is a slide template with id {int}")
-    public void slideWithId(int slideTemplateId) {
-        this.templateConfigurationTestContext
-                .withSlideTemplateId(slideTemplateId)
-                .assertSlideTemplateExists();
-    }
-
-    @And("^it's name is \"([^\"]+)\"$")
-    public void slideHasName(String expectedName) {
-        this.templateConfigurationTestContext.assertSlideTemplateName(expectedName);
-    }
-
-    @And("^it's file is \"([^\"]+)\"$")
-    public void slideHasFile(final String expectedFile) {
-        this.templateConfigurationTestContext.assertSlideTemplateFile(expectedFile);
-    }
-
-    @And("which defines {int} slide element(s)")
-    public void slideHasSlideElements(final int expectedNumberOfSlideElements) {
-        this.templateConfigurationTestContext.assertNumberOfSlideElements(expectedNumberOfSlideElements);
-    }
-
-    @Then("the slide template {int} has a template element with the id {int}")
-    public void slideElementId(final int slideTemplateId, final int slideElementId) {
-        this.templateConfigurationTestContext.withSlideTemplateId(slideTemplateId)
-                .withSlideElementTemplateId(slideElementId)
-                .assertSlideElementExists();
-    }
-
-    @And("^it's HTML id is \"([^\"]+)\"$")
-    public void slideElementHtmlId(final String expectedHtmlId) {
-        this.templateConfigurationTestContext.assertSlideElementHtmlId(expectedHtmlId);
-    }
-
-    @And("it's default content is \"([^\"]+)\"")
-    public void slideElementContent(final String expectedDefaultContent) {
-        this.templateConfigurationTestContext.assertSlideElementDefaultContent(expectedDefaultContent);
+            mapping.get(slideTemplateId).forEach(element -> assertAll(
+                    "Assertions of slide element templates for slide template " + slideTemplateId + " have failed",
+                    () -> this.templateConfigurationTestContext.withSlideElementTemplateId(element.getId()),
+                    () -> this.templateConfigurationTestContext.assertSlideElementHtmlId(element.getHtmlId()),
+                    () -> this.templateConfigurationTestContext.assertSlideElementDefaultContent(element.getDefaultContent())));
+        });
     }
 }

@@ -18,8 +18,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.geometry.Pos;
-import javafx.print.PageOrientation;
-import javafx.print.Paper;
 import javafx.print.PrintQuality;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ProgressIndicator;
@@ -50,6 +48,7 @@ import static javafx.print.Paper.A4;
  */
 public final class PresentationBrowser extends StackPane {
     private static final Logger LOGGER = Logger.getLogger(PresentationBrowser.class.getName());
+    private static final String UNDEFINED_JS_VALUE = "undefined";
 
     private final BooleanProperty interactionAllowed = new SimpleBooleanProperty(true);
     private final BooleanProperty spinnerAllowed = new SimpleBooleanProperty(true);
@@ -177,12 +176,8 @@ public final class PresentationBrowser extends StackPane {
             PresentationBrowser.this.injectBackend(this.getBackend());
             PresentationBrowser.this.injectServer(SlideshowFXServer.getSingleton());
         });
-        this.internalBrowser.getEngine().setOnError(errorEvent -> {
-            LOGGER.log(SEVERE, "An error occurred in the internal browser", errorEvent.getException());
-        });
-        this.internalBrowser.getEngine().setOnAlert(event -> {
-            DialogHelper.showAlert("SlideshowFX", event.getData());
-        });
+        this.internalBrowser.getEngine().setOnError(errorEvent -> LOGGER.log(SEVERE, "An error occurred in the internal browser", errorEvent.getException()));
+        this.internalBrowser.getEngine().setOnAlert(event -> DialogHelper.showAlert("SlideshowFX", event.getData()));
     }
 
     /**
@@ -204,13 +199,13 @@ public final class PresentationBrowser extends StackPane {
 
             // Only inject the backend if it is not already present
             final Object member = window.getMember(this.getPresentation().getTemplateConfiguration().getJsObject());
-            if ("undefined".equals(member)) {
+            if (UNDEFINED_JS_VALUE.equals(member)) {
                 window.setMember(PresentationBrowser.this.getPresentation().getTemplateConfiguration().getJsObject(), backend);
             }
 
             // Inject the browser only if it's not already present
             final Object browser = window.getMember("sfxBrowser");
-            if ("undefined".equals(browser)) {
+            if (UNDEFINED_JS_VALUE.equals(browser)) {
                 window.setMember("sfxBrowser", this);
             }
         }
@@ -234,7 +229,7 @@ public final class PresentationBrowser extends StackPane {
 
             // Only inject the server if it is not already present
             final Object member = window.getMember(this.getPresentation().getTemplateConfiguration().getSfxServerObject());
-            if ("undefined".equals(member)) {
+            if (UNDEFINED_JS_VALUE.equals(member)) {
                 window.setMember(this.getPresentation().getTemplateConfiguration().getSfxServerObject(), server);
             }
         }
@@ -423,8 +418,7 @@ public final class PresentationBrowser extends StackPane {
      * it.
      */
     public final String getCurrentSlideId() {
-        final String slideId = (String) this.internalBrowser.getEngine().executeScript(this.getPresentation().getTemplateConfiguration().getGetCurrentSlideMethod() + "();");
-        return slideId;
+        return (String) this.internalBrowser.getEngine().executeScript(this.getPresentation().getTemplateConfiguration().getGetCurrentSlideMethod() + "();");
     }
 
     /**

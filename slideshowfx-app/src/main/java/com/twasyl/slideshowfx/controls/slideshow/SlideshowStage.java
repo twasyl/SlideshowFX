@@ -15,8 +15,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
-import java.util.logging.Logger;
-
 /**
  * The stage is defined when the presentation enters in slideshow mode. It is necessary to create the stage with a {@link Context}
  * to properly configure the stage.
@@ -24,16 +22,16 @@ import java.util.logging.Logger;
  * defining to which event screen will respond (key event and so on).
  *
  * @author Thierry Wasylczenko
- * @version 1.0.0
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class SlideshowStage implements Actor {
-    private static final Logger LOGGER = Logger.getLogger(SlideshowStage.class.getName());
     private static final String DO_NOT_CONSIDER_EVENT_TEXT = "do_not_consider";
     private Context context;
 
     private Runnable onCloseAction = null;
-    private Stage slideshowStage, informationStage;
+    private Stage presentationStage;
+    private Stage informationStage;
     private SlideshowPane slideshowPane;
     private InformationPane informationPane;
 
@@ -45,7 +43,7 @@ public class SlideshowStage implements Actor {
     public SlideshowStage(final Context context) {
         this.context = context;
 
-        this.initializeSlideshowStage();
+        this.initializePresentationStage();
         this.initializeInformationStage();
         this.initializeKeyEvents();
     }
@@ -56,14 +54,14 @@ public class SlideshowStage implements Actor {
      * found, which should be a video projector for instance. If only one screen is present, the stage will be displayed
      * on it.
      */
-    private final void initializeSlideshowStage() {
+    private final void initializePresentationStage() {
         this.slideshowPane = new SlideshowPane();
         Themes.applyTheme(this.slideshowPane, GlobalConfiguration.getThemeName());
 
         final Scene scene = new Scene(this.slideshowPane);
 
-        this.slideshowStage = new Stage(StageStyle.UNDECORATED);
-        this.slideshowStage.setScene(scene);
+        this.presentationStage = new Stage(StageStyle.UNDECORATED);
+        this.presentationStage.setScene(scene);
 
         /*
         Getting the number of screens in order to place the stage for the presentation on the right one. If there is
@@ -88,13 +86,13 @@ public class SlideshowStage implements Actor {
         }
 
         if (screenToDisplayOn != null) {
-            this.slideshowStage.setX(screenToDisplayOn.getBounds().getMinX());
-            this.slideshowStage.setY(screenToDisplayOn.getBounds().getMinY());
-            this.slideshowStage.setWidth(screenToDisplayOn.getBounds().getWidth());
-            this.slideshowStage.setHeight(screenToDisplayOn.getBounds().getHeight());
+            this.presentationStage.setX(screenToDisplayOn.getBounds().getMinX());
+            this.presentationStage.setY(screenToDisplayOn.getBounds().getMinY());
+            this.presentationStage.setWidth(screenToDisplayOn.getBounds().getWidth());
+            this.presentationStage.setHeight(screenToDisplayOn.getBounds().getHeight());
         }
 
-        this.slideshowStage.setAlwaysOnTop(true);
+        this.presentationStage.setAlwaysOnTop(true);
     }
 
     /**
@@ -142,7 +140,7 @@ public class SlideshowStage implements Actor {
                 if (this.onCloseAction != null) this.onCloseAction.run();
 
                 final WindowEvent slideshowCloseRequest = new WindowEvent(this.informationStage, WindowEvent.WINDOW_CLOSE_REQUEST);
-                this.slideshowStage.fireEvent(slideshowCloseRequest);
+                this.presentationStage.fireEvent(slideshowCloseRequest);
                 this.slideshowPane.getBrowser().stopListeningToSlideChangedEvents();
 
                 if (this.informationStage != null) {
@@ -168,7 +166,7 @@ public class SlideshowStage implements Actor {
 
     @Override
     public boolean supportsMessage(Object message) {
-        return message != null && message instanceof SlideChangedEvent;
+        return message instanceof SlideChangedEvent;
     }
 
     @Override
@@ -202,49 +200,58 @@ public class SlideshowStage implements Actor {
      * @return A copy of the original event with a new text.
      */
     private KeyEvent copyEventWithNewText(final KeyEvent event, final String newText) {
-        final KeyEvent copy = new KeyEvent(event.getSource(), event.getTarget(), event.getEventType(),
+        return new KeyEvent(event.getSource(), event.getTarget(), event.getEventType(),
                 event.getCharacter(), newText, event.getCode(), event.isShiftDown(), event.isControlDown(),
                 event.isAltDown(), event.isMetaDown());
-
-        return copy;
     }
 
     /**
-     * Displays the slideshow and the information screen if it was previously created.
+     * Displays the presentation and the information screen if it was previously created.
      */
     public void show() {
-        if (this.slideshowStage != null) {
-            this.slideshowPane.getBrowser().loadPresentationAndDo(this.context.getPresentation(), () -> {
-                this.slideshowPane.getBrowser().slide(this.context.getStartAtSlideId());
-
-                if (this.informationPane != null) {
-                    final Slide currentSlide;
-
-                    if (this.context.getStartAtSlideId() == null) {
-                        currentSlide = this.context.getPresentation().getConfiguration().getSlideById(this.getDisplayedSlideId());
-                    } else {
-                        currentSlide = this.context.getPresentation().getConfiguration().getSlideById(this.context.getStartAtSlideId());
-                    }
-
-                    this.informationPane.setSpeakerNotes(currentSlide.getSpeakerNotes());
-
-                    this.informationPane.getCurrentSlideBrowser().loadPresentationAndDo(this.context.getPresentation(), () -> {
-                        this.informationPane.getCurrentSlideBrowser().slide(this.context.getStartAtSlideId());
-
-                        this.informationPane.getNextSlideBrowser().loadPresentationAndDo(this.context.getPresentation(), () -> {
-                            final Slide nextSlide = this.context.getPresentation().getConfiguration().getSlideAfter(currentSlide.getSlideNumber());
-
-                            if (nextSlide != null) {
-                                this.informationPane.getNextSlideBrowser().slide(nextSlide.getId());
-                            }
-                        });
-                    });
-                }
-            });
-            this.slideshowStage.show();
+        if (this.presentationStage != null) {
+            this.slideshowPane.getBrowser().loadPresentationAndDo(this.context.getPresentation(), getOnLoadedAction());
+            this.presentationStage.show();
         }
 
         if (this.informationStage != null) this.informationStage.show();
+    }
+
+    /**
+     * Get the action that must be executed when the slide show is {@link #show() shown}.
+     *
+     * @return The action to be executed on show.
+     */
+    private Runnable getOnLoadedAction() {
+        return () -> {
+            this.slideshowPane.getBrowser().slide(this.context.getStartAtSlideId());
+
+            if (this.informationPane != null) {
+                final Slide currentSlide;
+
+                if (this.context.getStartAtSlideId() == null) {
+                    currentSlide = this.context.getPresentation().getConfiguration().getSlideById(this.getDisplayedSlideId());
+                } else {
+                    currentSlide = this.context.getPresentation().getConfiguration().getSlideById(this.context.getStartAtSlideId());
+                }
+
+                if (currentSlide.getSpeakerNotes() != null) {
+                    this.informationPane.setSpeakerNotes(currentSlide.getSpeakerNotes());
+                }
+
+                this.informationPane.getCurrentSlideBrowser().loadPresentationAndDo(this.context.getPresentation(), () -> {
+                    this.informationPane.getCurrentSlideBrowser().slide(this.context.getStartAtSlideId());
+
+                    this.informationPane.getNextSlideBrowser().loadPresentationAndDo(this.context.getPresentation(), () -> {
+                        final Slide nextSlide = this.context.getPresentation().getConfiguration().getSlideAfter(currentSlide.getSlideNumber());
+
+                        if (nextSlide != null) {
+                            this.informationPane.getNextSlideBrowser().slide(nextSlide.getId());
+                        }
+                    });
+                });
+            }
+        };
     }
 
     /**
@@ -264,7 +271,7 @@ public class SlideshowStage implements Actor {
      * @return The ID of the current slide or {@code null} if no slide is considered displayed.
      */
     public String getDisplayedSlideId() {
-        if (this.slideshowStage != null) {
+        if (this.presentationStage != null) {
             return this.slideshowPane.getBrowser().getCurrentSlideId();
         }
         return null;

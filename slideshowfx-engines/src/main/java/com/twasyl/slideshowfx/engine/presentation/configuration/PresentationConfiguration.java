@@ -172,7 +172,7 @@ public class PresentationConfiguration implements IConfiguration {
 
                 if (currentSlide.getSlideNumber().equals(slideNumber)) {
                     try {
-                        slide = this.slides.get(delta);
+                        slide = this.slides.get(index + delta);
                     } catch (IndexOutOfBoundsException ex) {
                         LOGGER.fine("The slide identified by the slide number " + slideNumber + " doesn't have the desired sibling");
                     }

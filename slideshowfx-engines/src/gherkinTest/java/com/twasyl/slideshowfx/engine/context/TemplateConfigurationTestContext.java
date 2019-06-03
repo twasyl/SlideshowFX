@@ -6,7 +6,6 @@ import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideElementTemplate;
 import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.engine.template.configuration.TemplateConfiguration;
-import com.twasyl.slideshowfx.utils.beans.Pair;
 import com.twasyl.slideshowfx.utils.io.DefaultCharsetReader;
 import io.vertx.core.json.JsonObject;
 
@@ -81,9 +80,6 @@ public class TemplateConfigurationTestContext extends AbstractConfigurationTestC
             case "slides template directory":
                 assertEquals(new File(engine.getWorkingDirectory(), expectedValue), this.configuration.getSlidesTemplateDirectory());
                 break;
-            case "slides presentation directory":
-                assertEquals(new File(engine.getWorkingDirectory(), expectedValue), this.configuration.getSlidesPresentationDirectory());
-                break;
             default:
                 fail("Unknown field '" + fieldName + "'");
         }
@@ -101,40 +97,25 @@ public class TemplateConfigurationTestContext extends AbstractConfigurationTestC
                 () -> assertEquals(expectedNumber, this.configuration.getDefaultVariables().size()));
     }
 
-    public void assertDefaultVariable(final String expectedVariableName, final String expectedVariableValue) {
-        assertNotNull(expectedVariableName);
-
-        final Variable variable = this.configuration.getDefaultVariables()
+    public void assertHasDefaultVariable(final Variable expectedDefaultVariable) {
+        assertNotNull(this.configuration.getDefaultVariables()
                 .stream()
-                .filter(pair -> expectedVariableName.equals(pair.getName()))
+                .filter(expectedDefaultVariable::equals)
                 .findAny()
-                .orElse(null);
-
-        assertAll(
-                () -> assertNotNull(variable, "Variable with name '" + expectedVariableName + "' not found"),
-                () -> assertNotNull(variable.getValue()),
-                () -> assertEquals(expectedVariableValue, variable.getValue()));
-    }
-
-    public void assertSlideTemplateExists() {
-        assertNotNull(this.slideTemplate, "The template is null");
-    }
-
-    public void assertSlideElementExists() {
-        assertNotNull(this.slideElementTemplate);
+                .orElse(null));
     }
 
     public void assertSlideTemplateName(final String expectedName) {
         assertEquals(expectedName, this.slideTemplate.getName());
     }
 
-    public void assertSlideTemplateFile(final String expectedFile) {
-        final File slideTemplateFile = new File(this.configuration.getSlidesTemplateDirectory(), expectedFile);
+    public void assertSlideTemplateFile(final File expectedFile) {
+        final File slideTemplateFile = new File(this.configuration.getSlidesTemplateDirectory(), expectedFile.getName());
         assertEquals(slideTemplateFile, this.slideTemplate.getFile());
     }
 
-    public void assertNumberOfSlideElements(int expectedSlideElements) {
-        assertEquals(expectedSlideElements, this.slideTemplate.getElements().length);
+    public void assertNumberOfSlideElementTemplates(int expectedSlideElementTemplates) {
+        assertEquals(expectedSlideElementTemplates, this.slideTemplate.getElements().length);
     }
 
     public void assertSlideElementHtmlId(final String expectedHtmlId) {

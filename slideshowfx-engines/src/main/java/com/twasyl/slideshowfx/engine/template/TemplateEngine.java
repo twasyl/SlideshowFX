@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.engine.template.configuration.TemplateConfigurationFields.*;
 import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.getDefaultCharset;
+import static java.util.stream.Collectors.toList;
 
 /**
  * This class is used to managed the templates provided by SlideshowFX.
@@ -164,21 +165,18 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
                         }
 
                         final JsonArray elementsJson = ((JsonObject) slideJson).getJsonArray(SLIDE_ELEMENTS.getFieldName());
-                        if (elementsJson != null && elementsJson.size() > 0) {
-                            slideTemplate.setElements(new SlideElementTemplate[elementsJson.size()]);
-                            SlideElementTemplate element;
-                            JsonObject elementJson;
-
-                            for (int index = 0; index < elementsJson.size(); index++) {
-                                element = new SlideElementTemplate();
-                                elementJson = elementsJson.getJsonObject(index);
-
-                                element.setId(elementJson.getInteger(SLIDE_ELEMENT_ID.getFieldName()).intValue());
-                                element.setHtmlId(elementJson.getString(SLIDE_ELEMENT_HTML_ID.getFieldName()));
-                                element.setDefaultContent(elementJson.getString(SLIDE_ELEMENT_DEFAULT_CONTENT.getFieldName()));
-
-                                slideTemplate.getElements()[index] = element;
-                            }
+                        if (elementsJson != null && !elementsJson.isEmpty()) {
+                            slideTemplate.setElements(elementsJson.stream()
+                                    .map(e -> (JsonObject) e)
+                                    .map(json -> {
+                                        final SlideElementTemplate element = new SlideElementTemplate();
+                                        element.setId(json.getInteger(SLIDE_ELEMENT_ID.getFieldName()));
+                                        element.setHtmlId(json.getString(SLIDE_ELEMENT_HTML_ID.getFieldName()));
+                                        element.setDefaultContent(json.getString(SLIDE_ELEMENT_DEFAULT_CONTENT.getFieldName()));
+                                        return element;
+                                    })
+                                    .collect(toList())
+                                    .toArray(new SlideElementTemplate[elementsJson.size()]));
                         }
 
                         templateConfiguration.getSlideTemplates().add(slideTemplate);

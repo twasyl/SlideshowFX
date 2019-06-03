@@ -70,20 +70,20 @@ ext.os = [
 
 ext.dependencies = [
         asciidoctorj: [version: '1.6.1'],
-        box         : [version: '2.26.0'],
-        drive       : [version: 'v3-rev20181213-1.28.0'],
-        dropbox     : [version: '3.0.11'],
-        felix       : [version: '6.0.1'],
+        box         : [version: '2.33.0'],
+        drive       : [version: 'v3-rev20190501-1.28.0'],
+        dropbox     : [version: '3.1.0'],
+        felix       : [version: '6.0.3'],
         freemarker  : [version: '2.3.28'],
-        jsoup       : [version: '1.11.3'],
-        junit       : [version: '5.4.0'],
+        jsoup       : [version: '1.12.1'],
+        junit       : [version: '5.4.2'],
         markdown    : [version: '0.13'],
         mockito     : [version: '2.26.0'],
         monocle     : [version: '8u76-b04'],
         testfx      : [version: '4.0.15-alpha'],
         vertx       : [version: '3.7.1'],
         wikitext    : [version: '3.0.29'],
-        zxing       : [version: '3.3.3']
+        zxing       : [version: '3.4.0']
 ]
 
 subprojects {

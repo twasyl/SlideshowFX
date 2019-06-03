@@ -393,6 +393,7 @@ The configuration of the presentation is wrapped into an JSON configuration file
         "template-id": 1,
         "id": "slide-1400836547234",
         "number": "1400836547234",
+        "speaker-notes": "<content encoded in Base64>",
         "elements": [
           {
             "template-id": 3,
@@ -428,6 +429,7 @@ The configuration of the presentation is wrapped into an JSON configuration file
         "template-id": 2,
         "id": "slide-1400836587307",
         "number": "1400836587307",
+        "speaker-notes": "<content encoded in Base64>",
         "elements": [
           {
             "template-id": 1,

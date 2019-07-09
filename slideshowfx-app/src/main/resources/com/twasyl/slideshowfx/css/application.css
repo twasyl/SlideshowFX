@@ -37,7 +37,7 @@
 
 .font-awesome {
     -fx-icon-color: sfx-font-awesome-color;
-    -fx-icon-size: 20px;
+    -fx-icon-size: 15px;
 }
 
 .icon-stack .font-awesome.default-icon-color-0 {
@@ -658,7 +658,7 @@
 #loadTemplate_cog_icon.font-awesome,
 #addSlideButton_plus_icon.font-awesome,
 #deleteSlide_times_icon.font-awesome {
-    -fx-icon-size: 10px;
+    -fx-icon-size: 8px;
 }
 
 #serverButton:start-server .font-awesome {
@@ -686,26 +686,22 @@
     -fx-border-width: 3px;
 }
 
-/**********************/
-/**** Options view ****/
-/**********************/
-
-#snippetExecutorContainer .text-field {
-	-fx-background-color: sfx-snippet-executor-container-text-field-background-color-1, sfx-snippet-executor-container-text-field-background-color-2;
-}
-
 /**************************/
 /**** Internal browser ****/
 /**************************/
 
 #addressBar {
     -fx-border-color: sfx-internal-browser-address-bar-border-color;
-    -fx-background-radius: 10px;
+    -fx-background-radius: 0px;
     -fx-border-width: 0.5px;
 }
 
 #addressPanel {
     -fx-padding: 10px 0 0 0;
+}
+
+#addressPanel .button {
+    -fx-border-width: 0;
 }
 
 /**************************/

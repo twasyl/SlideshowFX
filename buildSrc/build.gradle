@@ -1,13 +1,18 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'java-gradle-plugin'
 }
 
 gradlePlugin {
     plugins {
-        create("SlideshowFXPlugins") {
+        create("SlideshowFXPlugin") {
             id = "sfx-plugin"
             implementationClass = "com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin"
+        }
+
+        create("SlideshowFXPublisher") {
+            id = "sfx-publisher"
+            implementationClass = "com.twasyl.slideshowfx.gradle.plugins.sfxpublisher.SlideshowFXPublisherPlugin"
         }
     }
 }

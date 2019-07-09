@@ -4,8 +4,6 @@ import org.gradle.api.tasks.TaskAction;
 import org.gradle.jvm.tasks.Jar;
 
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Arrays;
 
 /**
@@ -20,15 +18,8 @@ public class UninstallAllVersionsPlugin extends AbstractPluginTask {
     @TaskAction
     public void uninstall() {
         final Jar jar = (Jar) getProject().getTasks().getByName("jar");
-        final FilenameFilter pluginFilenameFilter = (dir, name) -> name.startsWith(jar.getArchiveBaseName().get()) && name.endsWith(".jar");
+        final FilenameFilter pluginFilenameFilter = (dir, name) -> name.startsWith(jar.getArchiveBaseName().get());
 
-        Arrays.stream(pluginsDir.listFiles(pluginFilenameFilter))
-                .forEach(file -> {
-                    try {
-                        Files.delete(file.toPath());
-                    } catch (IOException e) {
-                        getLogger().error("Can not uninstall plugin", e);
-                    }
-                });
+        Arrays.stream(pluginsDir.listFiles(pluginFilenameFilter)).forEach(getProject()::delete);
     }
 }

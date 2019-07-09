@@ -1,15 +1,14 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Extension allowing to insert quizs inside a SlideshowFX presentation'
 version = '1.2-SNAPSHOT'
 
 dependencies {
-    api project(':slideshowfx-content-extension')
     implementation project(':slideshowfx-global-configuration')
     implementation project(':slideshowfx-icons')
     api project(':slideshowfx-markup')
@@ -26,12 +25,8 @@ sfxPlugin {
     contentExtension = true
 
     bundle {
-        name = 'SlideshowFX quiz extension'
-        symbolicName = 'com.twasyl.slideshowfx.content.extension.quiz'
-        description = 'Support for inserting quiz in slides'
-        activator = 'com.twasyl.slideshowfx.content.extension.quiz.activator.QuizContentExtensionActivator'
-        exportPackage = 'com.twasyl.slideshowfx.content.extension.quiz.controllers,com.twasyl.slideshowfx.content.extension.quiz,com.twasyl.slideshowfx.content.extension.quiz.activator'
-        setupWizardLabel = 'Quiz'
+        name = 'Quiz'
+        description = 'Insert quiz in slides'
         setupWizardIconName = 'QUESTION'
     }
 }

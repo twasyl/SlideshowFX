@@ -4,6 +4,7 @@ import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.shape.controllers.ShapeContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import java.util.StringJoiner;
@@ -20,12 +21,13 @@ import static com.twasyl.slideshowfx.icons.Icon.STAR;
  * @version 1.1-SNAPSHOT
  * @since SlideshowFX 2.0
  */
+@Plugin
 public class ShapeContentExtension extends AbstractContentExtension<ShapeContentExtensionController> {
 
     public ShapeContentExtension() {
         super("SHAPE",
-                ShapeContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/shape/fxml/ShapeContentExtension.fxml"),
-                ShapeContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/shape/resources/snapsvg.zip"),
+                "/com/twasyl/slideshowfx/content/extension/shape/fxml/ShapeContentExtension.fxml",
+                "/com/twasyl/slideshowfx/content/extension/shape/resources/snapsvg.zip",
                 STAR,
                 "Insert shapes", "Insert shapes");
 

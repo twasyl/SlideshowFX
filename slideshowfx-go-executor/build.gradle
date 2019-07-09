@@ -1,8 +1,8 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Snippet executor allowing to execute some go inside a SlideshowFX presentation'
@@ -10,20 +10,15 @@ version = '1.1-SNAPSHOT'
 
 dependencies {
     implementation project(':slideshowfx-global-configuration')
-    implementation project(':slideshowfx-snippet-executor')
     implementation project(':slideshowfx-plugin')
     implementation project(':slideshowfx-utils')
 }
 
 sfxPlugin {
     snippetExecutor = true
-    
+
     bundle {
-        name = 'SlideshowFX Go executor'
-        symbolicName = 'com.twasyl.slideshowfx.snippet.executor.go'
-        description = 'Allow to execute Go code inside a presentation'
-        activator = 'com.twasyl.slideshowfx.snippet.executor.go.activator.GoSnippetExecutorActivator'
-        exportPackage = 'com.twasyl.slideshowfx.snippet.executor.go,com.twasyl.slideshowfx.snippet.executor.go.activator'
-        setupWizardLabel = 'Go'
+        name = 'Go executor'
+        description = 'Execute Go code inside a presentation'
     }
 }

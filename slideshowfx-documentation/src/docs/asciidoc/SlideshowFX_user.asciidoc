@@ -152,7 +152,7 @@ SlideshowFX can be extended using plugins. Currently SlideshowFX defines the fol
 * _hosting connector_ ;
 * _code snippet executor_.
 
-Plugins are represented by files having the **.jar* extension.
+Plugins are represented by files having the **.sfx-plugin* extension.
 
 ==== Install plugins
 

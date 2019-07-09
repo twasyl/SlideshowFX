@@ -1,35 +1,22 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Extension allowing to define slide\'s content using the markdown syntax'
 version = '1.2-SNAPSHOT'
 
 dependencies {
-    implementation project(':slideshowfx-markup')
-
-    compile "org.asciidoctor:asciidoctorj:${rootProject.ext.dependencies.asciidoctorj.version}"
+    pluginDependencies "org.asciidoctor:asciidoctorj:${rootProject.ext.dependencies.asciidoctorj.version}"
 }
 
 sfxPlugin {
     markupPlugin = true
 
     bundle {
-        name = 'SlideshowFX asciidoctor support'
-        symbolicName = 'com.twasyl.slideshowfx.markup.asciidoctor'
-        description = 'Support asciidoctor for defining slide\'s content'
-        activator = 'com.twasyl.slideshowfx.markup.asciidoctor.activator.AsciidoctorActivator'
-        classpath = configurations.compile.resolve().collect { artifact -> artifact.name }.join(',').concat(',.')
-        exportPackage = 'com.twasyl.slideshowfx.markup.asciidoctor,com.twasyl.slideshowfx.markup.asciidoctor.activator'
-        setupWizardLabel = 'Asciidoctor'
-    }
-}
-
-jar {
-    from(configurations.compile.resolve().collect()) {
-        include '*'
+        name = 'Asciidoctor'
+        description = 'Define slide\'s content in Asciidoctor'
     }
 }

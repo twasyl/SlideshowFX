@@ -27,8 +27,6 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 
 | asciidoctorj | {asciidoctorj-version} |
 
-| Apache Felix | {apache-felix-version} |
-
 | freemarker | {freemarker-version} |
 
 | jsoup | {jsoup-version} |
@@ -56,7 +54,7 @@ SlideshowFX contains the following modules:
 - *SlideshowFX-controls* which defines the custom graphical controls that may be used in other modules ;
 - *SlideshowFX-global-configuration* which defines the classes allowing to access and interact the SlideshowFX configuration ;
 - *SlideshowFX-logs* which defines the classes for the logging ;
-- *SlideshowFX-osgi* which defines the OSGi classes that are useful for other modules ;
+- *slideshowfx-plugin-manager* which defines the plugin manager responsible for loading all plugins ;
 - *SlideshowFX-server* which defines a server that is used by SlideshowFX ;
 - *SlideshowFX-markup* which defines the base classes for creating an OSGi module for supporting a new markup syntax in SlideshowFX to define slides' content ;
 - *SlideshowFX-asciidoctor* which defines the implementation of SlideshowFX-markup to define slides' content in asciidoctor ;
@@ -103,7 +101,10 @@ gradlew :slideshowfx-app:processResources
 
 Some gradle tasks are provided to help the developer :
 
+- *bundle* provided for all plugins and to create the package for the plugin ;
 - *installPlugin* provided for all plugins and allowing to deploy the plugin directly to the folder : `~/.SlideshowFX/plugins` ;
+- *uninstallPlugin* provided for all plugins and allowing to deploy uninstall the plugin directly from the folder : `~/.SlideshowFX/plugins` ;
+- *uninstallAllVersionsPlugin* provided for all plugins and allowing to deploy uninstall all versions of the plugin directly from the folder : `~/.SlideshowFX/plugins` ;
 - *listSnapshotProjects* allowing to list projects having a `SNAPSHOT` version. This is particularly useful for knowing which project should update it's version before publishing ;
 - *saveProjectsToBePublished* allowing to save within the `gradle.properties` file the projects having a `SNAPSHOT` version and that should be published on bintray ;
 - *:slideshowfx-app:createSlideContentEditor* allows to build the `sfx-slide-content-editor.zip` archive when passing the `-PaceVersion=xxx` property on the command line ;

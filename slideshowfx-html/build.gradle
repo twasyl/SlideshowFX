@@ -1,17 +1,15 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = "Extension allowing to define slide's content using the HTML syntax"
-version = '1.0'
+version = '1.1-SNAPSHOT'
 
 dependencies {
-    implementation project(':slideshowfx-markup')
-
-    integrationTestImplementation project(':slideshowfx-osgi')
+    integrationTestImplementation project(':slideshowfx-plugin-manager')
     integrationTestImplementation project(':slideshowfx-plugin').sourceSets.integrationTest.output
 }
 
@@ -19,11 +17,7 @@ sfxPlugin {
     markupPlugin = true
 
     bundle {
-        name = 'SlideshowFX HTML support'
-        symbolicName = 'com.twasyl.slideshowfx.markup.html'
-        description = 'Support HTML for defining slide\'s content'
-        activator = 'com.twasyl.slideshowfx.markup.html.activator.HtmlActivator'
-        exportPackage = 'com.twasyl.slideshowfx.markup.html,com.twasyl.slideshowfx.markup.html.activator'
-        setupWizardLabel = 'HTML'
+        name = 'HTML support'
+        description = 'Define slide\'s content in HTML'
     }
 }

@@ -15,14 +15,6 @@ allprojects {
     }
 }
 
-def stripProjectVersion(String version) {
-    if (version.contains("-SNAPSHOT")) {
-        return version.replace("-SNAPSHOT", "")
-    } else {
-        return version
-    }
-}
-
 def getPlatform() {
     def osProperty = System.properties['os.name'].toLowerCase()
 
@@ -48,19 +40,6 @@ def getPlatformAndArchitecture() {
     return "${getPlatform()}-${getArchitecture()}"
 }
 
-def isPlugin(Project project) {
-    return project.getPluginManager().hasPlugin('sfx-plugin')
-}
-
-/**
- * Get all projects that have a SNAPSHOT version.
- * @return The list of snapshot projects.
- */
-def getSnapshotProjects() {
-    return allprojects.findAll { it.version.contains('-SNAPSHOT') }
-}
-
-
 ext.os = [
         MAC    : 'osx',
         WINDOWS: 'windows',
@@ -69,14 +48,13 @@ ext.os = [
 ]
 
 ext.dependencies = [
-        asciidoctorj: [version: '1.6.1'],
-        box         : [version: '2.33.0'],
-        drive       : [version: 'v3-rev20190501-1.28.0'],
-        dropbox     : [version: '3.1.0'],
-        felix       : [version: '6.0.3'],
+        asciidoctorj: [version: '2.1.0'],
+        box         : [version: '2.34.0'],
+        drive       : [version: 'v3-rev20190620-1.30.1'],
+        dropbox     : [version: '3.1.1'],
         freemarker  : [version: '2.3.28'],
         jsoup       : [version: '1.12.1'],
-        junit       : [version: '5.4.2'],
+        junit       : [version: '5.5.0'],
         markdown    : [version: '0.13'],
         mockito     : [version: '2.26.0'],
         monocle     : [version: '8u76-b04'],
@@ -181,51 +159,10 @@ subprojects {
     def sfxPluginCallback = {
         evaluationDependsOn(':slideshowfx-plugin')
 
-        sfxPlugin {
-            bundle {
-                vendor = "Thierry Wasylczenko"
-            }
-        }
-
         dependencies {
-            implementation "org.apache.felix:org.apache.felix.framework:${rootProject.ext.dependencies.felix.version}"
-
-            integrationTestImplementation project(':slideshowfx-osgi')
+            integrationTestImplementation project(':slideshowfx-plugin-manager')
             integrationTestImplementation project(':slideshowfx-plugin').sourceSets.integrationTest.output
         }
-    }
-
-    def bintrayCallback = {
-        bintray {
-            user = System.properties['bintrayUserName'] ?: System.env['BINTRAY_USER_NAME']
-            key = System.properties['bintrayApiKey'] ?: System.env['BINTRAY_API_KEY']
-
-            configurations = ['archives']
-
-            pkg {
-                repo = 'SlideshowFX'
-                name = project.name
-                websiteUrl = 'https://slideshowfx.github.io'
-                issueTrackerUrl = 'https://github.com/twasyl/SlideshowFX/issues'
-                vcsUrl = 'https://github.com/twasyl/SlideshowFX.git'
-
-                desc = project.description
-
-                licenses = ['Apache-2.0']
-
-                githubRepo = 'twasyl/SlideshowFX'
-                githubReleaseNotesFile = 'CHANGELOG.textile'
-
-                version {
-                    name = rootProject.stripProjectVersion(project.version)
-                    desc = project.description
-                    released = new Date()
-                    vcsTag = "v${rootProject.stripProjectVersion(project.version)}"
-                }
-            }
-        }
-
-        bintrayUpload.enabled = System.properties["${project.name}.publish"] ?: false
     }
 
     def jacocoCallback = {
@@ -278,7 +215,6 @@ subprojects {
 
     plugins.withType(JavaPlugin, javaCallback)
     plugins.withId('sfx-plugin', sfxPluginCallback)
-    plugins.withId('com.jfrog.bintray', bintrayCallback)
     plugins.withId('jacoco', jacocoCallback)
     plugins.withId('org.sonarqube', sonarqubeCallback)
 }
@@ -298,28 +234,4 @@ tasks.sonarqube.dependsOn {
                 it.tasks.check
         ]
     }.flatten()
-}
-
-/**
- * Task listing the projects that have a SNAPSHOT a version. These projects will be printed on the console with their
- * version.
- */
-task listSnapshotProjects {
-    doLast {
-        getSnapshotProjects().each { println "${it.name} => ${it.version}" }
-    }
-}
-
-/**
- * Save as system properties in {@code gradle.properties} file the project that should be published. This task uses
- * {@link #getSnapshotProjects()} to determine which project should be published.
- */
-task saveProjectsToBePublished {
-    doLast {
-        new File("$rootProject.projectDir/gradle.properties").withWriter { out ->
-            getSnapshotProjects().findAll { rootProject.isPlugin(it) || it.name.equals('slideshowfx-setup') } each {
-                out.println "systemProp.${it.name}.publish=true"
-            }
-        }
-    }
 }

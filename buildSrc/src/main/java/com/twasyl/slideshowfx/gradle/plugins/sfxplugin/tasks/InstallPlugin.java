@@ -1,13 +1,14 @@
 package com.twasyl.slideshowfx.gradle.plugins.sfxplugin.tasks;
 
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.jvm.tasks.Jar;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.BUNDLE_TASK_NAME;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
@@ -20,15 +21,21 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 public class InstallPlugin extends AbstractPluginTask {
 
     @TaskAction
-    public void install() throws IOException {
+    public void install() {
         if (!pluginsDir.exists()) {
             pluginsDir.mkdirs();
         }
 
-        final Jar jar = (Jar) getProject().getTasks().getByName("jar");
-        if (jar.getArchiveFile().isPresent()) {
-            final Path copy = new File(pluginsDir, jar.getArchiveFileName().get()).toPath();
-            Files.copy(jar.getArchiveFile().get().getAsFile().toPath(), copy, REPLACE_EXISTING);
+        final FileCollection files = getProject().getTasks().getByName(BUNDLE_TASK_NAME).getOutputs().getFiles();
+        if (!files.isEmpty()) {
+            files.forEach(file -> {
+                final Path copy = new File(pluginsDir, file.getName()).toPath();
+                try {
+                    Files.copy(file.toPath(), copy, REPLACE_EXISTING);
+                } catch (IOException e) {
+                    getLogger().error("Can not install file " + file.getName(), e);
+                }
+            });
         }
     }
 }

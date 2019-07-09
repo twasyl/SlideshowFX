@@ -13,8 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.concurrent.Task;
-import javafx.geometry.Pos;
-import javafx.geometry.Side;
+import javafx.scene.Cursor;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -26,6 +25,7 @@ import javafx.util.Duration;
 import java.util.HashSet;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
+import static javafx.geometry.Side.TOP;
 
 /**
  * A center that contains multiple {@link Notification}. The center displays a progress for the task that is considered
@@ -34,7 +34,7 @@ import static javafx.geometry.Pos.CENTER_LEFT;
  * within a {@link Notification} and can be unregistered from the center.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class NotificationCenter extends StackPane {
@@ -84,9 +84,7 @@ public class NotificationCenter extends StackPane {
      */
     private final void initStatusListeners() {
         // Initialize the UI elements for responding to the current task status
-        this.currentTaskMessage.textProperty().addListener((textValue, oldText, newText) -> {
-            this.labelTransition.playFromStart();
-        });
+        this.currentTaskMessage.textProperty().addListener((textValue, oldText, newText) -> this.labelTransition.playFromStart());
 
         // The listener to the task will update the label and the progress bar for the new task
         this.currentTask.addListener((taskValue, oldTask, newtask) -> {
@@ -109,7 +107,7 @@ public class NotificationCenter extends StackPane {
      */
     private final void initProgressBar() {
         this.currentTaskProgress.setPrefWidth(200);
-
+        this.currentTaskProgress.setCursor(Cursor.HAND);
         this.currentTaskProgress.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1) {
                 final ContextMenu menu = new ContextMenu();
@@ -119,7 +117,7 @@ public class NotificationCenter extends StackPane {
                     menu.getItems().add(notification);
                 });
 
-                menu.getItems().addListener((ListChangeListener) (change) -> {
+                menu.getItems().addListener((ListChangeListener) change -> {
                     if (change.next() && change.wasRemoved()) {
                         change.getRemoved()
                                 . stream()
@@ -128,9 +126,9 @@ public class NotificationCenter extends StackPane {
                     change.reset();
 
                     menu.hide();
-                    menu.show(this.currentTaskProgress, Side.TOP, 0, 0);
+                    menu.show(this.currentTaskProgress, TOP, 0, 0);
                 });
-                menu.show(this.currentTaskProgress, Side.TOP, 0, 0);
+                menu.show(this.currentTaskProgress, TOP, 0, 0);
             }
         });
     }
@@ -164,7 +162,7 @@ public class NotificationCenter extends StackPane {
         this.setProgress(progress);
         this.setText(text);
 
-        PlatformHelper.run(() -> this.labelTransition.playFromStart());
+        PlatformHelper.run(this.labelTransition::playFromStart);
     }
 
     /**
@@ -198,9 +196,8 @@ public class NotificationCenter extends StackPane {
     /**
      * Adds a task to the list of current tasks in the notification center.
      * @param task The task to add.
-     * @throws NullPointerException If the provided task is {@code null}.
      */
-    public void registerTask(final Task task) throws NullPointerException {
+    public void registerTask(final Task task) {
         if(task == null) throw new NullPointerException("The task to add to the notification center can not be null");
 
         ((SimpleSetProperty) this.registeredTasks).add(task);

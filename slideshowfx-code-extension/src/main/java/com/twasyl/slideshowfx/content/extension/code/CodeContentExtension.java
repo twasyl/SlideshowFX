@@ -4,6 +4,7 @@ import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.code.controllers.CodeContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import java.util.StringJoiner;
@@ -23,17 +24,18 @@ import static java.util.regex.Pattern.MULTILINE;
  * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class CodeContentExtension extends AbstractContentExtension<CodeContentExtensionController> {
     protected static final String LINE_NUMBERS_CSS_CLASS = "line-numbers";
 
     public CodeContentExtension() {
         super("CODE",
-                CodeContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/code/fxml/CodeContentExtension.fxml"),
-                CodeContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/code/resources/prism.zip"),
+                "/com/twasyl/slideshowfx/content/extension/code/fxml/CodeContentExtension.fxml",
+                "/com/twasyl/slideshowfx/content/extension/code/resources/prism.zip",
                 CODE,
                 "Insert code", "Insert code");
 
-        final String baseURL = "prism/1.15.0/";
+        final String baseURL = "prism/1.16.0/";
 
         // Add URL
         this.putResource(ResourceType.CSS_FILE, baseURL.concat("prism.css"));

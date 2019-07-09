@@ -8,6 +8,7 @@ import com.twasyl.slideshowfx.hosting.connector.BasicHostingConnectorOptions;
 import com.twasyl.slideshowfx.hosting.connector.box.io.BoxFile;
 import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -35,6 +36,7 @@ import static com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnect
  * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.1
  */
+@Plugin
 public class BoxHostingConnector extends AbstractHostingConnector<BasicHostingConnectorOptions> {
     private static final Logger LOGGER = Logger.getLogger(BoxHostingConnector.class.getName());
 

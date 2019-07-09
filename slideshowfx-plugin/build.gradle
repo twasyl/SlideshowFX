@@ -8,5 +8,5 @@ description = "Module defining a markup"
 version = '1.0'
 
 dependencies {
-    integrationTestImplementation project(':slideshowfx-osgi')
+    integrationTestImplementation project(':slideshowfx-plugin-manager')
 }

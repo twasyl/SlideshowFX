@@ -2,8 +2,8 @@ plugins {
     id 'java'
     id 'distribution'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Module for the installer of SlideshowFX'
@@ -39,7 +39,7 @@ jar {
     manifest {
         attributes += [
                 'Implementation-Title'    : 'SlideshowFX-setup',
-                'Implementation-Version'  : "${version}",
+                'Implementation-Version'  : "${project.version}",
                 'Class-Path'              : configurations.compile.collect { it.getName() }.join(' '),
                 'Main-Class'              : 'com.twasyl.slideshowfx.setup.app.SlideshowFXSetup',
                 'JavaFX-Application-Class': 'com.twasyl.slideshowfx.setup.app.SlideshowFXSetup',
@@ -129,29 +129,29 @@ distributions {
 prepareBundle.dependsOn jar,
         ':slideshowfx-documentation:distZip',
         ':slideshowfx-app:createBundle',
-        ':slideshowfx-alert-extension:jar',
-        ':slideshowfx-box-hosting-connector:jar',
-        ':slideshowfx-code-extension:jar',
-        ':slideshowfx-drive-hosting-connector:jar',
-        ':slideshowfx-dropbox-hosting-connector:jar',
-        ':slideshowfx-go-executor:jar',
-        ':slideshowfx-golo-executor:jar',
-        ':slideshowfx-groovy-executor:jar',
-        ':slideshowfx-html:jar',
-        ':slideshowfx-image-extension:jar',
-        ':slideshowfx-java-executor:jar',
-        ':slideshowfx-javascript-executor:jar',
-        ':slideshowfx-kotlin-executor:jar',
-        ':slideshowfx-link-extension:jar',
-        ':slideshowfx-markdown:jar',
-        ':slideshowfx-quiz-extension:jar',
-        ':slideshowfx-quote-extension:jar',
-        ':slideshowfx-ruby-executor:jar',
-        ':slideshowfx-scala-executor:jar',
-        ':slideshowfx-sequence-diagram-extension:jar',
-        ':slideshowfx-shape-extension:jar',
-        ':slideshowfx-snippet-extension:jar',
-        ':slideshowfx-textile:jar'
+        ':slideshowfx-alert-extension:bundle',
+        ':slideshowfx-box-hosting-connector:bundle',
+        ':slideshowfx-code-extension:bundle',
+        ':slideshowfx-drive-hosting-connector:bundle',
+        ':slideshowfx-dropbox-hosting-connector:bundle',
+        ':slideshowfx-go-executor:bundle',
+        ':slideshowfx-golo-executor:bundle',
+        ':slideshowfx-groovy-executor:bundle',
+        ':slideshowfx-html:bundle',
+        ':slideshowfx-image-extension:bundle',
+        ':slideshowfx-java-executor:bundle',
+        ':slideshowfx-javascript-executor:bundle',
+        ':slideshowfx-kotlin-executor:bundle',
+        ':slideshowfx-link-extension:bundle',
+        ':slideshowfx-markdown:bundle',
+        ':slideshowfx-quiz-extension:bundle',
+        ':slideshowfx-quote-extension:bundle',
+        ':slideshowfx-ruby-executor:bundle',
+        ':slideshowfx-scala-executor:bundle',
+        ':slideshowfx-sequence-diagram-extension:bundle',
+        ':slideshowfx-shape-extension:bundle',
+        ':slideshowfx-snippet-extension:bundle',
+        ':slideshowfx-textile:bundle'
 
 createBundle.dependsOn prepareBundle
 distZip.dependsOn createBundle

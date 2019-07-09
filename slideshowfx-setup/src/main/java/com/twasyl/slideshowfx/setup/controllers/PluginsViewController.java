@@ -2,8 +2,9 @@ package com.twasyl.slideshowfx.setup.controllers;
 
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.icons.FontAwesome;
+import com.twasyl.slideshowfx.plugin.manager.internal.PluginFile;
+import com.twasyl.slideshowfx.plugin.manager.internal.RegisteredPlugin;
 import com.twasyl.slideshowfx.ui.controls.PluginFileButton;
-import com.twasyl.slideshowfx.utils.Jar;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -25,14 +26,13 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.icons.Icon.REFRESH;
-import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.toList;
 
 /**
  * Controller for the {@code PluginsView.xml} file.
  *
  * @author Thierry Wasylczenko
- * @version 1.3
+ * @version 1.4-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class PluginsViewController implements Initializable {
@@ -41,7 +41,7 @@ public class PluginsViewController implements Initializable {
 
     protected static final String MARKUP_PLUGINS_DIRECTORY_NAME = "markups";
     protected static final String SNIPPET_EXECUTORS_PLUGINS_DIRECTORY_NAME = "executors";
-    protected static  final String CONTENT_EXTENSION_PLUGINS_DIRECTORY_NAME = "extensions";
+    protected static final String CONTENT_EXTENSION_PLUGINS_DIRECTORY_NAME = "extensions";
     protected static final String HOSTING_CONNECTOR_PLUGINS_DIRECTORY_NAME = "hostingConnectors";
 
     @FXML
@@ -67,27 +67,10 @@ public class PluginsViewController implements Initializable {
     @FXML
     private CheckBox installAllHostingConnectorPlugins;
 
-    private List<Jar> installedPlugins;
+    private List<RegisteredPlugin> installedPlugins;
     private final ObjectProperty<File> pluginsDirectory = new SimpleObjectProperty<>();
     private final List<File> pluginsToInstall = new ArrayList<>();
     private final IntegerProperty numberOfSelectedMarkup = new SimpleIntegerProperty();
-
-    /**
-     * Converts the given instance of {@link File} to a {@link Jar} instance.
-     *
-     * @param file The file to convert.
-     * @return An instance of {@link Jar}.
-     */
-    private static Jar convertFileToJar(File file) {
-        if (file != null) {
-            try {
-                return new Jar(file);
-            } catch (IOException e) {
-                LOGGER.log(WARNING, "Can not convert file to Jar", e);
-            }
-        }
-        return null;
-    }
 
     /**
      * Get the list of the plugins the user has chosen to install. Each {@link File} corresponds to the plugin file.
@@ -142,11 +125,17 @@ public class PluginsViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         if (GlobalConfiguration.getPluginsDirectory().exists()) {
-            final File[] jarArray = GlobalConfiguration.getPluginsDirectory()
-                    .listFiles((dir, name) -> name != null && !name.startsWith(".") && name.endsWith(".jar"));
+            final File[] plugins = GlobalConfiguration.getPluginsDirectory()
+                    .listFiles((dir, name) -> name != null && !name.startsWith(".") && name.endsWith(PluginFile.EXTENSION));
 
-            installedPlugins = Arrays.stream(jarArray)
-                    .map(PluginsViewController::convertFileToJar)
+            installedPlugins = Arrays.stream(plugins)
+                    .map(file -> {
+                        try {
+                            return new RegisteredPlugin(new PluginFile(file));
+                        } catch (IOException e) {
+                            return null;
+                        }
+                    })
                     .filter(Objects::nonNull)
                     .collect(toList());
         }
@@ -232,9 +221,16 @@ public class PluginsViewController implements Initializable {
 
         view.getChildren().clear();
 
-        Arrays.stream(specializedPluginsDir.listFiles())
-                .filter(file -> file.getName().endsWith(".jar"))
-                .map(PluginFileButton::new)
+        Arrays.stream(specializedPluginsDir.listFiles(((dir, name) -> name.endsWith(PluginFile.EXTENSION))))
+                .map(file -> {
+                    try {
+                        final PluginFile plugin = new PluginFile(file);
+                        return new PluginFileButton(plugin);
+                    } catch (IOException e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
                 .sorted(Comparator.comparing(PluginFileButton::getLabel))
                 .forEach(button -> {
                     button.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {
@@ -278,24 +274,19 @@ public class PluginsViewController implements Initializable {
      * @param plugin The plugin file to check.
      * @return {@code true} if the plugin is already installed, {@code false} otherwise.
      */
-    private boolean isEarlierPluginVersionInstalled(final File plugin) {
-        try (final Jar jar = new Jar(plugin)) {
-            final String pluginLabel = jar.getManifestAttributeValue("Setup-Wizard-Label", "");
-            final String pluginVersion = jar.getManifestAttributeValue("Bundle-Version", "");
+    private boolean isEarlierPluginVersionInstalled(final PluginFile plugin) {
+        final RegisteredPlugin registeredPlugin = new RegisteredPlugin(plugin);
+        final String pluginLabel = registeredPlugin.getName();
+        final String pluginVersion = registeredPlugin.getVersion();
 
-            return installedPlugins.stream()
-                    .filter(p -> {
-                        final String label = p.getManifestAttributeValue("Setup-Wizard-Label", "");
-                        final String version = p.getManifestAttributeValue("Bundle-Version", "");
+        return installedPlugins.stream()
+                .filter(rp -> {
+                    final String label = rp.getName();
+                    final String version = rp.getVersion();
 
-                        return pluginLabel.equals(label) && pluginVersion.compareTo(version) > 0;
-                    })
-                    .count() > 0;
-        } catch (IOException e) {
-            LOGGER.log(WARNING, "Error when trying to determine if an older version of plugin is already installed", e);
-        }
-
-        return false;
+                    return pluginLabel.equals(label) && pluginVersion.compareTo(version) > 0;
+                })
+                .count() > 0;
     }
 
 

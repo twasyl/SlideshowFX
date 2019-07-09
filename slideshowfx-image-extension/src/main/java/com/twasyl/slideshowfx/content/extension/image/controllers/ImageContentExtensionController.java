@@ -1,7 +1,7 @@
 package com.twasyl.slideshowfx.content.extension.image.controllers;
 
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtensionController;
-import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.utils.DialogHelper;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.twasyl.slideshowfx.osgi.OSGiManager.PRESENTATION_RESOURCES_FOLDER;
+import static com.twasyl.slideshowfx.plugin.manager.PluginManager.PRESENTATION_RESOURCES_FOLDER;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.stream.Collectors.toList;
 import static javafx.scene.control.ButtonType.CANCEL;
@@ -82,7 +82,7 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
         File imageFile = chooser.showOpenDialog(null);
 
         if (imageFile != null) {
-            final OSGiManager manager = OSGiManager.getInstance();
+            final PluginManager manager = PluginManager.getInstance();
             File targetFile = new File((File) manager.getPresentationProperty(PRESENTATION_RESOURCES_FOLDER), imageFile.getName());
             final CopyOption[] copyOptions;
 
@@ -130,7 +130,7 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
     private List<File> lookupResources() {
         final List<File> images = new ArrayList<>();
 
-        final File resourcesFolder = (File) OSGiManager.getInstance().getPresentationProperty(PRESENTATION_RESOURCES_FOLDER);
+        final File resourcesFolder = (File) PluginManager.getInstance().getPresentationProperty(PRESENTATION_RESOURCES_FOLDER);
         final File[] files = resourcesFolder.listFiles(IMAGE_FILTER);
 
         if (files != null) {
@@ -265,7 +265,7 @@ public class ImageContentExtensionController extends AbstractContentExtensionCon
 
         final File selection = this.getSelectedFile();
         if (selection != null) {
-            final File workingDir = (File) OSGiManager.getInstance().getPresentationProperty(OSGiManager.PRESENTATION_FOLDER);
+            final File workingDir = (File) PluginManager.getInstance().getPresentationProperty(PluginManager.PRESENTATION_FOLDER);
 
             url = workingDir.toPath().relativize(selection.toPath()).toString().replace(File.separator, "/");
         }

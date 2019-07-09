@@ -18,7 +18,7 @@ import com.twasyl.slideshowfx.engine.template.configuration.SlideTemplate;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.icons.FontAwesome;
 import com.twasyl.slideshowfx.markup.IMarkup;
-import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.utils.DialogHelper;
@@ -38,10 +38,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -52,6 +49,7 @@ import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.utils.PlatformHelper.run;
 import static java.lang.Double.NaN;
+import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 
 /**
@@ -100,13 +98,9 @@ public class PresentationViewController implements ThemeAwareController {
      * The treatment is then delegated to the {@link #updateSlide(IMarkup, String)} method.
      *
      * @param event
-     * @throws TransformerException
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
      */
     @FXML
-    private void updateSlideWithText(ActionEvent event) throws TransformerException, IOException, ParserConfigurationException, SAXException {
+    private void updateSlideWithText(ActionEvent event) {
         this.updateSlide();
     }
 
@@ -234,13 +228,8 @@ public class PresentationViewController implements ThemeAwareController {
      * This method updates a slide of the presentation. The <code>markup</code> and the <code>originalContent</code> are
      * deduced from the user interface. If all parameters can be deduced, then {@link #updateSlide(IMarkup, String)} is
      * called, otherwise nothing is performed.
-     *
-     * @throws TransformerException
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
      */
-    private void updateSlide() throws TransformerException, IOException, ParserConfigurationException, SAXException {
+    private void updateSlide() {
         RadioButton selectedMarkup = (RadioButton) this.markupContentType.getSelectedToggle();
 
         if (selectedMarkup != null) {
@@ -257,12 +246,8 @@ public class PresentationViewController implements ThemeAwareController {
      *
      * @param markup          The markup with which the new content was generated.
      * @param originalContent The original content, in Base64, with which the slide will be updated.
-     * @throws TransformerException
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
      */
-    private void updateSlide(final IMarkup markup, final String originalContent) throws TransformerException, IOException, ParserConfigurationException, SAXException {
+    private void updateSlide(final IMarkup markup, final String originalContent) {
         final String elementId = String.format("%1$s-%2$s", this.slideNumber.getText(), this.fieldName.getText());
         String htmlContent = markup.convertAsHtml(originalContent);
 
@@ -328,7 +313,7 @@ public class PresentationViewController implements ThemeAwareController {
 
             this.speakerNotes.setText(slide.getSpeakerNotes());
         } else {
-            LOGGER.info(String.format("Prefill information for the field %1$s of slide #%2$s is impossible: the slide is not found", field, slideNumber));
+            LOGGER.log(INFO, "Prefill information for the field {0} of slide #{1} is impossible: the slide is not found", new String[]{field, slideNumber});
         }
     }
 
@@ -336,12 +321,12 @@ public class PresentationViewController implements ThemeAwareController {
      * Test if the given {@code contentCode} is supported.
      *
      * @param contentCode The code of the {@link IMarkup} to test if it is supported.
-     * @return {@code true} if there is an OSGi bundle having the given code, {@code false} otherwise.
+     * @return {@code true} if there is a plugin having the given code, {@code false} otherwise.
      */
     public boolean isContentSupported(final String contentCode) {
         boolean supported = false;
 
-        List<IMarkup> services = OSGiManager.getInstance().getInstalledServices(IMarkup.class);
+        List<IMarkup> services = PluginManager.getInstance().getServices(IMarkup.class);
 
         if (services != null) {
             Optional<IMarkup> iMarkup = services.stream()
@@ -356,7 +341,7 @@ public class PresentationViewController implements ThemeAwareController {
 
     /**
      * This method is called by the presentation in order to execute a code snippet. The executor is identified by the
-     * {@code snippetExecutorCode} and retrieved in the OSGi context to get the {@link ISnippetExecutor}
+     * {@code snippetExecutorCode} and retrieved in the plugin manager to get the {@link ISnippetExecutor}
      * instance that will execute the code.
      * The code to execute is passed to this method in Base64 using the {@code base64CodeSnippet} parameter. The execution
      * result will be pushed back to the presentation in the HTML element {@code consoleOutputId}.
@@ -368,7 +353,7 @@ public class PresentationViewController implements ThemeAwareController {
     public void executeCodeSnippet(final String snippetExecutorCode, final String base64CodeSnippet, final String consoleOutputId) {
 
         if (snippetExecutorCode != null) {
-            final Optional<ISnippetExecutor> snippetExecutor = OSGiManager.getInstance().getInstalledServices(ISnippetExecutor.class)
+            final Optional<ISnippetExecutor> snippetExecutor = PluginManager.getInstance().getServices(ISnippetExecutor.class)
                     .stream()
                     .filter(executor -> snippetExecutorCode.equals(executor.getCode()))
                     .findFirst();
@@ -498,7 +483,7 @@ public class PresentationViewController implements ThemeAwareController {
         }
 
         // Creating RadioButtons for each markup bundle installed
-        OSGiManager.getInstance().getInstalledServices(IMarkup.class)
+        PluginManager.getInstance().getServices(IMarkup.class)
                 .stream()
                 .sorted((markup1, markup2) -> markup1.getName().compareToIgnoreCase(markup2.getName()))
                 .forEach(this::createRadioButtonForMakup);
@@ -518,7 +503,7 @@ public class PresentationViewController implements ThemeAwareController {
         }
 
         // Creating Buttons for each extension bundle installed
-        OSGiManager.getInstance().getInstalledServices(IContentExtension.class)
+        PluginManager.getInstance().getServices(IContentExtension.class)
                 .stream()
                 .sorted(Comparator.comparing(IContentExtension::getCode))
                 .forEach(this::createButtonForContentExtension);
@@ -797,7 +782,7 @@ public class PresentationViewController implements ThemeAwareController {
         this.refreshMarkupSyntax();
 
         // Creating buttons for each content extension bundle installed
-        OSGiManager.getInstance().getInstalledServices(IContentExtension.class)
+        PluginManager.getInstance().getServices(IContentExtension.class)
                 .stream()
                 .sorted(Comparator.comparing(IContentExtension::getCode))
                 .forEach(this::createButtonForContentExtension);

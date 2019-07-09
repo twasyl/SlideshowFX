@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 public class SequenceDiagramContentExtensionIntegrationTest extends BasePluginIntegrationTest {
 
     @Test
-    @DisplayName("can be installed in the OSGi framework")
+    @DisplayName("can be installed in the plugin manager")
     void pluginIsInstalled() {
         assertPluginIsInstalled(IContentExtension.class, "SEQUENCE_DIAGRAM");
     }

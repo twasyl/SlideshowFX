@@ -3,6 +3,7 @@ package com.twasyl.slideshowfx.content.extension.snippet;
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.snippet.controllers.SnippetContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import java.util.Base64;
@@ -19,24 +20,25 @@ import static com.twasyl.slideshowfx.icons.Icon.TERMINAL;
  * {@link #buildDefaultContentString()} and {@link #buildContentString(IMarkup)}.
  *
  * @author Thierry Wasylczenko
- * @version 1.2-SNAPSHOT
+ * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class SnippetContentExtension extends AbstractContentExtension<SnippetContentExtensionController> {
 
     public SnippetContentExtension() {
         super("SNIPPET",
-                SnippetContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/snippet/fxml/SnippetContentExtension.fxml"),
-                SnippetContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/snippet/resources/snippet-executor.zip"),
+                "/com/twasyl/slideshowfx/content/extension/snippet/fxml/SnippetContentExtension.fxml",
+                "/com/twasyl/slideshowfx/content/extension/snippet/resources/snippet-executor.zip",
                 TERMINAL,
                 "Insert an executable code snippet", "Insert an executable code snippet");
 
         final String baseURL = "snippet-executor/";
 
         // Add URL
-        this.putResource(CSS_FILE, baseURL.concat("prism/1.15.0/prism.css"));
+        this.putResource(CSS_FILE, baseURL.concat("prism/1.16.0/prism.css"));
         this.putResource(JAVASCRIPT_FILE, String.format("%sfont-awesome/%s/js/%s", baseURL, getFontAwesomeVersion(), getFontAwesomeJSFilename()), getFontAwesomeJSFile());
-        this.putResource(JAVASCRIPT_FILE, baseURL.concat("prism/1.15.0/prism.js"));
+        this.putResource(JAVASCRIPT_FILE, baseURL.concat("prism/1.16.0/prism.js"));
     }
 
     @Override

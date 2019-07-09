@@ -8,10 +8,14 @@ import javafx.scene.control.ListCell;
  * {@link SupportedLanguage#getName() name} of the {@link SupportedLanguage language}.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 1.3
  */
 public class SupportedLanguageCell extends ListCell<SupportedLanguage> {
+
+    public SupportedLanguageCell() {
+        getStyleClass().add("supported-language-cell");
+    }
 
     @Override
     protected void updateItem(SupportedLanguage language, boolean empty) {
@@ -19,6 +23,8 @@ public class SupportedLanguageCell extends ListCell<SupportedLanguage> {
 
         if (language != null && !empty) {
             this.setText(language.getName());
+        } else {
+            this.setText(null);
         }
     }
 }

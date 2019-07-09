@@ -160,7 +160,7 @@
     sfx-messages-box-text-color: #FF8000;
 
     /* Colors for list views */
-    sfx-list-view-background-color: #2B2B2B, #2B2B2B;
+    sfx-list-view-background-color: sfx-application-background-color, sfx-application-background-color;
     sfx-list-view-background-focused-color: transparent, sfx-list-view-background-color, transparent;
 
     /* Colors for plugin file buttons */
@@ -187,10 +187,6 @@
     sfx-opened-presentations-tab-pane-background-color: #B6B6B6;
     sfx-opened-presentations-tab-pane-border-valid-drag-over-color: #A9B7C6;
     sfx-opened-presentations-tab-pane-border-invalid-drag-over-color: #BC3F3C;
-
-    /* Colors for the container of the snippet executors in the options view */
-    sfx-snippet-executor-container-text-field-background-color-1: derive(sfx-text-fill, 10%);
-    sfx-snippet-executor-container-text-field-background-color-2: #2B2B2B;
 
     /* Colors for the internal browser */
     sfx-internal-browser-address-bar-border-color: white;

@@ -1,7 +1,7 @@
 package com.twasyl.slideshowfx.ui.controls;
 
 import com.twasyl.slideshowfx.controls.stages.AboutStage;
-import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -14,7 +14,7 @@ public class AboutStageTest extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-        OSGiManager.getInstance().startAndDeploy();
+        PluginManager.getInstance().start();
     }
 
     @Override

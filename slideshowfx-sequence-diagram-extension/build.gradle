@@ -1,15 +1,14 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Extension allowing to insert sequence diagrams inside a SlideshowFX presentation'
 version = '1.2-SNAPSHOT'
 
 dependencies {
-    api project(':slideshowfx-content-extension')
     implementation project(':slideshowfx-icons')
     api project(':slideshowfx-markup')
     api project(':slideshowfx-plugin')
@@ -20,12 +19,8 @@ sfxPlugin {
     contentExtension = true
 
     bundle {
-        name = 'SlideshowFX sequence diagram extension'
-        symbolicName = 'com.twasyl.slideshowfx.content.extension.sequence.diagram'
-        description = 'Support for inserting sequence diagrams in presentations'
-        activator = 'com.twasyl.slideshowfx.content.extension.sequence.diagram.activator.SequenceDiagramContentExtensionActivator'
-        exportPackage = 'com.twasyl.slideshowfx.content.extension.sequence.diagram,com.twasyl.slideshowfx.content.extension.sequence.diagram.activator,com.twasyl.slideshowfx.content.extension.sequence.diagram.controllers'
-        setupWizardLabel = 'Sequence diagram'
+        name = 'Sequence diagram'
+        description = 'Insert sequence diagrams in presentations'
         setupWizardIconName = 'SHARE_ALT_SQUARE'
     }
 }

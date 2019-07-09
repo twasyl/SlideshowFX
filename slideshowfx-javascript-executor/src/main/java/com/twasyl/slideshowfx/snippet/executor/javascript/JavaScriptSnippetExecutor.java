@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.snippet.executor.javascript;
 
+import com.twasyl.slideshowfx.plugin.Plugin;
 import com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import javafx.collections.FXCollections;
@@ -19,9 +20,10 @@ import java.io.StringWriter;
  * with the code {@code JAVASCRIPT}.
  *
  * @author Thierry Wasyczenko
- * @version 1.0
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class JavaScriptSnippetExecutor extends AbstractSnippetExecutor<JavaScriptSnippetExecutorOptions> {
 
     public JavaScriptSnippetExecutor() {

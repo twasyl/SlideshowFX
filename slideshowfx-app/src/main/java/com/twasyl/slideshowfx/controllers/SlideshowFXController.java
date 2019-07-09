@@ -23,7 +23,7 @@ import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.icons.FontAwesome;
 import com.twasyl.slideshowfx.icons.Icon;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
-import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.plugin.IPlugin;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.server.service.*;
@@ -991,7 +991,7 @@ public class SlideshowFXController implements ThemeAwareController {
         this.downloadersMenu.getItems().clear();
         this.uploadersMenu.getItems().clear();
 
-        OSGiManager.getInstance().getInstalledServices(IHostingConnector.class)
+        PluginManager.getInstance().getServices(IHostingConnector.class)
                 .stream()
                 .sorted(Comparator.comparing(IPlugin::getName))
                 .forEach(hostingConnector -> {

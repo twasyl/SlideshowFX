@@ -9,6 +9,7 @@ import com.twasyl.slideshowfx.hosting.connector.AbstractHostingConnector;
 import com.twasyl.slideshowfx.hosting.connector.BasicHostingConnectorOptions;
 import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import javafx.concurrent.Worker;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -38,6 +39,7 @@ import static com.twasyl.slideshowfx.engine.presentation.PresentationEngine.DEFA
  * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class DropboxHostingConnector extends AbstractHostingConnector<BasicHostingConnectorOptions> {
     private static final Logger LOGGER = Logger.getLogger(DropboxHostingConnector.class.getName());
 

@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.plugin;
 
-import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
+import com.twasyl.slideshowfx.plugin.manager.internal.PluginFile;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,7 +23,7 @@ public abstract class BasePluginIntegrationTest {
     static File buildDir = new File("build");
     static File libsDir = new File(buildDir, "libs");
     static File tmpDir = new File(buildDir, "tmp");
-    static File plugingsDir = new File(tmpDir, "plugins");
+    protected static File plugingsDir = new File(tmpDir, "plugins");
 
     private static void copyPluginToTestLocation(final File plugin) {
         Path copiedPlugin = new File(plugingsDir, plugin.getName()).toPath();
@@ -41,28 +42,28 @@ public abstract class BasePluginIntegrationTest {
             plugingsDir.mkdirs();
         }
 
-        Arrays.stream(libsDir.listFiles((dir, name) -> name.endsWith(".jar"))).forEach(BasePluginIntegrationTest::copyPluginToTestLocation);
+        Arrays.stream(libsDir.listFiles((dir, name) -> name.endsWith(PluginFile.EXTENSION))).forEach(BasePluginIntegrationTest::copyPluginToTestLocation);
     }
 
     @BeforeEach
-    void startOSGi() {
-        OSGiManager.getInstance().startAndDeploy();
+    void start() {
+        PluginManager.getInstance().start();
     }
 
     @AfterEach
-    void stopOSGi() {
-        OSGiManager.getInstance().stop();
+    void stop() {
+        PluginManager.getInstance().stop();
     }
 
     /**
-     * Asserts a plugin is installed in the OSGi environment. The method checks that the service is installed in the
-     * OSGi environment and that it has the given name.
+     * Asserts a plugin is installed in the plugin manager.
+     * The method checks that the service is installed in the plugin manager and that it has the given name.
      *
      * @param pluginClass The class of the plugin: {@code IContentExtension.class}, {@code IHostingConnector.class}, {@code IMarkup.class}, {@code ISnippetExecutor.class}.
      * @param pluginName  The name of the plugin.
      */
     public void assertPluginIsInstalled(final Class<? extends IPlugin> pluginClass, final String pluginName) {
-        final List<? extends IPlugin> installedServices = OSGiManager.getInstance().getInstalledServices(pluginClass);
+        final List<? extends IPlugin> installedServices = PluginManager.getInstance().getServices(pluginClass);
         assertNotNull(installedServices);
         assertEquals(1, installedServices.size());
         assertEquals(pluginName, installedServices.get(0).getName());

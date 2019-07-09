@@ -19,6 +19,7 @@ public class SlideshowFXPluginExtension {
     private boolean hostingConnector = false;
     private boolean snippetExecutor = false;
     private boolean markupPlugin = false;
+    private String pluginClass;
 
     public SlideshowFXPluginExtension(ObjectFactory objectFactory) {
         bundle = objectFactory.newInstance(SlideshowFXBundleExtension.class);

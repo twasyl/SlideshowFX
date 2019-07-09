@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.markup.textile;
 
 import com.twasyl.slideshowfx.markup.AbstractMarkup;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import org.eclipse.mylyn.wikitext.parser.DocumentBuilder;
 import org.eclipse.mylyn.wikitext.parser.MarkupParser;
 import org.eclipse.mylyn.wikitext.parser.builder.HtmlDocumentBuilder;
@@ -16,9 +17,10 @@ import java.util.logging.Logger;
  * This markup language is identified byt the code {@code TEXTILE} which is returned by {@link com.twasyl.slideshowfx.markup.IMarkup#getCode()}.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class TextileMarkup extends AbstractMarkup {
     private static final Logger LOGGER = Logger.getLogger(TextileMarkup.class.getName());
 

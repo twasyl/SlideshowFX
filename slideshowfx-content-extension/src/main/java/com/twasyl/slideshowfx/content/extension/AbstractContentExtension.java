@@ -33,16 +33,22 @@ public abstract class AbstractContentExtension<T extends AbstractContentExtensio
     protected final Icon icon;
     protected final String toolTip;
     protected final String title;
-    protected final URL resourcesArchive;
+    protected final String resourcesArchive;
     protected Set<Resource> resources = new LinkedHashSet<>();
-    protected URL fxmlURL;
+    protected String fxml;
     protected T controller;
 
     /**
-     * Creates a new instance of the content extension.
+     * Creates a new instance of the content extension. Both {@code fxml} and {@code resourcesArchive} are the absolute
+     * location of the element within the content extension project. For example:
+     *
+     * <ul>
+     *     <li>{@code /com/twasyl/slideshowfx/custom/content/extension/fxml/Custom.fxml}</li>
+     *     <li>{@code /com/twasyl/slideshowfx/custom/content/extension/resources/custom.zip}</li>
+     * </ul>
      *
      * @param code             The code of the content extension. Can not be null or empty.
-     * @param fxmlURL
+     * @param fxml             The FXML representing the UI of this content extension.
      * @param resourcesArchive The archive that contains all resources that will be extracted for the presentation.
      * @param icon             The icon for this content extension that will be used in the SlideshowFX's UI.
      * @param toolTip          The tooltip for this content extension that will be used in the SlideshowFX's UI.
@@ -50,7 +56,7 @@ public abstract class AbstractContentExtension<T extends AbstractContentExtensio
      * @throws NullPointerException     If the code is null.
      * @throws IllegalArgumentException If the code is empty.
      */
-    protected AbstractContentExtension(String code, URL fxmlURL, URL resourcesArchive, Icon icon, String toolTip, String title) {
+    protected AbstractContentExtension(String code, String fxml, String resourcesArchive, Icon icon, String toolTip, String title) {
         super(code);
 
         if (code == null) throw new NullPointerException("The code of the content extension is null");
@@ -59,7 +65,7 @@ public abstract class AbstractContentExtension<T extends AbstractContentExtensio
         if (this.code.isEmpty())
             throw new IllegalArgumentException("The code of the content extension can not be empty");
 
-        this.fxmlURL = fxmlURL;
+        this.fxml = fxml;
         this.resourcesArchive = resourcesArchive;
         this.icon = icon;
         this.toolTip = toolTip;
@@ -69,11 +75,6 @@ public abstract class AbstractContentExtension<T extends AbstractContentExtensio
     @Override
     public String getCode() {
         return this.code;
-    }
-
-    @Override
-    public URL getResourcesArchive() {
-        return this.resourcesArchive;
     }
 
     @Override
@@ -125,9 +126,9 @@ public abstract class AbstractContentExtension<T extends AbstractContentExtensio
             LOGGER.log(SEVERE, "Can not create the directory where the resources must be extracted");
         }
 
-        if (this.getResourcesArchive() != null && this.getResourcesArchive().getFile() != null) {
+        if (this.resourcesArchive != null) {
             try {
-                ZipUtils.unzip(this.getClass().getResourceAsStream(this.getResourcesArchive().getFile()), directory);
+                ZipUtils.unzip(this.getClass().getResourceAsStream(this.resourcesArchive), directory);
             } catch (IOException e) {
                 LOGGER.log(SEVERE, "Can not extract the resources", e);
             }
@@ -191,7 +192,7 @@ public abstract class AbstractContentExtension<T extends AbstractContentExtensio
 
     @Override
     public Pane getUI() {
-        FXMLLoader loader = new FXMLLoader(this.fxmlURL);
+        FXMLLoader loader = new FXMLLoader(this.getClass().getResource(this.fxml));
         Pane root = null;
 
         try {

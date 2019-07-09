@@ -35,13 +35,13 @@ With SlideshowFX, bring your presentation to the next level of interactivity.
 
 # How to get started
 
-As SlideshowFX is a still young project, you will need to build it manually in order to test it. In order to do so, you will need:
+You can build SlideshowFX manually in order to test it. In order to do so, you will need:
 
-* A JDK 8 update 201 ;
+* A JDK 8 update 212 ;
 * The `JAVA_HOME` system variable set to point to your JDK installation.
 
 Then in order to build the application:
 
 * Open a command line in the repository folder ;
-* Execute the command `gradlew clean package` and wait for it to finish successfully ;
+* Execute the command `gradlew :slideshowfx-setup:distZip` and wait for it to finish successfully ;
 * Go in `REPOSITORY_HOME/slideshowfx-setup/build/distributions` in order to find the `SlideshowFX-<platform>-<arch>.zip` archive containing the SlideshowFX installer

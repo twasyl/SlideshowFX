@@ -1,6 +1,6 @@
 package com.twasyl.slideshowfx.ui;
 
-import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.theme.Themes;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -20,13 +20,13 @@ public class PluginCenterTest extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-        OSGiManager.getInstance().startAndDeploy();
+        PluginManager.getInstance().start();
     }
 
     @Override
     public void stop() throws Exception {
         super.stop();
-        OSGiManager.getInstance().stop();
+        PluginManager.getInstance().stop();
     }
 
     @Override

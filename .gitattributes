@@ -1,0 +1,9 @@
+*.java text eol=lf
+*.css text eol=lf
+*.fxml text eol=lf
+*.yml text eol=lf
+*.sh text eol=lf
+*.md text eol=lf
+*.asciidoc text eol=lf
+*.gradle text eol=lf
+*.properties text eol=lf

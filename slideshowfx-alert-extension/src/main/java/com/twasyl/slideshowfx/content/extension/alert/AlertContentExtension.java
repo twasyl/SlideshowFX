@@ -4,6 +4,7 @@ import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.alert.controllers.AlertContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import static com.twasyl.slideshowfx.icons.Icon.EXCLAMATION_TRIANGLE;
@@ -19,12 +20,13 @@ import static java.lang.System.currentTimeMillis;
  * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class AlertContentExtension extends AbstractContentExtension<AlertContentExtensionController> {
 
     public AlertContentExtension() {
         super("ALERT",
-                AlertContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/alert/fxml/AlertContentExtension.fxml"),
-                AlertContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/alert/resources/sweetalert2.zip"),
+                "/com/twasyl/slideshowfx/content/extension/alert/fxml/AlertContentExtension.fxml",
+                "/com/twasyl/slideshowfx/content/extension/alert/resources/sweetalert2.zip",
                 EXCLAMATION_TRIANGLE,
                 "Insert an alert", "Insert an alert");
 
@@ -64,7 +66,6 @@ public class AlertContentExtension extends AbstractContentExtension<AlertContent
         builder.append("\t\t});\n");
         builder.append("\t};\n");
         builder.append("</script>");
-
 
         return builder.toString();
     }

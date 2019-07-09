@@ -3,6 +3,7 @@ package com.twasyl.slideshowfx.content.extension.link;
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.link.controllers.LinkContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import static com.twasyl.slideshowfx.icons.Icon.LINK;
@@ -17,11 +18,12 @@ import static com.twasyl.slideshowfx.icons.Icon.LINK;
  * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class LinkContentExtension extends AbstractContentExtension<LinkContentExtensionController> {
 
     public LinkContentExtension() {
         super("LINK",
-                LinkContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/link/fxml/LinkContentExtension.fxml"),
+                "/com/twasyl/slideshowfx/content/extension/link/fxml/LinkContentExtension.fxml",
                 null,
                 LINK,
                 "Insert a link", "Insert a link");

@@ -2,7 +2,7 @@ import org.gradle.util.GradleVersion
 
 buildscript {
     dependencies {
-        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.16'
+        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.18'
     }
 }
 
@@ -15,7 +15,7 @@ description = 'SlideshowFX documentation to be included within the application a
 version = '1.0'
 
 asciidoctorj {
-    version = '1.6.1'
+    version = '2.1.0'
 }
 asciidoctor {
     backends = ['html5', 'pdf']
@@ -30,11 +30,10 @@ asciidoctor {
             'linkcss'                      : 'false',
             'slideshowfx_version'          : "${rootProject.version}",
             'asciidoctor-source'           : "${project.projectDir}/src/asciidoc",
-            'javafx-version'               : '8 update 201',
-            'jdk-version'                  : '8 update 201',
+            'javafx-version'               : '8 update 212',
+            'jdk-version'                  : '8 update 212',
             'gradle-version'               : "${GradleVersion.current().version}",
             'asciidoctorj-version'         : "${rootProject.ext.dependencies.asciidoctorj.version}",
-            'apache-felix-version'         : "${rootProject.ext.dependencies.felix.version}",
             'freemarker-version'           : "${rootProject.ext.dependencies.freemarker.version}",
             'jsoup-version'                : "${rootProject.ext.dependencies.jsoup.version}",
             'wikitext-textile-core-version': "${rootProject.ext.dependencies.wikitext.version}",
@@ -44,12 +43,11 @@ asciidoctor {
             'box-version'                  : "${rootProject.ext.dependencies.box.version}",
             'drive-version'                : "${rootProject.ext.dependencies.drive.version}",
             'dropbox-version'              : "${rootProject.ext.dependencies.dropbox.version}",
-            'ace-version'                  : '1.4.2'
+            'ace-version'                  : '1.4.5'
     ]
 }
 
 build.dependsOn 'asciidoctor'
-
 
 distributions {
     html {

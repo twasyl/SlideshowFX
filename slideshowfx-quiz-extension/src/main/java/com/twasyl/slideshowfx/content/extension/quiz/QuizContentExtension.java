@@ -3,6 +3,7 @@ package com.twasyl.slideshowfx.content.extension.quiz;
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.quiz.controllers.QuizContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import com.twasyl.slideshowfx.server.beans.quiz.Quiz;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
@@ -23,11 +24,12 @@ import static com.twasyl.slideshowfx.icons.Icon.QUESTION;
  * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class QuizContentExtension extends AbstractContentExtension<QuizContentExtensionController> {
 
     public QuizContentExtension() {
         super("QUIZ",
-                QuizContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/quiz/fxml/QuizContentExtension.fxml"),
+                "/com/twasyl/slideshowfx/content/extension/quiz/fxml/QuizContentExtension.fxml",
                 null,
                 QUESTION,
                 "Insert a quiz", "Insert a quiz");

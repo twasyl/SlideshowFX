@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 public class JavascriptSnippetExecutorIntegrationTest extends BasePluginIntegrationTest {
 
     @Test
-    @DisplayName("can be installed in the OSGi framework")
+    @DisplayName("can be installed in the plugin manager")
     void pluginIsInstalled() {
         assertPluginIsInstalled(ISnippetExecutor.class, "JAVASCRIPT");
     }

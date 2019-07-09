@@ -1,8 +1,8 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Snippet executor allowing to execute some Ruby inside a SlideshowFX presentation'
@@ -10,20 +10,15 @@ version = '1.0-SNAPSHOT'
 
 dependencies {
     implementation project(':slideshowfx-global-configuration')
-    implementation project(':slideshowfx-snippet-executor')
     implementation project(':slideshowfx-plugin')
     implementation project(':slideshowfx-utils')
 }
 
 sfxPlugin {
     snippetExecutor = true
-    
+
     bundle {
-        name = 'SlideshowFX Ruby executor'
-        symbolicName = 'com.twasyl.slideshowfx.snippet.executor.ruby'
-        description = 'Allow to execute Ruby code inside a presentation'
-        activator = 'com.twasyl.slideshowfx.snippet.executor.ruby.activator.RubySnippetExecutorActivator'
-        exportPackage = 'com.twasyl.slideshowfx.snippet.executor.ruby,com.twasyl.slideshowfx.snippet.executor.ruby.activator'
-        setupWizardLabel = 'Ruby'
+        name = 'Ruby executor'
+        description = 'Execute Ruby code inside a presentation'
     }
 }

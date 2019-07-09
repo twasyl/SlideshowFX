@@ -1,15 +1,14 @@
 package com.twasyl.slideshowfx.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.WARNING;
 
 /**
  * Class representing a JAR file and allowing to manipulate it's attributes easily.
@@ -21,8 +20,7 @@ import java.util.logging.Logger;
 public class Jar implements AutoCloseable {
     private static final Logger LOGGER = Logger.getLogger(Jar.class.getName());
 
-    protected final JarFile jar;
-    protected final File file;
+    protected final InputStream stream;
     protected Manifest manifest = null;
     protected Attributes manifestAttributes = null;
 
@@ -33,8 +31,11 @@ public class Jar implements AutoCloseable {
      * @throws IOException If an error occurs.
      */
     public Jar(final File file) throws IOException {
-        this.file = file;
-        this.jar = new JarFile(this.file);
+        this(new FileInputStream(file));
+    }
+
+    public Jar(final InputStream input) throws IOException {
+        this.stream = input;
     }
 
     /**
@@ -53,18 +54,9 @@ public class Jar implements AutoCloseable {
 
     @Override
     public void close() throws IOException {
-        if (this.jar != null) {
-            this.jar.close();
+        if (this.stream != null) {
+            this.stream.close();
         }
-    }
-
-    /**
-     * Get the {@link File} of this JAR.
-     *
-     * @return The {@link File} of this JAR.
-     */
-    public File getFile() {
-        return file;
     }
 
     /**
@@ -75,7 +67,36 @@ public class Jar implements AutoCloseable {
      * @throws IOException
      */
     public InputStream getInputStream(final JarEntry entry) throws IOException {
-        return this.jar.getInputStream(entry);
+        JarEntry iteratedEntry;
+
+        if (entry != null) {
+            final String entryName = entry.getName();
+
+            try (final JarInputStream jarStream = buildJarInputStream()) {
+                while ((iteratedEntry = jarStream.getNextJarEntry()) != null) {
+                    if (entryName.equals(iteratedEntry.getName())) {
+                        try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+                            final byte[] buffer = new byte[1024];
+                            int bytesRead;
+
+                            while ((bytesRead = jarStream.read(buffer)) != -1) {
+                                output.write(buffer, 0, bytesRead);
+                            }
+
+                            output.flush();
+                            return new ByteArrayInputStream(output.toByteArray());
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private JarInputStream buildJarInputStream() throws IOException {
+        this.stream.reset();
+        return new JarInputStream(this.stream);
     }
 
     /**
@@ -85,10 +106,10 @@ public class Jar implements AutoCloseable {
      */
     public final Manifest getManifest() {
         if (this.manifest == null) {
-            try {
-                this.manifest = this.jar.getManifest();
+            try (final JarInputStream jarStream = buildJarInputStream()) {
+                this.manifest = jarStream.getManifest();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Can not retrieve the MANIFEST file of the JAR", e);
+                LOGGER.log(WARNING, "Can not retrieve the manifest", e);
             }
         }
 
@@ -102,10 +123,10 @@ public class Jar implements AutoCloseable {
      */
     public final Attributes getManifestAttributes() {
         if (this.manifestAttributes == null) {
-            final Manifest manifest = getManifest();
+            final Manifest retievedManifest = getManifest();
 
-            if (manifest != null) {
-                this.manifestAttributes = manifest.getMainAttributes();
+            if (retievedManifest != null) {
+                this.manifestAttributes = retievedManifest.getMainAttributes();
             }
         }
 
@@ -135,8 +156,19 @@ public class Jar implements AutoCloseable {
      * @return The {@link JarEntry} or {@code null} if not found.
      */
     public final JarEntry getEntry(final String entryName) {
-        final JarEntry entry = this.jar.getJarEntry("META-INF/icon.png");
-        return entry;
+        JarEntry entry;
+
+        try (final JarInputStream jarStream = buildJarInputStream()) {
+            while ((entry = jarStream.getNextJarEntry()) != null) {
+                if (entry.getName().equals(entryName)) {
+                    return entry;
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.log(WARNING, "Error getting the entry " + entryName, e);
+        }
+
+        return null;
     }
 
     /**

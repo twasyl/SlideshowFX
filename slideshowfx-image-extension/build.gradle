@@ -1,19 +1,18 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Extension allowing to insert images inside a SlideshowFX presentation'
 version = '1.4-SNAPSHOT'
 
 dependencies {
-    api project(':slideshowfx-content-extension')
     implementation project(':slideshowfx-icons')
     api project(':slideshowfx-markup')
     api project(':slideshowfx-plugin')
-    implementation project(':slideshowfx-osgi')
+    implementation project(':slideshowfx-plugin-manager')
     api project(':slideshowfx-ui-controls')
 
     testCompile "org.mockito:mockito-core:${rootProject.ext.dependencies.mockito.version}"
@@ -26,12 +25,8 @@ sfxPlugin {
     contentExtension = true
 
     bundle {
-        name = 'SlideshowFX image extension'
-        symbolicName = 'com.twasyl.slideshowfx.content.extension.image'
-        description = 'Support for inserting image in slides'
-        activator = 'com.twasyl.slideshowfx.content.extension.image.activator.ImageContentExtensionActivator'
-        exportPackage = 'com.twasyl.slideshowfx.content.extension.image.controllers,com.twasyl.slideshowfx.content.extension.image,com.twasyl.slideshowfx.content.extension.image.activator'
-        setupWizardLabel = 'Image'
+        name = 'Image'
+        description = 'Insert image in slides'
         setupWizardIconName = 'PICTURE_ALT'
     }
 }

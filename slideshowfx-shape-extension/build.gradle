@@ -1,15 +1,14 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Extension allowing to insert shapes inside a SlideshowFX presentation'
 version = '1.1-SNAPSHOT'
 
 dependencies {
-    api project(':slideshowfx-content-extension')
     implementation project(':slideshowfx-icons')
     api project(':slideshowfx-markup')
     api project(':slideshowfx-plugin')
@@ -23,12 +22,8 @@ sfxPlugin {
     contentExtension = true
 
     bundle {
-        name = 'SlideshowFX shape extension'
-        symbolicName = 'com.twasyl.slideshowfx.content.extension.shape'
-        description = 'Support for inserting shapes in slides'
-        activator = 'com.twasyl.slideshowfx.content.extension.shape.activator.ShapeContentExtensionActivator'
-        exportPackage = 'com.twasyl.slideshowfx.content.extension.shape,com.twasyl.slideshowfx.content.extension.shape.controllers,com.twasyl.slideshowfx.content.extension.shape.activator'
-        setupWizardLabel = 'Shape'
+        name = 'Shape'
+        description = 'Insert shapes in slides'
         setupWizardIconName = 'STAR'
     }
 }

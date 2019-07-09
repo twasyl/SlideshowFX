@@ -19,11 +19,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.FINE;
+
 /**
  * Class defining FontAwesome icons.
  *
  * @author Thierry Wasylczenko
- * @version 1.0
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 2.0
  */
 public class FontAwesome extends Text {
@@ -53,7 +55,7 @@ public class FontAwesome extends Text {
 
     private static final Logger LOGGER = Logger.getLogger(FontAwesome.class.getName());
     private static final StyleablePropertyFactory<FontAwesome> FACTORY = new StyleablePropertyFactory<>(Text.getClassCssMetaData());
-    private static final String FONTAWESOME_VERSION = "5.5.0";
+    private static final String FONTAWESOME_VERSION = "5.9.0";
     private static final String FONTAWESOME_ROOT = "/com/twasyl/slideshowfx/icons/fontawesome/" + FONTAWESOME_VERSION.replaceAll("\\.", "_") + "/";
     private static final Map<FontCacheKey, Font> FONT_CACHE = new HashMap<>();
 
@@ -93,10 +95,10 @@ public class FontAwesome extends Text {
         final FontCacheKey key = new FontCacheKey(size, icon.getType());
         synchronized (FONT_CACHE) {
             if (FONT_CACHE.containsKey(key)) {
-                LOGGER.fine("Returned cached font for size " + size);
+                LOGGER.log(FINE, "Returned cached font for size {0}", size);
                 font = FONT_CACHE.get(key);
             } else {
-                LOGGER.fine("Font not found in cache for size " + size);
+                LOGGER.log(FINE, "Font not found in cache for size {0}", size);
                 try (final InputStream stream = FontAwesome.getFontAwesomeFontFile(icon.getType()).openStream()) {
                     font = Font.loadFont(stream, size);
                     FONT_CACHE.put(key, font);

@@ -15,7 +15,7 @@ dependencies {
     compile project(':slideshowfx-icons')
     compile project(':slideshowfx-logs')
     compile project(':slideshowfx-markup')
-    compile project(':slideshowfx-osgi')
+    compile project(':slideshowfx-plugin-manager')
     compile project(':slideshowfx-plugin')
     compile project(':slideshowfx-server')
     compile project(':slideshowfx-snippet-executor')
@@ -44,7 +44,7 @@ jar {
     manifest {
         attributes += [
                 'Implementation-Title'    : 'SlideshowFX',
-                'Implementation-Version'  : "${version}",
+                'Implementation-Version'  : "${project.version}",
                 'Class-Path'              : configurations.compile.collect { it.getName() }.join(' '),
                 'Main-Class'              : 'com.twasyl.slideshowfx.app.SlideshowFX',
                 'JavaFX-Preloader-Class'  : 'com.twasyl.slideshowfx.app.SlideshowFXPreloader',
@@ -256,7 +256,6 @@ task createSlideContentEditor {
 
 processResources.dependsOn project(':slideshowfx-documentation').distZip
 build.dependsOn createBundle
-
 
 test {
     jacoco {

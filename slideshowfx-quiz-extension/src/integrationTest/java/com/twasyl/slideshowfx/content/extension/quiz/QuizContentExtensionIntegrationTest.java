@@ -20,7 +20,7 @@ public class QuizContentExtensionIntegrationTest extends BasePluginIntegrationTe
     }
 
     @Test
-    @DisplayName("can be installed in the OSGi framework")
+    @DisplayName("can be installed in the plugin manager")
     void pluginIsInstalled() {
         assertPluginIsInstalled(IContentExtension.class, "QUIZ");
     }

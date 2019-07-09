@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.setup.step;
 
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.setup.app.SetupProperties;
 import com.twasyl.slideshowfx.setup.controllers.InstallationLocationViewController;
 import com.twasyl.slideshowfx.setup.exceptions.SetupStepException;
 import com.twasyl.slideshowfx.utils.OSUtils;
@@ -24,7 +25,7 @@ import static java.util.logging.Level.SEVERE;
  * During the {@link #rollback()} method, the application will be removed from the chosen location.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class InstallationLocationStep extends AbstractSetupStep {
@@ -32,31 +33,13 @@ public class InstallationLocationStep extends AbstractSetupStep {
 
     private boolean applicationDirectoryCreatedDuringSetup = false;
     private boolean configurationFileCreatedDuringSetup = false;
-    final String applicationName;
-    final String applicationVersion;
-    final File applicationArtifact;
-    final File documentationsFolder;
-    File installationLocation;
-    final String twitterConsumerKey;
-    final String twitterConsumerSecret;
+    private File installationLocation;
 
     /**
      * Create an instance of the step.
-     *
-     * @param appName               The name of the application.
-     * @param appVersion            The version of the application.
-     * @param applicationArtifact   The file or directory containing the application.
-     * @param twitterConsumerKey    The Twitter consumer key for the application
-     * @param twitterConsumerSecret The Twitter consumer secret for the application
      */
-    public InstallationLocationStep(final String appName, final String appVersion, final File applicationArtifact, final File documentationsFolder, String twitterConsumerKey, String twitterConsumerSecret) {
+    public InstallationLocationStep() {
         this.title("Installation location");
-        this.applicationName = appName;
-        this.applicationVersion = appVersion;
-        this.applicationArtifact = applicationArtifact;
-        this.documentationsFolder = documentationsFolder;
-        this.twitterConsumerKey = twitterConsumerKey;
-        this.twitterConsumerSecret = twitterConsumerSecret;
 
         final FXMLLoader loader = new FXMLLoader(InstallationLocationStep.class.getResource("/com/twasyl/slideshowfx/setup/fxml/InstallationLocationView.fxml"));
 
@@ -89,7 +72,7 @@ public class InstallationLocationStep extends AbstractSetupStep {
         copyApplication(versionFolder);
         copyDocumentation(versionFolder);
         createLoggingConfigurationFile(applicationFolder);
-        patchApplicationCfgFile(new File(versionFolder, this.applicationArtifact.getName()));
+        patchApplicationCfgFile(new File(versionFolder, SetupProperties.getInstance().getApplicationArtifact().getName()));
         createApplicationConfigurationFile();
     }
 
@@ -112,18 +95,18 @@ public class InstallationLocationStep extends AbstractSetupStep {
     }
 
     protected void copyApplication(File versionFolder) throws SetupStepException {
-        final CopyFileVisitor artifactCopier = new CopyFileVisitor(versionFolder.toPath(), this.applicationArtifact.toPath());
+        final CopyFileVisitor artifactCopier = new CopyFileVisitor(versionFolder.toPath(), SetupProperties.getInstance().getApplicationArtifact().toPath());
         try {
-            Files.walkFileTree(this.applicationArtifact.toPath(), artifactCopier);
+            Files.walkFileTree(SetupProperties.getInstance().getApplicationArtifact().toPath(), artifactCopier);
         } catch (IOException ex) {
             throw new SetupStepException("Error copying application artifact", ex);
         }
     }
 
     protected void copyDocumentation(File versionFolder) throws SetupStepException {
-        final CopyFileVisitor documentationCopier = new CopyFileVisitor(versionFolder.toPath(), this.documentationsFolder.toPath());
+        final CopyFileVisitor documentationCopier = new CopyFileVisitor(versionFolder.toPath(), SetupProperties.getInstance().getDocumentationsDirectory().toPath());
         try {
-            Files.walkFileTree(this.documentationsFolder.toPath(), documentationCopier);
+            Files.walkFileTree(SetupProperties.getInstance().getDocumentationsDirectory().toPath(), documentationCopier);
         } catch (IOException ex) {
             throw new SetupStepException("Error copying documentations", ex);
         }
@@ -174,8 +157,8 @@ public class InstallationLocationStep extends AbstractSetupStep {
     protected void createApplicationConfigurationFile() {
         this.applicationDirectoryCreatedDuringSetup = GlobalConfiguration.createApplicationDirectory();
         this.configurationFileCreatedDuringSetup = GlobalConfiguration.createConfigurationFile();
-        GlobalConfiguration.setTwitterConsumerKey(this.twitterConsumerKey);
-        GlobalConfiguration.setTwitterConsumerSecret(this.twitterConsumerSecret);
+        GlobalConfiguration.setTwitterConsumerKey(SetupProperties.getInstance().getTwitterConsumerKey());
+        GlobalConfiguration.setTwitterConsumerSecret(SetupProperties.getInstance().getTwitterConsumerSecret());
     }
 
     @Override
@@ -216,10 +199,10 @@ public class InstallationLocationStep extends AbstractSetupStep {
     }
 
     protected File getApplicationFolderSetup() {
-        return new File(installationLocation, this.applicationName);
+        return new File(installationLocation, SetupProperties.getInstance().getApplicationName());
     }
 
     protected File getVersionFolderSetup() {
-        return new File(getApplicationFolderSetup(), this.applicationVersion);
+        return new File(getApplicationFolderSetup(), SetupProperties.getInstance().getApplicationVersion());
     }
 }

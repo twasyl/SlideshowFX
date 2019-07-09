@@ -8,8 +8,8 @@ Changes to the SlideshowFX software are listed by version within this document.
 
 #### New and noteworthy
 
-* Upgrade FontAwesome to version 5.5.0
-* Upgrade vert.x to version 3.5.6
+* Upgrade FontAwesome to version 5.9.0
+* Upgrade vert.x to version 3.7.1
 * Upgrade Box hosting connector internal library
 * Upgrade Dropbox hosting connector internal library
 * Upgrade Google Drive hosting connector internal library
@@ -19,10 +19,11 @@ Changes to the SlideshowFX software are listed by version within this document.
 * Upgrade the asciidoctor markup extension internal library
 * Introducing a presentation outline
 * New theme functionality
-* Uses ACE 1.4.2 in the slide content editor
+* Uses ACE 1.4.5 in the slide content editor
 * Support Ruby executable snippets
 * Image extension allows to specify image's dimensions
 * Image extension memorize the latest used folder
+* Plugins packaging and architecture have changed
 
 #### Bug fixes
 
@@ -31,6 +32,10 @@ Changes to the SlideshowFX software are listed by version within this document.
 * Fix answered icon in attendee's chat
 * Fix the author of messages in attendee's chat : for self messages, "I" is displayed instead of the login name
 * Fix Zip Slip vulnerability
+
+#### Breaking change
+
+* SlideshowFX plugins are now distributed as a *.sfx-plugin. Previous plugins versions are unsupported and can be safely removed from any installation
 
 #### Included plugins within the packaging
 

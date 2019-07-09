@@ -1,7 +1,7 @@
 package com.twasyl.slideshowfx.markup.markdown;
 
 import com.twasyl.slideshowfx.markup.IMarkup;
-import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.plugin.BasePluginIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MarkdownMarkupIntegrationTest extends BasePluginIntegrationTest {
 
     @Test
-    @DisplayName("can be installed in the OSGi framework")
+    @DisplayName("can be installed in the plugin manager")
     void pluginIsInstalled() {
         assertPluginIsInstalled(IMarkup.class, "Markdown");
     }
@@ -22,7 +22,7 @@ public class MarkdownMarkupIntegrationTest extends BasePluginIntegrationTest {
     @Test
     @DisplayName("can convert some text")
     void convertText() {
-        List<IMarkup> installedServices = OSGiManager.getInstance().getInstalledServices(IMarkup.class);
+        List<IMarkup> installedServices = PluginManager.getInstance().getServices(IMarkup.class);
 
         final String html = installedServices.get(0).convertAsHtml("# Hello");
         assertEquals("<h1>Hello</h1>", html);

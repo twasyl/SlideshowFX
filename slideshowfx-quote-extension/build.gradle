@@ -1,15 +1,14 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Extension allowing to insert quotes inside a SlideshowFX presentation'
 version = '1.2-SNAPSHOT'
 
 dependencies {
-    api project(':slideshowfx-content-extension')
     implementation project(':slideshowfx-icons')
     api project(':slideshowfx-markup')
     api project(':slideshowfx-plugin')
@@ -20,12 +19,8 @@ sfxPlugin {
     contentExtension = true
 
     bundle {
-        name = 'SlideshowFX quote extension'
-        symbolicName = 'com.twasyl.slideshowfx.content.extension.quote'
-        description = 'Support for inserting quote in slides'
-        activator = 'com.twasyl.slideshowfx.content.extension.quote.activator.QuoteContentExtensionActivator'
-        exportPackage = 'com.twasyl.slideshowfx.content.extension.quote.controllers,com.twasyl.slideshowfx.content.extension.quote,com.twasyl.slideshowfx.content.extension.quote.activator'
-        setupWizardLabel = 'Quote'
+        name = 'Quote'
+        description = 'Insert quote in slides'
         setupWizardIconName = 'QUOTE_LEFT'
     }
 }

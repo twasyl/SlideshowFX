@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'jacoco'
-    id 'com.jfrog.bintray'
+
     id 'org.sonarqube'
 }
 

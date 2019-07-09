@@ -1,18 +1,18 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Hosting connector allowing to open and save presentations from and to Dropbox'
 version = '1.3-SNAPSHOT'
 
 dependencies {
-    compile "com.dropbox.core:dropbox-core-sdk:${rootProject.ext.dependencies.dropbox.version}"
+    pluginDependencies "com.dropbox.core:dropbox-core-sdk:${rootProject.ext.dependencies.dropbox.version}"
+
     implementation project(':slideshowfx-engines')
     implementation project(':slideshowfx-global-configuration')
-    implementation project(':slideshowfx-hosting-connector')
     api project(':slideshowfx-plugin')
 }
 
@@ -20,18 +20,7 @@ sfxPlugin {
     hostingConnector = true
 
     bundle {
-        name = 'SlideshowFX Dropbox hosting connector'
-        symbolicName = 'com.twasyl.slideshowfx.hosting.connector.dropbox'
+        name = 'Dropbox'
         description = 'Support for connecting to Dropbox'
-        activator = 'com.twasyl.slideshowfx.hosting.connector.dropbox.activator.DropboxHostingConnectorActivator'
-        classpath = configurations.compile.resolve().collect { artifact -> artifact.name }.join(',').concat(',.')
-        exportPackage = 'com.twasyl.slideshowfx.hosting.connector.dropbox,com.twasyl.slideshowfx.hosting.connector.dropbox.activator'
-        setupWizardLabel = 'Dropbox'
-    }
-}
-
-jar {
-    from(configurations.compile.resolve().collect()) {
-        include '*'
     }
 }

@@ -1,19 +1,17 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Extension allowing to define slide\'s content using the markdown syntax'
-version = '1.0'
+version = '1.1-SNAPSHOT'
 
 dependencies {
-    implementation project(':slideshowfx-markup')
+    pluginDependencies "com.github.rjeschke:txtmark:${rootProject.ext.dependencies.markdown.version}"
 
-    compile "com.github.rjeschke:txtmark:${rootProject.ext.dependencies.markdown.version}"
-
-    integrationTestImplementation project(':slideshowfx-osgi')
+    integrationTestImplementation project(':slideshowfx-plugin-manager')
     integrationTestImplementation project(':slideshowfx-plugin').sourceSets.integrationTest.output
 }
 
@@ -21,18 +19,7 @@ sfxPlugin {
     markupPlugin = true
 
     bundle {
-        name = 'SlideshowFX markdown support'
-        symbolicName = 'com.twasyl.slideshowfx.markup.markdown'
-        description = 'Support markdown for defining slide\'s content'
-        activator = 'com.twasyl.slideshowfx.markup.markdown.activator.MarkdownActivator'
-        classpath = configurations.compile.resolve().collect { artifact -> artifact.name }.join(',').concat(',.')
-        exportPackage = 'com.twasyl.slideshowfx.markup.markdown,com.twasyl.slideshowfx.markup.markdown.activator'
-        setupWizardLabel = 'Markdown'
-    }
-}
-
-jar {
-    from(configurations.compile.resolve().collect()) {
-        include '*'
+        name = 'markdown'
+        description = 'Define slide\'s content in markdown'
     }
 }

@@ -1,14 +1,13 @@
 package com.twasyl.slideshowfx.utils.io;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.logging.Level.WARNING;
 
 /**
  * This class provides utility methods on I/O.
@@ -59,5 +58,29 @@ public class IOUtils {
         }
 
         return builder.toString();
+    }
+
+    /**
+     * Dump the given {@link InputStream} into another one. If the given stream is closed or if an error occurs during
+     * the dump, {@code null} is returned.
+     *
+     * @param input The stream to dump.
+     * @return a dumped input stream.
+     */
+    public static InputStream dump(final InputStream input) {
+        final byte[] buffer = new byte[1024];
+        int bytesRead;
+
+        try (final ByteArrayOutputStream dump = new ByteArrayOutputStream()) {
+            while ((bytesRead = input.read(buffer)) != -1) {
+                dump.write(buffer, 0, bytesRead);
+            }
+
+            dump.flush();
+            return new ByteArrayInputStream(dump.toByteArray());
+        } catch (IOException e) {
+            LOGGER.log(WARNING, "Error dumping InputStream", e);
+            return null;
+        }
     }
 }

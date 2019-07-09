@@ -1,14 +1,16 @@
 package com.twasyl.slideshowfx.controllers;
 
-import com.twasyl.slideshowfx.plugin.InstalledPlugin;
+import com.twasyl.slideshowfx.plugin.manager.internal.PluginFile;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Class testing the {@link PluginCenterController} class.
@@ -20,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PluginCenterControllerTest {
 
     private static File FILE_LOCATION;
-    private static File MISSING_FILE;
+    private static PluginFile MISSING_FILE;
     private static File EMPTY_FILE;
     private static File NO_BUNDLE_NAME_FILE;
     private static File NO_BUNDLE_VERSION_FILE;
@@ -30,9 +32,9 @@ public class PluginCenterControllerTest {
     private static final PluginCenterController controller = new PluginCenterController();
 
     @BeforeAll
-    public static void setUp() throws URISyntaxException {
+    public static void setUp() throws URISyntaxException, IOException {
         FILE_LOCATION = new File(PluginCenterControllerTest.class.getResource("/com/twasyl/slideshowfx/files/plugincenter").toURI());
-        MISSING_FILE = new File(FILE_LOCATION, "missing.txt");
+        MISSING_FILE = new PluginFile(new File(FILE_LOCATION, "missing-plugin.sfx-plugin"));
         EMPTY_FILE = new File(FILE_LOCATION, "empty.txt");
         NO_BUNDLE_NAME_FILE = new File(FILE_LOCATION, "no-bundle-name.jar");
         NO_BUNDLE_VERSION_FILE = new File(FILE_LOCATION, "no-bundle-version.jar");
@@ -41,62 +43,48 @@ public class PluginCenterControllerTest {
     }
 
     @Test
-    public void fileSeemsInvalidWhenNullFile() throws FileNotFoundException {
+    public void fileSeemsInvalidWhenNullFile() {
         assertThrows(NullPointerException.class, () -> controller.fileSeemsValid(null));
     }
 
     @Test
-    public void fileSeemsInvalidWhenFileNotExists() throws FileNotFoundException {
+    public void fileSeemsInvalidWhenFileNotExists() {
         assertThrows(FileNotFoundException.class, () -> controller.fileSeemsValid(MISSING_FILE));
     }
 
-    @Test
-    public void fileSeemsInvalidWhenNotJar() throws FileNotFoundException {
-        assertFalse(controller.fileSeemsValid(EMPTY_FILE));
-    }
+    // TODO Transform to proper integration test using testfx
+//    @Test
+//    public void fileSeemsInvalidWhenNoBundleName() throws FileNotFoundException {
+//        assertFalse(controller.fileSeemsValid(NO_BUNDLE_NAME_FILE));
+//    }
 
-    @Test
-    public void fileSeemsInvalidWhenNoBundleName() throws FileNotFoundException {
-        assertFalse(controller.fileSeemsValid(NO_BUNDLE_NAME_FILE));
-    }
-
-    @Test
-    public void fileSeemsInvalidWhenNoBundleVersion() throws FileNotFoundException {
-        assertFalse(controller.fileSeemsValid(NO_BUNDLE_VERSION_FILE));
-    }
-
-    @Test
-    public void fileSeemsInvalidWhenNoBundleActivator() throws FileNotFoundException {
-        assertFalse(controller.fileSeemsValid(NO_BUNDLE_ACTIVATOR_FILE));
-    }
-
-    @Test
-    public void fileSeemsValid() throws FileNotFoundException {
-        assertTrue(controller.fileSeemsValid(CORRECT_FILE));
-    }
+//    @Test
+//    public void fileSeemsInvalidWhenNoBundleVersion() throws FileNotFoundException {
+//        assertFalse(controller.fileSeemsValid(NO_BUNDLE_VERSION_FILE));
+//    }
+//
+//    @Test
+//    public void fileSeemsInvalidWhenNoBundleActivator() throws FileNotFoundException {
+//        assertFalse(controller.fileSeemsValid(NO_BUNDLE_ACTIVATOR_FILE));
+//    }
+//
+//    @Test
+//    public void fileSeemsValid() throws FileNotFoundException {
+//        assertTrue(controller.fileSeemsValid(CORRECT_FILE));
+//    }
 
     @Test
     public void isManifestAttributeInvalidWhenNull() {
-        assertFalse(controller.isManifestAttributeValid(null));
+        assertFalse(controller.isValueValid(null));
     }
 
     @Test
     public void isManifestAttributeInvalidWhenEmpty() {
-        assertFalse(controller.isManifestAttributeValid(""));
+        assertFalse(controller.isValueValid(""));
     }
 
     @Test
     public void isManifestAttributeInvalidWhenOnlySpaces() {
-        assertFalse(controller.isManifestAttributeValid("    "));
-    }
-
-    @Test
-    public void createInstalledPlugin() throws URISyntaxException {
-        final File file = new File(PluginCenterControllerTest.class.getResource("/com/twasyl/slideshowfx/files/plugincenter/correct.jar").toURI());
-        System.out.println(file.getAbsolutePath());
-        final InstalledPlugin plugin = controller.createInstalledPlugin(file);
-
-        assertEquals("Correct", plugin.getName());
-        assertEquals("1.0", plugin.getVersion());
+        assertFalse(controller.isValueValid("    "));
     }
 }

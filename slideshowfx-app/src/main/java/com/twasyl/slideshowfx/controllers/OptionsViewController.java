@@ -3,7 +3,7 @@ package com.twasyl.slideshowfx.controllers;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
-import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.services.AutoSavingService;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.theme.Theme;
@@ -57,10 +57,10 @@ public class OptionsViewController implements Initializable {
      * This methods saves the options displayed in the view and make them persistent.
      */
     public void saveOptions() {
-        final OSGiManager manager = OSGiManager.getInstance();
-        manager.getInstalledServices(ISnippetExecutor.class)
+        final PluginManager manager = PluginManager.getInstance();
+        manager.getServices(ISnippetExecutor.class)
                 .forEach(ISnippetExecutor::saveNewOptions);
-        manager.getInstalledServices(IHostingConnector.class)
+        manager.getServices(IHostingConnector.class)
                 .forEach(IHostingConnector::saveNewOptions);
 
         this.saveAutoSavingOptions();
@@ -174,7 +174,7 @@ public class OptionsViewController implements Initializable {
      * Display the configuration UI for each {@link ISnippetExecutor}.
      */
     private void initializeSnippetExecutorUI() {
-        OSGiManager.getInstance().getInstalledServices(ISnippetExecutor.class)
+        PluginManager.getInstance().getServices(ISnippetExecutor.class)
                 .forEach(snippet -> {
                     final Node configurationUI = snippet.getConfigurationUI();
 
@@ -191,7 +191,7 @@ public class OptionsViewController implements Initializable {
      * Displays the configuration UI for each {@link IHostingConnector}
      */
     private void initializeHostingConnectorUI() {
-        OSGiManager.getInstance().getInstalledServices(IHostingConnector.class)
+        PluginManager.getInstance().getServices(IHostingConnector.class)
                 .forEach(hostingConnector -> {
                     final Node configurationUI = hostingConnector.getConfigurationUI();
 

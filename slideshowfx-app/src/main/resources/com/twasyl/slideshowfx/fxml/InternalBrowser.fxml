@@ -13,7 +13,7 @@
     </stylesheets>
 
     <top>
-        <HBox fx:id="addressPanel" alignment="BASELINE_CENTER">
+        <HBox fx:id="addressPanel" alignment="BASELINE_CENTER" spacing="5">
             <Button fx:id="previousPage" onAction="#navigateToPreviousPage">
                 <graphic>
                     <FontAwesome icon="CHEVRON_LEFT" />

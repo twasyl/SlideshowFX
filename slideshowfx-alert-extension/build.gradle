@@ -1,33 +1,32 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Extension allowing to insert alerts inside a SlideshowFX presentation'
 version = '1.3-SNAPSHOT'
 
 dependencies {
-    api project(':slideshowfx-content-extension')
     implementation project(':slideshowfx-icons')
     api project(':slideshowfx-markup')
     api project(':slideshowfx-plugin')
     api project(':slideshowfx-ui-controls')
 
     testCompile "org.mockito:mockito-core:${rootProject.ext.dependencies.mockito.version}"
+
+    integrationTestCompile "org.testfx:testfx-core:${rootProject.ext.dependencies.testfx.version}"
+    integrationTestCompile "org.testfx:testfx-junit5:${rootProject.ext.dependencies.testfx.version}"
+    integrationTestCompile "org.testfx:openjfx-monocle:${rootProject.ext.dependencies.monocle.version}"
 }
 
 sfxPlugin {
     contentExtension = true
 
     bundle {
-        name = 'SlideshowFX alert extension'
-        symbolicName = 'com.twasyl.slideshowfx.content.extension.alert'
-        description = 'Support for inserting alert in slides'
-        activator = 'com.twasyl.slideshowfx.content.extension.alert.activator.AlertContentExtensionActivator'
-        exportPackage = 'com.twasyl.slideshowfx.content.extension.alert.controllers,com.twasyl.slideshowfx.content.extension.alert,com.twasyl.slideshowfx.content.extension.alert.activator'
-        setupWizardLabel = 'Alert'
+        name = 'Alert'
+        description = 'Insert alert in slides'
         setupWizardIconName = 'EXCLAMATION_TRIANGLE'
     }
 }

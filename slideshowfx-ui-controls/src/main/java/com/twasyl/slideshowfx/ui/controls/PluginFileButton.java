@@ -2,7 +2,8 @@ package com.twasyl.slideshowfx.ui.controls;
 
 import com.twasyl.slideshowfx.icons.FontAwesome;
 import com.twasyl.slideshowfx.icons.Icon;
-import com.twasyl.slideshowfx.utils.Jar;
+import com.twasyl.slideshowfx.plugin.manager.internal.PluginFile;
+import com.twasyl.slideshowfx.plugin.manager.internal.RegisteredPlugin;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ToggleButton;
@@ -14,9 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-import java.io.*;
-import java.util.jar.JarEntry;
-import java.util.logging.Level;
+import java.io.ByteArrayInputStream;
 import java.util.logging.Logger;
 
 import static javafx.geometry.Pos.TOP_RIGHT;
@@ -26,7 +25,7 @@ import static javafx.geometry.Pos.TOP_RIGHT;
  * {@code plugin-file-button}.
  *
  * @author Thierry Wasylczenko
- * @version 1.3
+ * @version 1.4-SNAPSHOT
  * @since SlideshowFX 1.1
  */
 public class PluginFileButton extends ToggleButton {
@@ -34,24 +33,20 @@ public class PluginFileButton extends ToggleButton {
 
     private static final double BUTTON_SIZE = 80;
 
-    private Jar pluginFile;
+    private RegisteredPlugin plugin;
     private final String label;
     private final String version;
     private final String description;
     private boolean hasBadge = false;
     private String badgeDescription;
 
-    public PluginFileButton(final File pluginFile) {
-        try {
-            this.pluginFile = new Jar(pluginFile);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Invalid JAR file", e);
-        }
+    public PluginFileButton(final PluginFile pluginFile) {
+        this.plugin = new RegisteredPlugin(pluginFile);
 
         final Node icon = this.buildIconNode();
-        this.label = this.pluginFile.getManifestAttributeValue("Setup-Wizard-Label", this.pluginFile.getFile().getName());
-        this.version = this.pluginFile.getManifestAttributeValue("Bundle-Version", "");
-        this.description = this.pluginFile.getManifestAttributeValue("Bundle-Description", "");
+        this.label = this.plugin.getName();
+        this.version = this.plugin.getVersion();
+        this.description = this.plugin.getDescription();
 
         this.setPrefSize(BUTTON_SIZE, BUTTON_SIZE);
         this.setMinSize(BUTTON_SIZE, BUTTON_SIZE);
@@ -73,15 +68,7 @@ public class PluginFileButton extends ToggleButton {
         this.setGraphic(graphics);
         this.setTooltipText();
 
-        this.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {
-            this.setTooltipText();
-        });
-
-        try {
-            this.pluginFile.close();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can not close plugin file", e);
-        }
+        this.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> this.setTooltipText());
     }
 
     protected void setTooltipText() {
@@ -130,8 +117,8 @@ public class PluginFileButton extends ToggleButton {
      *
      * @return The file associated to this button.
      */
-    public File getFile() {
-        return this.pluginFile.getFile();
+    public PluginFile getFile() {
+        return this.plugin.getFile();
     }
 
     /**
@@ -173,50 +160,20 @@ public class PluginFileButton extends ToggleButton {
     }
 
     /**
-     * Get the icon of the plugin stored within the JAR file as an array of bytes. If no icon is present, an empty array
-     * is returned.
-     *
-     * @return The icon of the plugin.
-     */
-    protected final byte[] getIconFromJar() {
-        final ByteArrayOutputStream iconOut = new ByteArrayOutputStream();
-
-        final JarEntry icon = this.pluginFile.getEntry("META-INF/icon.png");
-
-        if (icon != null) {
-            try (final InputStream iconIn = this.pluginFile.getInputStream(icon)) {
-                final byte[] buffer = new byte[512];
-                int numberOfBytesRead;
-
-                while ((numberOfBytesRead = iconIn.read(buffer)) != -1) {
-                    iconOut.write(buffer, 0, numberOfBytesRead);
-                }
-
-                iconOut.flush();
-                iconOut.close();
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Can not the icon from JAR", e);
-            }
-        }
-
-        return iconOut.toByteArray();
-    }
-
-    /**
      * Create the {@code Node} that will contain the icon of the plugin.
      *
      * @return The element containing the icon of the plugin.
      */
     protected final Node buildIconNode() {
         Node icon = null;
-        final byte[] iconFromJar = this.getIconFromJar();
+        final byte[] iconFromJar = this.plugin.getIcon();
 
         if (iconFromJar != null && iconFromJar.length > 0) {
             final ByteArrayInputStream input = new ByteArrayInputStream(iconFromJar);
             final Image image = new Image(input, 50, 50, true, true);
             icon = new ImageView(image);
         } else {
-            final String fontIconName = this.pluginFile.getManifestAttributeValue("Setup-Wizard-Icon-Name", "");
+            final String fontIconName = this.plugin.getIconName();
 
             if (!fontIconName.isEmpty()) {
                 icon = new FontAwesome(Icon.valueOf(fontIconName));

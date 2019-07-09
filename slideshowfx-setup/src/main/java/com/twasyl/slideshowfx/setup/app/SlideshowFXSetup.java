@@ -10,7 +10,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -19,27 +18,10 @@ import java.util.Properties;
  * Application class used to perform the setup of the application on the client's computer.
  *
  * @author Thierry Wasylczenko
- * @version 1.2
+ * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class SlideshowFXSetup extends Application {
-
-    protected static final String SETUP_PLUGINS_DIRECTORY_PROPERTY = "setup.plugins.directory";
-    protected static final String SETUP_APPLICATION_ARTIFACT_PROPERTY = "setup.application.artifact";
-    protected static final String SETUP_DOCUMENTATIONS_DIRECTORY_PROPERTY = "setup.documentations.directory";
-    protected static final String SETUP_APPLICATION_NAME_PROPERTY = "setup.application.name";
-    protected static final String SETUP_APPLICATION_VERSION_PROPERTY = "setup.application.version";
-    protected static final String SETUP_SERVICE_TWITTER_CONSUMER_KEY_PROPERTY = "setup.service.twitter.consumerKey";
-    protected static final String SETUP_SERVICE_TWITTER_CONSUMER_SECRET_PROPERTY = "setup.service.twitter.consumerSecret";
-
-    protected File pluginsDirectory;
-    protected File applicationArtifact;
-    protected File documentationsFolder;
-    protected String applicationName;
-    protected String applicationVersion;
-    protected String twitterConsumerKey;
-    protected String twitterConsumerSecret;
-
     protected SetupViewController controller;
 
     protected Parent getRootNode() throws IOException {
@@ -49,11 +31,11 @@ public class SlideshowFXSetup extends Application {
 
         final String license = IOUtils.read(SlideshowFXSetup.class.getResourceAsStream("/com/twasyl/slideshowfx/setup/license/LICENSE"));
 
-        controller.addStep(new WelcomeStep(this.applicationName, this.applicationVersion))
+        controller.addStep(new WelcomeStep())
                 .addStep(new LicenseStep(license))
-                .addStep(new InstallationLocationStep(this.applicationName, this.applicationVersion, this.applicationArtifact, this.documentationsFolder, this.twitterConsumerKey, this.twitterConsumerSecret))
-                .addStep(new PluginsStep(this.pluginsDirectory))
-                .addStep(new FinishStep(this.applicationName, this.applicationVersion));
+                .addStep(new InstallationLocationStep())
+                .addStep(new PluginsStep())
+                .addStep(new FinishStep());
 
         return root;
     }
@@ -61,11 +43,11 @@ public class SlideshowFXSetup extends Application {
     /**
      * Loads the properties used during the setup as the version, the various locations for plugins and documentation
      * and so on.
-     * @return A never {@code null} {@link Properties} instance.
+     * @return A never {@code null} {@link SetupProperties} instance.
      * @throws IOException
      */
-    protected Properties getSetupProperties() throws IOException {
-        final Properties properties = new Properties();
+    protected SetupProperties fillSetupProperties() throws IOException {
+        final SetupProperties properties = SetupProperties.getInstance();
         try (final InputStream input = getClass().getResourceAsStream("/com/twasyl/slideshowfx/setup/setup.properties")) {
             properties.load(input);
         }
@@ -75,16 +57,7 @@ public class SlideshowFXSetup extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-
-        final Properties properties = getSetupProperties();
-
-        this.pluginsDirectory = new File(properties.getProperty(SETUP_PLUGINS_DIRECTORY_PROPERTY));
-        this.applicationArtifact = new File(properties.getProperty(SETUP_APPLICATION_ARTIFACT_PROPERTY));
-        this.documentationsFolder = new File(properties.getProperty(SETUP_DOCUMENTATIONS_DIRECTORY_PROPERTY));
-        this.applicationName = properties.getProperty(SETUP_APPLICATION_NAME_PROPERTY);
-        this.applicationVersion = properties.getProperty(SETUP_APPLICATION_VERSION_PROPERTY);
-        this.twitterConsumerKey = properties.getProperty(SETUP_SERVICE_TWITTER_CONSUMER_KEY_PROPERTY);
-        this.twitterConsumerSecret = properties.getProperty(SETUP_SERVICE_TWITTER_CONSUMER_SECRET_PROPERTY);
+        fillSetupProperties();
     }
 
     @Override

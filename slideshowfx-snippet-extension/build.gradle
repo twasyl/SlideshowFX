@@ -1,19 +1,18 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Extension allowing to insert executable code snippets inside a SlideshowFX presentation'
 version = '1.3-SNAPSHOT'
 
 dependencies {
-    api project(':slideshowfx-content-extension')
     implementation project(':slideshowfx-global-configuration')
     implementation project(':slideshowfx-icons')
     api project(':slideshowfx-markup')
-    implementation project(':slideshowfx-osgi')
+    implementation project(':slideshowfx-plugin-manager')
     api project(':slideshowfx-plugin')
     implementation project(':slideshowfx-snippet-executor')
     api project(':slideshowfx-ui-controls')
@@ -27,12 +26,8 @@ sfxPlugin {
     contentExtension = true
 
     bundle {
-        name = 'SlideshowFX snippet extension'
-        symbolicName = 'com.twasyl.slideshowfx.content.extension.snippet'
-        description = 'Support for inserting code snippets in presentations'
-        activator = 'com.twasyl.slideshowfx.content.extension.snippet.activator.SnippetContentExtensionActivator'
-        exportPackage = 'com.twasyl.slideshowfx.content.extension.snippet.controls,com.twasyl.slideshowfx.content.extension.snippet.controllers,com.twasyl.slideshowfx.content.extension.snippet,com.twasyl.slideshowfx.content.extension.snippet.activator'
-        setupWizardLabel = 'Executable code snippet'
+        name = 'Executable snippet'
+        description = 'Insert executable code snippets in presentations'
         setupWizardIconName = 'TERMINAL'
     }
 }

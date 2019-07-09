@@ -3,17 +3,17 @@ package com.twasyl.slideshowfx.gradle.plugins.sfxplugin.extensions;
 import org.gradle.api.Project;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.twasyl.slideshowfx.gradle.Utils.stripProjectVersion;
+import static com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.PLUGIN_DEPENDENCIES_CONFIGURATION_NAME;
+import static java.util.stream.Collectors.toList;
 
 public class SlideshowFXBundleExtension {
     private String name;
-    private String symbolicName;
     private String description;
-    private String activator;
-    private String classpath;
-    private String vendor;
-    private String exportPackage;
-    private String setupWizardLabel;
     private String setupWizardIconName;
 
     public String getName() {
@@ -24,60 +24,12 @@ public class SlideshowFXBundleExtension {
         this.name = name;
     }
 
-    public String getSymbolicName() {
-        return symbolicName;
-    }
-
-    public void setSymbolicName(String symbolicName) {
-        this.symbolicName = symbolicName;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getActivator() {
-        return activator;
-    }
-
-    public void setActivator(String activator) {
-        this.activator = activator;
-    }
-
-    public String getClasspath() {
-        return classpath;
-    }
-
-    public void setClasspath(String classpath) {
-        this.classpath = classpath;
-    }
-
-    public String getVendor() {
-        return vendor;
-    }
-
-    public void setVendor(String vendor) {
-        this.vendor = vendor;
-    }
-
-    public String getExportPackage() {
-        return exportPackage;
-    }
-
-    public void setExportPackage(String exportPackage) {
-        this.exportPackage = exportPackage;
-    }
-
-    public String getSetupWizardLabel() {
-        return setupWizardLabel;
-    }
-
-    public void setSetupWizardLabel(String setupWizardLabel) {
-        this.setupWizardLabel = setupWizardLabel;
     }
 
     public String getSetupWizardIconName() {
@@ -91,21 +43,35 @@ public class SlideshowFXBundleExtension {
     public Map<String, Object> buildManifestAttributes(final Project project) {
         final Map<String, Object> manifestAttributes = new HashMap<>();
 
-        manifestAttributes.put("Bundle-ManifestVersion", "2");
-        manifestAttributes.put("Import-Package", "org.osgi.framework");
-
-        putValueIfValid(manifestAttributes, "Bundle-Name", getName());
-        putValueIfValid(manifestAttributes, "Bundle-SymbolicName", getSymbolicName());
-        putValueIfValid(manifestAttributes, "Bundle-Version", stripProjectVersion(project));
-        putValueIfValid(manifestAttributes, "Bundle-Description", getDescription());
-        putValueIfValid(manifestAttributes, "Bundle-Activator", getActivator());
-        putValueIfValid(manifestAttributes, "Bundle-ClassPath", getClasspath(), ".");
-        putValueIfValid(manifestAttributes, "Bundle-Vendor", getVendor());
-        putValueIfValid(manifestAttributes, "Export-Package", getExportPackage());
-        putValueIfValid(manifestAttributes, "Setup-Wizard-Label", getSetupWizardLabel());
-        putValueIfValid(manifestAttributes, "Setup-Wizard-Icon-Name", getSetupWizardIconName());
+        populateManifestWithPlugin(manifestAttributes, project);
+        populateManifestWithSetup(manifestAttributes);
 
         return manifestAttributes;
+    }
+
+    private String determineClasspath(Project project) {
+        final List<String> classPath = project.getConfigurations().getByName(PLUGIN_DEPENDENCIES_CONFIGURATION_NAME)
+                .resolve()
+                .stream()
+                .map(file -> "libs/" + file.getName())
+                .collect(toList());
+
+        if (classPath.isEmpty()) {
+            return null;
+        } else {
+            return classPath.stream().collect(Collectors.joining(",")).concat(",.");
+        }
+    }
+
+    private void populateManifestWithPlugin(Map<String, Object> manifestAttributes, Project project) {
+        putValueIfValid(manifestAttributes, "Class-Path", determineClasspath(project));
+        putValueIfValid(manifestAttributes, "Plugin-Name", getName());
+        putValueIfValid(manifestAttributes, "Plugin-Description", getDescription());
+        putValueIfValid(manifestAttributes, "Plugin-Version", stripProjectVersion(project));
+    }
+
+    private void populateManifestWithSetup(Map<String, Object> manifestAttributes) {
+        putValueIfValid(manifestAttributes, "Setup-Wizard-Icon-Name", getSetupWizardIconName());
     }
 
     private void putValueIfValid(final Map<String, Object> manifestAttributes, final String key, final String value) {
@@ -117,15 +83,6 @@ public class SlideshowFXBundleExtension {
             manifestAttributes.put(key, value.trim());
         } else if (defaultValue != null) {
             manifestAttributes.put(key, defaultValue);
-        }
-    }
-
-    private String stripProjectVersion(final Project project) {
-        final String version = project.getVersion().toString();
-        if (version.contains("-SNAPSHOT")) {
-            return version.replace("-SNAPSHOT", "");
-        } else {
-            return version;
         }
     }
 }

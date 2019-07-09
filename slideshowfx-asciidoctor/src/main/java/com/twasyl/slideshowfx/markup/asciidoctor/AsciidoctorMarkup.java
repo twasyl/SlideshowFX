@@ -1,11 +1,10 @@
 package com.twasyl.slideshowfx.markup.asciidoctor;
 
 import com.twasyl.slideshowfx.markup.AbstractMarkup;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.AttributesBuilder;
 import org.asciidoctor.OptionsBuilder;
-
-import static java.util.Arrays.asList;
 
 /**
  * This class implements the asciidoctor syntax.
@@ -15,13 +14,13 @@ import static java.util.Arrays.asList;
  * @version 1.2
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class AsciidoctorMarkup extends AbstractMarkup {
     private final Asciidoctor asciidoctor;
 
     public AsciidoctorMarkup() {
         super("ASCIIDOCTOR", "asciidoctor", "ace/mode/asciidoc");
-
-        this.asciidoctor = Asciidoctor.Factory.create(asList("uri:classloader:/gems/asciidoctor-1.5.8/lib"));
+        this.asciidoctor = Asciidoctor.Factory.create();
     }
 
     @Override

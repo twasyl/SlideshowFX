@@ -4,7 +4,7 @@ import com.twasyl.slideshowfx.controls.*;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.icons.FontAwesome;
 import com.twasyl.slideshowfx.icons.Icon;
-import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.server.beans.chat.ChatMessage;
 import com.twasyl.slideshowfx.server.beans.quiz.QuizResult;
@@ -125,7 +125,7 @@ public class SlideshowPane extends StackPane implements Actor {
 
     /**
      * This method is called by the presentation in order to execute a code snippet. The executor is identified by the
-     * {@code snippetExecutorCode} and retrieved in the OSGi context to get the {@link ISnippetExecutor}
+     * {@code snippetExecutorCode} and retrieved in the plugin manager to get the {@link ISnippetExecutor}
      * instance that will execute the code.
      * The code to execute is passed to this method in Base64 using the {@code base64CodeSnippet} parameter. The execution
      * result will be pushed back to the presentation in the HTML element {@code consoleOutputId}.
@@ -137,7 +137,7 @@ public class SlideshowPane extends StackPane implements Actor {
     public void executeCodeSnippet(final String snippetExecutorCode, final String base64CodeSnippet, final String consoleOutputId) {
 
         if (snippetExecutorCode != null) {
-            final Optional<ISnippetExecutor> snippetExecutor = OSGiManager.getInstance().getInstalledServices(ISnippetExecutor.class)
+            final Optional<ISnippetExecutor> snippetExecutor = PluginManager.getInstance().getServices(ISnippetExecutor.class)
                     .stream()
                     .filter(executor -> snippetExecutorCode.equals(executor.getCode()))
                     .findFirst();

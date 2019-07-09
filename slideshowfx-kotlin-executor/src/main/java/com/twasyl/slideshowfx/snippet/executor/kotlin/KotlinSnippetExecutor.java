@@ -2,6 +2,7 @@ package com.twasyl.slideshowfx.snippet.executor.kotlin;
 
 import com.sun.javafx.PlatformUtil;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.utils.beans.converter.FileStringConverter;
@@ -26,9 +27,10 @@ import java.util.logging.Logger;
  * This implementation is identified with the code {@code KOTLIN}.
  *
  * @author Thierry Wasyczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippetExecutorOptions> {
     private static final Logger LOGGER = Logger.getLogger(KotlinSnippetExecutor.class.getName());
 
@@ -42,7 +44,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
         this.setOptions(new KotlinSnippetExecutorOptions());
 
         final String kotlinHome = GlobalConfiguration.getProperty(this.getConfigurationBaseName().concat(KOTLIN_HOME_PROPERTY_SUFFIX));
-        if(kotlinHome != null) {
+        if (kotlinHome != null) {
             try {
                 this.getOptions().setKotlinHome(new File(kotlinHome));
             } catch (FileNotFoundException e) {
@@ -58,14 +60,14 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
         packageTextField.setPrefColumnCount(10);
         packageTextField.setTooltip(new Tooltip("The package name of this code snippet"));
         packageTextField.textProperty().addListener((textValue, oldText, newText) -> {
-            if(newText == null || newText.isEmpty()) codeSnippet.putProperty(PACKAGE_NAME_PROPERTY, null);
+            if (newText == null || newText.isEmpty()) codeSnippet.putProperty(PACKAGE_NAME_PROPERTY, null);
             else codeSnippet.putProperty(PACKAGE_NAME_PROPERTY, newText);
         });
 
         final CheckBox wrapInMain = new CheckBox("Wrap code snippet in main");
         wrapInMain.setTooltip(new Tooltip("Wrap the provided code snippet in a Kotlin main method"));
         wrapInMain.selectedProperty().addListener((selectedValue, oldSelected, newSelected) -> {
-            if(newSelected != null) codeSnippet.putProperty(WRAP_IN_MAIN_PROPERTY, newSelected.toString());
+            if (newSelected != null) codeSnippet.putProperty(WRAP_IN_MAIN_PROPERTY, newSelected.toString());
         });
 
         final TextArea imports = new TextArea();
@@ -74,7 +76,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
         imports.setPrefRowCount(15);
         imports.setWrapText(true);
         imports.textProperty().addListener((textValue, oldText, newText) -> {
-            if(newText.isEmpty()) codeSnippet.putProperty(IMPORTS_PROPERTY, null);
+            if (newText.isEmpty()) codeSnippet.putProperty(IMPORTS_PROPERTY, null);
             else codeSnippet.putProperty(IMPORTS_PROPERTY, newText);
         });
 
@@ -117,10 +119,10 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
 
     @Override
     public void saveNewOptions() {
-        if(this.getNewOptions() != null) {
+        if (this.getNewOptions() != null) {
             this.setOptions(this.getNewOptions());
 
-            if(this.getOptions().getKotlinHome() != null) {
+            if (this.getOptions().getKotlinHome() != null) {
                 GlobalConfiguration.setProperty(this.getConfigurationBaseName().concat(KOTLIN_HOME_PROPERTY_SUFFIX),
                         this.getOptions().getKotlinHome().getAbsolutePath().replaceAll("\\\\", "/"));
             }
@@ -148,7 +150,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
                     new File(this.getOptions().getKotlinHome(), "bin/kotlinc");
 
             final String[] compilationCommand = {koltincExecutable.getAbsolutePath(), codeFile.getName(),
-            "-include-runtime", "-d", jarFile};
+                    "-include-runtime", "-d", jarFile};
 
             Process process = null;
             try {
@@ -171,7 +173,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
             deleteGeneratedFile(codeFile);
 
             // Execute the Kotlin class only if the compilation was successful
-            if(process != null && process.exitValue() == 0) {
+            if (process != null && process.exitValue() == 0) {
 
                 final File kotlinExecutable = PlatformUtil.isWindows() ?
                         new File(this.getOptions().getKotlinHome(), "bin/kotlin.bat") :
@@ -206,6 +208,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
 
     /**
      * Create the source code file for the given code snippet.
+     *
      * @param codeSnippet The code snippet.
      * @return The file created and containing the source code.
      */
@@ -220,24 +223,24 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
     }
 
     /**
-     *
      * Build code file content according properties. The source code can then be written properly inside a file in order
      * to be compiled and then executed.
+     *
      * @param codeSnippet The code snippet to build the source code for.
      * @return The content of the source code file.
      */
     protected String buildSourceCode(final CodeSnippet codeSnippet) throws IOException {
         final StringBuilder sourceCode = new StringBuilder();
 
-        if(hasPackage(codeSnippet)) {
+        if (hasPackage(codeSnippet)) {
             sourceCode.append(getPackage(codeSnippet)).append("\n\n");
         }
 
-        if(hasImports(codeSnippet)) {
+        if (hasImports(codeSnippet)) {
             sourceCode.append(getImports(codeSnippet)).append("\n\n");
         }
 
-        if(mustBeWrappedIn(codeSnippet, WRAP_IN_MAIN_PROPERTY)) {
+        if (mustBeWrappedIn(codeSnippet, WRAP_IN_MAIN_PROPERTY)) {
             sourceCode.append("fun main(args: Array<String>) {\n")
                     .append(codeSnippet.getCode())
                     .append("\n}");
@@ -250,6 +253,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
 
     /**
      * Check if a package name has been specified.
+     *
      * @param codeSnippet The code snippet.
      * @return {@code true} if a package name has been defined, {@code false} otherwise.
      */
@@ -270,6 +274,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
 
     /**
      * Formats the package name to include the {@code package} keyword to it if necessary.
+     *
      * @param packageName The name of the package to format.
      * @return A well formatted package name.
      */
@@ -278,7 +283,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
 
         String formattedPackageLine;
 
-        if(packageName.startsWith(packageLineBeginning)) {
+        if (packageName.startsWith(packageLineBeginning)) {
             formattedPackageLine = packageName;
         } else {
             formattedPackageLine = packageLineBeginning.concat(packageName);
@@ -289,6 +294,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
 
     /**
      * Get the imports to be added to the source code.
+     *
      * @param codeSnippet The code snippet.
      */
     protected boolean hasImports(final CodeSnippet codeSnippet) {
@@ -319,6 +325,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
 
     /**
      * Format an import line by make sure it starts with the {@code import} keyword.
+     *
      * @param importLine The import line to format.
      * @return A well formatted import line.
      */
@@ -326,7 +333,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
         final String importLineBeginning = "import ";
         String formattedImportLine;
 
-        if(importLine.startsWith(importLineBeginning)) {
+        if (importLine.startsWith(importLineBeginning)) {
             formattedImportLine = importLine;
         } else {
             formattedImportLine = importLineBeginning.concat(importLine);

@@ -1,12 +1,15 @@
 package com.twasyl.slideshowfx.gradle.plugins.sfxplugin.tasks;
 
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.jvm.tasks.Jar;
+import org.gradle.internal.io.IoUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.BUNDLE_TASK_NAME;
 
 /**
  * Task uninstall the current version (defined in the build script) of the plugin from the installation directory.
@@ -18,9 +21,15 @@ import java.nio.file.Path;
 public class UninstallPlugin extends AbstractPluginTask {
 
     @TaskAction
-    public void uninstall() throws IOException {
-        final Jar jar = (Jar) getProject().getTasks().getByName("jar");
-        final Path plugin = new File(pluginsDir, jar.getArchiveFileName().get()).toPath();
-        Files.delete(plugin);
+    public void uninstall() {
+        final FileCollection files = getProject().getTasks().getByName(BUNDLE_TASK_NAME).getOutputs().getFiles();
+
+        if (!files.isEmpty()) {
+            files.forEach(file -> {
+                final File pluginFile = new File(pluginsDir, file.getName());
+                final Path explodedDir = new File(pluginsDir, file.getName().replace(".sfx-plugin", "")).toPath();
+                getProject().delete(pluginFile, explodedDir);
+            });
+        }
     }
 }

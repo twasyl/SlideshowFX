@@ -10,13 +10,17 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.StackPane?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml" style="-fx-padding: 5px;"
             fx:controller="com.twasyl.slideshowfx.content.extension.code.controllers.CodeContentExtensionController">
 
     <SplitPane orientation="HORIZONTAL" dividerPositions="0.25">
         <VBox spacing="5">
             <Label text="Language:"/>
-            <ListView fx:id="language" editable="false"/>
+            <StackPane alignment="TOP_RIGHT">
+                <ListView fx:id="language" editable="false"/>
+                <TextField fx:id="languageFilter" minWidth="50" prefWidth="50" maxWidth="50" visible="false" />
+            </StackPane>
         </VBox>
 
         <VBox spacing="5">

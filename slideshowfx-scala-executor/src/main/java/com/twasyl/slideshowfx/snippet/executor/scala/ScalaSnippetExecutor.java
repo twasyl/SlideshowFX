@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.snippet.executor.scala;
 
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.utils.beans.converter.FileStringConverter;
@@ -25,9 +26,10 @@ import java.util.logging.Logger;
  * This implementation is identified with the code {@code SCALA}.
  *
  * @author Thierry Wasyczenko
- * @version 1.0
+ * @version 1.0-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class ScalaSnippetExecutor extends AbstractSnippetExecutor<ScalaSnippetExecutorOptions> {
     private static final Logger LOGGER = Logger.getLogger(ScalaSnippetExecutor.class.getName());
 

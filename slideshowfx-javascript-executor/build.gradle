@@ -1,15 +1,14 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Snippet executor allowing to execute some Javascript inside a SlideshowFX presentation'
 version = '1.1-SNAPSHOT'
 
 dependencies {
-    implementation project(':slideshowfx-snippet-executor')
     implementation project(':slideshowfx-plugin')
 }
 
@@ -17,11 +16,7 @@ sfxPlugin {
     snippetExecutor = true
 
     bundle {
-        name = 'SlideshowFX JavaScript executor'
-        symbolicName = 'com.twasyl.slideshowfx.snippet.executor.javascript'
-        description = 'Allow to execute JavaScript code inside a presentation'
-        activator = 'com.twasyl.slideshowfx.snippet.executor.javascript.activator.JavaScriptSnippetExecutorActivator'
-        exportPackage = 'com.twasyl.slideshowfx.snippet.executor.javascript,com.twasyl.slideshowfx.snippet.executor.javascript.activator'
-        setupWizardLabel = 'JavaScript'
+        name = 'JavaScript executor'
+        description = 'Execute JavaScript code inside a presentation'
     }
 }

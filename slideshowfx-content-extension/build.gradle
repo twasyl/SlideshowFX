@@ -11,6 +11,5 @@ dependencies {
     implementation project(':slideshowfx-icons')
     implementation project(':slideshowfx-markup')
     implementation project(':slideshowfx-plugin')
-    implementation project(':slideshowfx-ui-controls')
     implementation project(':slideshowfx-utils')
 }

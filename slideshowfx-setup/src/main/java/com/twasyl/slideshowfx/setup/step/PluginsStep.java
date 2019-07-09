@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.setup.step;
 
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.setup.app.SetupProperties;
 import com.twasyl.slideshowfx.setup.controllers.PluginsViewController;
 import com.twasyl.slideshowfx.setup.exceptions.SetupStepException;
 import com.twasyl.slideshowfx.utils.io.IOUtils;
@@ -25,7 +26,7 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
  * During the {@link #rollback()} method, all installed plugins are removed.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class PluginsStep extends AbstractSetupStep {
@@ -35,10 +36,8 @@ public class PluginsStep extends AbstractSetupStep {
 
     /**
      * Create an instance of the step.
-     *
-     * @param pluginsDirectory The directory containing all plugins that can be installed.
      */
-    public PluginsStep(final File pluginsDirectory) {
+    public PluginsStep() {
         this.title("Plugins");
 
         final FXMLLoader loader = new FXMLLoader(PluginsStep.class.getResource("/com/twasyl/slideshowfx/setup/fxml/PluginsView.fxml"));
@@ -47,7 +46,7 @@ public class PluginsStep extends AbstractSetupStep {
             this.view = loader.load();
             this.controller = loader.getController();
 
-            ((PluginsViewController) this.controller).setPluginsDirectory(pluginsDirectory);
+            ((PluginsViewController) this.controller).setPluginsDirectory(SetupProperties.getInstance().getPluginsDirectory());
 
             final BooleanBinding markupSelected = ((PluginsViewController) this.controller).numberOfSelectedMarkup().greaterThan(0);
             this.validProperty().bind(markupSelected);

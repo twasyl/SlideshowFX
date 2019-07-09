@@ -188,10 +188,6 @@
     sfx-opened-presentations-tab-pane-border-valid-drag-over-color: #A9B7C6;
     sfx-opened-presentations-tab-pane-border-invalid-drag-over-color: #BC3F3C;
 
-    /* Colors for the container of the snippet executors in the options view */
-    sfx-snippet-executor-container-text-field-background-color-1: derive(sfx-text-fill, 10%);
-    sfx-snippet-executor-container-text-field-background-color-2: #2B2B2B;
-
     /* Colors for the internal browser */
     sfx-internal-browser-address-bar-border-color: white;
 

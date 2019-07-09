@@ -3,6 +3,7 @@ package com.twasyl.slideshowfx.content.extension.image;
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.image.controllers.ImageContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import static com.twasyl.slideshowfx.icons.Icon.PICTURE_ALT;
@@ -16,11 +17,12 @@ import static com.twasyl.slideshowfx.icons.Icon.PICTURE_ALT;
  * @version 1.4-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class ImageContentExtension extends AbstractContentExtension<ImageContentExtensionController> {
 
     public ImageContentExtension() {
         super("IMAGE",
-                ImageContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/image/fxml/ImageContentExtension.fxml"),
+                "/com/twasyl/slideshowfx/content/extension/image/fxml/ImageContentExtension.fxml",
                 null,
                 PICTURE_ALT,
                 "Insert an image", "Insert an image");

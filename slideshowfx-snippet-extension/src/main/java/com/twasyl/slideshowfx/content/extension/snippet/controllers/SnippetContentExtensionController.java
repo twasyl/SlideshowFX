@@ -2,7 +2,7 @@ package com.twasyl.slideshowfx.content.extension.snippet.controllers;
 
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtensionController;
 import com.twasyl.slideshowfx.content.extension.snippet.controls.SnippetExecutorListCell;
-import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.ui.controls.ZoomTextArea;
@@ -23,7 +23,7 @@ import static com.twasyl.slideshowfx.ui.controls.validators.Validators.isNotEmpt
  * This class is the controller used by the {@code SnippetContentExtension.fxml} file.
  *
  * @author Thierry Wasylczenko
- * @version 1.2
+ * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class SnippetContentExtensionController extends AbstractContentExtensionController {
@@ -58,15 +58,12 @@ public class SnippetContentExtensionController extends AbstractContentExtensionC
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        OSGiManager.getInstance().getInstalledServices(ISnippetExecutor.class)
+        PluginManager.getInstance().getServices(ISnippetExecutor.class)
                 .stream()
                 .sorted(Comparator.comparing(ISnippetExecutor::getCode))
                 .forEach(ref -> this.language.getItems().add(ref));
 
-        this.language.setCellFactory((ListView<ISnippetExecutor> param) -> {
-            final ListCell<ISnippetExecutor> cell = new SnippetExecutorListCell();
-            return cell;
-        });
+        this.language.setCellFactory((ListView<ISnippetExecutor> param) -> (ListCell<ISnippetExecutor>) new SnippetExecutorListCell());
 
         this.language.setButtonCell(new SnippetExecutorListCell());
 

@@ -1,8 +1,8 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Snippet executor allowing to execute some Kotlin inside a SlideshowFX presentation'
@@ -10,7 +10,6 @@ version = '1.2-SNAPSHOT'
 
 dependencies {
     implementation project(':slideshowfx-global-configuration')
-    implementation project(':slideshowfx-snippet-executor')
     implementation project(':slideshowfx-plugin')
     implementation project(':slideshowfx-utils')
 }
@@ -19,11 +18,7 @@ sfxPlugin {
     snippetExecutor = true
 
     bundle {
-        name = 'SlideshowFX Kotlin executor'
-        symbolicName = 'com.twasyl.slideshowfx.snippet.executor.kotlin'
-        description = 'Allow to execute Kotlin code inside a presentation'
-        activator = 'com.twasyl.slideshowfx.snippet.executor.kotlin.activator.KotlinSnippetExecutorActivator'
-        exportPackage = 'com.twasyl.slideshowfx.snippet.executor.kotlin,com.twasyl.slideshowfx.snippet.executor.kotlin.activator'
-        setupWizardLabel = 'Kotlin'
+        name = 'Kotlin executor'
+        description = 'Execute Kotlin code inside a presentation'
     }
 }

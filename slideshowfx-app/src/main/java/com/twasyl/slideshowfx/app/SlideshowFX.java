@@ -5,7 +5,7 @@ import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
-import com.twasyl.slideshowfx.osgi.OSGiManager;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.theme.Themes;
 import com.twasyl.slideshowfx.utils.DialogHelper;
@@ -63,9 +63,7 @@ public class SlideshowFX extends Application {
 
         prepareLoggingConfiguration();
 
-        // Start the MarkupManager
-        LOGGER.info("Starting Felix");
-        OSGiManager.getInstance().startAndDeploy();
+        PluginManager.getInstance().start();
 
         resolveFilesToOpenAtStartup();
     }
@@ -190,7 +188,7 @@ public class SlideshowFX extends Application {
             stopInternalServer();
         }
 
-        stopOSGIManager();
+        stopPluginManager();
     }
 
     /**
@@ -227,19 +225,19 @@ public class SlideshowFX extends Application {
     }
 
     /**
-     * Stops the OSGI manager. If some {@link IHostingConnector} are registered, disconnect from them.
+     * Stops the plugin manager. If some {@link IHostingConnector} are registered, disconnect from them.
      */
-    private void stopOSGIManager() {
+    private void stopPluginManager() {
         this.stopHostingConnectors();
-        LOGGER.info("Stopping the OSGi manager");
-        OSGiManager.getInstance().stop();
+        LOGGER.info("Stopping the plugin manager");
+        PluginManager.getInstance().stop();
     }
 
     /**
      * Disconnect all hosting connectors if they are running.
      */
     private void stopHostingConnectors() {
-        final List<IHostingConnector> connectors = OSGiManager.getInstance().getInstalledServices(IHostingConnector.class);
+        final List<IHostingConnector> connectors = PluginManager.getInstance().getServices(IHostingConnector.class);
 
         if (!connectors.isEmpty()) {
             LOGGER.info("Disconnecting from all hosting connectors");

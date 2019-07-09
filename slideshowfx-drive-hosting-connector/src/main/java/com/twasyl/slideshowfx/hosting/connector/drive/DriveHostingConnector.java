@@ -19,6 +19,7 @@ import com.twasyl.slideshowfx.hosting.connector.BasicHostingConnectorOptions;
 import com.twasyl.slideshowfx.hosting.connector.drive.io.GoogleFile;
 import com.twasyl.slideshowfx.hosting.connector.exceptions.HostingConnectorException;
 import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -43,6 +44,7 @@ import java.util.logging.Logger;
  * @version 1.2
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class DriveHostingConnector extends AbstractHostingConnector<BasicHostingConnectorOptions> {
     private static final Logger LOGGER = Logger.getLogger(DriveHostingConnector.class.getName());
     private static final String SLIDESHOWFX_MIME_TYPE = "application/slideshowfx";

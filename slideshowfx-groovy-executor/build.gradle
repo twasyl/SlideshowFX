@@ -1,8 +1,8 @@
 plugins {
     id 'sfx-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'
     id 'org.sonarqube'
+    id 'sfx-publisher'
 }
 
 description = 'Snippet executor allowing to execute some Groovy inside a SlideshowFX presentation'
@@ -10,7 +10,6 @@ version = '1.1-SNAPSHOT'
 
 dependencies {
     implementation project(':slideshowfx-global-configuration')
-    implementation project(':slideshowfx-snippet-executor')
     implementation project(':slideshowfx-plugin')
     implementation project(':slideshowfx-utils')
 }
@@ -19,11 +18,7 @@ sfxPlugin {
     snippetExecutor = true
 
     bundle {
-        name = 'SlideshowFX Groovy executor'
-        symbolicName = 'com.twasyl.slideshowfx.snippet.executor.groovy'
-        description = 'Allow to execute Groovy code inside a presentation'
-        activator = 'com.twasyl.slideshowfx.snippet.executor.groovy.activator.GroovySnippetExecutorActivator'
-        exportPackage = 'com.twasyl.slideshowfx.snippet.executor.groovy,com.twasyl.slideshowfx.snippet.executor.groovy.activator'
-        setupWizardLabel = 'Groovy'
+        name = 'Groovy executor'
+        description = 'Execute Groovy code inside a presentation'
     }
 }

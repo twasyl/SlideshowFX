@@ -3,6 +3,7 @@ package com.twasyl.slideshowfx.content.extension.quote;
 import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.quote.controllers.QuoteContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import static com.twasyl.slideshowfx.icons.Icon.QUOTE_LEFT;
@@ -17,11 +18,12 @@ import static com.twasyl.slideshowfx.icons.Icon.QUOTE_LEFT;
  * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class QuoteContentExtension extends AbstractContentExtension<QuoteContentExtensionController> {
 
     public QuoteContentExtension() {
         super("QUOTE",
-                QuoteContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/quote/fxml/QuoteContentExtension.fxml"),
+                "/com/twasyl/slideshowfx/content/extension/quote/fxml/QuoteContentExtension.fxml",
                 null,
                 QUOTE_LEFT,
                 "Insert a quote", "Insert a quote");

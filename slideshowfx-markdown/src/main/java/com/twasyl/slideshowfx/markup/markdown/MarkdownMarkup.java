@@ -2,18 +2,22 @@ package com.twasyl.slideshowfx.markup.markdown;
 
 import com.github.rjeschke.txtmark.Processor;
 import com.twasyl.slideshowfx.markup.AbstractMarkup;
+import com.twasyl.slideshowfx.plugin.Plugin;
 
 /**
  * This class implements the Markdown syntax.
  * This markup language is identified byt the code <code>MARKDOWN</code> which is returned by {@link com.twasyl.slideshowfx.markup.IMarkup#getCode()}.
  *
  * @author Thierry Wasylczenko
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 1.0
- * @version 1.0
  */
+@Plugin
 public class MarkdownMarkup extends AbstractMarkup {
 
-    public MarkdownMarkup() { super("MARKDOWN", "Markdown", "ace/mode/markdown"); }
+    public MarkdownMarkup() {
+        super("MARKDOWN", "Markdown", "ace/mode/markdown");
+    }
 
     /**
      * This methods convert the given <code>markupString</code> to HTML.
@@ -25,7 +29,8 @@ public class MarkdownMarkup extends AbstractMarkup {
      */
     @Override
     public String convertAsHtml(String markupString) throws IllegalArgumentException {
-        if(markupString == null) throw new IllegalArgumentException("Can not convert " + getName() + " to HTML : the String is null");
+        if (markupString == null)
+            throw new IllegalArgumentException("Can not convert " + getName() + " to HTML : the String is null");
         return Processor.process("[$PROFILE$]: extended\n" + markupString).trim();
     }
 }

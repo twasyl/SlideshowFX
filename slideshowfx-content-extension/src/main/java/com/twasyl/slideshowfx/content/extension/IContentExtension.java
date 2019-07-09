@@ -7,7 +7,6 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.layout.Pane;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Set;
 
 /**
@@ -60,17 +59,9 @@ public interface IContentExtension<T extends AbstractContentExtensionController>
     Set<Resource> getResources();
 
     /**
-     * Get the URL of the resources archive. Typically the archive is a ZIP file that contains a complete JavaScript
-     * library for example. The archive is usually present within the content extension project.
-     *
-     * @return The URL of the archive containing all resources for this content extension.
-     */
-    URL getResourcesArchive();
-
-    /**
-     * Extract the resources needed for this content extension to be working in a presentation in the given <code>directory</code>.
+     * Extract the resources needed for this content extension to be working in a presentation in the given {code directory}.
      * The default behavior will extract the resources in the in {@code directory/#getExtractBaseDirectory()}.
-     * Resources to extract are the ones contained within the archive located by the {@link #getResourcesArchive()}.
+     * Resources to extract are the ones contained within the archive located by the resources archive.
      *
      * @param directory The directory where the resources will be extracted.
      * @throws NullPointerException If the given directory is null.

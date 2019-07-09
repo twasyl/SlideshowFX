@@ -15,6 +15,7 @@ import java.nio.file.attribute.BasicFileAttributes;
  *     <li>{@link java.nio.file.SimpleFileVisitor#visitFile(Object, java.nio.file.attribute.BasicFileAttributes)}</li>
  *     <li>{@link java.nio.file.SimpleFileVisitor#visitFileFailed(Object, java.io.IOException)}</li>
  * </ul>
+ *
  * @author Thierry Wasylczenko
  * @version 1.0
  * @since SlideshowFX 1.0

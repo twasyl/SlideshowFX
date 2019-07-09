@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.setup.step;
 
+import com.twasyl.slideshowfx.setup.app.SetupProperties;
 import com.twasyl.slideshowfx.setup.controllers.FinishViewController;
 import com.twasyl.slideshowfx.setup.exceptions.SetupStepException;
 import javafx.fxml.FXMLLoader;
@@ -13,7 +14,7 @@ import static java.util.logging.Level.SEVERE;
  * Step displayed when the setup of the application is finished.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class FinishStep extends AbstractSetupStep {
@@ -21,11 +22,8 @@ public class FinishStep extends AbstractSetupStep {
 
     /**
      * Create a new finish step.
-     *
-     * @param appName    The name of the application.
-     * @param appVersion The version of the application.
      */
-    public FinishStep(final String appName, final String appVersion) {
+    public FinishStep() {
         this.title("Installation successful");
 
         final FXMLLoader loader = new FXMLLoader(FinishStep.class.getResource("/com/twasyl/slideshowfx/setup/fxml/FinishView.fxml"));
@@ -34,8 +32,9 @@ public class FinishStep extends AbstractSetupStep {
             this.view = loader.load();
             this.controller = loader.getController();
 
-            ((FinishViewController) this.controller).setApplicationName(appName)
-                    .setApplicationVersion(appVersion);
+            ((FinishViewController) this.controller)
+                    .setApplicationName(SetupProperties.getInstance().getApplicationName())
+                    .setApplicationVersion(SetupProperties.getInstance().getApplicationVersion());
 
             this.validProperty().set(true);
         } catch (IOException e) {

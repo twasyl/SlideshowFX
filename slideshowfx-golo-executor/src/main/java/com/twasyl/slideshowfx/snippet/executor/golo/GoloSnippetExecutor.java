@@ -2,6 +2,7 @@ package com.twasyl.slideshowfx.snippet.executor.golo;
 
 import com.sun.javafx.PlatformUtil;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
 import com.twasyl.slideshowfx.utils.beans.converter.FileStringConverter;
@@ -28,9 +29,10 @@ import static java.util.logging.Level.SEVERE;
  * This implementation is identified with the code {@code GOLO}.
  *
  * @author Thierry Wasyczenko
- * @version 1.0
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class GoloSnippetExecutor extends AbstractSnippetExecutor<GoloSnippetExecutorOptions> {
     private static final Logger LOGGER = Logger.getLogger(GoloSnippetExecutor.class.getName());
 

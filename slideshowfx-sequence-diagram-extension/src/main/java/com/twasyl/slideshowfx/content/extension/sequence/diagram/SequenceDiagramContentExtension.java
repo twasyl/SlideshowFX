@@ -4,6 +4,7 @@ import com.twasyl.slideshowfx.content.extension.AbstractContentExtension;
 import com.twasyl.slideshowfx.content.extension.ResourceType;
 import com.twasyl.slideshowfx.content.extension.sequence.diagram.controllers.SequenceDiagramContentExtensionController;
 import com.twasyl.slideshowfx.markup.IMarkup;
+import com.twasyl.slideshowfx.plugin.Plugin;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import static com.twasyl.slideshowfx.icons.Icon.SHARE_ALT_SQUARE;
@@ -17,12 +18,13 @@ import static com.twasyl.slideshowfx.icons.Icon.SHARE_ALT_SQUARE;
  * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
+@Plugin
 public class SequenceDiagramContentExtension extends AbstractContentExtension<SequenceDiagramContentExtensionController> {
 
     public SequenceDiagramContentExtension() {
         super("SEQUENCE_DIAGRAM",
-                SequenceDiagramContentExtension.class.getClassLoader().getResource("/com/twasyl/slideshowfx/content/extension/sequence/diagram/fxml/SequenceDiagramContentExtension.fxml"),
-                SequenceDiagramContentExtension.class.getResource("/com/twasyl/slideshowfx/content/extension/sequence/diagram/resources/jumly.zip"),
+                "/com/twasyl/slideshowfx/content/extension/sequence/diagram/fxml/SequenceDiagramContentExtension.fxml",
+                "/com/twasyl/slideshowfx/content/extension/sequence/diagram/resources/jumly.zip",
                 SHARE_ALT_SQUARE,
                 "Insert a sequence diagram", "Insert a sequence diagram");
 

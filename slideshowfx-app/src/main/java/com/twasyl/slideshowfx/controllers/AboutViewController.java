@@ -3,8 +3,8 @@ package com.twasyl.slideshowfx.controllers;
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.markup.IMarkup;
-import com.twasyl.slideshowfx.osgi.OSGiManager;
-import com.twasyl.slideshowfx.plugin.InstalledPlugin;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
+import com.twasyl.slideshowfx.plugin.manager.internal.RegisteredPlugin;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.utils.Jar;
 import javafx.event.Event;
@@ -41,7 +41,7 @@ public class AboutViewController implements Initializable {
     @FXML
     private Label javaVersion;
     @FXML
-    private TableView<InstalledPlugin> plugins;
+    private TableView<RegisteredPlugin> plugins;
 
     @FXML
     public void exitByClick(final MouseEvent event) {
@@ -54,11 +54,11 @@ public class AboutViewController implements Initializable {
     }
 
     protected void populatePluginsTable() {
-        OSGiManager manager = OSGiManager.getInstance();
-        this.plugins.getItems().addAll(manager.getInstalledPlugins(IMarkup.class));
-        this.plugins.getItems().addAll(manager.getInstalledPlugins(IContentExtension.class));
-        this.plugins.getItems().addAll(manager.getInstalledPlugins(ISnippetExecutor.class));
-        this.plugins.getItems().addAll(manager.getInstalledPlugins(IHostingConnector.class));
+        PluginManager manager = PluginManager.getInstance();
+        this.plugins.getItems().addAll(manager.getPlugins(IMarkup.class));
+        this.plugins.getItems().addAll(manager.getPlugins(IContentExtension.class));
+        this.plugins.getItems().addAll(manager.getPlugins(ISnippetExecutor.class));
+        this.plugins.getItems().addAll(manager.getPlugins(IHostingConnector.class));
     }
 
     @Override

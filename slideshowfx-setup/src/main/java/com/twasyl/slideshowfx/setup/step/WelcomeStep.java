@@ -1,5 +1,6 @@
 package com.twasyl.slideshowfx.setup.step;
 
+import com.twasyl.slideshowfx.setup.app.SetupProperties;
 import com.twasyl.slideshowfx.setup.controllers.WelcomeViewController;
 import com.twasyl.slideshowfx.setup.exceptions.SetupStepException;
 import javafx.fxml.FXMLLoader;
@@ -13,7 +14,7 @@ import static java.util.logging.Level.SEVERE;
  * A step displaying a welcome screen.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class WelcomeStep extends AbstractSetupStep {
@@ -22,11 +23,9 @@ public class WelcomeStep extends AbstractSetupStep {
     /**
      * Create an instance of the step.
      *
-     * @param appName    The name of the application.
-     * @param appVersion The version of the application.
      */
-    public WelcomeStep(final String appName, final String appVersion) {
-        this.title("Welcome to the installation of " + appName);
+    public WelcomeStep() {
+        this.title("Welcome to the installation of " + SetupProperties.getInstance().getApplicationName());
 
         final FXMLLoader loader = new FXMLLoader(WelcomeStep.class.getResource("/com/twasyl/slideshowfx/setup/fxml/WelcomeView.fxml"));
 
@@ -34,8 +33,9 @@ public class WelcomeStep extends AbstractSetupStep {
             this.view = loader.load();
             this.controller = loader.getController();
 
-            ((WelcomeViewController) this.controller).setApplicationName(appName)
-                    .setApplicationVersion(appVersion);
+            ((WelcomeViewController) this.controller)
+                    .setApplicationName(SetupProperties.getInstance().getApplicationName())
+                    .setApplicationVersion(SetupProperties.getInstance().getApplicationVersion());
 
             this.validProperty().set(true);
         } catch (IOException e) {

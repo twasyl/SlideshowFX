@@ -1,0 +1,13 @@
+body {
+    background-image: url('../images/dark-logo.png');
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+}
+
+body.dark {
+    background-color: #2B2B2B;
+}
+
+body.light {
+    background-color: #B6B6B6;
+}

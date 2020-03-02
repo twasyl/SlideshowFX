@@ -8,13 +8,11 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.Double?>
 <?import java.net.URL?>
-<StackPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.AboutViewController"
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:id="root"
+           fx:controller="com.twasyl.slideshowfx.controllers.AboutViewController"
            alignment="TOP_CENTER"
            onMouseClicked="#exitByClick" style="-fx-background-color: transparent">
-
-    <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/application.css" />
-    </stylesheets>
 
     <fx:define>
         <Double fx:id="VIEWPORT_HEIGHT" fx:value="230" />

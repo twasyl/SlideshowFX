@@ -186,7 +186,7 @@ public class WebappService extends AbstractSlideshowFXService {
                     final JsonObject data = request.getJsonObject(JSON_KEY_DATA);
                     data.put(JSON_KEY_ORIGIN, serverWebSocket.textHandlerID());
 
-                    this.vertx.eventBus().send(request.getString(JSON_KEY_SERVICE), data, asyncResult -> {
+                    this.vertx.eventBus().request(request.getString(JSON_KEY_SERVICE), data, asyncResult -> {
                         final JsonObject json = (JsonObject) asyncResult.result().body();
 
                         serverWebSocket.write(Buffer.buffer(json.encode()));

@@ -75,7 +75,7 @@ public class InstallationLocationViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         String defaultLocation;
 
-        if(SetupProperties.getInstance().getDefaultInstallationLocation() != null) {
+        if (SetupProperties.getInstance().getDefaultInstallationLocation() != null) {
             defaultLocation = SetupProperties.getInstance().getDefaultInstallationLocation().getAbsolutePath();
         } else if (OSUtils.isWindows()) {
             defaultLocation = System.getenv("LOCALAPPDATA");

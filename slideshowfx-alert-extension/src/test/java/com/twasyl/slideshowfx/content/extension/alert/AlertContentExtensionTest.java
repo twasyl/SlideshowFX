@@ -17,34 +17,41 @@ import static org.mockito.Mockito.spy;
  * @since SlideshowFX 2.0
  */
 public class AlertContentExtensionTest {
-    public static String EXPECTED_SCRIPT_WITH_TEXT_FORMAT = "<button id=\"{0}\">My button</button>\n" +
-            "<script type=\"text/javascript\">\n" +
-            "\tdocument.querySelector(''#{0}'').onclick = function() '{'\n" +
-            "\t\tSwal('{'\n" +
-            "\t\t\ttitleText: \"{1}\",\n" +
-            "\t\t\ttext: \"{2}\",\n" +
-            "\t\t\ttype: \"{3}\",\n" +
-            "\t\t\tshowConfirmButton: {4},\n" +
-            "\t\t\tshowCancelButton: {5},\n" +
-            "\t\t\tallowOutsideClick: {6},\n" +
-            "\t\t\tallowEscapeKey: {7},\n" +
-            "\t\t'}');\n" +
-            "\t'}';\n" +
-            "</script>";
+    public static String EXPECTED_SCRIPT_WITH_TEXT_FORMAT =
+            """
+            <button id="%1$s">My button</button>
+            <script type="text/javascript">
+                document.querySelector('#%1$s').onclick = function() {
+                    Swal.fire({
+                        title: "%2$s",
+                        text: "%3$s",
+                        icon: '%4$s',
+                        showConfirmButton: %5$s,
+                        showCancelButton: %6$s,
+                        allowOutsideClick: %7$s,
+                        allowEscapeKey: %8$s
+                    });
+                };
+            </script>
+            """;
 
-    public static String EXPECTED_SCRIPT_WITHOUT_TEXT_FORMAT = "<button id=\"{0}\">My button</button>\n" +
-            "<script type=\"text/javascript\">\n" +
-            "\tdocument.querySelector(''#{0}'').onclick = function() '{'\n" +
-            "\t\tSwal('{'\n" +
-            "\t\t\ttitleText: \"{1}\",\n" +
-            "\t\t\ttype: \"{2}\",\n" +
-            "\t\t\tshowConfirmButton: {3},\n" +
-            "\t\t\tshowCancelButton: {4},\n" +
-            "\t\t\tallowOutsideClick: {5},\n" +
-            "\t\t\tallowEscapeKey: {6},\n" +
-            "\t\t'}');\n" +
-            "\t'}';\n" +
-            "</script>";
+    public static String EXPECTED_SCRIPT_WITHOUT_TEXT_FORMAT =
+            """
+            <button id="%1$s">My button</button>
+            <script type="text/javascript">
+                document.querySelector('#%1$s').onclick = function() {
+                    Swal.fire({
+                        title: "%2$s",
+                        text: "",
+                        icon: '%3$s',
+                        showConfirmButton: %4$s,
+                        showCancelButton: %5$s,
+                        allowOutsideClick: %6$s,
+                        allowEscapeKey: %7$s
+                    });
+                };
+            </script>
+            """;
 
     public static AlertContentExtension extension;
     public static String GENERATED_ID = "swal-btn-" + System.currentTimeMillis();
@@ -80,7 +87,7 @@ public class AlertContentExtensionTest {
         doReturn(title).when(controller).getTitle();
         doReturn(alertsType).when(controller).getType();
 
-        final String expected = MessageFormat.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
+        final String expected = String.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
         final String content = extension.buildDefaultContentString();
 
         assertEquals(expected, content);
@@ -104,7 +111,7 @@ public class AlertContentExtensionTest {
         doReturn(title).when(controller).getTitle();
         doReturn(alertsType).when(controller).getType();
 
-        final String expected = MessageFormat.format(EXPECTED_SCRIPT_WITHOUT_TEXT_FORMAT, GENERATED_ID, title, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
+        final String expected = String.format(EXPECTED_SCRIPT_WITHOUT_TEXT_FORMAT, GENERATED_ID, title, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
         final String content = extension.buildDefaultContentString();
 
         assertEquals(expected, content);
@@ -129,7 +136,7 @@ public class AlertContentExtensionTest {
         doReturn(title).when(controller).getTitle();
         doReturn(alertsType).when(controller).getType();
 
-        final String expected = MessageFormat.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
+        final String expected = String.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
         final String content = extension.buildDefaultContentString();
 
         assertEquals(expected, content);
@@ -154,7 +161,7 @@ public class AlertContentExtensionTest {
         doReturn(title).when(controller).getTitle();
         doReturn(alertsType).when(controller).getType();
 
-        final String expected = MessageFormat.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
+        final String expected = String.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
         final String content = extension.buildDefaultContentString();
 
         assertEquals(expected, content);
@@ -179,7 +186,7 @@ public class AlertContentExtensionTest {
         doReturn(title).when(controller).getTitle();
         doReturn(alertsType).when(controller).getType();
 
-        final String expected = MessageFormat.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
+        final String expected = String.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
         final String content = extension.buildDefaultContentString();
 
         assertEquals(expected, content);
@@ -204,7 +211,7 @@ public class AlertContentExtensionTest {
         doReturn(title).when(controller).getTitle();
         doReturn(alertsType).when(controller).getType();
 
-        final String expected = MessageFormat.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
+        final String expected = String.format(EXPECTED_SCRIPT_WITH_TEXT_FORMAT, GENERATED_ID, title, alertsText, alertsType, confirmButtonVisible, cancelButtonVisible, clickOutsideAllowed, closeOnEsc);
         final String content = extension.buildDefaultContentString();
 
         assertEquals(expected, content);

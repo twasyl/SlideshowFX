@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.controls.slideshow;
 
 import com.twasyl.slideshowfx.controls.PresentationBrowser;
+import com.twasyl.slideshowfx.style.Styles;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -40,7 +41,7 @@ public class InformationPane extends StackPane {
         super();
 
         this.setAlignment(Pos.TOP_LEFT);
-        this.getStylesheets().add(InformationPane.class.getResource("/com/twasyl/slideshowfx/css/application.css").toExternalForm());
+        Styles.applyApplicationStyle(this);
         this.getStyleClass().add("information-scene");
 
         this.context = context;

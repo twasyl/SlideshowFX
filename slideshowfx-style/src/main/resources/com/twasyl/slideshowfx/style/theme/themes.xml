@@ -1,0 +1,4 @@
+<themes>
+    <theme name="Dark" cssFile="/com/twasyl/slideshowfx/style/theme/css/dark.css" slideEditorTheme="tomorrow_night" />
+    <theme name="Light" cssFile="/com/twasyl/slideshowfx/style/theme/css/light.css" slideEditorTheme="xcode" />
+</themes>

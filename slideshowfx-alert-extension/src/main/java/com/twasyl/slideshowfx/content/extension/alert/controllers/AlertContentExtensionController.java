@@ -105,6 +105,5 @@ public class AlertContentExtensionController extends AbstractContentExtensionCon
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.title.setValidator(Validators.isNotEmpty());
     }
 }

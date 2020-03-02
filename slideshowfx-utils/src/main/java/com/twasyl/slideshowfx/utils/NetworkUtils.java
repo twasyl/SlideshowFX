@@ -42,17 +42,17 @@ public class NetworkUtils {
             Enumeration<InetAddress> inetAddresses;
             InetAddress inet;
 
-            while(interfaces.hasMoreElements() && ipAddress == null) {
+            while (interfaces.hasMoreElements() && ipAddress == null) {
                 inetAddresses = interfaces.nextElement().getInetAddresses();
 
-                while(inetAddresses.hasMoreElements() && ipAddress == null) {
+                while (inetAddresses.hasMoreElements() && ipAddress == null) {
                     inet = inetAddresses.nextElement();
 
-                    if(inet.getHostAddress().startsWith("192.")) ipAddress = inet.getHostAddress();
+                    if (inet.getHostAddress().startsWith("192.")) ipAddress = inet.getHostAddress();
                 }
             }
 
-            if(ipAddress == null) ipAddress = "localhost";
+            if (ipAddress == null) ipAddress = "localhost";
         } catch (SocketException e) {
             LOGGER.finest("Can not find network interfaces");
             ipAddress = "localhost";
@@ -82,15 +82,15 @@ public class NetworkUtils {
             Enumeration<InetAddress> inetAddresses;
             InetAddress inet;
 
-            while(interfaces.hasMoreElements()) {
+            while (interfaces.hasMoreElements()) {
                 inetAddresses = interfaces.nextElement().getInetAddresses();
 
-                while(inetAddresses.hasMoreElements()) {
+                while (inetAddresses.hasMoreElements()) {
                     inet = inetAddresses.nextElement();
 
                     ipAddressMatcherMatcher = ipAddressPattern.matcher(inet.getHostAddress());
 
-                    if(ipAddressMatcherMatcher.matches()) ips.add(inet.getHostAddress());
+                    if (ipAddressMatcherMatcher.matches()) ips.add(inet.getHostAddress());
                 }
             }
 
@@ -105,6 +105,7 @@ public class NetworkUtils {
     /**
      * Get an {@link javafx.collections.ObservableList} containing the list of IP addresses of the machine.
      * This method calls {@link #getIPs()} to get the addresses.
+     *
      * @return An observable list of all IP addresses of the machine.
      */
     public static ObservableList<String> getObservableIps() {

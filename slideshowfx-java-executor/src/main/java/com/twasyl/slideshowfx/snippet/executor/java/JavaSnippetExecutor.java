@@ -170,13 +170,12 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
             if (process != null && process.exitValue() == 0) {
 
                 final File javaExecutable = new File(this.getOptions().getJavaHome(), "bin/java");
-                final String[] executionCommand = {javaExecutable.getAbsolutePath(), determineClassName(codeSnippet)};
+                final String[] executionCommand = {javaExecutable.getAbsolutePath(), "-cp", this.getTemporaryDirectory().getAbsolutePath(), determineClassName(codeSnippet)};
 
                 try {
                     process = new ProcessBuilder()
                             .redirectErrorStream(true)
                             .command(executionCommand)
-                            .directory(this.getTemporaryDirectory())
                             .start();
 
                     try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -189,7 +188,7 @@ public class JavaSnippetExecutor extends AbstractSnippetExecutor<JavaSnippetExec
                     waitForProcess(process);
                 }
 
-                deleteGeneratedFile(new File(this.getTemporaryDirectory(), determineClassName(codeSnippet)));
+                deleteGeneratedFile(new File(this.getTemporaryDirectory(), determineClassName(codeSnippet) + ".class"));
             }
         });
         snippetThread.start();

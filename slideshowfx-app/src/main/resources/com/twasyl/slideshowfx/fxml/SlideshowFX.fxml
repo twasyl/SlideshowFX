@@ -7,13 +7,9 @@
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import java.net.URL?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:id="root"
             fx:controller="com.twasyl.slideshowfx.controllers.SlideshowFXController"
             minWidth="1024" minHeight="768">
-    <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/application.css"/>
-    </stylesheets>
 
     <fx:define>
         <!-- Global Menus & MenuItems -->
@@ -67,7 +63,7 @@
         </MenuItem>
 
         <!-- Global ToolBar buttons -->
-        <Button fx:id="openPresentation" onAction="#openPresentation">
+        <Button fx:id="openPresentation" onAction="#openPresentation" styleClass="image">
             <tooltip>
                 <Tooltip text="Open presentation"/>
             </tooltip>

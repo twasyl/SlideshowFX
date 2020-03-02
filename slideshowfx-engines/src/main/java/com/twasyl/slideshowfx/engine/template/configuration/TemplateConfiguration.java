@@ -27,7 +27,6 @@ public class TemplateConfiguration implements IConfiguration {
     private String jsObject;
     private String sfxServerObject;
     private File slidesTemplateDirectory;
-    private File slidesPresentationDirectory;
     private File resourcesDirectory;
     private String slideIdPrefix;
     private String slidesContainer;

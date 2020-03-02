@@ -107,7 +107,6 @@ public class LinkContentExtensionController extends AbstractContentExtensionCont
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.address.setValidator(isNotEmpty());
         final String url = getClipboardURL();
 
         if (url != null) this.address.setText(url);

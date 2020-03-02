@@ -1,7 +1,10 @@
 package com.twasyl.slideshowfx.controllers;
 
+import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.style.Styles;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
@@ -13,6 +16,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,7 +32,7 @@ import static java.util.logging.Level.WARNING;
  * The controller class for the internal browser view.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class InternalBrowserController implements ThemeAwareController {
@@ -53,7 +60,6 @@ public class InternalBrowserController implements ThemeAwareController {
      */
     @FXML
     private void manageKeyPressed(KeyEvent event) {
-
         if (event.getCode() == KeyCode.ENTER) {
             this.browsingHistoryContextMenu.hide();
             this.loadPage(this.addressBar.getText());
@@ -147,6 +153,30 @@ public class InternalBrowserController implements ThemeAwareController {
         }
     }
 
+    /**
+     * Style the empty-webview page to inject the CSS according the current {@link com.twasyl.slideshowfx.style.theme.Theme}.
+     */
+    private void styleEmptyWebView() {
+        final Document document = this.browser.getEngine().getDocument();
+        final Element style = document.createElement("link");
+        style.setAttribute("rel", "stylesheet");
+        style.setAttribute("type", "text/css");
+        style.setAttribute("href", Styles.getEmptyWebViewStyle().toExternalForm());
+
+        final Node head = document.getElementsByTagName("head").item(0);
+        head.appendChild(style);
+
+        final Node body = document.getElementsByTagName("body").item(0);
+        Attr classAttr = (Attr) body.getAttributes().getNamedItem("class");
+
+        if (classAttr == null) {
+            classAttr = document.createAttribute("class");
+        }
+
+        classAttr.setValue(GlobalConfiguration.getThemeName().toLowerCase());
+        body.getAttributes().setNamedItem(classAttr);
+    }
+
     @Override
     public Parent getRoot() {
         return this.root;
@@ -158,6 +188,12 @@ public class InternalBrowserController implements ThemeAwareController {
         this.browsingHistoryContextMenu.setHideOnEscape(true);
 
         this.addressBar.textProperty().addListener((textValue, oldText, newText) -> this.displayBrowsingHistorySuggestion(newText));
+
+        this.browser.getEngine().getLoadWorker().stateProperty().addListener((value, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED && "SlideshowFX internal browser".equals(this.browser.getEngine().getTitle())) {
+                this.styleEmptyWebView();
+            }
+        });
 
         this.browser.getEngine().load(InternalBrowserController.class.getResource("/com/twasyl/slideshowfx/html/empty-webview.html").toExternalForm());
 

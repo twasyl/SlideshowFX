@@ -10,7 +10,6 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.FileList;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
@@ -33,9 +32,15 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.google.api.services.drive.DriveScopes.DRIVE;
+import static java.util.Collections.singletonList;
 
 /**
  * This connector allows to interact with Google Drive.
@@ -147,7 +152,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
         final GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory,
                 this.getOptions().getConsumerKey(),
                 this.getOptions().getConsumerSecret(),
-                Arrays.asList(DriveScopes.DRIVE))
+                singletonList(DRIVE))
                 .setAccessType("online")
                 .setApprovalPrompt("auto")
                 .build();
@@ -447,7 +452,7 @@ public class DriveHostingConnector extends AbstractHostingConnector<BasicHosting
         if (destination instanceof GoogleFile) {
             final GoogleFile googleFolder = (GoogleFile) destination;
 
-            body.setParents(Arrays.asList(googleFolder.getId()));
+            body.setParents(singletonList(googleFolder.getId()));
         }
 
         body.setName(engine.getArchive().getName());

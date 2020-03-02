@@ -105,6 +105,8 @@ SlideshowFX provides some options that can be changed using the *Options* menu a
 
 You are able to:
 
+* Choose the theme to apply to the application (Dark or Light) ;
+* Define proxy settings to be used by the application
 * Enable or disable an automatic save of your work at a given interval ;
 * Define the interval (in minutes) of saving automatically your work ;
 * Enable or disable the temporary files SlideshowFX creates ;
@@ -230,12 +232,13 @@ NOTE: Even if a presentation is opened from a hosting platform, saving it will a
 
 Code snippet executors allow to insert piece of code inside a presentation that can be executed live. This is particularly useful when you want to demonstrate features of a programming language. SlideshowFX currently provides support for the following languages:
 
-* Groovy
 * Go
 * Golo
+* Groovy
 * Java
 * JavaScript
 * Kotlin
+* Ruby
 * Scala
 
 ===== Configuration

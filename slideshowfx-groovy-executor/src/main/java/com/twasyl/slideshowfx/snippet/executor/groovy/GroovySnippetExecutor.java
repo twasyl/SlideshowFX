@@ -1,10 +1,10 @@
 package com.twasyl.slideshowfx.snippet.executor.groovy;
 
-import com.sun.javafx.PlatformUtil;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.plugin.Plugin;
 import com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
+import com.twasyl.slideshowfx.utils.OSUtils;
 import com.twasyl.slideshowfx.utils.beans.converter.FileStringConverter;
 import com.twasyl.slideshowfx.utils.io.DefaultCharsetReader;
 import javafx.beans.property.SimpleStringProperty;
@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * An implementation of {@link com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor} that allows to execute
+ * An implementation of {@link AbstractSnippetExecutor} that allows to execute
  * Java code snippets.
  * This implementation is identified with the code {@code JAVA}.
  *
@@ -165,7 +165,7 @@ public class GroovySnippetExecutor extends AbstractSnippetExecutor<GroovySnippet
             }
 
             // Execute the class
-            final File groovyExecutable = PlatformUtil.isWindows() ?
+            final File groovyExecutable = OSUtils.isWindows() ?
                     new File(this.getOptions().getGroovyHome(), "bin/groovy.bat") :
                     new File(this.getOptions().getGroovyHome(), "bin/groovy");
 

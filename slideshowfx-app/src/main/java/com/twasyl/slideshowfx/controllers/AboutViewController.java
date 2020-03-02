@@ -9,7 +9,6 @@ import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import com.twasyl.slideshowfx.utils.Jar;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
@@ -28,10 +27,10 @@ import java.util.logging.Logger;
  * Controller class of the {@code AboutView.fxml} view.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
-public class AboutViewController implements Initializable {
+public class AboutViewController implements ThemeAwareController {
     private Logger LOGGER = Logger.getLogger(AboutViewController.class.getName());
 
     @FXML
@@ -62,7 +61,12 @@ public class AboutViewController implements Initializable {
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public Parent getRoot() {
+        return this.root;
+    }
+
+    @Override
+    public void postInitialize(URL location, ResourceBundle resources) {
         this.slideshowFXVersion.setText(String.format("SlideshowFX version: %1$s", getApplicationVersion()));
         this.javaVersion.setText(String.format("Java version: %1$s", System.getProperty("java.version")));
         this.populatePluginsTable();

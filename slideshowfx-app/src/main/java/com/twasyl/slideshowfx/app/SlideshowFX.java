@@ -4,10 +4,11 @@ import com.twasyl.slideshowfx.controllers.SlideshowFXController;
 import com.twasyl.slideshowfx.engine.presentation.PresentationEngine;
 import com.twasyl.slideshowfx.engine.template.TemplateEngine;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.global.configuration.GlobalConfigurationObserver;
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
-import com.twasyl.slideshowfx.theme.Themes;
+import com.twasyl.slideshowfx.style.theme.Themes;
 import com.twasyl.slideshowfx.utils.DialogHelper;
 import com.twasyl.slideshowfx.utils.io.DeleteFileVisitor;
 import com.twasyl.slideshowfx.utils.time.DateTimeUtils;
@@ -50,10 +51,11 @@ public class SlideshowFX extends Application {
 
     @Override
     public void init() throws Exception {
-        Font.loadFont(SlideshowFX.class.getResource("/com/twasyl/slideshowfx/fonts/Inconsolata-Regular.ttf").toExternalForm(), 12);
+        Font.loadFont(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/fonts/Inconsolata-Regular.ttf"), 12);
 
-        // Read all themes
         Themes.read();
+
+        listenForProxyConfigurationChange();
 
         // Initialize the configuration
         GlobalConfiguration.createApplicationDirectory();
@@ -68,6 +70,37 @@ public class SlideshowFX extends Application {
         resolveFilesToOpenAtStartup();
     }
 
+    private void listenForProxyConfigurationChange() {
+        GlobalConfiguration.addObserver(new GlobalConfigurationObserver() {
+            @Override
+            public void updateTheme(String oldTheme, String newTheme) {
+                // Not concerned
+            }
+
+            @Override
+            public void updateHttpProxyHost(boolean forHttps, String oldHost, String newHost) {
+                final String name = forHttps ? "https.proxyHost" : "http.proxyHost";
+
+                if (newHost != null && !newHost.isBlank()) {
+                    System.setProperty(name, newHost);
+                } else {
+                    System.setProperty(name, "");
+                }
+            }
+
+            @Override
+            public void updateHttpProxyPort(boolean forHttps, Integer oldPort, Integer newPort) {
+                final String name = forHttps ? "https.proxyPort" : "http.proxyPort";
+
+                if (newPort != null && newPort.intValue() > 0) {
+                    System.setProperty(name, newPort.toString());
+                } else {
+                    System.setProperty(name, "");
+                }
+            }
+        });
+    }
+
     /**
      * Ensure the configuration file of the application exists and fill it with default value.
      */
@@ -77,6 +110,7 @@ public class SlideshowFX extends Application {
         }
 
         GlobalConfiguration.fillConfigurationWithDefaultValue();
+        GlobalConfiguration.loadHttpProxyConfiguration();
     }
 
     /**
@@ -144,7 +178,7 @@ public class SlideshowFX extends Application {
 
         try {
             final FXMLLoader loader = new FXMLLoader();
-            final Parent root = loader.load(SlideshowFX.class.getResourceAsStream("/com/twasyl/slideshowfx/fxml/SlideshowFX.fxml"));
+            final Parent root = loader.load(getClass().getResourceAsStream("/com/twasyl/slideshowfx/fxml/SlideshowFX.fxml"));
             ((SimpleObjectProperty<SlideshowFXController>) mainController).set(loader.getController());
 
             final Scene scene = new Scene(root);

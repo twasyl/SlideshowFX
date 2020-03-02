@@ -59,9 +59,7 @@ public class DisableAction implements Runnable {
                 setDisable.invoke(element, false);
             } catch (NoSuchMethodException e) {
                 LOGGER.log(Level.FINE, "No setDisableMethod found", e);
-            } catch (InvocationTargetException e) {
-                LOGGER.log(Level.WARNING, "Can not disable element", e);
-            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException | IllegalAccessException e) {
                 LOGGER.log(Level.WARNING, "Can not disable element", e);
             }
         });

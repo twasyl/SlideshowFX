@@ -22,73 +22,72 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 [options=header, width="65"]
 |===
 | API, Tool | Version | Comments
-
-| Java / JavaFX | {javafx-version} |
-
+| OpenJDK | {jdk-version} |
+| OpenJFX | {javafx-version} |
 | asciidoctorj | {asciidoctorj-version} |
-
 | freemarker | {freemarker-version} |
-
 | jsoup | {jsoup-version} |
-
 | org.eclipse.mylyn.wikitext.textile.core | {wikitext-textile-core-version} | Library used for textile support
-
 | txtmark | {txtmark-version} | Library used for the markdown support
-
 | vertx-core | {vertx-version} |
-
 | zxing-jse | {zxing-jse-version} |
-
 | http://ace.c9.io[ACE] | {ace-version} |
-
 |===
 
 === Project structure
 
 SlideshowFX contains the following modules:
 
-- *SlideshowFX-app* which is the module for the desktop client of SlideshowFX ;
-- *SlideshowFX-documentation* which contains the documentation of the application ;
-- *SlideshowFX-utils* which defines utilities classes that may be used in other modules ;
-- *SlideshowFX-engines* which defines the engines that are used in SlideshowFX for working with templates and presentations ;
-- *SlideshowFX-controls* which defines the custom graphical controls that may be used in other modules ;
-- *SlideshowFX-global-configuration* which defines the classes allowing to access and interact the SlideshowFX configuration ;
-- *SlideshowFX-logs* which defines the classes for the logging ;
+- *slideshowfx-app* which is the module for the desktop client of SlideshowFX ;
+- *slideshowfx-documentation* which contains the documentation of the application ;
+- *slideshowfx-utils* which defines utilities classes that may be used in other modules ;
+- *slideshowfx-engines* which defines the engines that are used in SlideshowFX for working with templates and presentations ;
+- *slideshowfx-controls* which defines the custom graphical controls that may be used in other modules ;
+- *slideshowfx-global-configuration* which defines the classes allowing to access and interact the SlideshowFX configuration ;
+- *slideshowfx-logs* which defines the classes for the logging ;
 - *slideshowfx-plugin-manager* which defines the plugin manager responsible for loading all plugins ;
-- *SlideshowFX-server* which defines a server that is used by SlideshowFX ;
-- *SlideshowFX-markup* which defines the base classes for creating an OSGi module for supporting a new markup syntax in SlideshowFX to define slides' content ;
-- *SlideshowFX-asciidoctor* which defines the implementation of SlideshowFX-markup to define slides' content in asciidoctor ;
-- *SlideshowFX-html* which defines the implementation of SlideshowFX-markup to define slides' content in HTML ;
-- *SlideshowFX-markdown* which defines the implementation of SlideshowFX-markup to define slides' content in markdown ;
-- *SlideshowFX-textile* which defines the implementation of SlideshowFX-markup to define slides' content in textile ;
-- *SlideshowFX-content-extension* which defines the base classes for creating an OSGi module for inserting specific content in slides (like images, ...) ;
-- *SlideshowFX-alert-extension* which defines the implementation of SlideshowFX-content-extension to insert beautiful alerts in slides ;
-- *SlideshowFX-code-extension* which defines the implementation of SlideshowFX-content-extension to insert code in slides ;
-- *SlideshowFX-image-extension* which defines the implementation of SlideshowFX-content-extension to insert images in slides ;
-- *SlideshowFX-link-extension* which defines the implementation of SlideshowFX-content-extension to insert HTML links in slides ;
-- *SlideshowFX-quiz-extension* which defines the implementation of SlideshowFX-content-extension to insert quiz in slides ;
-- *SlideshowFX-quote-extension* which defines the implementation of SlideshowFX-content-extension to insert quotes in slides ;
-- *SlideshowFX-sequence-diagram-extension* which defines the implementation of SlideshowFX-content-extension to insert sequence diagrams in slides ;
-- *SlideshowFX-shape-extension* which defines the implementation of SlideshowFX-content-extension to insert shapes in slides ;
-- *SlideshowFX-snippet-extension* which defines the implementation of SlideshowFX-content-extension to insert executable code snippet in slides ;
-- *SlideshowFX-hosting-connector* which defines the base classes for creating an OSGi module for connecting to a file hosting service ;
-- *SlideshowFX-box-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Box ;
-- *SlideshowFX-dropbox-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Dropbox ;
-- *SlideshowFX-drive-hosting-connector* which defines the implementation of SlideshowFX-hosting-connector to connect to Google Drive ;
-- *SlideshowFX-snippet-executor* which defines the base classes for creating an OSGi module for executing code snippet in a presentation ;
-- *SlideshowFX-go-executor* which defines the base classes for creating an OSGi module for executing Go code snippet in a presentation ;
-- *SlideshowFX-golo-executor* which defines the base classes for creating an OSGi module for executing Golo code snippet in a presentation ;
-- *SlideshowFX-groovy-executor* which defines the base classes for creating an OSGi module for executing Groovy code snippet in a presentation ;
-- *SlideshowFX-java-executor* which defines the base classes for creating an OSGi module for executing Java code snippet in a presentation ;
-- *SlideshowFX-javascript-executor* which defines the base classes for creating an OSGi module for executing JavaScript code snippet in a presentation ;
-- *SlideshowFX-kotlin-executor* which defines the base classes for creating an OSGi module for executing Kotlin code snippet in a presentation ;
-- *SlideshowFX-scala-executor* which defines the base classes for creating an OSGi module for executing Scala code snippet in a presentation ;
+- *slideshowfx-server* which defines a server that is used by SlideshowFX ;
+- *slideshowfx-markup* which defines the base classes for creating a plugin for supporting a new markup syntax in SlideshowFX to define slides' content ;
+- *slideshowfx-asciidoctor* which defines the implementation of slideshowfx-markup to define slides' content in asciidoctor ;
+- *slideshowfx-html* which defines the implementation of slideshowfx-markup to define slides' content in HTML ;
+- *slideshowfx-markdown* which defines the implementation of slideshowfx-markup to define slides' content in markdown ;
+- *slideshowfx-textile* which defines the implementation of slideshowfx-markup to define slides' content in textile ;
+- *slideshowfx-content-extension* which defines the base classes for creating a plugin module for inserting specific content in slides (like images, ...) ;
+- *slideshowfx-alert-extension* which defines the implementation of slideshowfx-content-extension to insert beautiful alerts in slides ;
+- *slideshowfx-code-extension* which defines the implementation of slideshowfx-content-extension to insert code in slides ;
+- *slideshowfx-image-extension* which defines the implementation of slideshowfx-content-extension to insert images in slides ;
+- *slideshowfx-link-extension* which defines the implementation of slideshowfx-content-extension to insert HTML links in slides ;
+- *slideshowfx-quiz-extension* which defines the implementation of slideshowfx-content-extension to insert quiz in slides ;
+- *slideshowfx-quote-extension* which defines the implementation of slideshowfx-content-extension to insert quotes in slides ;
+- *slideshowfx-sequence-diagram-extension* which defines the implementation of slideshowfx-content-extension to insert sequence diagrams in slides ;
+- *slideshowfx-shape-extension* which defines the implementation of slideshowfx-content-extension to insert shapes in slides ;
+- *slideshowfx-snippet-extension* which defines the implementation of slideshowfx-content-extension to insert executable code snippet in slides ;
+- *slideshowfx-hosting-connector* which defines the base classes for creating a plugin for connecting to a file hosting service ;
+- *slideshowfx-box-hosting-connector* which defines the implementation of slideshowfx-hosting-connector to connect to Box ;
+- *slideshowfx-dropbox-hosting-connector* which defines the implementation of slideshowfx-hosting-connector to connect to Dropbox ;
+- *slideshowfx-drive-hosting-connector* which defines the implementation of slideshowfx-hosting-connector to connect to Google Drive ;
+- *slideshowfx-snippet-executor* which defines the base classes for creating a plugin module for executing code snippet in a presentation ;
+- *slideshowfx-go-executor* which defines the implementation of slideshowfx-snippet-executor for executing Go code snippet in a presentation ;
+- *slideshowfx-golo-executor* which defines the implementation of slideshowfx-snippet-executor for executing Golo code snippet in a presentation ;
+- *slideshowfx-groovy-executor* which defines the implementation of slideshowfx-snippet-executor for executing Groovy code snippet in a presentation ;
+- *slideshowfx-java-executor* which defines the implementation of slideshowfx-snippet-executor for executing Java code snippet in a presentation ;
+- *slideshowfx-javascript-executor* which defines the implementation of slideshowfx-snippet-executor for executing JavaScript code snippet in a presentation ;
+- *slideshowfx-kotlin-executor* which defines the implementation of slideshowfx-snippet-executor for executing Kotlin code snippet in a presentation ;
+- *slideshowfx-ruby-executor* which defines the implementation of slideshowfx-snippet-executor for executing Ruby code snippet in a presentation ;
+- *slideshowfx-scala-executor* which defines the implementation of slideshowfx-snippet-executor for executing Scala code snippet in a presentation ;
 
 === Gradle
 
 SlideshowFX uses https://gradle.org/[gradle] as build system. The version used is {gradle-version}.
 
 ==== Particularities
+
+===== Using dedicated JDK for the build
+
+It is possible to use a different JDK than the one gradle uses to build the project. In order to define it, the property `build_jdk` has to be defined and point to a valid (Open)JDK installation.
+This property can be defined in the `gradle.properties` file of the gradle installation (defaults to `$user.home/.gradle/gradle.properties`).
+
+===== Documentation
 
 The documentation provided within the SlideshowFX application is the same as the one provided by the setup. In order to avoid duplicate files, the `slideshowfx-app` module unpacks the `slideshowfx-documentation` HTML documentation in its own sources. In order to update the documentation within the application and display it in the application during development, the following command could be used:
 
@@ -97,16 +96,135 @@ The documentation provided within the SlideshowFX application is the same as the
 gradlew :slideshowfx-app:processResources
 ----
 
+===== Annotation processor
+
+In order to ease the development of plugins, the `PluginProcessor` has been developed to automatically generate the services files for each plugin. The annotation processor takes classes annotated with the `com.twasyl.slideshowfx.plugin.Plugin` annotation.
+
+==== Custom plugins
+
+Custom gradle plugins have been developed for the project:
+
+[options=header]
+|===
+| Plugin | ID | Description
+| SlideshowFXPlugin | `sfx-plugin` | To be applied for projects representing a SlideshowFX plugin.
+| SlideshowFXPublisherPlugin | `sfx-publisher` | To be applied for projects that need to be published on Bintray.
+| SlideshowFXPackager | `sfx-packager` | To be applied on projects that are JavaFX application and that needs to be packaged as an application.
+| Gherkin | `gherkin` | To be applied on projects using Gherkin tests.
+|===
+
+===== SlideshowFXPlugin
+
+Gradle plugin to be applied for projects representing a SlideshowFX plugin.
+
+====== Tasks
+
+[options=header]
+|===
+| Name | Description
+| prepareManifest |  Adds to the MANIFEST.MF file the attribute regarding the plugin manager. These attributes are defined by a `sfxPlugin { bundle { ... }}}` extension
+| bundle | Creating the bundle of the plugin (having the `.sfx-plugin` extension)
+| installPlugin | Installs the current plugin in the `$user.home/.SlideshowFX/plugins` directory
+| uninstallPlugin | Uninstalls the **current** version of the plugin from the installation directory
+| uninstallAllVersionsPlugin | Uninstalls all versions of the plugin from the installation directory
+|===
+
+====== Configurations
+
+|===
+| Name | Description
+| bundles | Contains the produced bundle of the plugin, typically the `.sfx-plugin` file
+| pluginDependencies | Used to define the dependencies required by the plugin. Dependencies provided in this configuration will be packaged within the plugin bundle
+|===
+
+====== Extensions
+
+[options=header]
+|===
+| Name | Description
+| sfxPlugin | Allows to define the plugin information
+| bundle | _(To be used in the `sfxPlugin` extension)_ Allows to define the bundle information
+|===
+
+===== SlideshowFXPackager
+
+Gradle plugin to be applied on projects that are JavaFX application and that needs to be packaged as an application.
+
+====== Tasks
+
+[options=header]
+|===
+| Name | Description
+| prepareResources |  Copies dependencies and additional resources in dedicated folders to be then packages
+| createRuntime | Creates a custom JDK image to be used as runtime for the targeted application
+| createPackage | Creates the native package of the application
+| runApplication | Runs the application
+|===
+
+====== Extensions
+
+[options=header]
+|===
+| Name | Description
+| packaging | Allows to define the package configuration
+| runApplication | Allows to define the module and main class for running the application using the `runApplication` tasks
+|===
+
+====== Properties
+
+[options=header]
+|===
+| Name | Description | Default value | Used by tasks
+| useRuntime | Indicates to use the runtime created by the `createRuntime` tasks | - | `createRuntime`
+| debug | Indicates to run the application in debug mode | - | `runApplication`
+| debugPort | Indicates the debugging port on which a debugger can be attached when running the application | `5005` | `runApplication`
+|===
+
+===== SlideshowFXPublisherPlugin
+
+Gradle plugin to be applied for projects that need to be published on Bintray.
+
+====== Tasks
+
+[options=header]
+|===
+| Name | Description
+| publish |  Publishes the artifact on Bintray
+| listSnapshotProjects | Lists all projects having a snapshot version
+|===
+
+====== Properties
+
+[options=header]
+|===
+| Name | Description | Default value | Used by tasks
+| bintrayUserName | Username to publish on Bintray. Can be replaced by a `BINTRAY_USER_NAME` environment variable | - | `publish`
+| bintrayApiKey | API key to publish on Bintray. Can be replaced by a `BINTRAY_API_KEY` environment variable | - | `publish`
+|===
+
+===== Gherkin
+
+Gradle plugin to be applied on projects using Gherkin tests.
+
+====== Tasks
+
+[options=header]
+|===
+| Name | Description
+| gherkinTest |  Runs the Gherkin tests using Cucumber
+|===
+
+====== Configurations
+
+|===
+| Name | Description
+| gherkinTestImplementation | Contains the required dependencies to write the Gherkin tests
+|===
+
 ==== Custom tasks
 
 Some gradle tasks are provided to help the developer :
 
-- *bundle* provided for all plugins and to create the package for the plugin ;
-- *installPlugin* provided for all plugins and allowing to deploy the plugin directly to the folder : `~/.SlideshowFX/plugins` ;
-- *uninstallPlugin* provided for all plugins and allowing to deploy uninstall the plugin directly from the folder : `~/.SlideshowFX/plugins` ;
-- *uninstallAllVersionsPlugin* provided for all plugins and allowing to deploy uninstall all versions of the plugin directly from the folder : `~/.SlideshowFX/plugins` ;
-- *listSnapshotProjects* allowing to list projects having a `SNAPSHOT` version. This is particularly useful for knowing which project should update it's version before publishing ;
-- *saveProjectsToBePublished* allowing to save within the `gradle.properties` file the projects having a `SNAPSHOT` version and that should be published on bintray ;
 - *:slideshowfx-app:createSlideContentEditor* allows to build the `sfx-slide-content-editor.zip` archive when passing the `-PaceVersion=xxx` property on the command line ;
 - *:slideshowfx-alert-extension:createSweetAlertPackage* allows to build the `sweetalert.zip` archive when passing the `-PsweetAlertVersion=xxx` property on the command line ;
 - *:slideshowfx-shape-extension:createSnapSVGPackage* allows to build the `snapsvg.zip` archive when passing the `-PsnapSvgVersion=xxx` property on the command line.

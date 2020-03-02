@@ -9,7 +9,7 @@ import javafx.concurrent.Task;
  * classes which are used as predicates.
  *
  * @author Thierry Wasylczenko
- * @version 1.0.0
+ * @version 1.0
  * @since SlideshowFX 1.0
  */
 public class TaskAction {
@@ -22,10 +22,8 @@ public class TaskAction {
      * @throws java.lang.NullPointerException if the given {@code task} is null.
      */
     public static ForPredicate forTask(final Task task) {
-        if(task == null) throw new NullPointerException("The task can not be null");
+        if (task == null) throw new NullPointerException("The task can not be null");
 
-        final ForPredicate forPredicate = new ForPredicate(task);
-
-        return forPredicate;
+        return new ForPredicate(task);
     }
 }

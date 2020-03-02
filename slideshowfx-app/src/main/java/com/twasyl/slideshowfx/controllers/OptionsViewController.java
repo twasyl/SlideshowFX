@@ -6,16 +6,16 @@ import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
 import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.services.AutoSavingService;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
-import com.twasyl.slideshowfx.theme.Theme;
-import com.twasyl.slideshowfx.theme.ThemeNotFoundException;
-import com.twasyl.slideshowfx.theme.Themes;
+import com.twasyl.slideshowfx.style.theme.Theme;
+import com.twasyl.slideshowfx.style.theme.ThemeNotFoundException;
+import com.twasyl.slideshowfx.style.theme.Themes;
+import com.twasyl.slideshowfx.ui.controls.ExtendedTextField;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
+import javafx.scene.Parent;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
@@ -31,9 +31,11 @@ import java.util.logging.Logger;
  * @version 1.2
  * @since SlideshowFX 1.0
  */
-public class OptionsViewController implements Initializable {
+public class OptionsViewController implements ThemeAwareController {
     private static final Logger LOGGER = Logger.getLogger(OptionsViewController.class.getName());
 
+    @FXML
+    private TabPane root;
     @FXML
     private VBox snippetExecutorContainer;
     @FXML
@@ -52,6 +54,14 @@ public class OptionsViewController implements Initializable {
     private TextField snapshotDelay;
     @FXML
     private ComboBox<Theme> themes;
+    @FXML
+    private ExtendedTextField httpProxyHost;
+    @FXML
+    private ExtendedTextField httpProxyPort;
+    @FXML
+    private ExtendedTextField httpsProxyHost;
+    @FXML
+    private ExtendedTextField httpsProxyPort;
 
     /**
      * This methods saves the options displayed in the view and make them persistent.
@@ -68,6 +78,7 @@ public class OptionsViewController implements Initializable {
         this.saveMaxRecentPresentations();
         this.saveSnapshotDelay();
         this.saveTheme();
+        this.saveProxyConfiguration();
     }
 
     /**
@@ -167,6 +178,19 @@ public class OptionsViewController implements Initializable {
             GlobalConfiguration.setThemeName(theme.getName());
         } else {
             GlobalConfiguration.setThemeName(GlobalConfiguration.getDefaultThemeName());
+        }
+    }
+
+    private void saveProxyConfiguration() {
+        GlobalConfiguration.setHttpProxyHost(this.httpProxyHost.getText());
+        GlobalConfiguration.setHttpsProxyHost(this.httpsProxyHost.getText());
+
+        if (this.httpProxyPort.isValid()) {
+            GlobalConfiguration.setHttpProxyPort(Integer.parseInt(this.httpProxyPort.getText()));
+        }
+
+        if (this.httpsProxyPort.isValid()) {
+            GlobalConfiguration.setHttpsProxyPort(Integer.parseInt(this.httpsProxyPort.getText()));
         }
     }
 
@@ -271,11 +295,39 @@ public class OptionsViewController implements Initializable {
         } catch (ThemeNotFoundException e) {
             LOGGER.log(Level.WARNING, null, e);
         }
-
     }
+
+    private void initializeProxyUI() {
+        this.httpProxyHost.setText(GlobalConfiguration.getHttpProxyHost());
+
+        Integer port = GlobalConfiguration.getHttpProxyPort();
+        if (port != null) {
+            this.httpProxyPort.setText(port.toString());
+        }
+        this.httpsProxyHost.setText(GlobalConfiguration.getHttpsProxyHost());
+
+        port = GlobalConfiguration.getHttpsProxyPort();
+        if (port != null) {
+            this.httpsProxyPort.setText(port.toString());
+        }
+    }
+
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public Parent getRoot() {
+        return root;
+    }
+
+    public ReadOnlyBooleanProperty areInputsValid() {
+        final ReadOnlyBooleanWrapper property = new ReadOnlyBooleanWrapper();
+        property.bind(this.httpProxyPort.validProperty().and(this.httpsProxyPort.validProperty()));
+
+        return property;
+    }
+
+    @Override
+    public void postInitialize(URL location, ResourceBundle resources) {
         this.initializeThemes();
+        this.initializeProxyUI();
         this.initializeAutoSaveUI();
         this.initializeTemporaryFilesDeletionUI();
         this.initializeSnippetExecutorUI();

@@ -2,7 +2,8 @@ package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.server.beans.quiz.QuizResult;
-import com.twasyl.slideshowfx.theme.Themes;
+import com.twasyl.slideshowfx.style.Styles;
+import com.twasyl.slideshowfx.style.theme.Themes;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -28,9 +29,8 @@ public class QuizPanel extends Region {
      */
     public QuizPanel() {
         this.getStyleClass().add("quiz-panel");
-        this.getStylesheets().addAll(
-                CollapsibleToolPane.class.getResource("/com/twasyl/slideshowfx/css/application.css").toExternalForm(),
-                Themes.getByName(GlobalConfiguration.getThemeName()).getCssFile().toExternalForm());
+        Styles.applyApplicationStyle(this);
+        Themes.applyTheme(this, GlobalConfiguration.getThemeName());
 
         this.chart.set(new PieChart());
 
@@ -42,7 +42,6 @@ public class QuizPanel extends Region {
             this.chart.get().getData().clear();
 
             if (newQuizResult != null) {
-
                 PlatformHelper.run(() -> {
                     PieChart.Data correctAnswers = new PieChart.Data("Correct answers", 0);
                     correctAnswers.pieValueProperty().bind(newQuizResult.correctAnswersProperty());

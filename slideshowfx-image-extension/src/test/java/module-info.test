@@ -1,0 +1,14 @@
+--add-modules
+org.mockito,slideshowfx.html,slideshowfx.markdown,slideshowfx.textile
+--add-reads
+slideshowfx.image.extension=org.mockito
+--add-reads
+slideshowfx.image.extension=slideshowfx.html
+--add-reads
+slideshowfx.image.extension=slideshowfx.markdown
+--add-reads
+slideshowfx.image.extension=slideshowfx.textile
+--add-exports
+slideshowfx.image.extension/com.twasyl.slideshowfx.content.extension.image=org.mockito
+--add-exports
+slideshowfx.image.extension/com.twasyl.slideshowfx.content.extension.image.controllers=org.mockito

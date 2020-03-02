@@ -164,9 +164,6 @@ public class ShapeContentExtensionController extends AbstractContentExtensionCon
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.drawingWidth.setValidator(isInteger());
-        this.drawingHeight.setValidator(isInteger());
-
         this.shapeType.setCellFactory(listview -> new ShapeCell());
 
         this.shapeType.getItems().addAll(

@@ -381,6 +381,11 @@ public class TemplateConfigurationFilePane extends VBox {
             globallyValid = false;
         }
 
+        isValid = this.templateVersion.isValid();
+        if (globallyValid && !isValid) {
+            globallyValid = false;
+        }
+
         isValid = this.templateFile.isValid();
         if (globallyValid && !isValid) {
             globallyValid = false;

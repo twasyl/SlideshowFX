@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
  * An implementation of {@link SimpleFileVisitor} that lists all paths within a directory.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0
  * @version 1.0.0
+ * @since SlideshowFX 1.0
  */
 public class ListFilesFileVisitor extends SimpleFileVisitor<Path> {
 
@@ -26,20 +26,24 @@ public class ListFilesFileVisitor extends SimpleFileVisitor<Path> {
 
     /**
      * Get the paths visited by this {@link java.nio.file.FileVisitor}.
+     *
      * @return The list of all paths.
      */
-    public List<Path> getPaths() { return paths; }
+    public List<Path> getPaths() {
+        return paths;
+    }
 
     /**
      * Get the paths visited by this {@link java.nio.file.FileVisitor}.
+     *
      * @return The list of all files.
      */
     public List<File> getFiles() {
-        return paths.stream().map(path -> path.toFile()).collect(Collectors.toList());
+        return paths.stream().map(Path::toFile).collect(Collectors.toList());
     }
 
     @Override
-    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
         this.paths.add(file);
         this.nonEmptyDirectories.add(file.getParent());
 
@@ -47,14 +51,14 @@ public class ListFilesFileVisitor extends SimpleFileVisitor<Path> {
     }
 
     @Override
-    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
         this.paths.add(dir);
         return FileVisitResult.CONTINUE;
     }
 
     @Override
-    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-        if(this.nonEmptyDirectories.contains(dir)) {
+    public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+        if (this.nonEmptyDirectories.contains(dir)) {
             this.paths.remove(dir);
             this.nonEmptyDirectories.remove(dir);
         }

@@ -11,7 +11,7 @@ import java.time.LocalTime;
  * state changes.
  *
  * @author Thierry Wasylczenko
- * @version 1.0.0
+ * @version 1.0
  * @since SlideshowFX 1.0
  */
 public abstract class SlideshowFXTask<V> extends Task<V> {
@@ -25,6 +25,11 @@ public abstract class SlideshowFXTask<V> extends Task<V> {
         });
     }
 
-    public ReadOnlyObjectProperty<LocalTime> statusChangedTimeProperty() { return statusChangedTime; }
-    public LocalTime getStatusChangedTime() { return statusChangedTime.get(); }
+    public ReadOnlyObjectProperty<LocalTime> statusChangedTimeProperty() {
+        return statusChangedTime;
+    }
+
+    public LocalTime getStatusChangedTime() {
+        return statusChangedTime.get();
+    }
 }

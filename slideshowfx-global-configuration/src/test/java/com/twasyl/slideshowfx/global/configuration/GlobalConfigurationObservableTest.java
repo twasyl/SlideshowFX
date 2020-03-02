@@ -30,8 +30,21 @@ public class GlobalConfigurationObservableTest {
     @DisplayName("accepts GlobalConfigurationObserver instances")
     void addGlobalConfigurationObservers() {
         final GlobalConfigurationObservable observable = new GlobalConfigurationObservable();
-        observable.addObserver((GlobalConfigurationObserver) (oldTheme, newTheme) -> {
-            // We don't care
+        observable.addObserver(new GlobalConfigurationObserver() {
+            @Override
+            public void updateTheme(String oldTheme, String newTheme) {
+                // We don't care
+            }
+
+            @Override
+            public void updateHttpProxyHost(boolean forHttps, String oldHost, String newHost) {
+                // We don't care
+            }
+
+            @Override
+            public void updateHttpProxyPort(boolean forHttps, Integer oldPort, Integer newPort) {
+                // We don't care
+            }
         });
         assertEquals(1, observable.countObservers());
     }

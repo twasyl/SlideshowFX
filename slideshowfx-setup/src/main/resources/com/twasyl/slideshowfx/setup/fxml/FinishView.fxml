@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.*?>
-<HBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.setup.controllers.FinishViewController"
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:id="root"
+      fx:controller="com.twasyl.slideshowfx.setup.controllers.FinishViewController"
       spacing="20">
 
     <TextFlow maxWidth="490">
@@ -12,5 +14,5 @@
         <Text fx:id="applicationVersion" />
         <Text text=" is now complete." />
     </TextFlow>
-</HBox>
+</VBox>
 

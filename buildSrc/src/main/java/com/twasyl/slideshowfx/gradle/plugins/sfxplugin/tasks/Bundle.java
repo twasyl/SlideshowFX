@@ -15,6 +15,7 @@ import java.util.zip.ZipOutputStream;
 
 import static com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.BUNDLES_CONFIGURATION_NAME;
 import static com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.PLUGIN_DEPENDENCIES_CONFIGURATION_NAME;
+import static org.gradle.api.plugins.BasePlugin.BUILD_GROUP;
 
 /**
  * Task creating the bundle of a SlideshowFX plugin.
@@ -24,6 +25,10 @@ import static com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.
  * @since SlideshowFX @@NEXT-VERSION@@
  */
 public class Bundle extends AbstractPluginTask {
+
+    public Bundle() {
+        this.setGroup(BUILD_GROUP);
+    }
 
     @OutputFile
     public File getBundleFile() {
@@ -64,6 +69,8 @@ public class Bundle extends AbstractPluginTask {
                 while ((bytesRead = input.read(buffer)) != -1) {
                     zip.write(buffer, 0, bytesRead);
                 }
+
+                zip.flush();
             }
 
             zip.closeEntry();

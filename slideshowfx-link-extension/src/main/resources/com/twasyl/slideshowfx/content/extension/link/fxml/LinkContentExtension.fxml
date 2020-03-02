@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.twasyl.slideshowfx.ui.controls.ExtendedTextField?>
+<?import com.twasyl.slideshowfx.ui.controls.validators.Validators?>
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml" style="-fx-padding: 5px;" spacing="5"
       fx:controller="com.twasyl.slideshowfx.content.extension.link.controllers.LinkContentExtensionController">
 
-    <ExtendedTextField fx:id="address" label="Address" prefColumnCount="20"/>
+    <ExtendedTextField fx:id="address" label="Address" prefColumnCount="20">
+        <validator>
+            <Validators fx:factory="isNotEmpty"/>
+        </validator>
+    </ExtendedTextField>
 
     <ExtendedTextField fx:id="text" label="Text" prefColumnCount="20"/>
 </VBox>

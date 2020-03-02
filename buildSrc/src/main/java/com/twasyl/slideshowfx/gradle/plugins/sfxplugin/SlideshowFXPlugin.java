@@ -6,6 +6,8 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.plugins.JavaLibraryPlugin;
+import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.jvm.tasks.Jar;
@@ -15,19 +17,21 @@ import java.util.Arrays;
 
 import static com.twasyl.slideshowfx.gradle.annotation.processors.PluginProcessor.GENERATED_DIR_OPTION_NAME;
 import static org.gradle.api.plugins.JavaPlugin.*;
+import static org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME;
 
 /**
  * <p>Gradle plugin for defining a SlideshowFX plugin.</p>
  * <h1>Tasks</h1>
  * <p>The plugin adds several tasks to the build:</p>
  * <ul>
- *     <li><strong>prepare-manifest</strong> which adds to the MANIFEST.MF file the attribute regarding the plugin manager.
+ *     <li>{@value PREPARE_MANIFEST_TASK_NAME} which adds to the MANIFEST.MF file the attribute regarding the plugin manager.
  *     These attributes are defined by a {@code sfxPlugin { bundle { ... }}}</li>
- *     <li><strong>install-plugin</strong> for installing the current plugin in the {@code $user.home/.SlideshowFX/plugins}
+ *     <li>{@value BUNDLE_TASK_NAME} for creating the bundle of the plugin</li>
+ *     <li>{@value INSTALL_PLUGIN_TASK_NAME} for installing the current plugin in the {@code $user.home/.SlideshowFX/plugins}
  *     directory</li>
- *     <li><strong>uninstall-plugin</strong> which uninstall the <strong>current</strong> version of the plugin from the
+ *     <li>{@value UNINSTALL_PLUGIN_TASK_NAME} which uninstall the <strong>current</strong> version of the plugin from the
  *     installation directory</li>
- *     <li><strong>uninstall-all-versions-plugin</strong> which uninstall all versions of the plugin</li>
+ *     <li>{@value UNINSTALL_ALL_VERSIONS_PLUGIN_TASK_NAME} which uninstall all versions of the plugin</li>
  * </ul>
  * <h1>Configurations</h1>
  * <p>The plugin creates a configuration named {@value BUNDLES_CONFIGURATION_NAME} where the generated bundle will be added.</p>
@@ -62,8 +66,13 @@ public class SlideshowFXPlugin implements Plugin<Project> {
         project.getConfigurations().create(BUNDLES_CONFIGURATION_NAME);
 
         project.getPlugins().withType(JavaLibraryPlugin.class, javaLibraryPlugin -> {
-            project.getConfigurations().create(PLUGIN_DEPENDENCIES_CONFIGURATION_NAME, configuration ->
-                    project.getConfigurations().getByName(COMPILE_CLASSPATH_CONFIGURATION_NAME).extendsFrom(configuration));
+            project.getConfigurations().create(PLUGIN_DEPENDENCIES_CONFIGURATION_NAME, configuration -> {
+                project.getConfigurations().getByName(IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(configuration);
+                project.getConfigurations().getByName(API_CONFIGURATION_NAME).extendsFrom(configuration);
+                project.getConfigurations().getByName(COMPILE_CLASSPATH_CONFIGURATION_NAME).extendsFrom(configuration);
+                project.getConfigurations().getByName(TEST_COMPILE_CLASSPATH_CONFIGURATION_NAME).extendsFrom(configuration);
+                project.getConfigurations().getByName(TEST_IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(configuration);
+            });
         });
     }
 
@@ -73,7 +82,8 @@ public class SlideshowFXPlugin implements Plugin<Project> {
             project.getDependencies().add(ANNOTATION_PROCESSOR_CONFIGURATION_NAME, project.files(processor));
 
             project.getTasks().withType(JavaCompile.class).configureEach(javaCompile -> {
-                final File generatedDir = new File(project.getBuildDir(), "resources/main");
+                final SourceSetContainer sourceSets = project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets();
+                final File generatedDir = sourceSets.findByName(MAIN_SOURCE_SET_NAME).getOutput().getResourcesDir();
                 javaCompile.getOptions().getCompilerArgs().addAll(Arrays.asList(
                         "-A" + GENERATED_DIR_OPTION_NAME + "=" + generatedDir.getAbsolutePath()));
             });

@@ -19,6 +19,6 @@ public class OSUtils {
     }
 
     public static boolean isLinux() {
-        return OS.indexOf("nux") >= 0 || OS.indexOf("nix") >= 0 || OS.indexOf("ais") >= 0;
+        return OS.indexOf("nux") >= 0 || OS.indexOf("nix") >= 0 || OS.indexOf("aix") >= 0;
     }
 }

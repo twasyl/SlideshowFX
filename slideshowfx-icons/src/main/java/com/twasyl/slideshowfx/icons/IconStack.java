@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  * Class used to host multiple {@link FontAwesome} icons.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 2.0
  */
 public class IconStack extends StackPane {
@@ -22,6 +22,20 @@ public class IconStack extends StackPane {
     public IconStack() {
         getStyleClass().add("icon-stack");
         setListenerOnChildren();
+    }
+
+    /**
+     * Adds an icon to this stack. The icon can not be {@code null}.
+     *
+     * @param icon The icon to add.
+     * @return This stack.
+     */
+    public IconStack addIcon(final Icon icon) {
+        if (icon == null) throw new NullPointerException("The icon can't be null");
+
+        final FontAwesome fontAwesome = new FontAwesome(icon);
+        getChildren().add(fontAwesome);
+        return this;
     }
 
     private void setListenerOnChildren() {

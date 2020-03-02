@@ -5,77 +5,77 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
-<?import java.net.URL?>
-<BorderPane fx:id="templateBuilder" id="templateBuilder" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.TemplateBuilderController"
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:id="templateBuilder"
+            fx:controller="com.twasyl.slideshowfx.controllers.TemplateBuilderController"
+            id="templateBuilder"
             prefHeight="700" prefWidth="1024">
-    <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/application.css" />
-    </stylesheets>
 
     <top>
-        <ToolBar id="zouzou">
+        <ToolBar>
             <SplitMenuButton onAction="#buildTemplateArchive">
                 <graphic>
-                    <FontAwesome icon="ARCHIVE"  />
+                    <FontAwesome icon="ARCHIVE"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="Build template archive" />
+                    <Tooltip text="Build template archive"/>
                 </tooltip>
                 <items>
-                    <MenuItem text="Build as ..." onAction="#buildAsTemplateArchive" />
+                    <MenuItem text="Build as ..." onAction="#buildAsTemplateArchive"/>
                 </items>
             </SplitMenuButton>
 
             <SplitMenuButton onAction="#saveCurrentFile">
                 <graphic>
-                    <FontAwesome icon="FLOPPY" />
+                    <FontAwesome icon="FLOPPY"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="Save" />
+                    <Tooltip text="Save"/>
                 </tooltip>
                 <items>
-                    <MenuItem text="Save all" onAction="#saveAllFiles" />
+                    <MenuItem text="Save all" onAction="#saveAllFiles"/>
                 </items>
             </SplitMenuButton>
 
-            <Separator />
+            <Separator/>
 
             <SplitMenuButton onAction="#addFileToTreeView">
                 <graphic>
                     <IconStack>
-                        <FontAwesome id="addFileButton_file_icon" icon="FILE" />
-                        <FontAwesome id="addFileButton_plus_icon" icon="PLUS" StackPane.alignment="BOTTOM_CENTER" />
+                        <FontAwesome id="addFileButton_file_icon" icon="FILE"/>
+                        <FontAwesome id="addFileButton_plus_icon" icon="PLUS" StackPane.alignment="BOTTOM_CENTER"/>
                     </IconStack>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="Add file" />
+                    <Tooltip text="Add file"/>
                 </tooltip>
                 <items>
-                    <MenuItem text="Create empty file" onAction="#createFile" />
+                    <MenuItem text="Create empty file" onAction="#createFile"/>
                 </items>
             </SplitMenuButton>
 
             <SplitMenuButton onAction="#addFolderToTreeView">
                 <graphic>
                     <IconStack>
-                        <FontAwesome id="addFolderButton_folder_icon" icon="FOLDER" StackPane.alignment="BOTTOM_CENTER" />
-                        <FontAwesome id="addFolderButton_plus_icon" icon="PLUS" StackPane.alignment="BOTTOM_CENTER" />
+                        <FontAwesome id="addFolderButton_folder_icon" icon="FOLDER"
+                                     StackPane.alignment="BOTTOM_CENTER"/>
+                        <FontAwesome id="addFolderButton_plus_icon" icon="PLUS" StackPane.alignment="BOTTOM_CENTER"/>
                     </IconStack>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="Add folder" />
+                    <Tooltip text="Add folder"/>
                 </tooltip>
                 <items>
-                    <MenuItem text="Create directory" onAction="#createDirectory" />
+                    <MenuItem text="Create directory" onAction="#createDirectory"/>
                 </items>
             </SplitMenuButton>
 
             <Button onAction="#deleteFromTreeView" styleClass="image">
                 <tooltip>
-                    <Tooltip text="Delete selection" />
+                    <Tooltip text="Delete selection"/>
                 </tooltip>
                 <graphic>
-                    <FontAwesome icon="TRASH_ALT" />
+                    <FontAwesome icon="TRASH_ALT"/>
                 </graphic>
             </Button>
         </ToolBar>
@@ -83,8 +83,8 @@
 
     <center>
         <SplitPane>
-            <TemplateTreeView fx:id="templateContentTreeView" maxWidth="300" />
-            <TabPane fx:id="openedFiles" />
+            <TemplateTreeView fx:id="templateContentTreeView" maxWidth="300"/>
+            <TabPane fx:id="openedFiles"/>
         </SplitPane>
     </center>
 

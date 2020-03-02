@@ -4,7 +4,7 @@ import com.twasyl.slideshowfx.engine.presentation.configuration.Slide;
 import com.twasyl.slideshowfx.events.SlideChangedEvent;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.server.bus.Actor;
-import com.twasyl.slideshowfx.theme.Themes;
+import com.twasyl.slideshowfx.style.theme.Themes;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;

@@ -1,0 +1,12 @@
+--add-modules
+org.mockito,slideshowfx.html,slideshowfx.markdown,slideshowfx.textile
+--add-reads
+slideshowfx.link.extension=org.mockito
+--add-reads
+slideshowfx.link.extension=slideshowfx.html
+--add-reads
+slideshowfx.link.extension=slideshowfx.markdown
+--add-reads
+slideshowfx.link.extension=slideshowfx.textile
+--add-exports
+slideshowfx.link.extension/com.twasyl.slideshowfx.content.extension.link=org.mockito

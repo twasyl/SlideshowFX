@@ -11,7 +11,7 @@ import java.util.List;
  * is defined.
  *
  * @author Thierry Wasylczenko
- * @version 1.0.0
+ * @version 1.0
  * @since SlideshowFX 1.0
  */
 public class ForPredicate {
@@ -32,6 +32,7 @@ public class ForPredicate {
 
     /**
      * Creates a {@link com.twasyl.slideshowfx.utils.concurrent.WhenPredicate} for the given task.
+     *
      * @return a well created {@link com.twasyl.slideshowfx.utils.concurrent.WhenPredicate}.
      */
     public WhenPredicate when() {

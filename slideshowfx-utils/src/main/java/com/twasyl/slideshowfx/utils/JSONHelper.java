@@ -18,27 +18,27 @@ public class JSONHelper {
 
     /**
      * Read a JSON file and returns it to a JsonObject
-     * @param file The file containing a JSON object.
      *
+     * @param file The file containing a JSON object.
      * @return the JSON object corresponding to the content of the file.
      * @throws IOException If an error occurs when reading the file.
      */
     public static JsonObject readFromFile(File file) throws IOException {
-        if(file == null) throw new NullPointerException("The file to read can not be null.");
-        if(!file.exists()) throw new FileNotFoundException("The file to read does not exist.");
+        if (file == null) throw new NullPointerException("The file to read can not be null.");
+        if (!file.exists()) throw new FileNotFoundException("The file to read does not exist.");
 
         return readFromReader(new DefaultCharsetReader(file));
     }
 
     /**
      * Read a JSON string and returns it to a JsonObject
-     * @param reader The reader containing a JSON object.
      *
+     * @param reader The reader containing a JSON object.
      * @return the JSON object corresponding to the content of the reader.
      * @throws IOException If an error occurs when reading the reader.
      */
     public static JsonObject readFromReader(Reader reader) throws IOException {
-        if(reader == null) throw new NullPointerException("The reader to read can not be null.");
+        if (reader == null) throw new NullPointerException("The reader to read can not be null.");
 
         final StringBuilder dataAsString = new StringBuilder();
         String line;
@@ -57,7 +57,7 @@ public class JSONHelper {
 
         final JsonObject jsonObject;
 
-        if(!dataAsString.toString().trim().isEmpty()) {
+        if (!dataAsString.toString().trim().isEmpty()) {
             jsonObject = new JsonObject(dataAsString.toString().trim());
         } else {
             jsonObject = new JsonObject();
@@ -70,12 +70,12 @@ public class JSONHelper {
      * Save a JSON object to a file. The JSON object is pretty formatted.
      *
      * @param object The object to save.
-     * @param file The file where the JSON object is saved.
+     * @param file   The file where the JSON object is saved.
      * @throws FileNotFoundException If the file is not found.
      */
     public static void writeObject(JsonObject object, File file) throws IOException {
-        if(object == null) throw new NullPointerException("The JSON object to save can not be null");
-        if(file == null) throw new NullPointerException("The file can not be null");
+        if (object == null) throw new NullPointerException("The JSON object to save can not be null");
+        if (file == null) throw new NullPointerException("The file can not be null");
 
         writeObject(object, new DefaultCharsetWriter(file));
     }

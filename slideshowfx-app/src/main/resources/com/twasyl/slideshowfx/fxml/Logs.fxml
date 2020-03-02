@@ -3,13 +3,10 @@
 <?import com.twasyl.slideshowfx.ui.controls.ZoomTextArea?>
 <?import javafx.scene.layout.BorderPane?>
 <?import java.lang.Double?>
-<?import java.net.URL?>
-<BorderPane style="-fx-margin: 5px" xmlns:fx="http://javafx.com/fxml"
+<BorderPane fx:id="root"
             fx:controller="com.twasyl.slideshowfx.controllers.LogsController"
+            style="-fx-margin: 5px" xmlns:fx="http://javafx.com/fxml"
             minWidth="500" minHeight="400">
-    <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/application.css"/>
-    </stylesheets>
 
     <fx:define>
         <Double fx:id="TOOLBAR_ICON_WIDTH" fx:value="20"/>

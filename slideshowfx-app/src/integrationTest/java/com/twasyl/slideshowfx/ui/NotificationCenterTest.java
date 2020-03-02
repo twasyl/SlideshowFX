@@ -1,6 +1,7 @@
 package com.twasyl.slideshowfx.ui;
 
 import com.twasyl.slideshowfx.controls.notification.NotificationCenter;
+import com.twasyl.slideshowfx.style.Styles;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import javafx.application.Application;
@@ -20,7 +21,7 @@ public class NotificationCenterTest extends Application {
             protected Void call() throws Exception {
                 PlatformHelper.run(() -> ((SimpleStringProperty) this.titleProperty()).set("Indefinite task"));
 
-                while(true) {
+                while (true) {
                     Thread.sleep(5000);
                 }
             }
@@ -49,6 +50,7 @@ public class NotificationCenterTest extends Application {
         };
 
         final NotificationCenter center = new NotificationCenter();
+        Styles.applyApplicationStyle(center);
 
         PlatformHelper.run(() -> {
             center.setCurrentTask(indefiniteTask);
@@ -61,9 +63,6 @@ public class NotificationCenterTest extends Application {
         });
 
         final Scene scene = new Scene(center, 500, 300);
-        scene.getStylesheets().add(
-                NotificationCenter.class.getResource("/com/twasyl/slideshowfx/css/application.css").toExternalForm()
-        );
         primaryStage.setScene(scene);
         primaryStage.show();
     }

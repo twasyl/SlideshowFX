@@ -16,7 +16,7 @@ public final class Validators {
      * @return A validator checking non empty strings.
      */
     public static IValidator<String> isNotEmpty() {
-        return (value) -> value != null && !value.trim().isEmpty();
+        return value -> value != null && !value.isBlank();
     }
 
     /**
@@ -25,12 +25,22 @@ public final class Validators {
      * @return A validator checking integer strings.
      */
     public static IValidator<String> isInteger() {
-        return (value) -> {
+        return value -> {
             try {
                 Integer.parseInt(value);
                 return true;
             } catch (NumberFormatException ex) {
                 return false;
+            }
+        };
+    }
+
+    public static IValidator<String> isIntegerOrBlank() {
+        return value -> {
+            if (value == null || value.isBlank()) {
+                return true;
+            } else {
+                return isInteger().isValid(value);
             }
         };
     }
@@ -41,7 +51,7 @@ public final class Validators {
      * @return A validator checking double strings.
      */
     public static IValidator<String> isDouble() {
-        return (value) -> {
+        return value -> {
             try {
                 Double.parseDouble(value);
                 return true;

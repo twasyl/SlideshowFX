@@ -37,8 +37,8 @@ import static javafx.stage.WindowEvent.WINDOW_CLOSE_REQUEST;
  * Controller for the {SetupView.xml} file.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0
  * @version 1.0
+ * @since SlideshowFX 1.0
  */
 public class SetupViewController implements Initializable {
 
@@ -49,15 +49,24 @@ public class SetupViewController implements Initializable {
 
     private static final Logger LOGGER = Logger.getLogger(SetupViewController.class.getName());
 
-    @FXML private ObservableList<Button> buttonBarActions;
-    @FXML private BorderPane root;
-    @FXML private ScrollPane content;
-    @FXML private VBox stepsContainer;
-    @FXML private HBox buttonBar;
-    @FXML private Button cancel;
-    @FXML private Button previous;
-    @FXML private Button next;
-    @FXML private Button finish;
+    @FXML
+    private ObservableList<Button> buttonBarActions;
+    @FXML
+    private BorderPane root;
+    @FXML
+    private ScrollPane content;
+    @FXML
+    private VBox stepsContainer;
+    @FXML
+    private HBox buttonBar;
+    @FXML
+    private Button cancel;
+    @FXML
+    private Button previous;
+    @FXML
+    private Button next;
+    @FXML
+    private Button finish;
 
     private ObservableList<ISetupStep> steps = FXCollections.observableArrayList();
     private ObjectProperty<ISetupStep> currentStep = new SimpleObjectProperty<>();
@@ -66,7 +75,7 @@ public class SetupViewController implements Initializable {
     @FXML
     private void nextStep(final ActionEvent event) throws Exception {
         this.executeSafely(() -> {
-            if(currentStep.get().next() != null) {
+            if (currentStep.get().next() != null) {
                 this.currentStep.get().execute();
                 this.currentStep.set(this.currentStep.get().next());
             }
@@ -76,7 +85,7 @@ public class SetupViewController implements Initializable {
     @FXML
     private void previousStep(final ActionEvent event) throws Exception {
         this.executeSafely(() -> {
-            if(this.currentStep.get().previous() != null) {
+            if (this.currentStep.get().previous() != null) {
                 this.currentStep.get().rollback();
                 this.currentStep.set(this.currentStep.get().previous());
             }
@@ -86,7 +95,7 @@ public class SetupViewController implements Initializable {
     @FXML
     private void cancelSetup(final ActionEvent event) throws Exception {
         this.cancelSetup();
-        if(this.setupStatus == SetupStatus.ABORTED) {
+        if (this.setupStatus == SetupStatus.ABORTED) {
             this.requestClose();
         }
     }
@@ -100,21 +109,23 @@ public class SetupViewController implements Initializable {
     protected void executeSafely(final Operation operation) {
         try {
             operation.execute();
-        } catch(SetupStepException ex) {
+        } catch (SetupStepException ex) {
             LOGGER.log(Level.SEVERE, "Error when executing the operation", ex);
             DialogHelper.showError("Error", ex.getMessage());
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Unmanaged error when executing the operation", ex);
             DialogHelper.showError("Unmanaged error", ex.getMessage());
         }
     }
 
-    public SetupStatus getSetupStatus() { return this.setupStatus; }
+    public SetupStatus getSetupStatus() {
+        return this.setupStatus;
+    }
 
     public void cancelSetup() {
         final ButtonType answer = DialogHelper.showConfirmationAlert("Cancelling the installation", "Are you sure you want to cancel the installation?");
 
-        if(answer == ButtonType.YES) {
+        if (answer == ButtonType.YES) {
             this.rollbackAllSteps();
             this.setupStatus = SetupStatus.ABORTED;
         }
@@ -131,7 +142,7 @@ public class SetupViewController implements Initializable {
         this.executeSafely(() -> {
             ISetupStep stepToRollback = this.currentStep.get().previous();
 
-            while(stepToRollback != null) {
+            while (stepToRollback != null) {
                 stepToRollback.rollback();
                 stepToRollback = stepToRollback.previous();
             }
@@ -144,8 +155,8 @@ public class SetupViewController implements Initializable {
     }
 
     public SetupViewController addStep(final ISetupStep step) {
-        if(step != null) {
-            if(!steps.isEmpty()) {
+        if (step != null) {
+            if (!steps.isEmpty()) {
                 final ISetupStep lastStep = steps.get(steps.size() - 1);
                 lastStep.next(step);
                 step.previous(lastStep);
@@ -163,7 +174,7 @@ public class SetupViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.root.sceneProperty().addListener((sceneValue, oldScene, newScene) -> {
             newScene.windowProperty().addListener((windowValue, oldWindow, newWindow) -> {
-                if(newWindow != null && newWindow instanceof Stage) {
+                if (newWindow != null && newWindow instanceof Stage) {
                     ((Stage) newWindow).setTitle(this.currentStep.get().title());
                     manageCurrentStepText();
                 }
@@ -181,13 +192,13 @@ public class SetupViewController implements Initializable {
         });
 
         this.currentStep.addListener((value, oldStep, newStep) -> {
-            if(newStep != null) {
+            if (newStep != null) {
                 final Node view = newStep.getView();
                 view.maxWidth(800);
 
                 this.content.setContent(view);
 
-                if(this.root.getScene() != null) {
+                if (this.root.getScene() != null) {
                     ((Stage) this.root.getScene().getWindow()).setTitle(newStep.title());
                 }
 
@@ -207,11 +218,11 @@ public class SetupViewController implements Initializable {
     }
 
     protected void manageNextButtonState(final ISetupStep withStep) {
-        if(this.next.visibleProperty().isBound()) {
+        if (this.next.visibleProperty().isBound()) {
             this.next.visibleProperty().unbind();
         }
 
-        if(this.next.disableProperty().isBound()) {
+        if (this.next.disableProperty().isBound()) {
             this.next.disableProperty().unbind();
         }
 
@@ -220,7 +231,7 @@ public class SetupViewController implements Initializable {
     }
 
     protected void managePreviousButtonState(final ISetupStep withStep) {
-        if(this.previous.visibleProperty().isBound()) {
+        if (this.previous.visibleProperty().isBound()) {
             this.previous.visibleProperty().unbind();
         }
 
@@ -228,11 +239,11 @@ public class SetupViewController implements Initializable {
     }
 
     protected void manageFinishButtonState(final ISetupStep withStep) {
-        if(this.finish.visibleProperty().isBound()) {
+        if (this.finish.visibleProperty().isBound()) {
             this.finish.visibleProperty().unbind();
         }
 
-        if(this.finish.disableProperty().isBound()) {
+        if (this.finish.disableProperty().isBound()) {
             this.finish.disableProperty().unbind();
         }
 
@@ -244,7 +255,7 @@ public class SetupViewController implements Initializable {
         this.buttonBar.getChildren().clear();
 
         this.buttonBarActions.forEach(button -> {
-            if(button.isVisible())this.buttonBar.getChildren().add(button);
+            if (button.isVisible()) this.buttonBar.getChildren().add(button);
         });
     }
 
@@ -257,7 +268,7 @@ public class SetupViewController implements Initializable {
                     final Font currentFont = text.getFont();
                     FontWeight weight = FontWeight.NORMAL;
 
-                    if(text.getText().equals(this.currentStep.get().title())) {
+                    if (text.getText().equals(this.currentStep.get().title())) {
                         weight = FontWeight.BOLD;
                     }
 

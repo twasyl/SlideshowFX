@@ -1,0 +1,4 @@
+--add-modules
+org.mockito
+--add-reads
+slideshowfx.alert.extension=org.mockito

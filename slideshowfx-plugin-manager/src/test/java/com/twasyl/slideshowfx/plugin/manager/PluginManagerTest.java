@@ -1,7 +1,6 @@
 package com.twasyl.slideshowfx.plugin.manager;
 
 import com.twasyl.slideshowfx.plugin.IPlugin;
-import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.plugin.manager.internal.PluginFile;
 import com.twasyl.slideshowfx.plugin.manager.internal.RegisteredPlugin;
 import org.junit.jupiter.api.AfterEach;
@@ -13,7 +12,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import static com.twasyl.slideshowfx.plugin.PluginTestUtils.createDummyPlugin;
+import static com.twasyl.slideshowfx.plugin.manager.PluginTestUtils.createDummyPlugin;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

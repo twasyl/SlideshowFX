@@ -11,8 +11,8 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
  * {@link GlobalConfiguration#getDefaultCharset()}.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0
  * @version 1.0
+ * @since SlideshowFX 1.0
  */
 public class DefaultCharsetReader extends BufferedReader {
 

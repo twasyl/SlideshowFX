@@ -3,6 +3,7 @@ package com.twasyl.slideshowfx.controllers;
 import com.twasyl.slideshowfx.app.SlideshowFX;
 import com.twasyl.slideshowfx.concurrent.*;
 import com.twasyl.slideshowfx.controls.Tour;
+import com.twasyl.slideshowfx.controls.list.RecentPresentationsView;
 import com.twasyl.slideshowfx.controls.notification.NotificationCenter;
 import com.twasyl.slideshowfx.controls.slideshow.Context;
 import com.twasyl.slideshowfx.controls.slideshow.SlideshowStage;
@@ -23,12 +24,12 @@ import com.twasyl.slideshowfx.hosting.connector.io.RemoteFile;
 import com.twasyl.slideshowfx.icons.FontAwesome;
 import com.twasyl.slideshowfx.icons.Icon;
 import com.twasyl.slideshowfx.io.SlideshowFXExtensionFilter;
-import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.plugin.IPlugin;
+import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
 import com.twasyl.slideshowfx.server.service.*;
 import com.twasyl.slideshowfx.services.AutoSavingService;
-import com.twasyl.slideshowfx.theme.Themes;
+import com.twasyl.slideshowfx.style.theme.Themes;
 import com.twasyl.slideshowfx.utils.DialogHelper;
 import com.twasyl.slideshowfx.utils.NetworkUtils;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
@@ -39,7 +40,6 @@ import com.twasyl.slideshowfx.utils.concurrent.SlideshowFXTask;
 import com.twasyl.slideshowfx.utils.concurrent.TaskAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.DisableAction;
 import com.twasyl.slideshowfx.utils.concurrent.actions.EnableAction;
-import com.twasyl.slideshowfx.utils.keys.KeyEventUtils;
 import javafx.application.Platform;
 import javafx.beans.binding.StringExpression;
 import javafx.beans.property.SimpleStringProperty;
@@ -55,16 +55,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
-import javafx.scene.input.*;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
+import javafx.stage.*;
 
 import java.awt.*;
 import java.io.File;
@@ -74,17 +77,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.icons.Icon.PLAY;
+import static com.twasyl.slideshowfx.utils.keys.KeyEventUtils.isShortcutSequence;
+import static com.twasyl.slideshowfx.utils.keys.KeyEventUtils.isShortcutShiftSequence;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
+import static javafx.scene.input.KeyCode.*;
+import static javafx.stage.WindowEvent.WINDOW_CLOSE_REQUEST;
 
 /**
  * This class is the controller of the {@code SlideshowFX.fxml} file. It defines all actions possible inside the view
@@ -151,6 +156,8 @@ public class SlideshowFXController implements ThemeAwareController {
     @FXML
     private ObservableList<Object> whenNoDocumentOpened;
 
+    private Stage recentPresentationsStage;
+
     /* All methods called by the FXML */
 
     /**
@@ -195,17 +202,7 @@ public class SlideshowFXController implements ThemeAwareController {
      */
     @FXML
     private void openPresentation(ActionEvent event) {
-        FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
-        File file = chooser.showOpenDialog(null);
-
-        if (file != null) {
-            try {
-                this.openTemplateOrPresentation(file);
-            } catch (IllegalAccessException | FileNotFoundException e) {
-                LOGGER.log(SEVERE, "Can not open the presentation", e);
-            }
-        }
+        this.displayOpenPresentationView();
     }
 
     /**
@@ -620,7 +617,7 @@ public class SlideshowFXController implements ThemeAwareController {
      */
     @FXML
     private void startServerByKeyPressed(KeyEvent event) {
-        if (event.getCode().equals(KeyCode.ENTER)) this.startServer();
+        if (event.getCode().equals(ENTER)) this.startServer();
     }
 
     /**
@@ -725,7 +722,7 @@ public class SlideshowFXController implements ThemeAwareController {
             Themes.applyTheme(optionsView, GlobalConfiguration.getThemeName());
             final OptionsViewController controller = loader.getController();
 
-            final ButtonType response = DialogHelper.showCancellableDialog("Options", optionsView);
+            final ButtonType response = DialogHelper.showCancellableDialog("Options", optionsView, controller.areInputsValid());
 
             if (response != null && response == ButtonType.OK) {
                 controller.saveOptions();
@@ -736,6 +733,20 @@ public class SlideshowFXController implements ThemeAwareController {
     }
 
     /* All instance methods */
+
+    private void displayOpenPresentationView() {
+        FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
+        File file = chooser.showOpenDialog(null);
+
+        if (file != null) {
+            try {
+                this.openTemplateOrPresentation(file);
+            } catch (IllegalAccessException | FileNotFoundException e) {
+                LOGGER.log(SEVERE, "Can not open the presentation", e);
+            }
+        }
+    }
 
     /**
      * Open the dataFile. If the name ends with {@code .sfx} the file is considered as a presentation,
@@ -1193,6 +1204,53 @@ public class SlideshowFXController implements ThemeAwareController {
         }
     }
 
+    /**
+     * Shows a menu allowing to choose a recent presentation to open. If there are no recent presentations, then the
+     * view allowing to open a presentation is displayed.
+     */
+    private void displayRecentPresentationMenu() {
+        if (this.recentPresentationsStage == null) {
+            final Set<RecentPresentation> recentPresentations = GlobalConfiguration.getRecentPresentations();
+
+            if (recentPresentations.isEmpty()) {
+                this.displayOpenPresentationView();
+            } else {
+                final Consumer<RecentPresentation> presentationOpener = presentation -> {
+                    if (presentation != null) {
+                        try {
+                            this.openTemplateOrPresentation(presentation);
+                            this.recentPresentationsStage.fireEvent(new WindowEvent(this.recentPresentationsStage, WINDOW_CLOSE_REQUEST));
+                        } catch (IllegalAccessException | FileNotFoundException e) {
+                            LOGGER.log(SEVERE, "Can not open the presentation", e);
+                        }
+                    }
+                };
+
+                final RecentPresentationsView root = new RecentPresentationsView(presentationOpener);
+
+                recentPresentations.stream()
+                        .filter(RecentPresentation::exists)
+                        .forEach(root::addRecentPresentation);
+
+                initializeRecentPresentationsStage(root);
+                root.requestFocus();
+            }
+        } else {
+            this.recentPresentationsStage.requestFocus();
+        }
+    }
+
+    private void initializeRecentPresentationsStage(RecentPresentationsView view) {
+        final Scene scene = new Scene(view);
+        this.recentPresentationsStage = new Stage(StageStyle.UNDECORATED);
+        this.recentPresentationsStage.setTitle("Recent presentations");
+        this.recentPresentationsStage.setScene(scene);
+        this.recentPresentationsStage.setAlwaysOnTop(true);
+        this.recentPresentationsStage.setResizable(false);
+        this.recentPresentationsStage.setOnCloseRequest(event -> this.recentPresentationsStage = null);
+        this.recentPresentationsStage.show();
+    }
+
     @Override
     public Parent getRoot() {
         return this.root;
@@ -1268,18 +1326,23 @@ public class SlideshowFXController implements ThemeAwareController {
             boolean consumed = false;
 
             if (event.isShortcutDown()) {
-                if (KeyEventUtils.isShortcutSequence("R", event)) {
+                if (isShortcutSequence("R", event)) {
                     consumed = true;
                     this.reload(null);
+                } else if (isShortcutShiftSequence("O", event)) {
+                    consumed = true;
+                    this.displayRecentPresentationMenu();
                 }
-            } else if (KeyCode.DELETE.equals(event.getCode())) {
+            } else if (DELETE.equals(event.getCode())) {
                 consumed = true;
                 this.deleteSlide(null);
-            } else if (KeyCode.ALT.equals(event.getCode())) {
+            } else if (ALT.equals(event.getCode())) {
                 consumed = true;
             }
 
             if (consumed) event.consume();
         });
     }
+
+
 }

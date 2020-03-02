@@ -6,7 +6,8 @@ import javafx.beans.property.adapter.ReadOnlyJavaBeanStringProperty;
 import javafx.beans.property.adapter.ReadOnlyJavaBeanStringPropertyBuilder;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.layout.BorderPane;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -19,9 +20,10 @@ import java.util.logging.Logger;
  * Controller class for the {@code Logs.fxml} file.
  *
  * @author Thierry Wasylczenko
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 1.0
  */
-public class LogsController implements Initializable {
+public class LogsController implements ThemeAwareController {
     private static final Logger LOGGER = Logger.getLogger(LogsController.class.getName());
 
     private SlideshowFXHandler handler;
@@ -32,6 +34,9 @@ public class LogsController implements Initializable {
             this.logsArea.appendText(newLog);
         }
     };
+
+    @FXML
+    private BorderPane root;
 
     @FXML
     private ZoomTextArea logsArea;
@@ -67,7 +72,12 @@ public class LogsController implements Initializable {
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public Parent getRoot() {
+        return this.root;
+    }
+
+    @Override
+    public void postInitialize(URL location, ResourceBundle resources) {
         this.handler = getHandler();
         this.refreshLogs();
 
@@ -79,7 +89,7 @@ public class LogsController implements Initializable {
 
         this.logsArea.sceneProperty().addListener((sceneValue, oldScene, newScene) ->
                 newScene.windowProperty().addListener((windowValue, oldWindow, newWindow) -> {
-                    if (newWindow != null) {
+                    if (newWindow != null && latestLog != null && latestLogChangeListener != null) {
                         newWindow.setOnCloseRequest(event -> latestLog.removeListener(latestLogChangeListener));
                     }
                 })

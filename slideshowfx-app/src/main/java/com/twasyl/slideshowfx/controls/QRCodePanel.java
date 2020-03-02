@@ -7,7 +7,8 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.server.SlideshowFXServer;
-import com.twasyl.slideshowfx.theme.Themes;
+import com.twasyl.slideshowfx.style.Styles;
+import com.twasyl.slideshowfx.style.theme.Themes;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -35,9 +36,8 @@ public class QRCodePanel extends VBox {
         super(20);
 
         this.getStyleClass().add("qrcode-panel");
-        this.getStylesheets().addAll(
-                CollapsibleToolPane.class.getResource("/com/twasyl/slideshowfx/css/application.css").toExternalForm(),
-                Themes.getByName(GlobalConfiguration.getThemeName()).getCssFile().toExternalForm());
+        Styles.applyApplicationStyle(this);
+        Themes.applyTheme(this, GlobalConfiguration.getThemeName());
 
         this.setPrefWidth(300);
         this.setMinWidth(300);

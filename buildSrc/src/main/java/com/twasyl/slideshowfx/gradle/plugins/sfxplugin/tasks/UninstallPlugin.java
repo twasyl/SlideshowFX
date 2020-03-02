@@ -2,11 +2,8 @@ package com.twasyl.slideshowfx.gradle.plugins.sfxplugin.tasks;
 
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.internal.io.IoUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.BUNDLE_TASK_NAME;

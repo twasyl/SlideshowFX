@@ -16,7 +16,7 @@ import static java.util.logging.Level.SEVERE;
  * @version 1.1
  * @since SlideshowFX 1.0
  */
-public class LicenseStep extends AbstractSetupStep {
+public class LicenseStep extends AbstractSetupStep<LicenseViewController> {
     private static final Logger LOGGER = Logger.getLogger(LicenseStep.class.getName());
 
     /**
@@ -33,9 +33,9 @@ public class LicenseStep extends AbstractSetupStep {
             this.view = loader.load();
             this.controller = loader.getController();
 
-            ((LicenseViewController) this.controller).setLicence(licence);
+            this.controller.setLicence(licence);
 
-            this.validProperty().bind(((LicenseViewController) this.controller).agreementAcceptedProperty());
+            this.validProperty().bind(this.controller.agreementAcceptedProperty());
         } catch (IOException e) {
             LOGGER.log(SEVERE, "Can not find FXML", e);
         }

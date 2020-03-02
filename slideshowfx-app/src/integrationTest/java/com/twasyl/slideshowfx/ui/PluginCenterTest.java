@@ -1,7 +1,7 @@
 package com.twasyl.slideshowfx.ui;
 
 import com.twasyl.slideshowfx.plugin.manager.PluginManager;
-import com.twasyl.slideshowfx.theme.Themes;
+import com.twasyl.slideshowfx.style.theme.Themes;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -35,7 +35,6 @@ public class PluginCenterTest extends Application {
 
         Themes.applyTheme(root, "Dark");
         final Scene scene = new Scene(root);
-        scene.getStylesheets().add("/com/twasyl/slideshowfx/css/application.css");
 
         primaryStage.setScene(scene);
         primaryStage.show();

@@ -1,0 +1,105 @@
+package com.twasyl.slideshowfx.gradle.plugins.sfxpackager.tasks;
+
+import com.twasyl.slideshowfx.gradle.plugins.sfxpackager.extensions.PackageExtension;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.tasks.OutputDirectory;
+import org.gradle.api.tasks.TaskAction;
+import org.gradle.jvm.tasks.Jar;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.io.FileNotFoundException;
+
+import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME;
+
+/**
+ * Task preparing the resources needed for creating a package. The task will copy the dependencies and additional
+ * resources needed for the packaging.
+ *
+ * @author Thierry Wasylczenko
+ * @version 1.0-SNAPSHOT
+ * @since SlideshowFX @@NEXT-VERSION@@
+ */
+public class PrepareResources extends DefaultTask {
+
+    private PackageExtension packageExtension;
+    private File tmpDir;
+    private File dependenciesDir;
+    private File resourcesDir;
+    private File configDir;
+
+    @Inject
+    public PrepareResources(final PackageExtension packageExtension) {
+        this.packageExtension = packageExtension;
+        dependsOn(JAR_TASK_NAME);
+    }
+
+    private File getTmpDir() {
+        if (tmpDir == null) {
+            this.tmpDir = new File(getProject().getBuildDir(), "tmp");
+        }
+        return this.tmpDir;
+    }
+
+    @OutputDirectory
+    public File getDependenciesDir() {
+        if (this.dependenciesDir == null) {
+            this.dependenciesDir = new File(this.getTmpDir(), "modules");
+        }
+        return dependenciesDir;
+    }
+
+    @OutputDirectory
+    public File getResourcesDir() {
+        if (this.resourcesDir == null) {
+            this.resourcesDir = new File(this.getTmpDir(), "resources");
+        }
+        return resourcesDir;
+    }
+
+    @OutputDirectory
+    public File getConfigDir() {
+        if (this.configDir == null) {
+            this.configDir = new File(this.getTmpDir(), "config");
+        }
+        return configDir;
+    }
+
+    @TaskAction
+    public void copy() throws FileNotFoundException {
+        copyDependencies();
+        copyResources();
+    }
+
+    private void copyDependencies() {
+        if (!this.getDependenciesDir().exists()) {
+            this.getDependenciesDir().mkdirs();
+        }
+
+        final Jar jar = (Jar) getProject().getTasks().getByName(JAR_TASK_NAME);
+        if (jar != null && jar.getArchiveFile().isPresent()) {
+            getProject().copy(spec -> spec.from(jar.getArchiveFile().get()).into(dependenciesDir));
+        }
+        final Configuration defaultConfiguration = getProject().getConfigurations().getByName("default");
+
+        if (defaultConfiguration != null) {
+            defaultConfiguration.resolve().forEach(dependency -> {
+                getProject().copy(copySpec -> copySpec.from(dependency).into(getDependenciesDir()));
+            });
+        }
+    }
+
+    private void copyResources() {
+        if (this.packageExtension.resources != null && !this.packageExtension.resources.isEmpty()) {
+
+            if (!this.getResourcesDir().exists()) {
+                this.getResourcesDir().mkdirs();
+            }
+
+            this.packageExtension.resources.forEach((from, to) -> getProject().copy(spec -> {
+                spec.from(from).into(new File(this.getResourcesDir(), to));
+            }));
+        }
+    }
+}

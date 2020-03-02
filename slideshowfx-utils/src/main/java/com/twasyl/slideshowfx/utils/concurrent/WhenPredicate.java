@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * A WhenPredicate is created by {@link com.twasyl.slideshowfx.utils.concurrent.ForPredicate} instances and
  * add a listener on properties of a {@link javafx.concurrent.Task} that match a criterion.
+ *
  * @author Thierry Wasylczenko
  * @version 1.0.0
  * @since SlideshowFX 1.0
@@ -45,7 +46,7 @@ public class WhenPredicate {
         this.doPredicates.add(doPredicate);
 
         this.forPredicate.task.stateProperty().addListener((value, oldValue, newValue) -> {
-            if(newValue == state) {
+            if (newValue == state) {
                 PlatformHelper.run(doPredicate.runnable);
             }
         });

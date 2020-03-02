@@ -1,60 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.twasyl.slideshowfx.ui.controls.ExtendedTextField?>
+<?import com.twasyl.slideshowfx.ui.controls.validators.Validators?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import java.net.URL?>
-<TabPane style="-fx-margin: 5px" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.OptionsViewController"
+<TabPane xmlns:fx="http://javafx.com/fxml"
+         fx:id="root"
+         fx:controller="com.twasyl.slideshowfx.controllers.OptionsViewController"
+         style="-fx-margin: 5px"
          minWidth="500" minHeight="400">
-    <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/application.css" />
-    </stylesheets>
 
     <Tab text="General" closable="false">
         <VBox spacing="5" alignment="TOP_LEFT">
             <HBox spacing="5" alignment="BASELINE_LEFT">
-                <Label text="Theme:" />
-                <ComboBox fx:id="themes" />
-            </HBox>
-            <Separator />
-            <CheckBox fx:id="enableAutoSaving" text="Enable auto save interval" />
-            <HBox spacing="5" alignment="BASELINE_LEFT">
-                <Label text="Auto save interval:" />
-                <TextField fx:id="autoSavingInterval" prefColumnCount="3" text="5" />
-                <Label text="minutes" />
-            </HBox>
-            <Separator />
-            <CheckBox fx:id="enableTemporaryFilesDeletion" text="Enable temporary files deletion" />
-            <HBox spacing="5" alignment="BASELINE_LEFT">
-                <Label text="Temporary files max age:" />
-                <TextField fx:id="temporaryFilesMaxAge" prefColumnCount="3" />
-                <Label text="days" />
-            </HBox>
-            <Separator />
-            <HBox spacing="5" alignment="BASELINE_LEFT">
-                <Label text="Max recent presentations:" />
-                <TextField fx:id="maxRecentPresentations" prefColumnCount="3" text="10" />
+                <Label text="Theme:"/>
+                <ComboBox fx:id="themes"/>
             </HBox>
             <HBox spacing="5" alignment="BASELINE_LEFT">
-                <Label text="Snapshot delay:" />
-                <TextField fx:id="snapshotDelay" prefColumnCount="3" text="10" />
+                <VBox spacing="5">
+                    <Label text="HTTP proxy:"/>
+                    <HBox spacing="5">
+                        <ExtendedTextField fx:id="httpProxyHost" label="Host"/>
+                        <Label text=":"/>
+                        <ExtendedTextField fx:id="httpProxyPort" label="Port">
+                            <validator>
+                                <Validators fx:factory="isIntegerOrBlank"/>
+                            </validator>
+                        </ExtendedTextField>
+                    </HBox>
+                </VBox>
+            </HBox>
+            <HBox spacing="5" alignment="BASELINE_LEFT">
+                <VBox spacing="5">
+                    <Label text="HTTPS proxy:"/>
+                    <HBox spacing="5">
+                        <ExtendedTextField fx:id="httpsProxyHost" label="Host"/>
+                        <Label text=":"/>
+                        <ExtendedTextField fx:id="httpsProxyPort" label="Port">
+                            <validator>
+                                <Validators fx:factory="isIntegerOrBlank"/>
+                            </validator>
+                        </ExtendedTextField>
+                    </HBox>
+                </VBox>
+            </HBox>
+            <Separator/>
+            <CheckBox fx:id="enableAutoSaving" text="Enable auto save interval"/>
+            <HBox spacing="5" alignment="BASELINE_LEFT">
+                <Label text="Auto save interval:"/>
+                <TextField fx:id="autoSavingInterval" prefColumnCount="3" text="5"/>
+                <Label text="minutes"/>
+            </HBox>
+            <Separator/>
+            <CheckBox fx:id="enableTemporaryFilesDeletion" text="Enable temporary files deletion"/>
+            <HBox spacing="5" alignment="BASELINE_LEFT">
+                <Label text="Temporary files max age:"/>
+                <TextField fx:id="temporaryFilesMaxAge" prefColumnCount="3"/>
+                <Label text="days"/>
+            </HBox>
+            <Separator/>
+            <HBox spacing="5" alignment="BASELINE_LEFT">
+                <Label text="Max recent presentations:"/>
+                <TextField fx:id="maxRecentPresentations" prefColumnCount="3" text="10"/>
+            </HBox>
+            <HBox spacing="5" alignment="BASELINE_LEFT">
+                <Label text="Snapshot delay:"/>
+                <TextField fx:id="snapshotDelay" prefColumnCount="3" text="10"/>
             </HBox>
         </VBox>
     </Tab>
     <Tab text="Snippet executors" closable="false">
         <ScrollPane>
-          <VBox fx:id="snippetExecutorContainer" spacing="5">
-              <padding>
-                  <Insets top="5" right="5" bottom="5" left="5" />
-              </padding>
-          </VBox>
+            <VBox fx:id="snippetExecutorContainer" spacing="5">
+                <padding>
+                    <Insets top="5" right="5" bottom="5" left="5"/>
+                </padding>
+            </VBox>
         </ScrollPane>
     </Tab>
     <Tab text="Hosting connectors" closable="false">
         <ScrollPane>
             <VBox fx:id="hostingConnectorContainer" spacing="5">
                 <padding>
-                    <Insets top="5" right="5" bottom="5" left="5" />
+                    <Insets top="5" right="5" bottom="5" left="5"/>
                 </padding>
             </VBox>
         </ScrollPane>

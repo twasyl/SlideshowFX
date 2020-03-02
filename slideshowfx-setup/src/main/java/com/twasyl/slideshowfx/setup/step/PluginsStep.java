@@ -29,7 +29,7 @@ import static com.twasyl.slideshowfx.global.configuration.GlobalConfiguration.ge
  * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
-public class PluginsStep extends AbstractSetupStep {
+public class PluginsStep extends AbstractSetupStep<PluginsViewController> {
     private static final Logger LOGGER = Logger.getLogger(PluginsStep.class.getName());
 
     private boolean pluginsDirectoryCreatedDuringSetup = false;
@@ -46,9 +46,9 @@ public class PluginsStep extends AbstractSetupStep {
             this.view = loader.load();
             this.controller = loader.getController();
 
-            ((PluginsViewController) this.controller).setPluginsDirectory(SetupProperties.getInstance().getPluginsDirectory());
+            this.controller.setPluginsDirectory(SetupProperties.getInstance().getPluginsDirectory());
 
-            final BooleanBinding markupSelected = ((PluginsViewController) this.controller).numberOfSelectedMarkup().greaterThan(0);
+            final BooleanBinding markupSelected = this.controller.numberOfSelectedMarkup().greaterThan(0);
             this.validProperty().bind(markupSelected);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Can not initialize the plugin step", e);
@@ -57,7 +57,7 @@ public class PluginsStep extends AbstractSetupStep {
 
     @Override
     public void execute() throws SetupStepException {
-        final List<File> pluginsToInstall = ((PluginsViewController) this.controller).getPluginsToInstall();
+        final List<File> pluginsToInstall = this.controller.getPluginsToInstall();
 
         if (!pluginsToInstall.isEmpty()) {
             this.pluginsDirectoryCreatedDuringSetup = GlobalConfiguration.createPluginsDirectory();
@@ -75,7 +75,7 @@ public class PluginsStep extends AbstractSetupStep {
 
     @Override
     public void rollback() throws SetupStepException {
-        final List<File> pluginsToInstall = ((PluginsViewController) this.controller).getPluginsToInstall();
+        final List<File> pluginsToInstall = this.controller.getPluginsToInstall();
 
         if (!pluginsToInstall.isEmpty()) {
             for (File plugin : pluginsToInstall) {

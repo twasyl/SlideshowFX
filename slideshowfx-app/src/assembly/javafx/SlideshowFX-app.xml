@@ -10,8 +10,7 @@
             <fx:application id="application"
                             name="SlideshowFX"
                             mainClass="com.twasyl.slideshowfx.app.SlideshowFX"
-                            preloaderClass="com.twasyl.slideshowfx.app.SlideshowFXPreloader"
-                            fallbackClass="com.javafx.main.NoJavaFXFallback">
+                            preloaderClass="com.twasyl.slideshowfx.app.SlideshowFXPreloader">
             </fx:application>
 
             <fx:info title="SlideshowFX" vendor="Thierry Wasylczenko"
@@ -23,6 +22,7 @@
             </fx:info>
 
             <fx:platform javafx="8.0+" j2se="8.0">
+                <fx:jvmarg value="--add-opens java.base/java.net=org.apache.felix.framework" />
                 <fx:jvmarg value="-Xms512m"/>
                 <fx:jvmarg value="-Xmx2048m"/>
                 <fx:jvmarg value="-Dfile.encoding=UTF-8"/>
@@ -46,8 +46,7 @@
             <fx:application id="application"
                             name="SlideshowFX"
                             mainClass="com.twasyl.slideshowfx.app.SlideshowFX"
-                            preloaderClass="com.twasyl.slideshowfx.app.SlideshowFXPreloader"
-                            fallbackClass="com.javafx.main.NoJavaFXFallback"/>
+                            preloaderClass="com.twasyl.slideshowfx.app.SlideshowFXPreloader"/>
 
             <fx:info title="SlideshowFX" vendor="Thierry Wasylczenko"
                      copyright="Copyright SlideshowFX" license="Apache 2 license">
@@ -56,6 +55,7 @@
             </fx:info>
 
             <fx:platform javafx="8.0+" j2se="8.0">
+                <fx:jvmarg value="--add-opens java.base/java.net=org.apache.felix.framework" />
                 <fx:jvmarg value="-Xms512m"/>
                 <fx:jvmarg value="-Xmx2048m"/>
                 <fx:jvmarg value="-Dfile.encoding=UTF-8"/>
@@ -78,9 +78,9 @@
         <fx:deploy nativeBundles="all" outdir="${build.deploy.out.dir}" outfile="${build.deploy.out.file}">
             <fx:application id="application"
                             name="SlideshowFX"
+                            module="slideshowfx.app"
                             mainClass="com.twasyl.slideshowfx.app.SlideshowFX"
-                            preloaderClass="com.twasyl.slideshowfx.app.SlideshowFXPreloader"
-                            fallbackClass="com.javafx.main.NoJavaFXFallback"/>
+                            preloaderClass="com.twasyl.slideshowfx.app.SlideshowFXPreloader"/>
 
             <fx:info title="SlideshowFX" vendor="Thierry Wasylczenko"
                      copyright="Copyright SlideshowFX" license="Apache 2 license">
@@ -88,7 +88,12 @@
                 <fx:association extension="sfx" mimetype="application/sfx" description="SlideshowFX presentations"/>
             </fx:info>
 
-            <fx:platform javafx="8.0+" j2se="8.0">
+            <fx:runtime>
+                <fx:module-path value="${build.deploy.resources.dir}" />
+            </fx:runtime>
+
+            <fx:platform javafx="10.0+" j2se="10.0">
+                <fx:jvmarg value="--add-opens java.base/java.net=org.apache.felix.framework" />
                 <fx:jvmarg value="-Xms512m"/>
                 <fx:jvmarg value="-Xmx2048m"/>
                 <fx:jvmarg value="-Dfile.encoding=UTF-8"/>

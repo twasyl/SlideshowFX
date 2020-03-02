@@ -15,9 +15,9 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static java.util.logging.Level.SEVERE;
+import static java.util.stream.Collectors.toList;
 
 /**
  * A step allowing to choose the installation location of the application.
@@ -28,7 +28,7 @@ import static java.util.logging.Level.SEVERE;
  * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
-public class InstallationLocationStep extends AbstractSetupStep {
+public class InstallationLocationStep extends AbstractSetupStep<InstallationLocationViewController> {
     private static final Logger LOGGER = Logger.getLogger(InstallationLocationStep.class.getName());
 
     private boolean applicationDirectoryCreatedDuringSetup = false;
@@ -55,7 +55,7 @@ public class InstallationLocationStep extends AbstractSetupStep {
 
     @Override
     public void execute() throws SetupStepException {
-        final String originalLocation = ((InstallationLocationViewController) this.controller).getLocation().replaceAll("\\\\", "/");
+        final String originalLocation = this.controller.getLocation().replaceAll("\\\\", "/");
         installationLocation = new File(originalLocation);
 
         if (!installationLocation.exists()) {
@@ -72,7 +72,7 @@ public class InstallationLocationStep extends AbstractSetupStep {
         copyApplication(versionFolder);
         copyDocumentation(versionFolder);
         createLoggingConfigurationFile(applicationFolder);
-        patchApplicationCfgFile(new File(versionFolder, SetupProperties.getInstance().getApplicationArtifact().getName()));
+//        patchApplicationCfgFile(new File(versionFolder, SetupProperties.getInstance().getApplicationArtifact().getName()));
         createApplicationConfigurationFile();
     }
 
@@ -123,17 +123,17 @@ public class InstallationLocationStep extends AbstractSetupStep {
         final String cfgFileLocation;
 
         if (OSUtils.isMac()) {
-            cfgFileLocation = "Contents/Java";
+            cfgFileLocation = "Contents/MacOS/config";
         } else {
-            cfgFileLocation = "app";
+            cfgFileLocation = "config";
         }
 
-        final File cfgFile = new File(copiedApplicationArtifact, cfgFileLocation + "/SlideshowFX.cfg");
+        final File cfgFile = new File(copiedApplicationArtifact, cfgFileLocation + "/app.vmoptions");
 
-        final List<String> lines = new ArrayList<>();
+        final List<String> lines;
 
         try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(cfgFile)))) {
-            lines.addAll(reader.lines().collect(Collectors.toList()));
+            lines = new ArrayList<>(reader.lines().collect(toList()));
 
         } catch (IOException e) {
             throw new SetupStepException("Can not read configuration file to patch", e);

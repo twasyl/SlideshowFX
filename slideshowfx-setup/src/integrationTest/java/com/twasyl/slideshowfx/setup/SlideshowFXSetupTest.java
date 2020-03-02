@@ -6,6 +6,7 @@ import com.twasyl.slideshowfx.setup.app.SetupProperties;
 import com.twasyl.slideshowfx.setup.app.SlideshowFXSetup;
 import com.twasyl.slideshowfx.utils.OSUtils;
 import com.twasyl.slideshowfx.utils.io.IOUtils;
+import javafx.scene.control.Button;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -130,14 +131,9 @@ public class SlideshowFXSetupTest extends SlideshowFXSetup {
     }
 
     @Override
-    public void stop() throws Exception {
-        super.stop();
-        IOUtils.deleteDirectory(integrationTestsDir);
-    }
-
-    @Override
-    protected SetupProperties fillSetupProperties() {
-        return SetupProperties.getInstance()
+    public void init() throws Exception {
+        super.init();
+        SetupProperties.getInstance()
                 .withPluginsDirectory(pluginsDir)
                 .withApplicationArtifact(artifactFile)
                 .withDocumentationsDirectory(documentationDir)
@@ -148,7 +144,14 @@ public class SlideshowFXSetupTest extends SlideshowFXSetup {
                 .withDefaultInstallationLocation(integrationTestsDir);
     }
 
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        IOUtils.deleteDirectory(integrationTestsDir);
+    }
+
     public static void main(String[] args) {
+        new Button("Test");
         System.setProperty("application.dir", applicationDir.getAbsolutePath());
 
         initializeResources();

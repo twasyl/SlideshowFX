@@ -2,8 +2,8 @@ package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfigurationObserver;
-import com.twasyl.slideshowfx.theme.Theme;
-import com.twasyl.slideshowfx.theme.Themes;
+import com.twasyl.slideshowfx.style.theme.Theme;
+import com.twasyl.slideshowfx.style.theme.Themes;
 import com.twasyl.slideshowfx.utils.PlatformHelper;
 import com.twasyl.slideshowfx.utils.ZipUtils;
 import com.twasyl.slideshowfx.utils.keys.KeyEventUtils;
@@ -32,7 +32,7 @@ import static javafx.concurrent.Worker.State.SUCCEEDED;
  * content in the editor as well as getting it.
  *
  * @author Thierry Wasylczenko
- * @version 1.3
+ * @version 1.4-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class SlideContentEditor extends BorderPane implements GlobalConfigurationObserver {
@@ -56,8 +56,8 @@ public class SlideContentEditor extends BorderPane implements GlobalConfiguratio
 
         this.browser.setOnKeyPressed(event -> {
             final boolean isShortcutDown = event.isShortcutDown();
-            if (isShortcutDown) {
-                if (KeyEventUtils.isShortcutSequence("A", event)) SlideContentEditor.this.selectAll();
+            if (isShortcutDown && KeyEventUtils.isShortcutSequence("A", event)) {
+                SlideContentEditor.this.selectAll();
             }
         });
 
@@ -110,6 +110,16 @@ public class SlideContentEditor extends BorderPane implements GlobalConfiguratio
         this.setSlideEditorTheme(Themes.getByName(newTheme));
     }
 
+    @Override
+    public void updateHttpProxyHost(boolean forHttps, String oldHost, String newHost) {
+        // Not concerned
+    }
+
+    @Override
+    public void updateHttpProxyPort(boolean forHttps, Integer oldPort, Integer newPort) {
+        // Not concerned
+    }
+
     /**
      * This method retrieves the content of the Node allowing to define the content of the slide.
      *
@@ -119,9 +129,7 @@ public class SlideContentEditor extends BorderPane implements GlobalConfiguratio
         final String valueAsBase64 = (String) this.browser.getEngine().executeScript("getContent();");
         final byte[] valueAsBytes = Base64.getDecoder().decode(valueAsBase64);
 
-        String value = new String(valueAsBytes, getDefaultCharset());
-
-        return value;
+        return new String(valueAsBytes, getDefaultCharset());
     }
 
     /**
@@ -133,9 +141,7 @@ public class SlideContentEditor extends BorderPane implements GlobalConfiguratio
         final String valueAsBase64 = (String) this.browser.getEngine().executeScript("getSelectedContent();");
         final byte[] valueAsBytes = Base64.getDecoder().decode(valueAsBase64);
 
-        String value = new String(valueAsBytes, getDefaultCharset());
-
-        return value;
+        return new String(valueAsBytes, getDefaultCharset());
     }
 
     /**

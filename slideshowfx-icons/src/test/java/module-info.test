@@ -1,0 +1,12 @@
+--add-modules
+org.testfx.junit5
+--add-reads
+slideshowfx.icons=org.testfx.junit5
+--add-opens
+slideshowfx.icons/com.twasyl.slideshowfx.icons=org.testfx.junit5
+--add-opens
+javafx.graphics/com.sun.glass.ui=org.testfx
+--add-exports
+javafx.graphics/com.sun.javafx.application=org.testfx
+--add-exports
+javafx.graphics/com.sun.glass.ui=org.testfx.monocle

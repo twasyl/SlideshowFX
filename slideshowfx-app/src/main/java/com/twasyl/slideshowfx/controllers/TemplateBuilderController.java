@@ -8,12 +8,13 @@ import com.twasyl.slideshowfx.utils.DialogHelper;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -38,9 +39,11 @@ import static java.util.logging.Level.SEVERE;
  * @version 1.3-SNAPSHOT
  * @since SlideshowFX 1.0
  */
-public class TemplateBuilderController implements Initializable {
+public class TemplateBuilderController implements ThemeAwareController {
     private static final Logger LOGGER = Logger.getLogger(TemplateBuilderController.class.getName());
 
+    @FXML
+    private BorderPane templateBuilder;
     @FXML
     private TemplateTreeView templateContentTreeView;
     @FXML
@@ -272,7 +275,12 @@ public class TemplateBuilderController implements Initializable {
     }
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    public Parent getRoot() {
+        return this.templateBuilder;
+    }
+
+    @Override
+    public void postInitialize(URL url, ResourceBundle resourceBundle) {
         // Initialize the tree view
         this.templateContentTreeView.setOnItemClick(event -> {
             final boolean consumeEvent = event.getClickCount() == 2

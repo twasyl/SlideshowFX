@@ -6,7 +6,7 @@ package com.twasyl.slideshowfx.utils.concurrent;
  * added on the task by the {@link com.twasyl.slideshowfx.utils.concurrent.WhenPredicate}.
  *
  * @author Thierry Wasylczenko
- * @version 1.0.0
+ * @version 1.0
  * @since SlideshowFX 1.0
  */
 public class DoPredicate {
@@ -35,7 +35,7 @@ public class DoPredicate {
      * @throws java.lang.NullPointerException if {@code runnable} is null.
      */
     public ForPredicate perform(Runnable runnable) {
-        if(runnable == null) throw new NullPointerException("The action to perform can not be null");
+        if (runnable == null) throw new NullPointerException("The action to perform can not be null");
         this.runnable = runnable;
         return this.whenPredicate.forPredicate;
     }

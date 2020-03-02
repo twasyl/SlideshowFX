@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.twasyl.slideshowfx.ui.controls.ExtendedTextField?>
+<?import com.twasyl.slideshowfx.ui.controls.validators.Validators?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
@@ -19,11 +20,19 @@
     <center>
         <VBox spacing="10">
             <padding>
-                <Insets top="0" right="0" bottom="0" left="10" />
+                <Insets top="0" right="0" bottom="0" left="10"/>
             </padding>
             <HBox spacing="10" alignment="BASELINE_LEFT">
-                <ExtendedTextField fx:id="drawingWidth" label="Drawing's width" mandatory="true" />
-                <ExtendedTextField fx:id="drawingHeight" label="Drawing's height" mandatory="true" />
+                <ExtendedTextField fx:id="drawingWidth" label="Drawing's width" mandatory="true">
+                    <validator>
+                        <Validators fx:factory="isInteger"/>
+                    </validator>
+                </ExtendedTextField>
+                <ExtendedTextField fx:id="drawingHeight" label="Drawing's height" mandatory="true">
+                    <validator>
+                        <Validators fx:factory="isInteger"/>
+                    </validator>
+                </ExtendedTextField>
             </HBox>
             <ScrollPane>
                 <VBox fx:id="shapesToDraw" spacing="10"></VBox>

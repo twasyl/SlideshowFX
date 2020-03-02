@@ -17,7 +17,7 @@ import static java.util.logging.Level.SEVERE;
  * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
-public class WelcomeStep extends AbstractSetupStep {
+public class WelcomeStep extends AbstractSetupStep<WelcomeViewController> {
     private static final Logger LOGGER = Logger.getLogger(WelcomeStep.class.getName());
 
     /**
@@ -33,7 +33,7 @@ public class WelcomeStep extends AbstractSetupStep {
             this.view = loader.load();
             this.controller = loader.getController();
 
-            ((WelcomeViewController) this.controller)
+            this.controller
                     .setApplicationName(SetupProperties.getInstance().getApplicationName())
                     .setApplicationVersion(SetupProperties.getInstance().getApplicationVersion());
 

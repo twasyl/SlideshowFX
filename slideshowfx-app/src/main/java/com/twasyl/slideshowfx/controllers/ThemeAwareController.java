@@ -2,7 +2,8 @@ package com.twasyl.slideshowfx.controllers;
 
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfigurationObserver;
-import com.twasyl.slideshowfx.theme.Themes;
+import com.twasyl.slideshowfx.style.Styles;
+import com.twasyl.slideshowfx.style.theme.Themes;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 
@@ -27,12 +28,27 @@ public interface ThemeAwareController extends Initializable, GlobalConfiguration
 
     void postInitialize(URL location, ResourceBundle resources);
 
+    default void applyApplicationStyle() {
+        Styles.applyApplicationStyle(getRoot());
+    }
+
     default void applyTheme(final String theme) {
         Themes.applyTheme(getRoot(), theme);
     }
 
     @Override
+    default void updateHttpProxyHost(boolean forHttps, String oldHost, String newHost) {
+        // Not concerned
+    }
+
+    @Override
+    default void updateHttpProxyPort(boolean forHttps, Integer oldPort, Integer newPort) {
+        // Not concerned
+    }
+
+    @Override
     default void initialize(URL location, ResourceBundle resources) {
+        this.applyApplicationStyle();
         this.applyTheme(GlobalConfiguration.getThemeName());
         GlobalConfiguration.addObserver(this);
         this.postInitialize(location, resources);

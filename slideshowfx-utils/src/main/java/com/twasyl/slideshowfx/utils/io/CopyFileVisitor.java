@@ -28,43 +28,55 @@ public class CopyFileVisitor extends SimpleFileVisitor<Path> {
 
     /**
      * Get the target where data will be copied into.
+     *
      * @return The target where the files will be copied into.
      */
-    public Path getTarget() { return target; }
+    public Path getTarget() {
+        return target;
+    }
 
     /**
      * Set the target where files will be copied into.
+     *
      * @param target the new target of files.
      */
-    public void setTarget(Path target) { this.target = target; }
+    public void setTarget(Path target) {
+        this.target = target;
+    }
 
     /**
      * Get the source directory to copy into the target.
+     *
      * @return The source directory to copy into the target.
      */
-    public Path getSource() { return source; }
+    public Path getSource() {
+        return source;
+    }
 
     /**
      * Set the new directory to copy into the target.
+     *
      * @param source The new source to copy into the target.
      */
-    public void setSource(Path source) { this.source = source; }
+    public void setSource(Path source) {
+        this.source = source;
+    }
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
         final Path parent = source.getParent();
 
-        if(parent != null) {
+        if (parent != null) {
             Path copiedDirectory = target.resolve(parent.relativize(dir));
 
-            /**
+            /*
              * Manages the fact {@code dir} is equal to {@code source}
              */
-            if(copiedDirectory.equals(target)) {
+            if (copiedDirectory.equals(target)) {
                 copiedDirectory = new File(target.toFile(), dir.toFile().getName()).toPath();
             }
 
-            if(!Files.exists(copiedDirectory)) {
+            if (!Files.exists(copiedDirectory)) {
                 Files.createDirectories(copiedDirectory);
             }
         }
@@ -76,7 +88,7 @@ public class CopyFileVisitor extends SimpleFileVisitor<Path> {
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         final Path parent = source.getParent();
 
-        if(parent != null) {
+        if (parent != null) {
             Path copiedFile = target.resolve(parent.relativize(file));
             Files.copy(file, copiedFile, StandardCopyOption.REPLACE_EXISTING);
         }

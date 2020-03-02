@@ -44,7 +44,7 @@ public class ExtendedTextField extends VBox {
     private BooleanProperty mandatory = new SimpleBooleanProperty(false);
     private ReadOnlyBooleanProperty valid = new SimpleBooleanProperty();
 
-    private IValidator<String> validator;
+    private ObjectProperty<IValidator<String>> validator = new SimpleObjectProperty<>();
 
     public ExtendedTextField() {
         super(0);
@@ -83,7 +83,7 @@ public class ExtendedTextField extends VBox {
 
         this.textField.textProperty().addListener((textValue, oldText, newText) -> {
             Boolean validValue = null;
-            if (this.validator != null) {
+            if (this.getValidator() != null) {
                 validValue = this.isValid();
             }
             ((SimpleBooleanProperty) this.valid).setValue(validValue);
@@ -107,7 +107,7 @@ public class ExtendedTextField extends VBox {
                     this.hidePromptText();
                 }
             } else if (!newFocus && !isTextEmpty()) {
-                if (this.isMandatory() && this.validator != null && !isValid()) {
+                if (this.isMandatory() && this.getValidator() != null && !isValid()) {
                     this.textField.pseudoClassStateChanged(ERROR, true);
                 }
 
@@ -240,12 +240,16 @@ public class ExtendedTextField extends VBox {
         this.mandatory.set(mandatory);
     }
 
+    public ObjectProperty<IValidator<String>> validatorProperty() {
+        return this.validator;
+    }
+
     public IValidator<String> getValidator() {
-        return validator;
+        return validator.get();
     }
 
     public void setValidator(IValidator<String> validator) {
-        this.validator = validator;
+        this.validator.set(validator);
     }
 
     public boolean isValid() {
@@ -253,7 +257,7 @@ public class ExtendedTextField extends VBox {
             throw new IllegalArgumentException("No validator defined for the control");
         }
 
-        final boolean valid = this.validator.isValid(this.textField.getText());
+        final boolean valid = this.getValidator().isValid(this.textField.getText());
         if (!valid) {
             this.textField.pseudoClassStateChanged(ERROR, true);
         }

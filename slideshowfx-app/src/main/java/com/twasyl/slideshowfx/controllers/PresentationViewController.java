@@ -323,7 +323,7 @@ public class PresentationViewController implements ThemeAwareController {
      * @param contentCode The code of the {@link IMarkup} to test if it is supported.
      * @return {@code true} if there is a plugin having the given code, {@code false} otherwise.
      */
-    public boolean isContentSupported(final String contentCode) {
+    private boolean isContentSupported(final String contentCode) {
         boolean supported = false;
 
         List<IMarkup> services = PluginManager.getInstance().getServices(IMarkup.class);

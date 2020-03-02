@@ -70,6 +70,7 @@ public class IOUtils {
     public static InputStream dump(final InputStream input) {
         final byte[] buffer = new byte[1024];
         int bytesRead;
+        ByteArrayInputStream result = null;
 
         try (final ByteArrayOutputStream dump = new ByteArrayOutputStream()) {
             while ((bytesRead = input.read(buffer)) != -1) {
@@ -77,10 +78,11 @@ public class IOUtils {
             }
 
             dump.flush();
-            return new ByteArrayInputStream(dump.toByteArray());
+            result = new ByteArrayInputStream(dump.toByteArray());
         } catch (IOException e) {
             LOGGER.log(WARNING, "Error dumping InputStream", e);
-            return null;
         }
+
+        return result;
     }
 }

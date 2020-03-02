@@ -1,32 +1,51 @@
 package com.twasyl.slideshowfx.controls;
 
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
+import com.twasyl.slideshowfx.icons.IconStack;
 import com.twasyl.slideshowfx.server.beans.chat.ChatMessage;
-import com.twasyl.slideshowfx.theme.Themes;
+import com.twasyl.slideshowfx.style.Styles;
+import com.twasyl.slideshowfx.style.theme.Themes;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+
+import static com.twasyl.slideshowfx.icons.Icon.BAN;
+import static com.twasyl.slideshowfx.icons.Icon.COMMENTS_DOTS;
+import static javafx.geometry.Pos.CENTER;
+import static javafx.geometry.Pos.TOP_CENTER;
 
 /**
  * This class is the panel that will contain {@link com.twasyl.slideshowfx.controls.ChatBubble}. This panel ensures
  * it's width is the same as the bubbles contained into it. It also provides convenient methods to add chat messages.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class ChatPanel extends ScrollPane {
 
     private final static double WIDTH = 400;
     private final VBox messages = new VBox(5);
+    private final IconStack emptyChatStack = new IconStack();
 
     public ChatPanel() {
         this.getStyleClass().add("chat-panel");
-        this.getStylesheets().addAll(
-                CollapsibleToolPane.class.getResource("/com/twasyl/slideshowfx/css/application.css").toExternalForm(),
-                Themes.getByName(GlobalConfiguration.getThemeName()).getCssFile().toExternalForm());
+        Styles.applyApplicationStyle(this);
+        Themes.applyTheme(this, GlobalConfiguration.getThemeName());
+
+        this.emptyChatStack.getStyleClass().add("empty-chat-stack");
+        this.emptyChatStack.setAlignment(CENTER);
+        this.emptyChatStack.setPrefWidth(WIDTH);
+        this.emptyChatStack.setMinWidth(WIDTH);
+        this.emptyChatStack.setMaxWidth(WIDTH);
+
+        this.emptyChatStack
+                .addIcon(COMMENTS_DOTS)
+                .addIcon(BAN);
+
+        this.messages.setAlignment(CENTER);
+        this.messages.getChildren().add(this.emptyChatStack);
 
         this.setContent(this.messages);
-        this.setBackground(null);
 
         this.setPrefViewportWidth(WIDTH);
         this.setPrefWidth(WIDTH + 10);
@@ -37,7 +56,6 @@ public class ChatPanel extends ScrollPane {
          */
         this.sceneProperty().addListener((sceneValue, oldScene, newScene) -> {
             if (newScene != null) {
-
                 ChatPanel.this.messages.prefHeightProperty().bind(newScene.heightProperty().subtract(10));
                 ChatPanel.this.prefHeightProperty().bind(newScene.heightProperty());
             }
@@ -59,6 +77,11 @@ public class ChatPanel extends ScrollPane {
         bubble.setPrefWidth(WIDTH);
         bubble.setMinWidth(WIDTH);
         bubble.setMaxWidth(WIDTH);
+
+        if (this.messages.getChildren().size() == 1 && this.messages.getChildren().contains(this.emptyChatStack)) {
+            this.messages.getChildren().remove(0);
+            this.messages.setAlignment(TOP_CENTER);
+        }
 
         this.messages.getChildren().add(bubble);
 

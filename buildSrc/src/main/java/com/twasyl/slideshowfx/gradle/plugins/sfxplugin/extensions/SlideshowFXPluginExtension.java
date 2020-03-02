@@ -1,7 +1,6 @@
 package com.twasyl.slideshowfx.gradle.plugins.sfxplugin.extensions;
 
 import org.gradle.api.Action;
-import org.gradle.api.Project;
 import org.gradle.api.model.ObjectFactory;
 
 import java.io.File;
@@ -14,12 +13,11 @@ import java.io.File;
  * @since SlideshowFX @@NEXT-VERSION@@
  */
 public class SlideshowFXPluginExtension {
-    private SlideshowFXBundleExtension bundle;
-    private boolean contentExtension = false;
-    private boolean hostingConnector = false;
-    private boolean snippetExecutor = false;
-    private boolean markupPlugin = false;
-    private String pluginClass;
+    public SlideshowFXBundleExtension bundle;
+    public boolean contentExtension = false;
+    public boolean hostingConnector = false;
+    public boolean snippetExecutor = false;
+    public boolean markupPlugin = false;
 
     public SlideshowFXPluginExtension(ObjectFactory objectFactory) {
         bundle = objectFactory.newInstance(SlideshowFXBundleExtension.class);
@@ -69,19 +67,21 @@ public class SlideshowFXPluginExtension {
         this.markupPlugin = markupPlugin;
     }
 
-    public File getBundlePackageDestination(final Project bundleProject) {
-        final File baseLocation = new File(bundleProject.getBuildDir(), "tmp/bundles/package/plugins");
+    public String getBundlePackageDestination() {
+        String location = "plugins" + File.separator;
 
         if (isMarkupPlugin()) {
-            return new File(baseLocation, "markups");
+            location += "markups";
         } else if (isSnippetExecutor()) {
-            return new File(baseLocation, "executors");
+            location += "executors";
         } else if (isHostingConnector()) {
-            return new File(baseLocation, "hostingConnectors");
+            location += "hostingConnectors";
         } else if (isContentExtension()) {
-            return new File(baseLocation, "extensions");
+            location += "extensions";
         } else {
             return null;
         }
+
+        return location;
     }
 }

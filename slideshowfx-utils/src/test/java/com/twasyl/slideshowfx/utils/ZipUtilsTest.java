@@ -29,8 +29,8 @@ public class ZipUtilsTest {
     @BeforeAll
     public static void beforeClass() throws URISyntaxException {
 
-        testResultsDir = new File(ZipUtilsTest.class.getResource("/").toURI()).getParentFile();
-        resourcesDir = new File("src/test/resources/com/twasyl/slideshowfx/utils/zip/test.txt").getParentFile();
+        testResultsDir = new File("build/tmp");
+        resourcesDir = new File("src/test/resources/com/twasyl/slideshowfx/utils/zip");
 
         assertTrue(resourcesDir.exists());
     }

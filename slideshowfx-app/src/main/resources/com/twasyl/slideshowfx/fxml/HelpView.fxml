@@ -5,11 +5,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.web.WebView?>
 <?import java.lang.Double?>
-<?import java.net.URL?>
-<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.HelpViewController">
-    <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/application.css"/>
-    </stylesheets>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:id="root"
+           fx:controller="com.twasyl.slideshowfx.controllers.HelpViewController">
 
     <fx:define>
         <Double fx:id="BROWSER_WIDTH" fx:value="800"/>

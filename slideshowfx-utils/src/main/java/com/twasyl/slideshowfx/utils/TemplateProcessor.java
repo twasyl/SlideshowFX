@@ -20,10 +20,11 @@ public class TemplateProcessor {
     /**
      * This method returns a {@link freemarker.template.Configuration} as a singleton object, as recommended in the
      * freemarker documentation.
+     *
      * @return A never {code null} Configuration object.
      */
     public static synchronized Configuration getDefaultConfiguration() {
-        if(configurationSingleton == null) {
+        if (configurationSingleton == null) {
             configurationSingleton = new Configuration(Configuration.VERSION_2_3_23);
             configurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
             configurationSingleton.setDefaultEncoding(getDefaultCharset().displayName());
@@ -37,11 +38,12 @@ public class TemplateProcessor {
      * freemarker documentation.
      * This configuration is initialized with the {@code /com/twasyl/slideshowfx/server/webapp//js/} path for
      * {@link freemarker.template.Configuration#setDirectoryForTemplateLoading(java.io.File)}
+     *
      * @param classForTemplateLoading The class that will load the template.
      * @return A never {code null} Configuration object.
      */
     public static synchronized Configuration getJsConfiguration(Class classForTemplateLoading) {
-        if(jsConfigurationSingleton == null) {
+        if (jsConfigurationSingleton == null) {
             jsConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_23);
             jsConfigurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
             jsConfigurationSingleton.setDefaultEncoding(getDefaultCharset().displayName());
@@ -56,11 +58,12 @@ public class TemplateProcessor {
      * freemarker documentation.
      * This configuration is initialized with the {@code /com/twasyl/slideshowfx/server/webapp/html/} path for
      * {@link freemarker.template.Configuration#setDirectoryForTemplateLoading(java.io.File)}
+     *
      * @param classForTemplateLoading The class that will load the template.
      * @return A never {code null} Configuration object.
      */
     public static synchronized Configuration getHtmlConfiguration(Class classForTemplateLoading) {
-        if(htmlConfigurationSingleton == null) {
+        if (htmlConfigurationSingleton == null) {
             htmlConfigurationSingleton = new Configuration(Configuration.VERSION_2_3_23);
             htmlConfigurationSingleton.setIncompatibleImprovements(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
             htmlConfigurationSingleton.setDefaultEncoding(getDefaultCharset().displayName());

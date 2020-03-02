@@ -8,12 +8,12 @@ import javafx.scene.Node;
  * Abstract implementation of a {@link ISetupStep}.
  *
  * @author Thierry Wasylczenko
- * @since SlideshowFX 1.0
  * @version 1.0
+ * @since SlideshowFX 1.1-SNAPSHOT
  */
-public abstract class AbstractSetupStep implements ISetupStep {
+public abstract class AbstractSetupStep<I extends Initializable> implements ISetupStep {
     protected Node view;
-    protected Initializable controller;
+    protected I controller;
 
     private final StringProperty title = new SimpleStringProperty();
     private final BooleanProperty valid = new SimpleBooleanProperty(false);
@@ -21,10 +21,14 @@ public abstract class AbstractSetupStep implements ISetupStep {
     private final ObjectProperty<ISetupStep> next = new SimpleObjectProperty<>(null);
 
     @Override
-    public StringProperty titleProperty() { return this.title; }
+    public StringProperty titleProperty() {
+        return this.title;
+    }
 
     @Override
-    public String title() { return this.titleProperty().get(); }
+    public String title() {
+        return this.titleProperty().get();
+    }
 
     @Override
     public <T extends ISetupStep> T title(String title) {
@@ -33,7 +37,9 @@ public abstract class AbstractSetupStep implements ISetupStep {
     }
 
     @Override
-    public ObjectProperty<ISetupStep> previousProperty() { return this.previous; }
+    public ObjectProperty<ISetupStep> previousProperty() {
+        return this.previous;
+    }
 
     @Override
     public ISetupStep previous() {
@@ -47,7 +53,9 @@ public abstract class AbstractSetupStep implements ISetupStep {
     }
 
     @Override
-    public ObjectProperty<ISetupStep> nextProperty() { return this.next; }
+    public ObjectProperty<ISetupStep> nextProperty() {
+        return this.next;
+    }
 
     @Override
     public ISetupStep next() {
@@ -61,10 +69,30 @@ public abstract class AbstractSetupStep implements ISetupStep {
     }
 
     @Override
-    public BooleanProperty validProperty() { return this.valid; }
+    public <T extends ISetupStep> T find(Class<T> stepType) {
+        T result = null;
+        ISetupStep previousStep = previous();
+
+        while (result == null && previousStep != null) {
+            if (stepType.isInstance(previousStep)) {
+                result = stepType.cast(previousStep);
+            } else {
+                previousStep = previousStep.previous();
+            }
+        }
+
+        return result;
+    }
 
     @Override
-    public boolean isValid() { return this.valid.get(); }
+    public BooleanProperty validProperty() {
+        return this.valid;
+    }
+
+    @Override
+    public boolean isValid() {
+        return this.valid.get();
+    }
 
     @Override
     public <T extends ISetupStep> T setValid(boolean valid) {

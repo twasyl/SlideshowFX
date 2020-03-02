@@ -10,8 +10,8 @@ import javafx.scene.Node;
  * Represents a setup step.
  *
  * @author Thierry Wasylczenko
+ * @version 1.1-SNAPSHOT
  * @since SlideshowFX 1.0
- * @version 1.0
  */
 public interface ISetupStep {
 
@@ -74,6 +74,15 @@ public interface ISetupStep {
      * @return This step.
      */
     <T extends ISetupStep> T next(final ISetupStep step);
+
+    /**
+     * Lookup for a <b>previous</b> step having the desired type.
+     *
+     * @param stepType The type of step to find.
+     * @param <T> The type of the step.
+     * @return The first previous step being of the given type, {@code null} if not found.
+     */
+    <T extends  ISetupStep> T find(final Class<T> stepType);
 
     /**
      * Indicates if all information provided inside the step are valid.

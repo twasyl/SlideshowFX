@@ -11,6 +11,13 @@ import static com.twasyl.slideshowfx.gradle.Utils.stripProjectVersion;
 import static com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.PLUGIN_DEPENDENCIES_CONFIGURATION_NAME;
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Extension to define the properties of the plugin bundle.
+ *
+ * @author Thierry Wasylczenko
+ * @version 1.0
+ * @since SlideshowFX @@NEXT-VERSION@@
+ */
 public class SlideshowFXBundleExtension {
     private String name;
     private String description;

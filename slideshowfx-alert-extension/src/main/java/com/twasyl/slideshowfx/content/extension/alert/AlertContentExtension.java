@@ -30,7 +30,7 @@ public class AlertContentExtension extends AbstractContentExtension<AlertContent
                 EXCLAMATION_TRIANGLE,
                 "Insert an alert", "Insert an alert");
 
-        final String baseURL = "sweetalert2/7.29.1/";
+        final String baseURL = "sweetalert2/9.7.2/";
 
         // Add URL
         this.putResource(ResourceType.JAVASCRIPT_FILE, baseURL.concat("sweetalert2.all.min.js"));
@@ -43,31 +43,32 @@ public class AlertContentExtension extends AbstractContentExtension<AlertContent
 
     @Override
     public String buildDefaultContentString() {
-        final StringBuilder builder = new StringBuilder();
-
         final String id = generateID();
 
-        builder.append("<button id=\"").append(id).append("\">").append(this.getController().getButtonText()).append("</button>\n");
-
-        builder.append("<script type=\"text/javascript\">\n");
-        builder.append("\tdocument.querySelector('#").append(id).append("').onclick = function() {\n");
-        builder.append("\t\tSwal({\n");
-        builder.append("\t\t\ttitleText: \"").append(this.getController().getTitle()).append("\"");
-
-        if (this.getController().getText() != null && !this.getController().getText().isEmpty()) {
-            builder.append(",\n\t\t\ttext: \"").append(this.getController().getText()).append("\"");
-        }
-
-        builder.append(",\n\t\t\ttype: \"").append(this.getController().getType()).append("\",\n");
-        builder.append("\t\t\tshowConfirmButton: true,\n");
-        builder.append("\t\t\tshowCancelButton: ").append(this.getController().isCancelButtonVisible()).append(",\n");
-        builder.append("\t\t\tallowOutsideClick: ").append(this.getController().isClickOutsideAllowed()).append(",\n");
-        builder.append("\t\t\tallowEscapeKey: ").append(this.getController().isClickOutsideAllowed()).append(",\n");
-        builder.append("\t\t});\n");
-        builder.append("\t};\n");
-        builder.append("</script>");
-
-        return builder.toString();
+        return String.format(
+                """
+                <button id="%1$s">%2$s</button>
+                <script type="text/javascript">
+                    document.querySelector('#%1$s').onclick = function() {
+                        Swal.fire({
+                            title: "%3$s",
+                            text: "%4$s",
+                            icon: '%5$s',
+                            showConfirmButton: true,
+                            showCancelButton: %6$s,
+                            allowOutsideClick: %7$s,
+                            allowEscapeKey: %7$s
+                        });
+                    };
+                </script>
+                """,
+                id,
+                this.getController().getButtonText(),
+                this.getController().getTitle(),
+                this.getController().getText(),
+                this.getController().getType(),
+                this.getController().isCancelButtonVisible(),
+                this.getController().isClickOutsideAllowed());
     }
 
     @Override

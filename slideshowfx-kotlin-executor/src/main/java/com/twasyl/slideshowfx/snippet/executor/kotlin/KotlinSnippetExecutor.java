@@ -1,10 +1,10 @@
 package com.twasyl.slideshowfx.snippet.executor.kotlin;
 
-import com.sun.javafx.PlatformUtil;
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
 import com.twasyl.slideshowfx.plugin.Plugin;
 import com.twasyl.slideshowfx.snippet.executor.AbstractSnippetExecutor;
 import com.twasyl.slideshowfx.snippet.executor.CodeSnippet;
+import com.twasyl.slideshowfx.utils.OSUtils;
 import com.twasyl.slideshowfx.utils.beans.converter.FileStringConverter;
 import com.twasyl.slideshowfx.utils.io.DefaultCharsetReader;
 import javafx.collections.FXCollections;
@@ -145,7 +145,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
             // Compile the Kotlin class
             final String jarFile = "Snippet.jar";
 
-            final File koltincExecutable = PlatformUtil.isWindows() ?
+            final File koltincExecutable = OSUtils.isWindows() ?
                     new File(this.getOptions().getKotlinHome(), "bin/kotlinc.bat") :
                     new File(this.getOptions().getKotlinHome(), "bin/kotlinc");
 
@@ -175,7 +175,7 @@ public class KotlinSnippetExecutor extends AbstractSnippetExecutor<KotlinSnippet
             // Execute the Kotlin class only if the compilation was successful
             if (process != null && process.exitValue() == 0) {
 
-                final File kotlinExecutable = PlatformUtil.isWindows() ?
+                final File kotlinExecutable = OSUtils.isWindows() ?
                         new File(this.getOptions().getKotlinHome(), "bin/kotlin.bat") :
                         new File(this.getOptions().getKotlinHome(), "bin/kotlin");
 

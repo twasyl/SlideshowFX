@@ -1,0 +1,112 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      OS_NAME: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache JDK installations
+        id: jdkcache
+        uses: actions/cache@v1
+        with:
+          path: ~/jvm
+          key: ${{ runner.os }}-jvms
+
+      - name: Cache gradle dependencies
+        id: gradlecache
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle
+          key: ${{ runner.os }}-gradle
+
+      - name: Run tests
+        run: |
+          chmod +x .github/workflows/ci-utils.sh
+          source .github/workflows/ci-utils.sh
+          setupJDK build application
+          configureGradle
+          export _JAVA_OPTIONS="$(getJavaOptions)"
+          ./gradlew -q buildDashboard check
+        shell: bash
+
+#  analyze:
+#    runs-on: ubuntu-latest
+#      env:
+#        OS_NAME: ubuntu-latest
+#        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+#        SONAR_LOGIN: ${{ secrets.SONAR_TOKEN }}
+#        SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+#      steps:
+#        - uses: actions/checkout@v2
+#
+#        - name: Cache JDK installations
+#          id: jdkcache
+#          uses: actions/cache@v1
+#          with:
+#            path: ~/jvm
+#            key: ${{ runner.os }}-jvms
+#
+#        - name: Cache gradle dependencies
+#          id: gradlecache
+#          uses: actions/cache@v1
+#          with:
+#            path: ~/.gradle
+#            key: ${{ runner.os }}-gradle
+#
+#        - name: Run analysis
+#          run: |
+#            chmod +x .github/workflows/ci-utils.sh
+#            source .github/workflows/ci-utils.sh
+#            setupJDK build application
+#            configureGradle
+#            export _JAVA_OPTIONS="$(getJavaOptions)"
+#            ./gradlew -q sonarqube
+#          shell: bash
+
+  package:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest,windows-latest,ubuntu-latest]
+    env:
+      OS_NAME: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache JDK installations
+        id: jdkcache
+        uses: actions/cache@v1
+        with:
+          path: ~/jvm
+          key: ${{ runner.os }}-jvms
+
+      - name: Cache gradle dependencies
+        id: gradlecache
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle
+          key: ${{ runner.os }}-gradle
+
+      - name: Package
+        run: |
+          chmod +x .github/workflows/ci-utils.sh
+          source .github/workflows/ci-utils.sh
+          setupJDK build application
+          configureGradle
+          export _JAVA_OPTIONS="$(getJavaOptions)"
+          ./gradlew -q bundle
+          ./gradlew -q :slideshowfx-setup:createPackage
+        shell: bash
+
+      - uses: actions/upload-artifact@v1
+        if: success()
+        with:
+          name: Setup package
+          path: slideshowfx-setup/build/package

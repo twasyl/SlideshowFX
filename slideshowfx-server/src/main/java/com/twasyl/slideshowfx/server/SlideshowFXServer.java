@@ -236,7 +236,7 @@ public class SlideshowFXServer {
 
                 @Override
                 public void run() {
-                    SlideshowFXServer.this.vertx.eventBus().send(service, data, (AsyncResult<Message<JsonObject>> ar) -> {
+                    SlideshowFXServer.this.vertx.eventBus().request(service, data, (AsyncResult<Message<JsonObject>> ar) -> {
                         response.setValue(ar.result().body());
                         continueProcess = true;
                     });

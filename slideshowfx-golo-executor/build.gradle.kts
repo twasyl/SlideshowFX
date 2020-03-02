@@ -1,0 +1,29 @@
+plugins {
+    id("sfx-plugin")
+    id("org.openjfx.javafxplugin")
+    jacoco
+    id("org.sonarqube")
+    id("sfx-publisher")
+}
+
+description = "Snippet executor allowing to execute some Golo inside a SlideshowFX presentation"
+version = "1.1-SNAPSHOT"
+
+dependencies {
+    implementation(project(":slideshowfx-global-configuration"))
+    implementation(project(":slideshowfx-plugin"))
+    implementation(project(":slideshowfx-utils"))
+}
+
+javafx {
+    modules("javafx.controls", "javafx.graphics")
+}
+
+sfxPlugin {
+    snippetExecutor = true
+
+    bundle {
+        name = "golo executor"
+        description = "Execute Golo code inside a presentation"
+    }
+}

@@ -20,7 +20,7 @@ import static java.util.logging.Level.WARNING;
 public class Jar implements AutoCloseable {
     private static final Logger LOGGER = Logger.getLogger(Jar.class.getName());
 
-    protected final InputStream stream;
+    protected byte[] stream = null;
     protected Manifest manifest = null;
     protected Attributes manifestAttributes = null;
 
@@ -35,7 +35,18 @@ public class Jar implements AutoCloseable {
     }
 
     public Jar(final InputStream input) throws IOException {
-        this.stream = input;
+        if (input != null) {
+            final byte[] buffer = new byte[512];
+            int bytesRead;
+
+            try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+                while ((bytesRead = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, bytesRead);
+                }
+                output.flush();
+                this.stream = output.toByteArray();
+            }
+        }
     }
 
     /**
@@ -55,7 +66,7 @@ public class Jar implements AutoCloseable {
     @Override
     public void close() throws IOException {
         if (this.stream != null) {
-            this.stream.close();
+            this.stream = null;
         }
     }
 
@@ -95,8 +106,7 @@ public class Jar implements AutoCloseable {
     }
 
     private JarInputStream buildJarInputStream() throws IOException {
-        this.stream.reset();
-        return new JarInputStream(this.stream);
+        return new JarInputStream(new ByteArrayInputStream(this.stream));
     }
 
     /**
@@ -123,10 +133,10 @@ public class Jar implements AutoCloseable {
      */
     public final Attributes getManifestAttributes() {
         if (this.manifestAttributes == null) {
-            final Manifest retievedManifest = getManifest();
+            final Manifest retrievedManifest = getManifest();
 
-            if (retievedManifest != null) {
-                this.manifestAttributes = retievedManifest.getMainAttributes();
+            if (retrievedManifest != null) {
+                this.manifestAttributes = retrievedManifest.getMainAttributes();
             }
         }
 

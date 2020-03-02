@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.twasyl.slideshowfx.ui.controls.ExtendedTextField?>
+<?import com.twasyl.slideshowfx.ui.controls.validators.Validators?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.HBox?>
@@ -11,7 +12,11 @@
         <ToggleGroup fx:id="typeGroup"/>
     </fx:define>
 
-    <ExtendedTextField fx:id="title" mandatory="true" label="Title of the alert"/>
+    <ExtendedTextField fx:id="title" mandatory="true" label="Title of the alert">
+        <validator>
+            <Validators fx:factory="isNotEmpty"/>
+        </validator>
+    </ExtendedTextField>
     <ExtendedTextField fx:id="text" mandatory="false" label="Additional text"/>
     <ExtendedTextField fx:id="buttonText" label="Button's text for displaying the alert"/>
 

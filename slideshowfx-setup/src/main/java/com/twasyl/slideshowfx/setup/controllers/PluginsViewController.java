@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-import java.util.logging.Logger;
 
 import static com.twasyl.slideshowfx.icons.Icon.REFRESH;
 import static java.util.stream.Collectors.toList;
@@ -36,7 +35,6 @@ import static java.util.stream.Collectors.toList;
  * @since SlideshowFX 1.0
  */
 public class PluginsViewController implements Initializable {
-    private static Logger LOGGER = Logger.getLogger(PluginsViewController.class.getName());
     protected static final PseudoClass INVALID_STATE = PseudoClass.getPseudoClass("invalid");
 
     protected static final String MARKUP_PLUGINS_DIRECTORY_NAME = "markups";

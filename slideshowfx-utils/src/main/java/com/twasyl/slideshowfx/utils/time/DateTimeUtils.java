@@ -8,7 +8,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,11 +38,11 @@ public class DateTimeUtils {
 
     /**
      * Compares the {@link FileTime} of two {@link File files} and return the result. This method calls the
-     * {@link java.nio.file.attribute.FileTime#compareTo(Object)} method with {@code file2} as argument of the call.
+     * {@link java.nio.file.attribute.FileTime#compareTo(FileTime)} method with {@code file2} as argument of the call.
      *
-     * @param file1 The file which {@link FileTime} will be used as caller of {@link FileTime#compareTo(Object)}.
-     * @param file2 The file which is used as callee of {@link FileTime#compareTo(Object)}.
-     * @return The result of the {@link java.nio.file.attribute.FileTime#compareTo(Object)} method.
+     * @param file1 The file which {@link FileTime} will be used as caller of {@link FileTime#compareTo(FileTime)}.
+     * @param file2 The file which is used as callee of {@link FileTime#compareTo(FileTime)}.
+     * @return The result of the {@link java.nio.file.attribute.FileTime#compareTo(FileTime)} method.
      */
     public static int sortByFileTime(final File file1, final File file2) {
         int comparison = 0;

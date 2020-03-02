@@ -52,6 +52,20 @@ public class KeyEventUtils {
     }
 
     /**
+     * Check if a given {@link KeyEvent} corresponds to the given key combination sequence. A sequence is typically
+     * a string like {@code Shortcut+A} or {@code Shortcut+Shift+A}.
+     * In order to test the event, this method converts the given text using the {@link #shortcutShift(String)} method and
+     * then call {@link #is(String, KeyEvent)}.
+     *
+     * @param text  The expected text of the sequence.
+     * @param event The event to test.
+     * @return {@code true} if the event matches the provided sequence, {@code false} otherwise.
+     */
+    public static boolean isShortcutShiftSequence(final String text, final KeyEvent event) {
+        return is(shortcutShift(text), event);
+    }
+
+    /**
      * Utility method that concat the {@link #SHORTCUT} constant with the given text.
      *
      * @param text The text to concat.

@@ -12,7 +12,7 @@ import java.util.Properties;
  * @since SlideshowFX @@NEXT-VERSION@@
  */
 public class SetupProperties extends Properties {
-    public static final String SETUP_DEFAULT_INSTALLATION_LOCATION = "setup.default.installation.location";
+    public static final String SETUP_DEFAULT_INSTALLATION_LOCATION_PROPERTY = "setup.default.installation.location";
     public static final String SETUP_PLUGINS_DIRECTORY_PROPERTY = "setup.plugins.directory";
     public static final String SETUP_APPLICATION_ARTIFACT_PROPERTY = "setup.application.artifact";
     public static final String SETUP_DOCUMENTATIONS_DIRECTORY_PROPERTY = "setup.documentations.directory";
@@ -24,6 +24,14 @@ public class SetupProperties extends Properties {
     private static SetupProperties singleton;
 
     private SetupProperties() {
+        final var props = System.getProperties();
+        this.withApplicationName(props.getProperty(SETUP_APPLICATION_NAME_PROPERTY))
+                .withApplicationVersion(props.getProperty(SETUP_APPLICATION_VERSION_PROPERTY))
+                .withApplicationArtifact(new File(props.getProperty(SETUP_APPLICATION_ARTIFACT_PROPERTY)))
+                .withPluginsDirectory(new File(props.getProperty(SETUP_PLUGINS_DIRECTORY_PROPERTY)))
+                .withDocumentationsDirectory(new File(props.getProperty(SETUP_DOCUMENTATIONS_DIRECTORY_PROPERTY)))
+                .withTwitterConsumerKey(props.getProperty(SETUP_SERVICE_TWITTER_CONSUMER_KEY_PROPERTY))
+                .withTwitterConsumerKey(props.getProperty(SETUP_SERVICE_TWITTER_CONSUMER_SECRET_PROPERTY));
     }
 
     public static synchronized SetupProperties getInstance() {
@@ -35,14 +43,14 @@ public class SetupProperties extends Properties {
     }
 
     public File getDefaultInstallationLocation() {
-        if (containsKey(SETUP_DEFAULT_INSTALLATION_LOCATION)) {
-            return new File(getProperty(SETUP_DEFAULT_INSTALLATION_LOCATION));
+        if (containsKey(SETUP_DEFAULT_INSTALLATION_LOCATION_PROPERTY)) {
+            return new File(getProperty(SETUP_DEFAULT_INSTALLATION_LOCATION_PROPERTY));
         }
         return null;
     }
 
     public SetupProperties withDefaultInstallationLocation(final File installationLocation) {
-        setProperty(SETUP_DEFAULT_INSTALLATION_LOCATION, installationLocation.getAbsolutePath());
+        setProperty(SETUP_DEFAULT_INSTALLATION_LOCATION_PROPERTY, installationLocation.getAbsolutePath());
         return this;
     }
 

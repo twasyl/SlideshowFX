@@ -1,11 +1,13 @@
 package com.twasyl.slideshowfx.utils;
 
 import com.twasyl.slideshowfx.global.configuration.GlobalConfiguration;
-import com.twasyl.slideshowfx.theme.Themes;
+import com.twasyl.slideshowfx.style.Styles;
+import com.twasyl.slideshowfx.style.theme.Themes;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 
+import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -233,8 +235,9 @@ public class DialogHelper {
      * @param dialog The dialog to style.
      */
     private static void styleDialog(final Dialog dialog) {
-        if (dialog != null && DialogHelper.class.getResource("/com/twasyl/slideshowfx/css/application.css") != null) {
-            dialog.getDialogPane().getStylesheets().add("/com/twasyl/slideshowfx/css/application.css");
+        final URL applicationStyle = Styles.getApplicationStyle();
+        if (dialog != null && applicationStyle != null) {
+            dialog.getDialogPane().getStylesheets().add(applicationStyle.toExternalForm());
             Themes.applyTheme(dialog.getDialogPane(), GlobalConfiguration.getThemeName());
         }
     }

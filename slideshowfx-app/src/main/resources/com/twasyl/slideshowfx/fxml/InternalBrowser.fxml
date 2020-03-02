@@ -6,33 +6,31 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.web.WebView?>
-<?import java.net.URL?>
-<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="com.twasyl.slideshowfx.controllers.InternalBrowserController">
-    <stylesheets>
-        <URL value="@/com/twasyl/slideshowfx/css/application.css" />
-    </stylesheets>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:id="root"
+            fx:controller="com.twasyl.slideshowfx.controllers.InternalBrowserController">
 
     <top>
         <HBox fx:id="addressPanel" alignment="BASELINE_CENTER" spacing="5">
             <Button fx:id="previousPage" onAction="#navigateToPreviousPage">
                 <graphic>
-                    <FontAwesome icon="CHEVRON_LEFT" />
+                    <FontAwesome icon="CHEVRON_LEFT"/>
                 </graphic>
             </Button>
 
             <TextField fx:id="addressBar" promptText="Address"
-                       prefColumnCount="50" onKeyPressed="#manageKeyPressed" />
+                       prefColumnCount="50" onKeyPressed="#manageKeyPressed"/>
 
             <Button fx:id="nextPage" onAction="#navigateToNextPage">
                 <graphic>
-                    <FontAwesome icon="CHEVRON_RIGHT" />
+                    <FontAwesome icon="CHEVRON_RIGHT"/>
                 </graphic>
             </Button>
         </HBox>
     </top>
 
     <center>
-        <WebView fx:id="browser" />
+        <WebView fx:id="browser"/>
     </center>
 </BorderPane>
 

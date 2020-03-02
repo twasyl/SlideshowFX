@@ -1,6 +1,6 @@
 package com.twasyl.slideshowfx.plugin.manager.internal;
 
-import com.twasyl.slideshowfx.plugin.PluginTestUtils;
+import com.twasyl.slideshowfx.plugin.manager.PluginTestUtils;
 import com.twasyl.slideshowfx.plugin.AbstractPlugin;
 import com.twasyl.slideshowfx.plugin.IPlugin;
 import org.junit.jupiter.api.BeforeAll;

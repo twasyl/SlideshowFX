@@ -22,7 +22,22 @@ public class GlobalConfigurationObserverTest {
     void observersAreNotifiedWhenThemeChanges() throws InterruptedException, ExecutionException, TimeoutException {
         final CompletableFuture<Boolean> eventThrown = new CompletableFuture<>();
 
-        final GlobalConfigurationObserver observer = (oldTheme, newTheme) -> eventThrown.complete(true);
+        final GlobalConfigurationObserver observer = new GlobalConfigurationObserver() {
+            @Override
+            public void updateTheme(String oldTheme, String newTheme) {
+                eventThrown.complete(true);
+            }
+
+            @Override
+            public void updateHttpProxyHost(boolean forHttps, String oldHost, String newHost) {
+                // We don't care
+            }
+
+            @Override
+            public void updateHttpProxyPort(boolean forHttps, Integer oldPort, Integer newPort) {
+                // We don't care
+            }
+        };
 
         final GlobalConfigurationObservable observable = new GlobalConfigurationObservable();
         observable.addObserver(observer);
@@ -38,9 +53,22 @@ public class GlobalConfigurationObserverTest {
         final CompletableFuture<String> newTheme = new CompletableFuture<>();
         final CompletableFuture<Void> themeValues = CompletableFuture.allOf(oldTheme, newTheme);
 
-        final GlobalConfigurationObserver observer = (oldThemeValue, newThemeValue) -> {
-            oldTheme.complete(oldThemeValue);
-            newTheme.complete(newThemeValue);
+        final GlobalConfigurationObserver observer = new GlobalConfigurationObserver() {
+            @Override
+            public void updateTheme(String oldThemeValue, String newThemeValue) {
+                oldTheme.complete(oldThemeValue);
+                newTheme.complete(newThemeValue);
+            }
+
+            @Override
+            public void updateHttpProxyHost(boolean forHttps, String oldHost, String newHost) {
+                // We don't care
+            }
+
+            @Override
+            public void updateHttpProxyPort(boolean forHttps, Integer oldPort, Integer newPort) {
+                // We don't care
+            }
         };
 
         final GlobalConfigurationObservable observable = new GlobalConfigurationObservable();
@@ -59,9 +87,22 @@ public class GlobalConfigurationObserverTest {
         final CompletableFuture<String> newTheme = new CompletableFuture<>();
         final CompletableFuture<Void> themeValues = CompletableFuture.allOf(oldTheme, newTheme);
 
-        final GlobalConfigurationObserver observer = (oldThemeValue, newThemeValue) -> {
-            oldTheme.complete(oldThemeValue);
-            newTheme.complete(newThemeValue);
+        final GlobalConfigurationObserver observer = new GlobalConfigurationObserver() {
+            @Override
+            public void updateTheme(String oldThemeValue, String newThemeValue) {
+                oldTheme.complete(oldThemeValue);
+                newTheme.complete(newThemeValue);
+            }
+
+            @Override
+            public void updateHttpProxyHost(boolean forHttps, String oldHost, String newHost) {
+                // We don't care
+            }
+
+            @Override
+            public void updateHttpProxyPort(boolean forHttps, Integer oldPort, Integer newPort) {
+                // We don't care
+            }
         };
 
         final GlobalConfigurationObservable observable = spy(GlobalConfigurationObservable.class);

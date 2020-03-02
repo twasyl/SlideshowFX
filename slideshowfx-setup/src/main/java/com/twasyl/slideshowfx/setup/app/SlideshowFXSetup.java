@@ -40,24 +40,10 @@ public class SlideshowFXSetup extends Application {
         return root;
     }
 
-    /**
-     * Loads the properties used during the setup as the version, the various locations for plugins and documentation
-     * and so on.
-     * @return A never {@code null} {@link SetupProperties} instance.
-     * @throws IOException
-     */
-    protected SetupProperties fillSetupProperties() throws IOException {
-        final SetupProperties properties = SetupProperties.getInstance();
-        try (final InputStream input = getClass().getResourceAsStream("/com/twasyl/slideshowfx/setup/setup.properties")) {
-            properties.load(input);
-        }
-        return properties;
-    }
-
     @Override
     public void init() throws Exception {
         super.init();
-        fillSetupProperties();
+        SetupProperties.getInstance();
     }
 
     @Override

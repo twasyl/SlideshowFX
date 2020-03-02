@@ -4,21 +4,20 @@ import com.twasyl.slideshowfx.logs.SlideshowFXHandler;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Formatter;
 import java.util.logging.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.WARNING;
 
 /**
  * This class provides methods for accessing configuration properties.
  *
  * @author Thierry Wasylczenko
- * @version 1.1
+ * @version 1.2-SNAPSHOT
  * @since SlideshowFX 1.0
  */
 public class GlobalConfiguration {
@@ -137,6 +136,11 @@ public class GlobalConfiguration {
      * Name of the parameter for specifying if logs must be appended to the log file.
      */
     protected static final String LOG_FILE_APPEND_PARAMETER = "java.util.logging.FileHandler.append";
+
+    protected static final String HTTP_PROXY_HOST_PARAMETER = "http.proxy.host";
+    protected static final String HTTPS_PROXY_HOST_PARAMETER = "https.proxy.host";
+    protected static final String HTTP_PROXY_PORT_PARAMETER = "http.proxy.port";
+    protected static final String HTTPS_PROXY_PORT_PARAMETER = "https.proxy.port";
 
     public static void addObserver(final GlobalConfigurationObserver observer) {
         OBSERVABLE.addObserver(observer);
@@ -380,13 +384,16 @@ public class GlobalConfiguration {
         }
     }
 
+    /**
+     * Fill the configuration file, if it exists, with logging configuration with default values if needed.
+     */
     public static synchronized void fillLoggingConfigurationFileWithDefaultValue() {
         if (getLoggingConfigFile().exists()) {
             final Properties properties = readAllPropertiesFromConfigurationFile(getLoggingConfigFile());
 
             if (!properties.containsKey(LOG_LEVEL_PARAMETER)) setLogLevel(Level.INFO);
             if (!properties.containsKey(LOG_HANDLERS_PARAMETER))
-                setLogHandler(FileHandler.class, SlideshowFXHandler.class);
+                setLogHandler(ConsoleHandler.class, FileHandler.class, SlideshowFXHandler.class);
             if (!properties.containsKey(LOG_FILE_APPEND_PARAMETER)) setLogFileAppend(true);
             if (!properties.containsKey(FileHandler.class.getName().concat(LOG_ENCODING_SUFFIX)))
                 setLogEncoding(FileHandler.class, UTF_8);
@@ -399,6 +406,61 @@ public class GlobalConfiguration {
             if (!properties.containsKey(SlideshowFXHandler.class.getName().concat(LOG_FORMATTER_SUFFIX)))
                 setLogFormatter(SlideshowFXHandler.class, SimpleFormatter.class);
         }
+    }
+
+    /**
+     * Loads the HTTP proxy settings to be used by the application. If some settings are present, according events will
+     * be generated to be intercepted by the application and react the proper way.
+     */
+    public static synchronized void loadHttpProxyConfiguration() {
+        if (configurationFileExists()) {
+            final Properties properties = readAllPropertiesFromConfigurationFile(getConfigurationFile());
+
+            if (properties.containsKey(HTTP_PROXY_HOST_PARAMETER)) {
+                OBSERVABLE.notifyProxyHostChanged(false, System.getProperty("http.proxyHost"), properties.getProperty(HTTP_PROXY_HOST_PARAMETER));
+            }
+
+            if (properties.containsKey(HTTPS_PROXY_HOST_PARAMETER)) {
+                OBSERVABLE.notifyProxyHostChanged(true, System.getProperty("https.proxyHost"), properties.getProperty(HTTPS_PROXY_HOST_PARAMETER));
+            }
+
+            if (properties.containsKey(HTTP_PROXY_PORT_PARAMETER)) {
+                Integer currentPort = null;
+                try {
+                    currentPort = Integer.valueOf(System.getProperty("http.proxyPort"));
+                } catch (NumberFormatException e) {
+                    LOGGER.log(FINE, "Can not parse system property http.proxyHost", e);
+                }
+
+                Integer newPort = null;
+                try {
+                    newPort = Integer.valueOf(properties.getProperty(HTTP_PROXY_PORT_PARAMETER));
+                } catch (NumberFormatException e) {
+                    LOGGER.log(FINE, "Can not parse " + HTTP_PROXY_HOST_PARAMETER + " parameter", e);
+                }
+
+                OBSERVABLE.notifyProxyPortChanged(false, currentPort, newPort);
+            }
+
+            if (properties.containsKey(HTTPS_PROXY_PORT_PARAMETER)) {
+                Integer currentPort = null;
+                try {
+                    currentPort = Integer.valueOf(System.getProperty("https.proxyPort"));
+                } catch (NumberFormatException e) {
+                    LOGGER.log(FINE, "Can not parse system property https.proxyHost", e);
+                }
+
+                Integer newPort = null;
+                try {
+                    newPort = Integer.valueOf(properties.getProperty(HTTPS_PROXY_PORT_PARAMETER));
+                } catch (NumberFormatException e) {
+                    LOGGER.log(FINE, "Can not parse " + HTTPS_PROXY_HOST_PARAMETER + " parameter", e);
+                }
+
+                OBSERVABLE.notifyProxyPortChanged(true, currentPort, newPort);
+            }
+        }
+
     }
 
     /**
@@ -595,6 +657,38 @@ public class GlobalConfiguration {
         if (retrievedProperty != null) {
             try {
                 value = Long.parseLong(retrievedProperty);
+            } catch (NumberFormatException ex) {
+                LOGGER.log(WARNING, "The value of the property '" + propertyName + "' can not be parsed", ex);
+            }
+        }
+
+        return value;
+    }
+
+    /**
+     * Get the value of a property as a {@link Integer}.
+     *
+     * @param propertyName The name of the property to get.
+     * @return The value of the property or {@code null} if it is not present or can not be parsed.
+     */
+    public static Integer getIntegerProperty(final String propertyName) {
+        return getIntegerProperty(getConfigurationFile(), propertyName);
+    }
+
+    /**
+     * Get the value of a property as a {@link Integer}.
+     *
+     * @param file         The file from which retrieve the property.
+     * @param propertyName The name of the property to get.
+     * @return The value of the property or {@code null} if it is not present or can not be parsed.
+     */
+    public static Integer getIntegerProperty(final File file, final String propertyName) {
+        Integer value = null;
+
+        final String retrievedProperty = getProperty(file, propertyName);
+        if (retrievedProperty != null) {
+            try {
+                value = Integer.parseInt(retrievedProperty);
             } catch (NumberFormatException ex) {
                 LOGGER.log(WARNING, "The value of the property '" + propertyName + "' can not be parsed", ex);
             }
@@ -927,6 +1021,121 @@ public class GlobalConfiguration {
         if (!oldTheme.equals(theme)) {
             setProperty(THEME, theme);
             OBSERVABLE.notifyThemeChanged(oldTheme, theme);
+        }
+    }
+
+    /**
+     * Get the HTTP proxy host to be used by the application.
+     *
+     * @return The HTTP proxy host or {@code null} if undefined.
+     */
+    public static String getHttpProxyHost() {
+        return getProperty(HTTP_PROXY_HOST_PARAMETER);
+    }
+
+    /**
+     * Define the HTTP proxy host to be used by the application. If the provided value is {@code null} or blank, the
+     * property will be removed from the configuration.
+     *
+     * @param httpProxyHost The HTTP proxy host.
+     */
+    public static void setHttpProxyHost(final String httpProxyHost) {
+        final String oldHost = getHttpProxyHost();
+
+        if (!Objects.equals(oldHost, httpProxyHost)) {
+            if (httpProxyHost == null || httpProxyHost.isBlank()) {
+                removeProperty(HTTP_PROXY_HOST_PARAMETER);
+            } else {
+                setProperty(HTTP_PROXY_HOST_PARAMETER, httpProxyHost);
+            }
+            OBSERVABLE.notifyProxyHostChanged(false, oldHost, httpProxyHost);
+        }
+    }
+
+    /**
+     * Get the HTTPS proxy host to be used by the application.
+     *
+     * @return The HTTPS proxy host or {@code null} if undefined.
+     */
+    public static String getHttpsProxyHost() {
+        return getProperty(HTTPS_PROXY_HOST_PARAMETER);
+    }
+
+    /**
+     * Define the HTTPS proxy host to be used by the application. If the provided value is {@code null} or blank, the
+     * property will be removed from the configuration.
+     *
+     * @param httpsProxyHost The HTTPS proxy host.
+     */
+    public static void setHttpsProxyHost(final String httpsProxyHost) {
+        final String oldProxy = getHttpsProxyHost();
+
+        if (!Objects.equals(oldProxy, httpsProxyHost)) {
+            if (httpsProxyHost == null || httpsProxyHost.isBlank()) {
+                removeProperty(HTTPS_PROXY_HOST_PARAMETER);
+            } else {
+                setProperty(HTTPS_PROXY_HOST_PARAMETER, httpsProxyHost);
+            }
+
+            OBSERVABLE.notifyProxyHostChanged(true, oldProxy, httpsProxyHost);
+        }
+    }
+
+    /**
+     * Get the HTTP proxy port to be used by the application.
+     *
+     * @return The HTTP proxy port or {@code null} if undefined.
+     */
+    public static Integer getHttpProxyPort() {
+        return getIntegerProperty(HTTP_PROXY_PORT_PARAMETER);
+    }
+
+    /**
+     * Define the HTTP proxy port to be used by the application. If the provided value is {@code null} or less or equal to zero,
+     * the property will be removed from the configuration.
+     *
+     * @param httpProxyPort The HTTP proxy port.
+     */
+    public static void setHttpProxyPort(final Integer httpProxyPort) {
+        final Integer oldPort = getHttpProxyPort();
+
+        if (!Objects.equals(oldPort, httpProxyPort)) {
+            if (httpProxyPort == null || httpProxyPort.intValue() <= 0) {
+                removeProperty(HTTP_PROXY_PORT_PARAMETER);
+            } else {
+                setProperty(HTTP_PROXY_PORT_PARAMETER, httpProxyPort.toString());
+            }
+
+            OBSERVABLE.notifyProxyPortChanged(false, oldPort, httpProxyPort);
+        }
+    }
+
+    /**
+     * Get the HTTPS proxy port to be used by the application.
+     *
+     * @return The HTTPS proxy port or {@code null} if undefined.
+     */
+    public static Integer getHttpsProxyPort() {
+        return getIntegerProperty(HTTPS_PROXY_PORT_PARAMETER);
+    }
+
+    /**
+     * Define the HTTPS proxy port to be used by the application. If the provided value is {@code null} or less or equal to zero,
+     * the property will be removed from the configuration.
+     *
+     * @param httpsProxyPort The HTTPS proxy port.
+     */
+    public static void setHttpsProxyPort(final Integer httpsProxyPort) {
+        final Integer oldPort = getHttpsProxyPort();
+
+        if (!Objects.equals(oldPort, httpsProxyPort)) {
+            if (httpsProxyPort == null || httpsProxyPort.intValue() <= 0) {
+                removeProperty(HTTPS_PROXY_PORT_PARAMETER);
+            } else {
+                setProperty(HTTPS_PROXY_PORT_PARAMETER, httpsProxyPort.toString());
+            }
+
+            OBSERVABLE.notifyProxyPortChanged(true, oldPort, httpsProxyPort);
         }
     }
 

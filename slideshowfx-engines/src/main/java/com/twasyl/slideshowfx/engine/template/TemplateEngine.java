@@ -197,6 +197,7 @@ public class TemplateEngine extends AbstractEngine<TemplateConfiguration> {
             final JsonObject configurationJson = new JsonObject()
                     .put(TEMPLATE.getFieldName(), new JsonObject()
                             .put(TEMPLATE_NAME.getFieldName(), this.configuration.getName() == null ? "" : this.configuration.getName())
+                            .put(TEMPLATE_VERSION.getFieldName(), this.configuration.getVersion() == null ? "" : this.configuration.getVersion())
                             .put(TEMPLATE_FILE.getFieldName(), this.configuration.getFile() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getFile()))
                             .put(JS_OBJECT.getFieldName(), this.configuration.getJsObject() == null ? "" : this.configuration.getJsObject())
                             .put(TEMPLATE_RESOURCES_DIRECTORY.getFieldName(), this.configuration.getResourcesDirectory() == null ? "" : this.relativizeFromWorkingDirectory(this.configuration.getResourcesDirectory()))

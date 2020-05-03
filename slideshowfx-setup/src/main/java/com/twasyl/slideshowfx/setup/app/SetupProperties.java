@@ -31,7 +31,7 @@ public class SetupProperties extends Properties {
                 .withPluginsDirectory(new File(props.getProperty(SETUP_PLUGINS_DIRECTORY_PROPERTY)))
                 .withDocumentationsDirectory(new File(props.getProperty(SETUP_DOCUMENTATIONS_DIRECTORY_PROPERTY)))
                 .withTwitterConsumerKey(props.getProperty(SETUP_SERVICE_TWITTER_CONSUMER_KEY_PROPERTY))
-                .withTwitterConsumerKey(props.getProperty(SETUP_SERVICE_TWITTER_CONSUMER_SECRET_PROPERTY));
+                .withTwitterConsumerSecret(props.getProperty(SETUP_SERVICE_TWITTER_CONSUMER_SECRET_PROPERTY));
     }
 
     public static synchronized SetupProperties getInstance() {

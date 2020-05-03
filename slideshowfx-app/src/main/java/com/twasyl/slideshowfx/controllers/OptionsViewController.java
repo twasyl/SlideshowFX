@@ -186,12 +186,22 @@ public class OptionsViewController implements ThemeAwareController {
         GlobalConfiguration.setHttpsProxyHost(this.httpsProxyHost.getText());
 
         if (this.httpProxyPort.isValid()) {
-            GlobalConfiguration.setHttpProxyPort(Integer.parseInt(this.httpProxyPort.getText()));
+            GlobalConfiguration.setHttpProxyPort(this.getPortIntegerValue(this.httpProxyPort));
         }
 
         if (this.httpsProxyPort.isValid()) {
-            GlobalConfiguration.setHttpsProxyPort(Integer.parseInt(this.httpsProxyPort.getText()));
+            GlobalConfiguration.setHttpsProxyPort(this.getPortIntegerValue(this.httpsProxyPort));
         }
+    }
+
+    private Integer getPortIntegerValue(final ExtendedTextField field) {
+        final Integer port;
+        if (field.getText().isBlank()) {
+            port = null;
+        } else {
+            port = Integer.parseInt(field.getText());
+        }
+        return port;
     }
 
     /**

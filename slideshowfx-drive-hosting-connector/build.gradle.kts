@@ -17,7 +17,7 @@ dependencies {
     implementation(project(":slideshowfx-hosting-connector"))
 
     pluginDependencies(group = "com.google.apis", name = "google-api-services-drive", version = project.property("dependencies.drive.version") as String)
-    pluginDependencies(group = "com.google.auth", name = "google-auth-library-oauth2-http", version = "0.19.0")
+    pluginDependencies(group = "com.google.auth", name = "google-auth-library-oauth2-http", version = "0.20.0")
 }
 
 javafx {

@@ -6,6 +6,13 @@ pluginManagement {
     }
 }
 
+buildCache {
+    local {
+        directory = File(File(rootDir, ".gradle"), "build-cache")
+        removeUnusedEntriesAfterDays = 30
+    }
+}
+
 buildscript {
     repositories {
         maven {
@@ -15,6 +22,7 @@ buildscript {
     }
     dependencies {
         classpath(group = "org.openjfx", name = "javafx-plugin", version = "0.0.8")
+        classpath("org.asciidoctor:asciidoctor-gradle-jvm:3.1.0")
     }
 }
 

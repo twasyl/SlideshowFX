@@ -40,22 +40,18 @@ public class CreatePackage extends DefaultTask {
         final var cmd = new ArrayList<>();
         cmd.add(getJavaBinary(getProject(), "jpackage"));
 
-        final String appType;
         final String icon;
 
         if (isMac()) {
-            appType = "app-image";
             icon = "macosx" + separatorChar + "icon.icns";
         } else if (isWindows()) {
-            appType = "app-image";
             icon = "windows" + separatorChar + "icon.ico";
         } else {
-            appType = "deb";
             icon = "unix" + separatorChar + "icon.png";
         }
 
         cmd.add("--type");
-        cmd.add(appType);
+        cmd.add("app-image");
 
         cmd.add("--icon");
         cmd.add(new File(getProject().getProjectDir(), "src" + separatorChar + "assembly" + separatorChar + "javafx" + separatorChar + "package" + separatorChar + icon).getAbsolutePath());
@@ -65,9 +61,6 @@ public class CreatePackage extends DefaultTask {
 
         cmd.add("--name");
         cmd.add(this.packageExtension.executableBaseName);
-
-//        cmd.add("--app-version");
-//        cmd.add(getProject().getVersion());
 
         final var createRuntimeTask = (CreateRuntime) getProject().getTasks().getByName(CREATE_RUNTIME_TASK_NAME);
         cmd.add("--runtime-image");
@@ -85,13 +78,12 @@ public class CreatePackage extends DefaultTask {
             cmd.add(option);
         });
 
-        var result = getProject().exec(spec -> spec.commandLine(cmd));
-        if (result.getExitValue() == 0) {
-            getProject().copy(copy -> {
-                copy.from(prepareResourcesTask.getResourcesDir());
-                copy.into(new File(getPackage(), prepareResourcesTask.getResourcesDir().getName()));
-            });
+        if (this.packageExtension.resources != null && !this.packageExtension.resources.isEmpty()) {
+            cmd.add("--input");
+            cmd.add(prepareResourcesTask.getResourcesDir().getAbsolutePath());
         }
+
+        getProject().exec(spec -> spec.commandLine(cmd));
     }
 
     @OutputDirectory
@@ -99,8 +91,10 @@ public class CreatePackage extends DefaultTask {
         final String extension;
         if (isMac()) {
             extension = ".app";
-        } else {
+        } else if (isWindows()) {
             extension = "";
+        } else {
+            extension = ".deb";
         }
         return new File(this.packageExtension.outputDir, this.packageExtension.executableBaseName + extension);
     }

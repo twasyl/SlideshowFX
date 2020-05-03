@@ -40,8 +40,6 @@ import static javafx.geometry.HPos.RIGHT;
  * @since SlideshowFX 1.0
  */
 public class SlideshowPane extends StackPane implements Actor {
-    private static final Logger LOGGER = Logger.getLogger(SlideshowPane.class.getName());
-
     private final ObjectProperty<PresentationBrowser> browser = new SimpleObjectProperty<>();
 
     private final ChatPanel chatPanel = new ChatPanel();
@@ -76,17 +74,14 @@ public class SlideshowPane extends StackPane implements Actor {
 
     @Override
     public boolean supportsMessage(Object message) {
-        return message != null && (message instanceof QuizResult || message instanceof JsonObject);
+        return message instanceof QuizResult || message instanceof JsonObject;
     }
 
     @Override
     public void onMessage(Object message) {
         if (message instanceof QuizResult) {
             this.publishQuizResult((QuizResult) message);
-        } else if (message instanceof JsonObject) {
-
-            final JsonObject jsonMessage = (JsonObject) message;
-
+        } else if (message instanceof JsonObject jsonMessage) {
             if ("chat-message".equals(jsonMessage.getString(JSON_KEY_BROADCAST_MESSAGE_TYPE))) {
                 final JsonObject content = jsonMessage.getJsonObject(JSON_KEY_MESSAGE);
 
@@ -100,7 +95,7 @@ public class SlideshowPane extends StackPane implements Actor {
     /**
      * Initialize the browser that displays the presentation.
      */
-    private final void initializeBrowser() {
+    private void initializeBrowser() {
         this.browser.set(new PresentationBrowser());
         this.browser.get().setBackend(this);
         this.getChildren().add(this.browser.get());
@@ -109,7 +104,7 @@ public class SlideshowPane extends StackPane implements Actor {
     /**
      * Initialize the pane that contains all buttons related when the server is running (chat, QR code, quiz).
      */
-    private final void initializeCollapsibleToolPane() {
+    private void initializeCollapsibleToolPane() {
         final FontAwesome qrCodeIcon = new FontAwesome(Icon.QRCODE);
         final FontAwesome chatIcon = new FontAwesome(Icon.COMMENTS_O);
         final FontAwesome quizIcon = new FontAwesome(Icon.QUESTION);
@@ -153,7 +148,6 @@ public class SlideshowPane extends StackPane implements Actor {
                         while (change.next()) {
                             if (change.wasAdded()) {
                                 change.getAddedSubList()
-                                        .stream()
                                         .forEach(line -> this.browser.get().updateCodeSnippetConsole(consoleOutputId, line));
                             }
                         }

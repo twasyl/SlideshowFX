@@ -52,15 +52,13 @@ public class CollapsibleToolPane extends Region {
          * on the right/left of the screen, only displaying the toolbar
          */
         this.parentProperty().addListener((parentValue, oldParent, newParent) -> {
-            if (newParent != null && newParent instanceof Region) {
-                ((Region) newParent).widthProperty().addListener((widthValue, oldValue, newWidth) -> {
-                    this.placeToolbarAccordingParentAndPosition();
-                });
+            if (newParent instanceof Region region) {
+                region.widthProperty().addListener((widthValue, oldValue, newWidth) -> this.placeToolbarAccordingParentAndPosition());
             }
         });
 
         this.positionProperty().addListener((value, oldPos, newPos) -> {
-            this.toolbar.getChildren().forEach(button -> this.setPseudoClassAccordingPosition(button));
+            this.toolbar.getChildren().forEach(this::setPseudoClassAccordingPosition);
             this.placeToolbarAccordingParentAndPosition();
         });
 
@@ -267,15 +265,11 @@ public class CollapsibleToolPane extends Region {
      * Places the {@link #toolbar} according the parent's position.
      */
     private void placeToolbarAccordingParentAndPosition() {
-        if (this.getPosition() != null) {
-            if (this.getParent() != null && this.getParent() instanceof Region) {
-                final Region parent = (Region) this.getParent();
-
-                if (getPosition() == RIGHT) {
-                    this.toolbar.setLayoutX(parent.getWidth() - this.toolbar.getWidth());
-                } else if (getPosition() == LEFT) {
-                    this.toolbar.setLayoutX(0);
-                }
+        if (this.getPosition() != null && this.getParent() instanceof Region parent) {
+            if (getPosition() == RIGHT) {
+                this.toolbar.setLayoutX(parent.getWidth() - this.toolbar.getWidth());
+            } else if (getPosition() == LEFT) {
+                this.toolbar.setLayoutX(0);
             }
         }
     }

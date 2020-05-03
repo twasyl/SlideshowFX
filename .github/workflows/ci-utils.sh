@@ -141,7 +141,7 @@ function configureGradle() {
 }
 
 JVMS_DIR=$HOME/jvm
-BUILD_TOOL_JDK_VERSION=13.0.2
-BUILD_TOOL_JDK_BASE_DOWNLOAD_URL="https://download.java.net/java/GA/jdk13.0.2/d4173c853231432d94f001e99d882ca7/8/GPL/$(getJDKArchiveName build)"
-APPLICATION_JDK_VERSION=14
-APPLICATION_JDK_BASE_DOWNLOAD_URL="https://download.java.net/java/GA/jdk14/076bab302c7b4508975440c56f6cc26a/36/GPL/$(getJDKArchiveName application)"
+BUILD_TOOL_JDK_VERSION=14.0.1
+BUILD_TOOL_JDK_BASE_DOWNLOAD_URL="https://download.java.net/java/GA/jdk14.0.1/664493ef4a6946b186ff29eb326336a2/7/GPL/$(getJDKArchiveName build)"
+APPLICATION_JDK_VERSION=14.0.1
+APPLICATION_JDK_BASE_DOWNLOAD_URL="https://download.java.net/java/GA/jdk14.0.1/664493ef4a6946b186ff29eb326336a2/7/GPL/$(getJDKArchiveName application)"

@@ -1,3 +1,4 @@
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
@@ -40,7 +41,7 @@ packaging {
     outputDir = file("${getBuildDir()}/package")
     executableBaseName = "SlideshowFX"
 
-    runtime.modules = listOf("java.desktop", "java.logging", "java.net.http", "java.scripting", "java.xml", "jdk.jsobject", "jdk.unsupported", "jdk.unsupported.desktop", "jdk.xml.dom")
+    runtime.modules = listOf("java.desktop", "java.logging", "java.net.http", "java.scripting", "java.sql", "java.xml", "jdk.jsobject", "jdk.unsupported", "jdk.unsupported.desktop", "jdk.xml.dom")
 
     app.jvmOpts = listOf("-Xms512m",
             "-Xmx2g",
@@ -62,18 +63,17 @@ javafx {
     modules("javafx.controls", "javafx.fxml", "javafx.web")
 }
 
-// TODO Find a way to copy the documentation again
-//tasks.processResources {
-//    doLast {
-//        copy {
-//            from(project(":slideshowfx-documentation").tasks.named("asciidoctor").getBackendOutputDirectories())
-//            into("${buildDir}/resources/main/com/twasyl/slideshowfx/documentation/html")
-//            into("${buildDir}/resources/main/com/twasyl/slideshowfx/documentation/html")
-//        }
-//    }
-//}
-
 tasks {
+    processResources {
+        dependsOn(":slideshowfx-documentation:asciidoctor")
+        doLast {
+            copy {
+                from(project(":slideshowfx-documentation").tasks.named<AsciidoctorTask>("asciidoctor").get().backendOutputDirectories)
+                into("${sourceSets["main"].output.resourcesDir!!.absolutePath}/com/twasyl/slideshowfx/documentation/html")
+            }
+        }
+    }
+
     register<Zip>("zipSlideContentEditor") {
         archiveFileName.set("sfx-slide-content-editor.zip")
         destinationDirectory.set(file("${buildDir}/tmp"))
@@ -240,25 +240,24 @@ tasks {
         }
     }
 
-    // TODO Ensure the dependencies are set by evaluationDepends on statements
-//    prepareResources {
-//        dependsOn(
-//                project(":slideshowfx-content-extension").tasks.jar,
-//                project(":slideshowfx-documentation").tasks.named("asciidoctor"),
-//                project(":slideshowfx-engines").tasks.jar,
-//                project(":slideshowfx-global-configuration").tasks.jar,
-//                project(":slideshowfx-hosting-connector").tasks.jar,
-//                project(":slideshowfx-icons").tasks.jar,
-//                project(":slideshowfx-logs").tasks.jar,
-//                project(":slideshowfx-markup").tasks.jar,
-//                project(":slideshowfx-plugin").tasks.jar,
-//                project(":slideshowfx-plugin-manager").tasks.jar,
-//                project(":slideshowfx-server").tasks.jar,
-//                project(":slideshowfx-snippet-executor").tasks.jar,
-//                project(":slideshowfx-style").tasks.jar,
-//                project(":slideshowfx-ui-controls").tasks.jar,
-//                project(":slideshowfx-utils").tasks.jar)
-//    }
+    prepareResources {
+        dependsOn(
+                ":slideshowfx-content-extension:jar",
+                ":slideshowfx-documentation:asciidoctor",
+                ":slideshowfx-engines:jar",
+                ":slideshowfx-global-configuration:jar",
+                ":slideshowfx-hosting-connector:jar",
+                ":slideshowfx-icons:jar",
+                ":slideshowfx-logs:jar",
+                ":slideshowfx-markup:jar",
+                ":slideshowfx-plugin:jar",
+                ":slideshowfx-plugin-manager:jar",
+                ":slideshowfx-server:jar",
+                ":slideshowfx-snippet-executor:jar",
+                ":slideshowfx-style:jar",
+                ":slideshowfx-ui-controls:jar",
+                ":slideshowfx-utils:jar")
+    }
 
     build {
         dependsOn("createPackage")
@@ -270,19 +269,3 @@ tasks {
         }
     }
 }
-
-evaluationDependsOn(":slideshowfx-content-extension")
-evaluationDependsOn(":slideshowfx-documentation")
-evaluationDependsOn(":slideshowfx-engines")
-evaluationDependsOn(":slideshowfx-global-configuration")
-evaluationDependsOn(":slideshowfx-hosting-connector")
-evaluationDependsOn(":slideshowfx-icons")
-evaluationDependsOn(":slideshowfx-logs")
-evaluationDependsOn(":slideshowfx-markup")
-evaluationDependsOn(":slideshowfx-plugin")
-evaluationDependsOn(":slideshowfx-plugin-manager")
-evaluationDependsOn(":slideshowfx-server")
-evaluationDependsOn(":slideshowfx-snippet-executor")
-evaluationDependsOn(":slideshowfx-style")
-evaluationDependsOn(":slideshowfx-ui-controls")
-evaluationDependsOn(":slideshowfx-utils")

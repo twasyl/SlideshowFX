@@ -9,9 +9,9 @@ import org.gradle.jvm.tasks.Jar;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME;
+import static org.gradle.api.plugins.JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME;
 
 /**
  * Task preparing the resources needed for creating a package. The task will copy the dependencies and additional
@@ -67,7 +67,7 @@ public class PrepareResources extends DefaultTask {
     }
 
     @TaskAction
-    public void copy() throws FileNotFoundException {
+    public void copy() {
         copyDependencies();
         copyResources();
     }
@@ -77,14 +77,14 @@ public class PrepareResources extends DefaultTask {
             this.getDependenciesDir().mkdirs();
         }
 
-        final Jar jar = (Jar) getProject().getTasks().getByName(JAR_TASK_NAME);
+        final var jar = (Jar) getProject().getTasks().getByName(JAR_TASK_NAME);
         if (jar != null && jar.getArchiveFile().isPresent()) {
             getProject().copy(spec -> spec.from(jar.getArchiveFile().get()).into(dependenciesDir));
         }
-        final Configuration defaultConfiguration = getProject().getConfigurations().getByName("default");
 
-        if (defaultConfiguration != null) {
-            defaultConfiguration.resolve().forEach(dependency -> {
+        final Configuration runtimeClasspath = getProject().getConfigurations().getByName(RUNTIME_CLASSPATH_CONFIGURATION_NAME);
+        if (runtimeClasspath != null) {
+            runtimeClasspath.resolve().forEach(dependency -> {
                 getProject().copy(copySpec -> copySpec.from(dependency).into(getDependenciesDir()));
             });
         }

@@ -34,7 +34,7 @@ tasks {
                         "box-version" to project.property("dependencies.box.version") as String,
                         "drive-version" to project.property("dependencies.drive.version") as String,
                         "dropbox-version" to project.property("dependencies.dropbox.version") as String,
-                        "ace-version" to "1.4.8"
+                        "ace-version" to "1.4.11"
                 )
         )
     }

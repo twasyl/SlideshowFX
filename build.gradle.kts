@@ -31,6 +31,21 @@ subprojects {
     val moduleName by extra(project.name.replace("-", "."))
     val useBuildJdk = hasProperty("build_jdk")
 
+    plugins.apply(IdeaPlugin::class)
+
+    plugins.withType<IdeaPlugin>().configureEach {
+        val idea = this
+        this.model.module {
+            outputDir = file("out${File.separator}production${File.separator}${moduleName}")
+            testOutputDir = file("out${File.separator}test${File.separator}${moduleName}")
+        }
+
+        task<Delete>("ideaCleanOutput") {
+            enabled = idea.model.module.outputDir.exists() || idea.model.module.testOutputDir.exists()
+            delete = setOf(idea.model.module.outputDir, idea.model.module.testOutputDir)
+        }
+    }
+
     plugins.withType<JavaPlugin>().configureEach {
         val javaHome = property("build_jdk") as String
         val javaExecutablesPath = File(javaHome, "bin")
@@ -68,8 +83,9 @@ subprojects {
         tasks {
             withType<JavaCompile>().configureEach {
                 inputs.property("moduleName", moduleName)
-                sourceCompatibility = JavaVersion.VERSION_HIGHER.toString()
-                targetCompatibility = JavaVersion.VERSION_HIGHER.toString()
+                sourceCompatibility = JavaVersion.VERSION_14.toString()
+                targetCompatibility = JavaVersion.VERSION_14.toString()
+                modularity.inferModulePath.set(true)
 
                 options.apply {
                     if (useBuildJdk) {
@@ -85,13 +101,6 @@ subprojects {
                 options.apply {
                     if (useBuildJdk) {
                         sourcepath = files(mainSourceSet.java.srcDirs, mainSourceSet.resources.srcDirs)
-                    }
-
-                    doFirst {
-                        if (!classpath.isEmpty) {
-                            compilerArgs.addAll(arrayOf("--module-path", classpath.asPath))
-                            classpath = files()
-                        }
                     }
                 }
             }
@@ -200,7 +209,7 @@ subprojects {
 
     plugins.withType<JavaFXPlugin>().configureEach {
         extensions.getByType<JavaFXOptions>().apply {
-            version = "14-ea+8"
+            version = "14.0.1"
         }
     }
 

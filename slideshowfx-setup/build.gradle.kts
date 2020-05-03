@@ -1,8 +1,12 @@
+import com.twasyl.slideshowfx.gradle.Utils.isMac
+import com.twasyl.slideshowfx.gradle.Utils.isWindows
+import com.twasyl.slideshowfx.gradle.plugins.sfxpackager.SlideshowFXPackager.CREATE_PACKAGE_TASK_NAME
 import com.twasyl.slideshowfx.gradle.plugins.sfxpackager.tasks.CreatePackage
 import com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.BUNDLE_TASK_NAME
 import com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.SFX_PLUGIN_EXTENSION
 import com.twasyl.slideshowfx.gradle.plugins.sfxplugin.extensions.SlideshowFXPluginExtension
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
+import java.io.File.separator
 
 buildscript {
     repositories {
@@ -35,10 +39,21 @@ dependencies {
     implementation(project(":slideshowfx-utils"))
 }
 
-val createPackage = tasks.getByName<CreatePackage>("createPackage")
+rootProject.subprojects.forEach {
+    if (it.name != project.name) {
+       project.evaluationDependsOn(it.path)
+    }
+}
 
 packaging {
-    outputDir = file("${getBuildDir()}/package")
+    val createPackage = project(":slideshowfx-app").tasks.getByName<CreatePackage>(CREATE_PACKAGE_TASK_NAME)
+    val resourcesLocation = "\$ROOTDIR$separator" +
+            when {
+                isMac() -> "app"
+                isWindows() -> "app"
+                else -> "lib${separator}app"
+            }
+    outputDir = file("$buildDir/package")
     executableBaseName = "SlideshowFXSetup"
 
     runtime.modules = listOf("java.desktop", "java.logging", "java.scripting", "java.xml", "jdk.unsupported", "jdk.unsupported.desktop")
@@ -51,9 +66,9 @@ packaging {
             "--add-modules", "ALL-MODULE-PATH",
             "-Dsetup.application.name=SlideshowFX",
             "-Dsetup.application.version=${project.version}",
-            "-Dsetup.application.artifact=./resources/${createPackage.`package`.name}",
-            "-Dsetup.plugins.directory=./resources/plugins",
-            "-Dsetup.documentations.directory=./resources/documentations",
+            "-Dsetup.application.artifact=\"$resourcesLocation${separator}${createPackage.`package`.name}\"",
+            "-Dsetup.plugins.directory=\"$resourcesLocation${separator}plugins\"",
+            "-Dsetup.documentations.directory=\"$resourcesLocation${separator}documentations\"",
             "-Dsetup.service.twitter.consumerKey=${System.getenv("TWITTER_CONSUMER_KEY")}",
             "-Dsetup.service.twitter.consumerSecret=${System.getenv("TWITTER_CONSUMER_SECRET")}")
     
@@ -70,13 +85,11 @@ packaging {
                     addResource(bundle.outputs.files, destination)
                 }
             }
-    // TODO Make this computation work again
-/*
-    val asciidoctorTask = project(":slideshowfx-documentation").tasks.getByName("asciidoctor", AsciidoctorTask::class)
+
+    val asciidoctorTask = project(":slideshowfx-documentation").tasks.named<AsciidoctorTask>("asciidoctor").get()
     asciidoctorTask.backendOutputDirectories.forEach { backend ->
         addResource(fileTree(backend), "documentations")
     }
- */
 }
 
 runApplication {
@@ -88,73 +101,67 @@ javafx {
     modules("javafx.controls", "javafx.fxml")
 }
 
-tasks.processResources {
-    doLast {
-        // TODO Remove this task when using JVM properties is properly working
-//        ant.propertyfile(file: "${sourceSets.main.output.resourcesDir}/com/twasyl/slideshowfx/setup/setup.properties") {
-//        entry(key: "setup.application.name", value: "SlideshowFX")
-//        entry(key: "setup.application.version", value: "${version}")
-//        entry(key: "setup.application.artifact", value: "./resources/${project(":slideshowfx-app").createPackage.package.name}")
-//        entry(key: "setup.plugins.directory", value: "./resources/plugins")
-//        entry(key: "setup.documentations.directory", value: "./resources/documentations")
-//        entry(key: "setup.service.twitter.consumerKey", value: "${System.env["TWITTER_CONSUMER_KEY"]}")
-//        entry(key: "setup.service.twitter.consumerSecret", value: "${System.env["TWITTER_CONSUMER_SECRET"]}")
-//    }
-    }
-}
-
-tasks.jar {
-    manifest {
-        attributes(
-                "Implementation-Title" to "SlideshowFX-setup",
-                "Implementation-Version" to "${project.version}",
-                "Main-Class" to "com.twasyl.slideshowfx.setup.app.SlideshowFXSetup",
-                "JavaFX-Application-Class" to "com.twasyl.slideshowfx.setup.app.SlideshowFXSetup",
-                "JavaFX-Version" to "14+"
-        )
-    }
-}
-
 distributions {
     main {
         contents {
-            from(createPackage.`package`)
+            from(tasks.getByName<CreatePackage>(CREATE_PACKAGE_TASK_NAME).`package`)
         }
     }
 }
 
-tasks.named("createPackage") {
-    dependsOn(":slideshowfx-app:createPackage", ":slideshowfx-documentation:asciidoctor",
+tasks {
+    jar {
+        manifest {
+            attributes(
+                    "Implementation-Title" to "SlideshowFX-setup",
+                    "Implementation-Version" to "${project.version}",
+                    "Main-Class" to "com.twasyl.slideshowfx.setup.app.SlideshowFXSetup",
+                    "JavaFX-Application-Class" to "com.twasyl.slideshowfx.setup.app.SlideshowFXSetup",
+                    "JavaFX-Version" to "14+"
+            )
+        }
+    }
+
+    named<CreatePackage>(CREATE_PACKAGE_TASK_NAME) {
+        dependsOn(
+            ":slideshowfx-app:${CREATE_PACKAGE_TASK_NAME}",
+            ":slideshowfx-documentation:asciidoctor",
+            // Content extensions
             ":slideshowfx-alert-extension:bundle",
-            ":slideshowfx-box-hosting-connector:bundle",
             ":slideshowfx-code-extension:bundle",
-            ":slideshowfx-drive-hosting-connector:bundle",
-            ":slideshowfx-dropbox-hosting-connector:bundle",
-            ":slideshowfx-go-executor:bundle",
-            ":slideshowfx-golo-executor:bundle",
-            ":slideshowfx-groovy-executor:bundle",
-            ":slideshowfx-html:bundle",
             ":slideshowfx-image-extension:bundle",
-            ":slideshowfx-java-executor:bundle",
-            ":slideshowfx-javascript-executor:bundle",
-            ":slideshowfx-kotlin-executor:bundle",
             ":slideshowfx-link-extension:bundle",
-            ":slideshowfx-markdown:bundle",
             ":slideshowfx-quiz-extension:bundle",
             ":slideshowfx-quote-extension:bundle",
-            ":slideshowfx-ruby-executor:bundle",
-            ":slideshowfx-scala-executor:bundle",
             ":slideshowfx-sequence-diagram-extension:bundle",
             ":slideshowfx-shape-extension:bundle",
             ":slideshowfx-snippet-extension:bundle",
+            // Hosting connectors
+            ":slideshowfx-box-hosting-connector:bundle",
+            ":slideshowfx-drive-hosting-connector:bundle",
+            ":slideshowfx-dropbox-hosting-connector:bundle",
+            // Snippet executors
+            ":slideshowfx-go-executor:bundle",
+            ":slideshowfx-golo-executor:bundle",
+            ":slideshowfx-groovy-executor:bundle",
+            ":slideshowfx-java-executor:bundle",
+            ":slideshowfx-javascript-executor:bundle",
+            ":slideshowfx-kotlin-executor:bundle",
+            ":slideshowfx-ruby-executor:bundle",
+            ":slideshowfx-scala-executor:bundle",
+            // Markups
+            ":slideshowfx-asciidoctor:bundle",
+            ":slideshowfx-html:bundle",
+            ":slideshowfx-markdown:bundle",
             ":slideshowfx-textile:bundle")
-}
+    }
 
-tasks.named<Zip>("distZip") {
-    dependsOn("createPackage")
-    archiveFileName.set("${createPackage.distributionBaseName()}.zip")
-}
+    named<Zip>("distZip") {
+        dependsOn(CREATE_PACKAGE_TASK_NAME)
+        archiveFileName.set("${createPackage.get().distributionBaseName()}.zip")
+    }
 
-tasks.named("distTar") {
-    enabled = false
+    named("distTar") {
+        enabled = false
+    }
 }

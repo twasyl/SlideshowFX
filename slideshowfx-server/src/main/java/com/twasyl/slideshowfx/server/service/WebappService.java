@@ -29,7 +29,7 @@ public class WebappService extends AbstractSlideshowFXService {
 
     @Override
     public void start() {
-        SlideshowFXServer.getSingleton().getHttpServer().websocketHandler(this.buildWebSocketHandler());
+        SlideshowFXServer.getSingleton().getHttpServer().webSocketHandler(this.buildWebSocketHandler());
         this.updateRouteMatcher();
     }
 
@@ -158,7 +158,7 @@ public class WebappService extends AbstractSlideshowFXService {
     /**
      * Build the WebSocket handler for handling shared WebSocket calls.
      *
-     * @return
+     * @return The built WebSocket handler
      */
     private Handler<ServerWebSocket> buildWebSocketHandler() {
         return serverWebSocket -> {

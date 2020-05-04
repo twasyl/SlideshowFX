@@ -7,6 +7,9 @@ import org.openjfx.gradle.JavaFXOptions
 import org.openjfx.gradle.JavaFXPlugin
 import org.sonarqube.gradle.SonarQubeExtension
 import org.sonarqube.gradle.SonarQubePlugin
+import org.sonarqube.gradle.SonarQubeTask
+import java.nio.charset.StandardCharsets.UTF_8
+import kotlin.text.RegexOption.MULTILINE
 
 buildscript {
     repositories {
@@ -165,7 +168,7 @@ subprojects {
         dependencies {
             "${GHERKIN_TEST_SOURCE_SET_NAME}Implementation"(group = "org.junit.jupiter", name = "junit-jupiter-api", version = project.property("dependencies.junit.version") as String)
             "${GHERKIN_TEST_SOURCE_SET_NAME}Implementation"(group = "org.junit.jupiter", name = "junit-jupiter-params", version = project.property("dependencies.junit.version") as String)
-            "${GHERKIN_TEST_SOURCE_SET_NAME}Implementation"(group = "io.cucumber", name = "cucumber-java", version = "5.4.1")
+            "${GHERKIN_TEST_SOURCE_SET_NAME}Implementation"(group = "io.cucumber", name = "cucumber-java", version = project.property("dependencies.cucumber.version") as String)
         }
 
         tasks.named("check").configure {
@@ -183,26 +186,26 @@ subprojects {
     }
 
     plugins.withType<JacocoPlugin>().configureEach {
-        tasks.withType<JacocoReport>().configureEach {
+        tasks {
+            withType<JacocoReport>().configureEach {
+                executionData.setFrom(fileTree("$buildDir/jacoco").include("*.exec"))
 
-            val sourceSetContainer = project.extensions.getByType<SourceSetContainer>()
-            sourceSets(sourceSetContainer[integrationTest])
+                reports.apply {
+                    csv.isEnabled = false
+                    html.isEnabled = true
+                    xml.isEnabled = true
+                }
 
-            if (plugins.hasPlugin(GherkinPlugin::class)) {
-                sourceSets(sourceSetContainer[GHERKIN_TEST_SOURCE_SET_NAME])
+                dependsOn(integrationTest)
+                if (plugins.hasPlugin(GherkinPlugin::class)) {
+                    dependsOn(GHERKIN_TEST_TASK_NAME)
+                }
             }
 
-            executionData(fileTree("$buildDir/jacoco").matching { include("*.exec") })
-
-            reports.apply {
-                csv.isEnabled = false
-                html.isEnabled = true
-                xml.isEnabled = true
-            }
-
-            dependsOn(integrationTest)
-            if (plugins.hasPlugin(GherkinPlugin::class)) {
-                dependsOn(GHERKIN_TEST_TASK_NAME)
+            named("check").configure {
+                project.tasks.withType<JacocoReport>().forEach {
+                    this.dependsOn(it)
+                }
             }
         }
     }
@@ -228,7 +231,7 @@ subprojects {
         for (set in requiredSourceSets) {
             testDirs.addAll(set.allSource.srcDirs.filter { it.exists() })
 
-            var resultFile = file("$buildDir/jacoco/${set.name}.exec")
+            var resultFile = file("$buildDir/reports/jacoco/${set.name}/jacocoTestReport.xml")
             if (resultFile.exists()) {
                 jacocoReports.add(resultFile)
             }
@@ -242,7 +245,7 @@ subprojects {
         extensions.getByType<SonarQubeExtension>().apply {
             properties {
                 property("sonar.tests", testDirs.joinToString(separator = ",") { it.absolutePath })
-                property("sonar.jacoco.reportPaths", jacocoReports.joinToString(separator = ",") { it.absolutePath })
+                property("sonar.coverage.jacoco.xmlReportPaths", jacocoReports.joinToString(separator = ",") { it.absolutePath })
                 property("sonar.junit.reportPaths", junitReports.joinToString(separator = ",") { it.absolutePath })
             }
         }
@@ -254,10 +257,65 @@ sonarqube {
         property("sonar.host.url", System.getProperty("sonar.host.url", System.getenv("SONAR_HOST_URL")))
         property("sonar.login", System.getProperty("sonar.login", System.getenv("SONAR_LOGIN")))
         property("sonar.projectKey", System.getProperty("sonar.projectKey", System.getenv("SONAR_PROJECT_KEY")))
+        property("sonar.organization", System.getProperty("sonar.organization", System.getenv("SONAR_ORGANIZATION")))
+        property("sonar.branch.name", System.getProperty("sonar.branch.name", System.getenv("SONAR_BRANCH")))
+        property("sonar.sourceEncoding", "UTF-8")
     }
 }
 
-tasks.sonarqube {
-    dependsOn(subprojects.filter { project -> project.pluginManager.hasPlugin("org.sonarqube") }
-            .map { project -> project.tasks.named("check") })
+tasks {
+    withType<SonarQubeTask>().configureEach {
+        dependsOn(subprojects.filter { project -> project.pluginManager.hasPlugin("org.sonarqube") }
+                .map { project -> project.tasks.named("check") })
+    }
+
+    register("updateProductVersionNumber") {
+        group = "Release"
+        description = "Update the product version number in all relevant files."
+
+        doLast {
+            val excludeBuildFolders = fun(it: File): Boolean {
+                return it.name != "build" && it.name != ".gradle"
+            }
+            val filesToBeEventuallyUpdated = fun(it: File): Boolean {
+                return it.extension == "java" || it.extension == "yml"
+            }
+            val updateContent = fun(it: File) {
+                val nextVersionToken = "@@NEXT-VERSION@@"
+                val newVersion = (project.findProperty("productVersion") ?: System.getenv("PRODUCT_VERSION")) as String
+                val content = it.readText(charset = UTF_8)
+
+                if (content.contains(nextVersionToken)) {
+                    logger.info("File {} will be updated", rootDir.toPath().relativize(it.toPath()))
+                    it.writeText(content.replace(nextVersionToken, newVersion), charset = UTF_8)
+                }
+            }
+
+            val dirs = mutableListOf(File(rootDir, "buildSrc"), File(rootDir, ".github"))
+            dirs.addAll(subprojects.map { it.projectDir })
+            dirs.forEach { it.walkTopDown()
+                    .onEnter(excludeBuildFolders)
+                    .filter(filesToBeEventuallyUpdated)
+                    .forEach(updateContent) }
+        }
+    }
+
+    register("removeSnapshots") {
+        group = "Release"
+        description = "Remove the -SNAPSHOT qualifier from versions."
+
+        doLast {
+            val search = Regex("(^version\\s+=\\s+\"\\d+(?:\\.\\d+){0,1})-SNAPSHOT(\"$)", MULTILINE)
+            val replacement = fun(result: MatchResult): String {
+                return result.groups.elementAt(1)?.value + result.groups.elementAt(2)?.value
+            }
+            subprojects.filter { it.version.toString().endsWith("-SNAPSHOT") }
+                    .map { it.buildFile }
+                    .forEach {
+                        logger.info("Updating build file {}", it)
+                        val content = it.readText(charset = UTF_8)
+                        it.writeText(content.replace(search, replacement), charset = UTF_8)
+                    }
+        }
+    }
 }

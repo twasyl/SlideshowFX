@@ -15,6 +15,7 @@ import org.gradle.api.tasks.SourceSetContainer;
  * </ul>
  */
 public class GherkinPlugin implements Plugin<Project> {
+    public static final String GHERKIN_EXTENSION_NAME = "gherkin";
     public static final String GHERKIN_TEST_SOURCE_SET_NAME = "gherkinTest";
     public static final String GHERKIN_TEST_TASK_NAME = "gherkinTest";
 

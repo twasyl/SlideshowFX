@@ -10,11 +10,6 @@ gradlePlugin {
             implementationClass = "com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin"
         }
 
-        create("SlideshowFXPublisher") {
-            id = "sfx-publisher"
-            implementationClass = "com.twasyl.slideshowfx.gradle.plugins.sfxpublisher.SlideshowFXPublisherPlugin"
-        }
-
         create("SlideshowFXPackager") {
             id = "sfx-packager"
             implementationClass = "com.twasyl.slideshowfx.gradle.plugins.sfxpackager.SlideshowFXPackager"

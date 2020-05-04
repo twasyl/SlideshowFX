@@ -24,11 +24,10 @@ plugins {
     jacoco
     id("org.sonarqube")
     id("sfx-packager")
-    id("sfx-publisher")
 }
 
 description = "Module for the installer of SlideshowFX"
-version = "@@NEXT_VERSION@@"
+version = project.findProperty("productVersion") ?: System.getenv("PRODUCT_VERSION") ?: "@@NEXT-VERSION@@"
 
 dependencies {
     implementation(project(":slideshowfx-global-configuration"))

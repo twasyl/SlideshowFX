@@ -12,7 +12,7 @@ plugins {
 }
 
 description = "The SlideshowFX application"
-version = "@@NEXT_VERSION@@"
+version = project.findProperty("productVersion") ?: System.getenv("PRODUCT_VERSION") ?: "@@NEXT-VERSION@@"
 
 dependencies {
     implementation(project(":slideshowfx-content-extension"))
@@ -235,7 +235,7 @@ tasks {
                     "Main-Class" to "com.twasyl.slideshowfx.app.SlideshowFX",
                     "JavaFX-Preloader-Class" to "com.twasyl.slideshowfx.app.SlideshowFXPreloader",
                     "JavaFX-Application-Class" to "com.twasyl.slideshowfx.app.SlideshowFX",
-                    "JavaFX-Version" to "13+"
+                    "JavaFX-Version" to "14+"
             )
         }
     }

@@ -65,29 +65,29 @@ function getJavaHome() {
   installationFolder=$(getJavaInstallationFolder $1)
 
   if [ "$(isOSX)" == "true" ]; then
-    echo -n "$JVMS_DIR/$installationFolder/Contents/Home"
+    echo -n "$JAVA_HOMES/$installationFolder/Contents/Home"
   else
-    echo -n "$JVMS_DIR/$installationFolder"
+    echo -n "$JAVA_HOMES/$installationFolder"
   fi
 }
 
 function cleanJDKInstallations() {
   echo "Cleaning previous JDK installations"
-  jdks=$(ls $JVMS_DIR)
+  jdks=$(ls $JAVA_HOMES)
   buildJdk="$(getJavaInstallationFolder build)"
   applicationJdk="$(getJavaInstallationFolder application)"
 
   for jdk in $jdks; do
     if [ "$jdk" != "$buildJdk" ] && [ "$jdk" != "$applicationJdk" ]; then
       echo "Cleaning $jdk"
-      rm -rf $JVMS_DIR/$jdk
+      rm -rf $JAVA_HOMES/$jdk
     fi
   done
 }
 
 function setupJDK() {
-  if [ ! -d "$JVMS_DIR" ]; then
-    mkdir -p "$JVMS_DIR"
+  if [ ! -d "$JAVA_HOMES" ]; then
+    mkdir -p "$JAVA_HOMES"
   fi
 
   cleanJDKInstallations
@@ -105,8 +105,8 @@ function setupJDK() {
 
     if [ ! -d "$javaHome" ]; then
       echo "Setup JDK $jvmVersion"
-      mkdir -p $JVMS_DIR
-      pushd $JVMS_DIR >/dev/null
+      mkdir -p $JAVA_HOMES
+      pushd $JAVA_HOMES >/dev/null
       echo "Downloading JDK $jvmVersion from $downloadUrl"
       curl -s $downloadUrl --output $archiveName
       if [ "$(getOS)" == "windows" ]; then
@@ -135,12 +135,25 @@ function getJavaOptions() {
 }
 
 function configureGradle() {
-  mkdir -p ~/.gradle
-  echo org.gradle.java.home=$(convertPath $(getJavaHome build)) >> ~/.gradle/gradle.properties
-  echo build_jdk=$(convertPath $(getJavaHome application)) >> ~/.gradle/gradle.properties
+  mkdir -p $GRADLE_USER_HOME
+  echo "org.gradle.java.home=$(convertPath $(getJavaHome build))" > $GRADLE_USER_HOME/gradle.properties
+  echo "org.gradle.caching=true" >> $GRADLE_USER_HOME/gradle.properties
+  echo "build_jdk=$(convertPath $(getJavaHome application))" >> $GRADLE_USER_HOME/gradle.properties
 }
 
-JVMS_DIR=$HOME/jvm
+# Creates a file listing the JVMs for GitHub actions to be able to detect changes in the cache
+function createJVMSListFile() {
+  echo "build=$BUILD_TOOL_JDK_VERSION" > $GITHUB_WORKSPACE/jvms.list
+  echo -n "application=$APPLICATION_JDK_VERSION" >> $GITHUB_WORKSPACE/jvms.list
+}
+
+function setupBuildEnvironment() {
+  setupJDK build application
+  configureGradle
+  export _JAVA_OPTIONS="$(getJavaOptions)"
+  export JAVA_HOME="$(getJavaHome build)"
+}
+
 BUILD_TOOL_JDK_VERSION=14.0.1
 BUILD_TOOL_JDK_BASE_DOWNLOAD_URL="https://download.java.net/java/GA/jdk14.0.1/664493ef4a6946b186ff29eb326336a2/7/GPL/$(getJDKArchiveName build)"
 APPLICATION_JDK_VERSION=14.0.1

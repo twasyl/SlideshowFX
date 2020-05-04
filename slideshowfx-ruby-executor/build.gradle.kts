@@ -3,7 +3,6 @@ plugins {
     id("org.openjfx.javafxplugin")
     jacoco
     id("org.sonarqube")
-    id("sfx-publisher")
 }
 
 description = "Snippet executor allowing to execute some Ruby inside a SlideshowFX presentation"

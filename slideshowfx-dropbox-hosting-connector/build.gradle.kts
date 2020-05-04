@@ -3,7 +3,6 @@ plugins {
     id("org.openjfx.javafxplugin")
     jacoco
     id("org.sonarqube")
-    id("sfx-publisher")
 }
 
 description = "Hosting connector allowing to open and save presentations from and to Dropbox"

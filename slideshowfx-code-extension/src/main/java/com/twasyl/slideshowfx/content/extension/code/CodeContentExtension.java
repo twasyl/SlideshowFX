@@ -35,7 +35,7 @@ public class CodeContentExtension extends AbstractContentExtension<CodeContentEx
                 CODE,
                 "Insert code", "Insert code");
 
-        final String baseURL = "prism/1.16.0/";
+        final String baseURL = "prism/1.20.0/";
 
         // Add URL
         this.putResource(ResourceType.CSS_FILE, baseURL.concat("prism.css"));

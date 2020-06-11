@@ -180,28 +180,6 @@ Gradle plugin to be applied on projects that are JavaFX application and that nee
 | debugPort | Indicates the debugging port on which a debugger can be attached when running the application | `5005` | `runApplication`
 |===
 
-===== SlideshowFXPublisherPlugin
-
-Gradle plugin to be applied for projects that need to be published on Bintray.
-
-====== Tasks
-
-[options=header]
-|===
-| Name | Description
-| publish |  Publishes the artifact on Bintray
-| listSnapshotProjects | Lists all projects having a snapshot version
-|===
-
-====== Properties
-
-[options=header]
-|===
-| Name | Description | Default value | Used by tasks
-| bintrayUserName | Username to publish on Bintray. Can be replaced by a `BINTRAY_USER_NAME` environment variable | - | `publish`
-| bintrayApiKey | API key to publish on Bintray. Can be replaced by a `BINTRAY_API_KEY` environment variable | - | `publish`
-|===
-
 ===== Gherkin
 
 Gradle plugin to be applied on projects using Gherkin tests.
@@ -226,8 +204,11 @@ Gradle plugin to be applied on projects using Gherkin tests.
 Some gradle tasks are provided to help the developer :
 
 - *ideaCleanOutput* removes all files produced by the IntelliJ compilation
+- *removeSnapshots* removes the `-SNAPSHOT` qualifier from projects' versions
+- *updateProductVersionNumber* updates the product version in source files when passing the `-PproductVersion=xxx` property on the command line ;
 - *:slideshowfx-app:createSlideContentEditor* allows to build the `sfx-slide-content-editor.zip` archive when passing the `-PaceVersion=xxx` property on the command line ;
 - *:slideshowfx-alert-extension:createSweetAlertPackage* allows to build the `sweetalert.zip` archive when passing the `-PsweetAlertVersion=xxx` property on the command line ;
+- *:slideshowfx-icons:updateFontAwesome* allows to update the FontAwesome version shipped with SlideshowFX when passing `-PfontAwesomeVersion=xxx` property on the command line ;
 - *:slideshowfx-shape-extension:createSnapSVGPackage* allows to build the `snapsvg.zip` archive when passing the `-PsnapSvgVersion=xxx` property on the command line.
 
 === Set up your environment

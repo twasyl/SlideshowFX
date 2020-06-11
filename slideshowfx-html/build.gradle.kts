@@ -3,7 +3,6 @@ plugins {
     id("org.openjfx.javafxplugin")
     jacoco
     id("org.sonarqube")
-    id("sfx-publisher")
 }
 
 description = "Extension allowing to define slide's content using the HTML syntax"

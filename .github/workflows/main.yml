@@ -2,75 +2,15 @@ name: CI
 on:
   push:
     branches:
-      - master-disabled
+      - '*'
+    tags:
+      - 'v*'
+
+env:
+  PRODUCT_VERSION: "@@NEXT-VERSION@@"
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    env:
-      OS_NAME: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache JDK installations
-        id: jdkcache
-        uses: actions/cache@v1
-        with:
-          path: ~/jvm
-          key: ${{ runner.os }}-jvms
-
-      - name: Cache gradle dependencies
-        id: gradlecache
-        uses: actions/cache@v1
-        with:
-          path: ~/.gradle
-          key: ${{ runner.os }}-gradle
-
-      - name: Run tests
-        run: |
-          chmod +x .github/workflows/ci-utils.sh
-          source .github/workflows/ci-utils.sh
-          setupJDK build application
-          configureGradle
-          export _JAVA_OPTIONS="$(getJavaOptions)"
-          ./gradlew -q buildDashboard check
-        shell: bash
-
-#  analyze:
-#    runs-on: ubuntu-latest
-#      env:
-#        OS_NAME: ubuntu-latest
-#        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-#        SONAR_LOGIN: ${{ secrets.SONAR_TOKEN }}
-#        SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
-#      steps:
-#        - uses: actions/checkout@v2
-#
-#        - name: Cache JDK installations
-#          id: jdkcache
-#          uses: actions/cache@v1
-#          with:
-#            path: ~/jvm
-#            key: ${{ runner.os }}-jvms
-#
-#        - name: Cache gradle dependencies
-#          id: gradlecache
-#          uses: actions/cache@v1
-#          with:
-#            path: ~/.gradle
-#            key: ${{ runner.os }}-gradle
-#
-#        - name: Run analysis
-#          run: |
-#            chmod +x .github/workflows/ci-utils.sh
-#            source .github/workflows/ci-utils.sh
-#            setupJDK build application
-#            configureGradle
-#            export _JAVA_OPTIONS="$(getJavaOptions)"
-#            ./gradlew -q sonarqube
-#          shell: bash
-
-  package:
+  setup:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -79,34 +19,173 @@ jobs:
       OS_NAME: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-
-      - name: Cache JDK installations
-        id: jdkcache
-        uses: actions/cache@v1
-        with:
-          path: ~/jvm
-          key: ${{ runner.os }}-jvms
-
-      - name: Cache gradle dependencies
-        id: gradlecache
-        uses: actions/cache@v1
-        with:
-          path: ~/.gradle
-          key: ${{ runner.os }}-gradle
-
-      - name: Package
-        run: |
-          chmod +x .github/workflows/ci-utils.sh
-          source .github/workflows/ci-utils.sh
-          setupJDK build application
-          configureGradle
-          export _JAVA_OPTIONS="$(getJavaOptions)"
-          ./gradlew -q bundle
-          ./gradlew -q :slideshowfx-setup:createPackage
+      - run: |
+          echo ::set-env name=JAVA_HOMES::$HOME/.jvms
+          echo ::set-env name=GRADLE_USER_HOME::$HOME/.gradle
+          chmod +x .github/workflows/ci-utils.sh && source .github/workflows/ci-utils.sh && createJVMSListFile
         shell: bash
+      - name: Cache JDK installations
+        id: jdk
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.JAVA_HOMES }}
+          key: ${{ matrix.os }}-jvms-${{ hashFiles('jvms.list') }}
+      - name: Cache gradle dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.GRADLE_USER_HOME }}
+          key: ${{ matrix.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+      - name: Setup build environment
+        shell: bash
+        run: chmod +x .github/workflows/ci-utils.sh && source .github/workflows/ci-utils.sh && setupBuildEnvironment && ./gradlew -q tasks
 
-      - uses: actions/upload-artifact@v1
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    env:
+      OS_NAME: ubuntu-latest
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      SONAR_LOGIN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+      SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          echo ::set-env name=JAVA_HOMES::$HOME/.jvms
+          echo ::set-env name=GRADLE_USER_HOME::$HOME/.gradle
+          echo ::set-env name=SONAR_BRANCH::$(echo -n ${GITHUB_REF/refs\/heads\//})
+          chmod +x .github/workflows/ci-utils.sh && source .github/workflows/ci-utils.sh && createJVMSListFile
+      - name: Cache JDK installations
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.JAVA_HOMES }}
+          key: ubuntu-latest-jvms-${{ hashFiles('jvms.list') }}
+      - name: Cache gradle dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.GRADLE_USER_HOME }}
+          key: ubuntu-latest-gradle-${{ hashFiles('**/*.gradle*') }}
+      - name: Run tests
+        id: tests
+        run: |
+          chmod +x .github/workflows/ci-utils.sh && source .github/workflows/ci-utils.sh && setupBuildEnvironment
+          ./gradlew -q check sonarqube
+          echo ::set-output name=report_name::reports-$(echo -n $GITHUB_REF | sed -E "s/refs\/(heads|tags)\///g")-$(date +'%Y%m%dT%H%M%S')
+          echo ::set-output name=execution_time::$(date +'%Y%m%dT%H%M%S')
+      - uses: actions/upload-artifact@v2
+        if: success() || failure()
+        with:
+          name: ${{ steps.tests.outputs.report_name }}
+          path: "**/reports/"
+
+  package:
+    needs: [setup,test]
+    runs-on: ${{ matrix.os }}
+    if: success() && contains(github.ref, 'refs/tags/')
+    strategy:
+      matrix:
+        os: [macos-latest,windows-latest,ubuntu-latest]
+    env:
+      OS_NAME: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          echo ::set-env name=JAVA_HOMES::$HOME/.jvms
+          echo ::set-env name=GRADLE_USER_HOME::$HOME/.gradle
+          chmod +x .github/workflows/ci-utils.sh && source .github/workflows/ci-utils.sh && createJVMSListFile
+        shell: bash
+      - name: Cache JDK installations
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.JAVA_HOMES }}
+          key: ${{ matrix.os }}-jvms-${{ hashFiles('jvms.list') }}
+      - name: Cache gradle dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.GRADLE_USER_HOME }}
+          key: ${{ matrix.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+      - name: Package
+        run: chmod +x .github/workflows/ci-utils.sh && source .github/workflows/ci-utils.sh && setupBuildEnvironment && ./gradlew -q bundle :slideshowfx-setup:distZip
+        shell: bash
+      - uses: actions/upload-artifact@v2
         if: success()
         with:
-          name: Setup package
-          path: slideshowfx-setup/build/package
+          name: setup-package-${{ matrix.os }}
+          path: slideshowfx-setup/build/distributions/*.zip
+
+  release:
+    needs: [test, package]
+    runs-on: ubuntu-latest
+    if: success() && contains(github.ref, 'refs/tags/')
+    env:
+      PACKAGES_PATH: packages
+    steps:
+      - uses: actions/checkout@v2
+      - run: mkdir -p $PACKAGES_PATH
+      - name: Retrieve OSX setup package
+        uses: actions/download-artifact@v2
+        with:
+          name: setup-package-macos-latest
+          path: ${{ env.PACKAGES_PATH }}
+      - name: Retrieve Windows setup package
+        uses: actions/download-artifact@v2
+        with:
+          name: setup-package-windows-latest
+          path: ${{ env.PACKAGES_PATH }}
+      - name: Retrieve Unix setup package
+        uses: actions/download-artifact@v2
+        with:
+          name: setup-package-ubuntu-latest
+          path: ${{ env.PACKAGES_PATH }}
+      - name: Read release notes
+        id: release_notes
+        run: |
+          TAG_NAME=$(echo -n $GITHUB_REF | sed -E "s/refs\/(heads|tags)\///g")
+          RELEASE_NOTES_CONTENT=$(cat release-notes/${TAG_NAME}.md)
+          RELEASE_NOTES_CONTENT="${RELEASE_NOTES_CONTENT//$'\n'/'%0A'}"
+          RELEASE_NOTES_CONTENT="${RELEASE_NOTES_CONTENT//$'\r'/'%0D'}"
+          echo ::set-output name=content::$RELEASE_NOTES_CONTENT
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: SlideshowFX ${{ env.PRODUCT_VERSION }}
+          body: |
+            ${{ steps.release_notes.outputs.content }}
+          draft: true
+          prerelease: false
+      - name: Attaching OSX setup package
+        uses: actions/upload-release-asset@v1
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.PACKAGES_PATH }}/SlideshowFXSetup-${{ env.PRODUCT_VERSION }}-osx.zip
+          asset_name: SlideshowFXSetup-${{ env.PRODUCT_VERSION }}-osx.zip
+          asset_content_type: application/zip
+      - name: Attaching Windows setup package
+        uses: actions/upload-release-asset@v1
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.PACKAGES_PATH }}/SlideshowFXSetup-${{ env.PRODUCT_VERSION }}-windows.zip
+          asset_name: SlideshowFXSetup-${{ env.PRODUCT_VERSION }}-windows.zip
+          asset_content_type: application/zip
+      - name: Attaching Unix setup package
+        uses: actions/upload-release-asset@v1
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.PACKAGES_PATH }}/SlideshowFXSetup-${{ env.PRODUCT_VERSION }}-unix.zip
+          asset_name: SlideshowFXSetup-${{ env.PRODUCT_VERSION }}-unix.zip
+          asset_content_type: application/zip

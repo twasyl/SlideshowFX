@@ -83,19 +83,12 @@ public class CreatePackage extends DefaultTask {
             cmd.add(prepareResourcesTask.getResourcesDir().getAbsolutePath());
         }
 
-        getProject().exec(spec -> spec.commandLine(cmd));
+        getProject().exec(spec -> spec.commandLine(cmd)).assertNormalExitValue();
     }
 
     @OutputDirectory
     public File getPackage() {
-        final String extension;
-        if (isMac()) {
-            extension = ".app";
-        } else if (isWindows()) {
-            extension = "";
-        } else {
-            extension = ".deb";
-        }
+        final String extension = isMac() ? ".app" : "";
         return new File(this.packageExtension.outputDir, this.packageExtension.executableBaseName + extension);
     }
 

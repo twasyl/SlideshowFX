@@ -3,7 +3,6 @@ plugins {
     id("org.openjfx.javafxplugin")
     jacoco
     id("org.sonarqube")
-    id("sfx-publisher")
 }
 
 description = "xtension allowing to insert images inside a SlideshowFX presentation"

@@ -7,7 +7,6 @@ plugins {
     id("org.openjfx.javafxplugin")
     jacoco
     id("org.sonarqube")
-    id("sfx-publisher")
 }
 
 description = "Extension allowing to insert shapes inside a SlideshowFX presentation"

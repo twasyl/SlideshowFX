@@ -11,7 +11,8 @@ version = "1.1-SNAPSHOT"
 dependencies {
     implementation(project(":slideshowfx-plugin"))
 
-    pluginDependencies(group = "com.github.rjeschke", name = "txtmark", version = project.property("dependencies.markdown.version") as String)
+    pluginDependencies(group = "com.atlassian.commonmark", name = "commonmark", version = project.property("dependencies.markdown.version") as String)
+    pluginDependencies(group = "com.atlassian.commonmark", name = "commonmark-ext-gfm-tables", version = project.property("dependencies.markdown.version") as String)
 }
 
 javafx {

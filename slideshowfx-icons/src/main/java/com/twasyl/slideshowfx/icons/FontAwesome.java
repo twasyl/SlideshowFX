@@ -55,7 +55,7 @@ public class FontAwesome extends Text {
 
     private static final Logger LOGGER = Logger.getLogger(FontAwesome.class.getName());
     private static final StyleablePropertyFactory<FontAwesome> FACTORY = new StyleablePropertyFactory<>(Text.getClassCssMetaData());
-    private static final String FONTAWESOME_VERSION = "5.13.0";
+    private static final String FONTAWESOME_VERSION = "5.14.0";
     private static final String FONTAWESOME_ROOT = "/com/twasyl/slideshowfx/icons/fontawesome/" + FONTAWESOME_VERSION.replaceAll("\\.", "_") + "/";
     private static final Map<FontCacheKey, Font> FONT_CACHE = new HashMap<>();
 

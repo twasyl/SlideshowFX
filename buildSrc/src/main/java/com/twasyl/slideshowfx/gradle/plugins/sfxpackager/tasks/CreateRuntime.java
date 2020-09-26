@@ -48,10 +48,10 @@ public class CreateRuntime extends DefaultTask {
 
         final List<Object> cmd = new ArrayList<>();
         cmd.add(getJavaBinary(getProject(), "jlink"));
-        cmd.add("--no-header-files");
-        cmd.add("--no-man-pages");
-        cmd.add("--compress=2");
-        cmd.add("--strip-debug");
+
+        if (this.packageExtension.runtime.jlinkOptions != null) {
+            this.packageExtension.runtime.jlinkOptions.forEach(cmd::add);
+        }
 
         if (this.packageExtension.runtime.modules != null && !this.packageExtension.runtime.modules.isEmpty()) {
             cmd.add("--add-modules");

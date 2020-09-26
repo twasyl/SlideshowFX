@@ -1,3 +1,5 @@
+import com.twasyl.slideshowfx.gradle.Utils.isMac
+import com.twasyl.slideshowfx.gradle.Utils.isWindows
 import com.twasyl.slideshowfx.gradle.plugins.gherkin.GherkinPlugin
 import com.twasyl.slideshowfx.gradle.plugins.gherkin.GherkinPlugin.GHERKIN_TEST_SOURCE_SET_NAME
 import com.twasyl.slideshowfx.gradle.plugins.gherkin.GherkinPlugin.GHERKIN_TEST_TASK_NAME
@@ -86,8 +88,8 @@ subprojects {
         tasks {
             withType<JavaCompile>().configureEach {
                 inputs.property("moduleName", moduleName)
-                sourceCompatibility = JavaVersion.VERSION_14.toString()
-                targetCompatibility = JavaVersion.VERSION_14.toString()
+                sourceCompatibility = JavaVersion.VERSION_15.toString()
+                targetCompatibility = JavaVersion.VERSION_15.toString()
                 modularity.inferModulePath.set(true)
 
                 options.apply {
@@ -153,6 +155,14 @@ subprojects {
             useJUnitPlatform()
             testClassesDirs = sourceSetContainer[integrationTest].output.classesDirs
             classpath = sourceSetContainer[integrationTest].runtimeClasspath
+
+            jvmArgs("--enable-preview", "-Djava.awt.headless=true", "-Dtestfx.robot=glass", "-Dtestfx.headless=true", "-Dprism.order=sw")
+
+            if (isMac()) {
+                jvmArgs("-Dprism.verbose=true")
+            } else if (isWindows()) {
+                jvmArgs("-Dprism.text=t2k")
+            }
         }
     }
 
@@ -186,6 +196,10 @@ subprojects {
     }
 
     plugins.withType<JacocoPlugin>().configureEach {
+        extensions.getByType<JacocoPluginExtension>().apply {
+            toolVersion = "0.8.6"
+        }
+
         tasks {
             withType<JacocoReport>().configureEach {
                 executionData.setFrom(fileTree("$buildDir/jacoco").include("*.exec"))
@@ -212,7 +226,7 @@ subprojects {
 
     plugins.withType<JavaFXPlugin>().configureEach {
         extensions.getByType<JavaFXOptions>().apply {
-            version = "14.0.1"
+            version = "15"
         }
     }
 
@@ -293,10 +307,12 @@ tasks {
 
             val dirs = mutableListOf(File(rootDir, "buildSrc"), File(rootDir, ".github"))
             dirs.addAll(subprojects.map { it.projectDir })
-            dirs.forEach { it.walkTopDown()
-                    .onEnter(excludeBuildFolders)
-                    .filter(filesToBeEventuallyUpdated)
-                    .forEach(updateContent) }
+            dirs.forEach {
+                it.walkTopDown()
+                        .onEnter(excludeBuildFolders)
+                        .filter(filesToBeEventuallyUpdated)
+                        .forEach(updateContent)
+            }
         }
     }
 

@@ -1,4 +1,5 @@
-import org.asciidoctor.gradle.jvm.AsciidoctorTask
+import com.twasyl.slideshowfx.gradle.plugins.documentation.Documentation.RENDER_DOCUMENTATION_TASK_NAME
+import com.twasyl.slideshowfx.gradle.plugins.documentation.tasks.RenderDocumentation
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
@@ -12,11 +13,10 @@ plugins {
 }
 
 description = "The SlideshowFX application"
-version = project.findProperty("productVersion") ?: System.getenv("PRODUCT_VERSION") ?: "@@NEXT-VERSION@@"
+version = project.findProperty("productVersion") ?: System.getenv("PRODUCT_VERSION") ?: "2020.1"
 
 dependencies {
     implementation(project(":slideshowfx-content-extension"))
-    implementation(project(":slideshowfx-documentation"))
     implementation(project(":slideshowfx-engines"))
     implementation(project(":slideshowfx-global-configuration"))
     implementation(project(":slideshowfx-hosting-connector"))
@@ -42,6 +42,11 @@ packaging {
     executableBaseName = "SlideshowFX"
 
     runtime.modules = listOf("java.desktop", "java.logging", "java.net.http", "java.scripting", "java.sql", "java.xml", "jdk.jsobject", "jdk.unsupported", "jdk.unsupported.desktop", "jdk.xml.dom")
+    runtime.jlinkOptions = listOf("--no-header-files",
+            "--no-man-pages",
+            "--compress=0",
+            "--strip-debug",
+            "--strip-native-commands")
 
     app.jvmOpts = listOf("-Xms512m",
             "-Xmx2g",
@@ -51,12 +56,9 @@ packaging {
             "-Djava.util.logging.config.file=@@LOGGING_CONFIGURATION_FILE@@",
             "-Djavafx.preloader=com.twasyl.slideshowfx.app.SlideshowFXPreloader",
             "--add-modules", "ALL-MODULE-PATH")
-    app.module = "slideshowfx.app/com.twasyl.slideshowfx.app.SlideshowFX"
-}
 
-runApplication {
-    module = "slideshowfx.app"
-    mainClass = "com.twasyl.slideshowfx.app.SlideshowFX"
+    app.module = "slideshowfx.app"
+    app.mainClass = "com.twasyl.slideshowfx.app.SlideshowFX"
 }
 
 javafx {
@@ -65,11 +67,19 @@ javafx {
 
 tasks {
     processResources {
-        dependsOn(":slideshowfx-documentation:asciidoctor")
+        dependsOn(":slideshowfx-documentation:$RENDER_DOCUMENTATION_TASK_NAME")
         doLast {
             copy {
-                from(project(":slideshowfx-documentation").tasks.named<AsciidoctorTask>("asciidoctor").get().backendOutputDirectories)
+                from(project(":slideshowfx-documentation").tasks.named<RenderDocumentation>(RENDER_DOCUMENTATION_TASK_NAME).get().outputs)
                 into("${sourceSets["main"].output.resourcesDir!!.absolutePath}/com/twasyl/slideshowfx/documentation/html")
+            }
+
+            if (plugins.hasPlugin(IdeaPlugin::class)) {
+                val out = plugins.getPlugin(IdeaPlugin::class).model.module.outputDir
+                copy {
+                    from(project(":slideshowfx-documentation").tasks.named<RenderDocumentation>(RENDER_DOCUMENTATION_TASK_NAME).get().outputs)
+                    into("${out}/com/twasyl/slideshowfx/documentation")
+                }
             }
         }
     }
@@ -243,7 +253,7 @@ tasks {
     prepareResources {
         dependsOn(
                 ":slideshowfx-content-extension:jar",
-                ":slideshowfx-documentation:asciidoctor",
+                ":slideshowfx-documentation:$RENDER_DOCUMENTATION_TASK_NAME",
                 ":slideshowfx-engines:jar",
                 ":slideshowfx-global-configuration:jar",
                 ":slideshowfx-hosting-connector:jar",

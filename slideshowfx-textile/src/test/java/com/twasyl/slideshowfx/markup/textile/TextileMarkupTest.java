@@ -23,39 +23,56 @@ public class TextileMarkupTest {
         assertThrows(IllegalArgumentException.class, () -> markup.convertAsHtml(null));
     }
 
-    @Test public void generateH1() {
+    @Test
+    public void generateH1() {
         final String result = markup.convertAsHtml("h1. A title");
 
         assertEquals("<h1 id=\"Atitle\">A title</h1>", result);
     }
 
-    @Test public void generateH2() {
+    @Test
+    public void generateH2() {
         final String result = markup.convertAsHtml("h2. A title");
 
         assertEquals("<h2 id=\"Atitle\">A title</h2>", result);
     }
 
-    @Test public void generateInlineCode() {
+    @Test
+    public void generateInlineCode() {
         final String result = markup.convertAsHtml("@public class Java { }@");
 
         assertEquals("<p><code>public class Java { }</code></p>", result);
     }
 
-    @Test public void generateCodeBloc() {
+    @Test
+    public void generateCodeBloc() {
         final String result = markup.convertAsHtml("bc. final String s;");
 
         assertEquals("<pre><code>final String s;\n</code></pre>", result);
     }
 
-    @Test public void generateStrong() {
+    @Test
+    public void generateStrong() {
         final String result = markup.convertAsHtml("*Strong text*");
 
         assertEquals("<p><strong>Strong text</strong></p>", result);
     }
 
-    @Test public void generateUnorderedList() {
+    @Test
+    public void generateUnorderedList() {
         final String result = markup.convertAsHtml("* One\n* Two");
 
         assertEquals("<ul><li>One</li><li>Two</li></ul>", result);
+    }
+
+    @Test
+    public void generateTable() {
+        final String result = markup.convertAsHtml(
+                //"|^.\n" +
+                        "|_. Column 1 |_. Column 2 |\n" +
+                        //"|-.\n" +
+                        "| Value 1 | Value 2 |");
+
+        assertEquals("<table>\n<thead>\n<tr>\n<th>Column 1</th>\n<th>Column 2</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Value 1</td>\n<td>Value 2</td>\n</tr>\n</tbody>\n</table>", result);
     }
 }

@@ -121,7 +121,7 @@ public class PresentationVariablesPanel extends BorderPane {
 
     private JavaBeanObjectProperty buildVariableNameProperty(final Variable variable) {
         try {
-            return new JavaBeanObjectPropertyBuilder<>()
+            return JavaBeanObjectPropertyBuilder.create()
                     .bean(variable)
                     .getter("getName")
                     .setter("setName")
@@ -134,7 +134,7 @@ public class PresentationVariablesPanel extends BorderPane {
 
     private JavaBeanObjectProperty buildVariableValueProperty(final Variable variable) {
         try {
-            return new JavaBeanObjectPropertyBuilder<>()
+            return JavaBeanObjectPropertyBuilder.create()
                     .bean(variable)
                     .getter("getValue")
                     .setter("setValue")

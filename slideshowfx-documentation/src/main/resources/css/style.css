@@ -1,0 +1,133 @@
+body {
+    font-family: Verdana;
+    margin: 10px;
+
+    --PRIMARY-COLOR: #ff9320;
+    --LIGHT-PRIMARY-COLOR: #ffc180;
+    counter-reset: title-level-second-numerotation;
+}
+
+h1 { color: var(--PRIMARY-COLOR); }
+
+h2 {
+    margin-left: 10pt;
+    font-size: 25px;
+    counter-reset: title-level-third-numerotation;
+}
+
+h2::before {
+    counter-increment: title-level-second-numerotation;
+    content: counter(title-level-second-numerotation) ". ";
+}
+
+h3 {
+    margin-left: 20pt;
+    font-size: 20px;
+    counter-reset: title-level-fourth-numerotation;
+}
+
+h3::before {
+    counter-increment: title-level-third-numerotation;
+    content: counter(title-level-second-numerotation) "." counter(title-level-third-numerotation) ". ";
+}
+
+h4 {
+    margin-left: 40pt;
+    font-size: 15px;
+    counter-reset: title-level-fifth-numerotation;
+}
+
+h4::before {
+    counter-increment: title-level-fourth-numerotation;
+    content: counter(title-level-second-numerotation) "." counter(title-level-third-numerotation) "." counter(title-level-fourth-numerotation) ". ";
+}
+
+h5 {
+    margin-left: 40pt;
+    font-size: 15px;
+    counter-reset: title-level-sixth-numerotation;
+}
+
+h5::before {
+    counter-increment: title-level-fifth-numerotation;
+    content: counter(title-level-second-numerotation) "." counter(title-level-third-numerotation) "." counter(title-level-fourth-numerotation) "." counter(title-level-fifth-numerotation) ". ";
+}
+
+h6 {
+    margin-left: 40pt;
+    font-size: 15px;
+}
+
+h6::before {
+    counter-increment: title-level-sixth-numerotation;
+    content: counter(title-level-second-numerotation) "." counter(title-level-third-numerotation) "." counter(title-level-fourth-numerotation) "." counter(title-level-fifth-numerotation) "." counter(title-level-sixth-numerotation) ". ";
+}
+
+pre {
+    background-color: #f5f2f0;
+    border: 0.5px solid #c4c4c4;
+}
+
+:not(pre) > code {
+    border: 0.5px solid var(--PRIMARY-COLOR);
+    background-color: var(--LIGHT-PRIMARY-COLOR);
+    padding: 0px 3px;
+    border-radius: 5px;
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    border: 1px solid var(--PRIMARY-COLOR);
+}
+
+table td,
+table th {
+    padding: 5px;
+}
+
+table > thead {
+    background-color: var(--LIGHT-PRIMARY-COLOR);
+    color: #000000;
+}
+
+table > tbody tr:nth-child(even) {
+    background: #e3e3e3;
+}
+
+table > tbody tr:nth-child(odd) {
+    background: whitesmoke;
+}
+
+table td+td,
+table th+th {
+    border-left: 1px solid #e3e3e3;
+}
+
+a,
+a:visited {
+    color: var(--PRIMARY-COLOR)
+}
+
+.fa-stack {
+    font-size: 0.6em;
+}
+
+.top-right {
+    line-height: normal;
+    top: 0;
+    right: 0;
+}
+
+.bottom-center {
+    line-height: normal;
+    bottom: 0;
+}
+
+.orange {
+    color: #FF8000
+}
+
+.green {
+    color: green;
+}

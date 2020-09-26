@@ -12,14 +12,6 @@ dependencies {
     implementation(project(":slideshowfx-plugin"))
 
     pluginDependencies(group = "org.asciidoctor", name = "asciidoctorj", version = project.property("dependencies.asciidoctorj.version") as String)
-    constraints {
-        pluginDependencies("com.github.jnr:jnr-enxio:0.22") {
-            because("previous versions is JPMS incompatible")
-        }
-        pluginDependencies("com.github.jnr:jnr-unixsocket:0.23") {
-            because("previous versions is JPMS incompatible")
-        }
-    }
 }
 
 javafx {

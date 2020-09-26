@@ -66,12 +66,12 @@ public class CreatePackage extends DefaultTask {
         cmd.add("--runtime-image");
         cmd.add(createRuntimeTask.getRuntimeDir().getAbsolutePath());
 
-        cmd.add("--module");
-        cmd.add(this.packageExtension.app.module);
-
         final var prepareResourcesTask = (PrepareResources) getProject().getTasks().getByName(PREPARE_RESOURCES_TASK_NAME);
         cmd.add("--module-path");
         cmd.add(prepareResourcesTask.getDependenciesDir().getAbsolutePath());
+
+        cmd.add("--module");
+        cmd.add(this.packageExtension.app.module + "/" + this.packageExtension.app.mainClass);
 
         this.packageExtension.app.jvmOpts.forEach(option -> {
             cmd.add("--java-options");

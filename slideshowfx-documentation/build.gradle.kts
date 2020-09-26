@@ -1,45 +1,27 @@
 import org.gradle.util.GradleVersion
-import org.asciidoctor.gradle.jvm.AbstractAsciidoctorTask
 
 plugins {
-    id("org.asciidoctor.jvm.convert")
+     id("documentation")
 }
 
 description = "SlideshowFX documentation to be included within the application and the setup package"
 version = "1.0"
 
-tasks {
-    "asciidoctor"(AbstractAsciidoctorTask::class) {
-        attributes(
-                mapOf(
-                        "source-highlighter" to "coderay",
-                        "toc" to "left",
-                        "icons" to "font",
-                        "iconfont-remote!" to "",
-                        "webfonts!" to "",
-                        "setanchors" to "",
-                        "sectlinks" to "",
-                        "slideshowfx_version" to rootProject.version,
-                        "asciidoctor-source" to "${project.projectDir}/src/docs/asciidoc",
-                        "jdk-version" to "14",
-                        "javafx-version" to "14",
-                        "gradle-version" to GradleVersion.current().version,
-                        "asciidoctorj-version" to project.property("dependencies.asciidoctorj.version") as String,
-                        "freemarker-version" to project.property("dependencies.freemarker.version") as String,
-                        "jsoup-version" to project.property("dependencies.jsoup.version") as String,
-                        "wikitext-textile-core-version" to project.property("dependencies.wikitext.version") as String,
-                        "txtmark-version" to project.property("dependencies.markdown.version") as String,
-                        "vertx-version" to project.property("dependencies.vertx.version") as String,
-                        "zxing-jse-version" to project.property("dependencies.zxing.version") as String,
-                        "box-version" to project.property("dependencies.box.version") as String,
-                        "drive-version" to project.property("dependencies.drive.version") as String,
-                        "dropbox-version" to project.property("dependencies.dropbox.version") as String,
-                        "ace-version" to "1.4.11"
-                )
-        )
-    }
-}
-
-tasks.build {
-    dependsOn("asciidoctor")
+documentation {
+    properties(mutableMapOf(
+                "slideshowfx_version" to (project.findProperty("productVersion") ?: System.getenv("PRODUCT_VERSION") ?: "2020.1"),
+                "jdk_version" to "15",
+                "javafx_version" to "15",
+                "gradle_version" to GradleVersion.current().version,
+                "asciidoctorj_version" to project.property("dependencies.asciidoctorj.version") as String,
+                "commonmark_version" to project.property("dependencies.markdown.version") as String,
+                "freemarker_version" to project.property("dependencies.freemarker.version") as String,
+                "jsoup_version" to project.property("dependencies.jsoup.version") as String,
+                "wikitext_textile_core_version" to project.property("dependencies.wikitext.version") as String,
+                "vertx_version" to project.property("dependencies.vertx.version") as String,
+                "zxing_jse_version" to project.property("dependencies.zxing.version") as String,
+                "box_version" to project.property("dependencies.box.version") as String,
+                "drive_version" to project.property("dependencies.drive.version") as String,
+                "dropbox_version" to project.property("dependencies.dropbox.version") as String,
+                "ace_version" to "1.4.11"))
 }

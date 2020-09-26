@@ -1,8 +1,7 @@
 pluginManagement {
     plugins {
-        id("org.asciidoctor.jvm.convert") version "3.1.0"
-        id("org.sonarqube") version "2.8"
-        id("org.openjfx.javafxplugin") version "0.0.8"
+        id("org.sonarqube") version "3.0"
+        id("org.openjfx.javafxplugin") version "0.0.9"
     }
 }
 
@@ -21,8 +20,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath(group = "org.openjfx", name = "javafx-plugin", version = "0.0.8")
-        classpath("org.asciidoctor:asciidoctor-gradle-jvm:3.1.0")
+        classpath(group = "org.openjfx", name = "javafx-plugin", version = "0.0.9")
     }
 }
 

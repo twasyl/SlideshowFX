@@ -20,11 +20,13 @@ import java.util.Map;
 public class PackageExtension {
     public static class Runtime {
         public List<String> modules;
+        public List<String> jlinkOptions;
     }
 
     public static class Application {
         public List<String> jvmOpts = new ArrayList<>();
         public String module;
+        public String mainClass;
     }
 
     public Project project;

@@ -7,7 +7,7 @@ on:
       - 'v*'
 
 env:
-  PRODUCT_VERSION: "@@NEXT-VERSION@@"
+  PRODUCT_VERSION: "2020.1"
 
 jobs:
   setup:
@@ -19,25 +19,27 @@ jobs:
       OS_NAME: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          echo ::set-env name=JAVA_HOMES::$HOME/.jvms
-          echo ::set-env name=GRADLE_USER_HOME::$HOME/.gradle
-          chmod +x .github/workflows/ci-utils.sh && source .github/workflows/ci-utils.sh && createJVMSListFile
-        shell: bash
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Cache JVM lists
+        uses: actions/cache@v2
+        with:
+          path: jvms.list
+          key: ${{ matrix.os }}-jvms-${{ hashFiles('jvms.list') }}
       - name: Cache JDK installations
         id: jdk
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
-          path: ${{ env.JAVA_HOMES }}
+          path: "${{ env.HOME }}/.jvms"
           key: ${{ matrix.os }}-jvms-${{ hashFiles('jvms.list') }}
       - name: Cache gradle dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
-          path: ${{ env.GRADLE_USER_HOME }}
+          path: "${{ env.HOME }}/.gradle"
           key: ${{ matrix.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-      - name: Setup build environment
-        shell: bash
-        run: chmod +x .github/workflows/ci-utils.sh && source .github/workflows/ci-utils.sh && setupBuildEnvironment && ./gradlew -q tasks
+      - run: python .github/workflows/ci.py --setup --gradle "-q tasks"
 
   test:
     needs: setup
@@ -51,26 +53,24 @@ jobs:
       SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          echo ::set-env name=JAVA_HOMES::$HOME/.jvms
-          echo ::set-env name=GRADLE_USER_HOME::$HOME/.gradle
-          echo ::set-env name=SONAR_BRANCH::$(echo -n ${GITHUB_REF/refs\/heads\//})
-          chmod +x .github/workflows/ci-utils.sh && source .github/workflows/ci-utils.sh && createJVMSListFile
-      - name: Cache JDK installations
-        uses: actions/cache@v1
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          path: ${{ env.JAVA_HOMES }}
+          python-version: '3.8'
+      - name: Cache JDK installations
+        uses: actions/cache@v2
+        with:
+          path: "${{ env.HOME }}/.jvms"
           key: ubuntu-latest-jvms-${{ hashFiles('jvms.list') }}
       - name: Cache gradle dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
-          path: ${{ env.GRADLE_USER_HOME }}
+          path: "${{ env.HOME }}/.gradle"
           key: ubuntu-latest-gradle-${{ hashFiles('**/*.gradle*') }}
       - name: Run tests
         id: tests
         run: |
-          chmod +x .github/workflows/ci-utils.sh && source .github/workflows/ci-utils.sh && setupBuildEnvironment
-          ./gradlew -q check sonarqube
+          python .github/workflows/ci.py --setup --gradle "-q check sonarqube"
           echo ::set-output name=report_name::reports-$(echo -n $GITHUB_REF | sed -E "s/refs\/(heads|tags)\///g")-$(date +'%Y%m%dT%H%M%S')
           echo ::set-output name=execution_time::$(date +'%Y%m%dT%H%M%S')
       - uses: actions/upload-artifact@v2
@@ -90,24 +90,22 @@ jobs:
       OS_NAME: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          echo ::set-env name=JAVA_HOMES::$HOME/.jvms
-          echo ::set-env name=GRADLE_USER_HOME::$HOME/.gradle
-          chmod +x .github/workflows/ci-utils.sh && source .github/workflows/ci-utils.sh && createJVMSListFile
-        shell: bash
-      - name: Cache JDK installations
-        uses: actions/cache@v1
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          path: ${{ env.JAVA_HOMES }}
+          python-version: '3.8'
+      - name: Cache JDK installations
+        uses: actions/cache@v2
+        with:
+          path: "${{ env.HOME }}/.jvms"
           key: ${{ matrix.os }}-jvms-${{ hashFiles('jvms.list') }}
       - name: Cache gradle dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
-          path: ${{ env.GRADLE_USER_HOME }}
+          path: "${{ env.HOME }}/.gradle"
           key: ${{ matrix.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
       - name: Package
-        run: chmod +x .github/workflows/ci-utils.sh && source .github/workflows/ci-utils.sh && setupBuildEnvironment && ./gradlew -q bundle :slideshowfx-setup:distZip
-        shell: bash
+        run: python .github/workflows/ci.py --setup --gradle "-q bundle :slideshowfx-setup:distZip"
       - uses: actions/upload-artifact@v2
         if: success()
         with:

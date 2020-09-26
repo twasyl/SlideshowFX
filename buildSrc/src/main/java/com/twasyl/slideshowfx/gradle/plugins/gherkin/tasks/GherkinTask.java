@@ -61,7 +61,7 @@ public class GherkinTask extends JavaExec implements Reporting<TestTaskReports> 
     }
 
     private void configureJvmArgs() {
-        jvmArgs("--enable-preview");
+        jvmArgs("--enable-preview", "-Dcucumber.publish.quiet=true", "-Dcucumber.publish.enabled=false");
     }
 
     private void adjustJvmArgsWhenJacocoEnabled() {
@@ -107,14 +107,14 @@ public class GherkinTask extends JavaExec implements Reporting<TestTaskReports> 
     @Override
     public void exec() {
         if (reports.getHtml().isEnabled()) {
-            args("--plugin", String.format("html:%1$s", reports.getHtml().getDestination().getAbsolutePath()));
+            args("--plugin", String.format("html:%1$s", new File(reports.getHtml().getDestination().getAbsoluteFile(), "index.html")));
         }
 
         if (reports.getJunitXml().isEnabled()) {
             args("--plugin", String.format("junit:%1$s", new File(this.reports.getJunitXml().getDestination(), "TEST-gherkin.xml")));
         }
 
-        args("--strict", "--glue", "gradle.cucumber", getProject().getExtensions().getByType(SourceSetContainer.class).getByName(GHERKIN_TEST_SOURCE_SET_NAME).getResources().getSrcDirs().iterator().next());
+        args("--glue", "gradle.cucumber", getProject().getExtensions().getByType(SourceSetContainer.class).getByName(GHERKIN_TEST_SOURCE_SET_NAME).getResources().getSrcDirs().iterator().next());
         super.exec();
     }
 

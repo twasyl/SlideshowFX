@@ -665,7 +665,7 @@ public class PresentationViewController implements ThemeAwareController {
         this.loadPresentationInBrowser();
 
         try {
-            final JavaBeanObjectProperty<File> archiveFile = new JavaBeanObjectPropertyBuilder<>()
+            final JavaBeanObjectProperty<File> archiveFile = JavaBeanObjectPropertyBuilder.create()
                     .bean(this.presentationEngine)
                     .getter("getArchive")
                     .setter("setArchive")
@@ -674,7 +674,7 @@ public class PresentationViewController implements ThemeAwareController {
 
             ((SimpleStringProperty) this.presentationName).bind(new FilenameBinding(archiveFile));
 
-            final JavaBeanObjectProperty<Boolean> presentationModifiedSinceLatestSave = new JavaBeanObjectPropertyBuilder<>()
+            final JavaBeanObjectProperty<Boolean> presentationModifiedSinceLatestSave = JavaBeanObjectPropertyBuilder.create()
                     .bean(this.presentationEngine)
                     .getter("isModifiedSinceLatestSave")
                     .setter("setModifiedSinceLatestSave")

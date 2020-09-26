@@ -51,7 +51,7 @@ public class LogsController implements ThemeAwareController {
 
     private void setLogHandlerListener() throws NoSuchMethodException {
         if (this.handler != null) {
-            latestLog = new ReadOnlyJavaBeanStringPropertyBuilder()
+            latestLog = ReadOnlyJavaBeanStringPropertyBuilder.create()
                     .bean(this.handler)
                     .getter("getLatestLog")
                     .name("latestLog")

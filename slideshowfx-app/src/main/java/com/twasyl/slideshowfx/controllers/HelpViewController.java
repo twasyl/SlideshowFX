@@ -1,12 +1,10 @@
 package com.twasyl.slideshowfx.controllers;
 
-import com.twasyl.slideshowfx.utils.io.IOUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -38,26 +36,18 @@ public class HelpViewController implements ThemeAwareController {
     }
 
     protected void loadUserDocumentation() {
-        this.userDocumentationBrowser.getEngine().loadContent(getUserDocumentation());
+        this.userDocumentationBrowser.getEngine().load(getUserDocumentation());
     }
 
     protected void loadDeveloperDocumentation() {
-        this.developerDocumentationBrowser.getEngine().loadContent(getDeveloperDocumentation());
+        this.developerDocumentationBrowser.getEngine().load(getDeveloperDocumentation());
     }
 
     protected String getUserDocumentation() {
-        return this.getDocumentation("/com/twasyl/slideshowfx/documentation/html/SlideshowFX_user.html");
+        return HelpViewController.class.getResource("/com/twasyl/slideshowfx/documentation/SlideshowFX_user.html").toExternalForm();
     }
 
     protected String getDeveloperDocumentation() {
-        return this.getDocumentation("/com/twasyl/slideshowfx/documentation/html/SlideshowFX_developer.html");
-    }
-
-    protected String getDocumentation(final String documentationFile) {
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-
-        final String documentation = IOUtils.read(HelpViewController.class.getResourceAsStream(documentationFile));
-        return documentation;
+        return HelpViewController.class.getResource("/com/twasyl/slideshowfx/documentation/SlideshowFX_developer.html").toExternalForm();
     }
 }

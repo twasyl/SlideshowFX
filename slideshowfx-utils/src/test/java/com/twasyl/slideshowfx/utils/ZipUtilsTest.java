@@ -1,6 +1,8 @@
 package com.twasyl.slideshowfx.utils;
 
 import com.twasyl.slideshowfx.utils.io.DeleteFileVisitor;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

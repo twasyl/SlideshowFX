@@ -1,6 +1,3 @@
-import com.twasyl.slideshowfx.style.Styles;
-import com.twasyl.slideshowfx.style.theme.Themes;
-
 module slideshowfx.app {
     opens com.twasyl.slideshowfx.app to javafx.graphics, javafx.fxml;
     opens com.twasyl.slideshowfx.controllers to javafx.graphics, javafx.fxml, javafx.web;
@@ -13,6 +10,7 @@ module slideshowfx.app {
     requires java.desktop;
     requires java.logging;
     requires javafx.controls;
+    requires javafx.base;
     requires javafx.fxml;
     requires javafx.graphics;
     requires javafx.web;
@@ -35,6 +33,6 @@ module slideshowfx.app {
     requires slideshowfx.ui.controls;
     requires vertx.core;
 
-    uses Themes;
-    uses Styles;
+    uses com.twasyl.slideshowfx.style.theme.Themes;
+    uses com.twasyl.slideshowfx.style.Styles;
 }

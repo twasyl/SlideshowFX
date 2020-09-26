@@ -1,21 +1,13 @@
 import com.twasyl.slideshowfx.gradle.Utils.isMac
 import com.twasyl.slideshowfx.gradle.Utils.isWindows
+import com.twasyl.slideshowfx.gradle.plugins.documentation.Documentation.RENDER_DOCUMENTATION_TASK_NAME
+import com.twasyl.slideshowfx.gradle.plugins.documentation.tasks.RenderDocumentation
 import com.twasyl.slideshowfx.gradle.plugins.sfxpackager.SlideshowFXPackager.CREATE_PACKAGE_TASK_NAME
 import com.twasyl.slideshowfx.gradle.plugins.sfxpackager.tasks.CreatePackage
 import com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.BUNDLE_TASK_NAME
 import com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.SFX_PLUGIN_EXTENSION
 import com.twasyl.slideshowfx.gradle.plugins.sfxplugin.extensions.SlideshowFXPluginExtension
-import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import java.io.File.separator
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath("org.asciidoctor:asciidoctor-gradle-jvm:3.1.0")
-    }
-}
 
 plugins {
     java
@@ -27,7 +19,7 @@ plugins {
 }
 
 description = "Module for the installer of SlideshowFX"
-version = project.findProperty("productVersion") ?: System.getenv("PRODUCT_VERSION") ?: "@@NEXT-VERSION@@"
+version = project.findProperty("productVersion") ?: System.getenv("PRODUCT_VERSION") ?: "2020.1"
 
 dependencies {
     implementation(project(":slideshowfx-global-configuration"))
@@ -40,7 +32,7 @@ dependencies {
 
 rootProject.subprojects.forEach {
     if (it.name != project.name) {
-       project.evaluationDependsOn(it.path)
+        project.evaluationDependsOn(it.path)
     }
 }
 
@@ -56,6 +48,11 @@ packaging {
     executableBaseName = "SlideshowFXSetup"
 
     runtime.modules = listOf("java.desktop", "java.logging", "java.scripting", "java.xml", "jdk.unsupported", "jdk.unsupported.desktop")
+    runtime.jlinkOptions = listOf("--no-header-files",
+            "--no-man-pages",
+            "--compress=0",
+            "--strip-debug",
+            "--strip-native-commands")
 
     app.jvmOpts = listOf("-Xms512m",
             "-Xmx1g",
@@ -70,7 +67,7 @@ packaging {
             "-Dsetup.documentations.directory=\"$resourcesLocation${separator}documentations\"",
             "-Dsetup.service.twitter.consumerKey=${System.getenv("TWITTER_CONSUMER_KEY")}",
             "-Dsetup.service.twitter.consumerSecret=${System.getenv("TWITTER_CONSUMER_SECRET")}")
-    
+
     app.module = "slideshowfx.setup/com.twasyl.slideshowfx.setup.app.SlideshowFXSetup"
 
     addResource(createPackage.outputs.files, createPackage.`package`.name)
@@ -85,15 +82,8 @@ packaging {
                 }
             }
 
-    val asciidoctorTask = project(":slideshowfx-documentation").tasks.named<AsciidoctorTask>("asciidoctor").get()
-    asciidoctorTask.backendOutputDirectories.forEach { backend ->
-        addResource(fileTree(backend), "documentations")
-    }
-}
-
-runApplication {
-    module = "slideshowfx.setup"
-    mainClass = "com.twasyl.slideshowfx.setup.app.SlideshowFXSetup"
+    val renderDocumentation = project(":slideshowfx-documentation").tasks.named<RenderDocumentation>(RENDER_DOCUMENTATION_TASK_NAME).get()
+    renderDocumentation.outputs.files.forEach { addResource(fileTree(it), "documentations") }
 }
 
 javafx {
@@ -123,36 +113,36 @@ tasks {
 
     named<CreatePackage>(CREATE_PACKAGE_TASK_NAME) {
         dependsOn(
-            ":slideshowfx-app:${CREATE_PACKAGE_TASK_NAME}",
-            ":slideshowfx-documentation:asciidoctor",
-            // Content extensions
-            ":slideshowfx-alert-extension:bundle",
-            ":slideshowfx-code-extension:bundle",
-            ":slideshowfx-image-extension:bundle",
-            ":slideshowfx-link-extension:bundle",
-            ":slideshowfx-quiz-extension:bundle",
-            ":slideshowfx-quote-extension:bundle",
-            ":slideshowfx-sequence-diagram-extension:bundle",
-            ":slideshowfx-shape-extension:bundle",
-            ":slideshowfx-snippet-extension:bundle",
-            // Hosting connectors
-            ":slideshowfx-box-hosting-connector:bundle",
-            ":slideshowfx-drive-hosting-connector:bundle",
-            ":slideshowfx-dropbox-hosting-connector:bundle",
-            // Snippet executors
-            ":slideshowfx-go-executor:bundle",
-            ":slideshowfx-golo-executor:bundle",
-            ":slideshowfx-groovy-executor:bundle",
-            ":slideshowfx-java-executor:bundle",
-            ":slideshowfx-javascript-executor:bundle",
-            ":slideshowfx-kotlin-executor:bundle",
-            ":slideshowfx-ruby-executor:bundle",
-            ":slideshowfx-scala-executor:bundle",
-            // Markups
-            ":slideshowfx-asciidoctor:bundle",
-            ":slideshowfx-html:bundle",
-            ":slideshowfx-markdown:bundle",
-            ":slideshowfx-textile:bundle")
+                ":slideshowfx-app:$CREATE_PACKAGE_TASK_NAME",
+                ":slideshowfx-documentation:$RENDER_DOCUMENTATION_TASK_NAME",
+                // Content extensions
+                ":slideshowfx-alert-extension:bundle",
+                ":slideshowfx-code-extension:bundle",
+                ":slideshowfx-image-extension:bundle",
+                ":slideshowfx-link-extension:bundle",
+                ":slideshowfx-quiz-extension:bundle",
+                ":slideshowfx-quote-extension:bundle",
+                ":slideshowfx-sequence-diagram-extension:bundle",
+                ":slideshowfx-shape-extension:bundle",
+                ":slideshowfx-snippet-extension:bundle",
+                // Hosting connectors
+                ":slideshowfx-box-hosting-connector:bundle",
+                ":slideshowfx-drive-hosting-connector:bundle",
+                ":slideshowfx-dropbox-hosting-connector:bundle",
+                // Snippet executors
+                ":slideshowfx-go-executor:bundle",
+                ":slideshowfx-golo-executor:bundle",
+                ":slideshowfx-groovy-executor:bundle",
+                ":slideshowfx-java-executor:bundle",
+                ":slideshowfx-javascript-executor:bundle",
+                ":slideshowfx-kotlin-executor:bundle",
+                ":slideshowfx-ruby-executor:bundle",
+                ":slideshowfx-scala-executor:bundle",
+                // Markups
+                ":slideshowfx-asciidoctor:bundle",
+                ":slideshowfx-html:bundle",
+                ":slideshowfx-markdown:bundle",
+                ":slideshowfx-textile:bundle")
     }
 
     named<Zip>("distZip") {

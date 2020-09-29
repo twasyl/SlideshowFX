@@ -23,5 +23,5 @@ documentation {
                 "box_version" to project.property("dependencies.box.version") as String,
                 "drive_version" to project.property("dependencies.drive.version") as String,
                 "dropbox_version" to project.property("dependencies.dropbox.version") as String,
-                "ace_version" to "1.4.11"))
+                "ace_version" to "1.4.12"))
 }

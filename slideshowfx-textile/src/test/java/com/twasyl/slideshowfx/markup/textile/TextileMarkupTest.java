@@ -68,11 +68,10 @@ public class TextileMarkupTest {
     @Test
     public void generateTable() {
         final String result = markup.convertAsHtml(
-                //"|^.\n" +
-                        "|_. Column 1 |_. Column 2 |\n" +
-                        //"|-.\n" +
-                        "| Value 1 | Value 2 |");
+                        """
+                        |_. Column 1 |_. Column 2 |
+                        | Value 1 | Value 2 |""");
 
-        assertEquals("<table>\n<thead>\n<tr>\n<th>Column 1</th>\n<th>Column 2</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Value 1</td>\n<td>Value 2</td>\n</tr>\n</tbody>\n</table>", result);
+        assertEquals("<table><tr><th>Column 1</th><th>Column 2</th></tr><tr><td>Value 1</td><td>Value 2</td></tr></table>", result);
     }
 }

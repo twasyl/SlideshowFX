@@ -91,8 +91,13 @@ public class PluginTestUtils {
 
         if (!compiledClass.exists()) {
             final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            try (final StandardJavaFileManager manager = compiler.getStandardFileManager(null, null, null)) {
-                compiler.getTask(null, manager, null, Arrays.asList("-d", "build/tmp/", "-cp", ".." + separator + "slideshowfx-plugin" + separator + "build" + separator + "classes" + separator + "java" + separator + "main"), null, singletonList(new DummyPluginClass())).call();
+            try (final StandardJavaFileManager manager = compiler.getStandardFileManager(null, null, null);
+                 final var writer = new StringWriter()) {
+                final var task = compiler.getTask(writer, manager, null, Arrays.asList("--enable-preview", "-source", "15", "-d", "build/tmp/", "-cp", ".." + separator + "slideshowfx-plugin" + separator + "build" + separator + "classes" + separator + "java" + separator + "main"), null, singletonList(new DummyPluginClass()));
+
+                if (!task.call()) {
+                    fail(writer.toString());
+                }
             } catch (IOException e) {
                 fail(e);
             }

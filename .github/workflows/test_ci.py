@@ -123,7 +123,7 @@ class InstallJDKTestCase(unittest.TestCase):
         shutil.rmtree('.jvms')
 
     def test_install_build_jdk(self):
-        self.ci_env.install_jdk(ci.BUILD_JDK)
+        self.ci_env.install_jdk(self.ci_env.build_jdk)
 
 
 class ConfigureGradleTestCase(unittest.TestCase):

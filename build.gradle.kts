@@ -1,5 +1,4 @@
 import com.twasyl.slideshowfx.gradle.Utils.isMac
-import com.twasyl.slideshowfx.gradle.Utils.isWindows
 import com.twasyl.slideshowfx.gradle.plugins.gherkin.GherkinPlugin
 import com.twasyl.slideshowfx.gradle.plugins.gherkin.GherkinPlugin.GHERKIN_TEST_SOURCE_SET_NAME
 import com.twasyl.slideshowfx.gradle.plugins.gherkin.GherkinPlugin.GHERKIN_TEST_TASK_NAME
@@ -63,6 +62,19 @@ subprojects {
             return executable.toString()
         }
 
+        fun jvmArgsForTests(): List<String> {
+            val jvmArgs = mutableListOf("--enable-preview", "-Djava.awt.headless=true", "-Dtestfx.headless=true",
+                    "-Dprism.order=sw", "-Dtestfx.robot=glass")
+
+            if (isMac()) {
+                jvmArgs.add("-Dprism.verbose=true")
+            } else {
+                jvmArgs.add("-Dprism.text=t2k")
+            }
+
+            return jvmArgs
+        }
+
         val sourceSetContainer = project.extensions.getByType<SourceSetContainer>()
         val mainSourceSet = sourceSetContainer["main"]
         mainSourceSet.output.resourcesDir = mainSourceSet.output.classesDirs.elementAt(0)
@@ -120,9 +132,9 @@ subprojects {
                 }
 
                 doFirst {
-                    jvmArgs("--enable-preview",
-                            "--add-exports", "org.junit.platform.commons/org.junit.platform.commons.util=ALL-UNNAMED",
+                    jvmArgs("--add-exports", "org.junit.platform.commons/org.junit.platform.commons.util=ALL-UNNAMED",
                             "--add-exports", "org.junit.platform.commons/org.junit.platform.commons.logging=ALL-UNNAMED")
+                    jvmArgs(jvmArgsForTests())
                 }
             }
 
@@ -142,26 +154,23 @@ subprojects {
                 this.executable = javaExecutable("java")
             }
 
+            register<Test>(integrationTest).configure {
+                dependsOn("jar")
+                description = "Runs integration tests."
+                group = "verification"
+                useJUnitPlatform()
+                testClassesDirs = sourceSetContainer[integrationTest].output.classesDirs
+                classpath = sourceSetContainer[integrationTest].runtimeClasspath
+
+                doFirst {
+                    options {
+                        jvmArgs(jvmArgsForTests())
+                    }
+                }
+            }
+
             named("check").configure {
                 dependsOn(integrationTest)
-            }
-        }
-
-        task<Test>(integrationTest) {
-            dependsOn("jar")
-            description = "Runs integration tests."
-            group = "verification"
-
-            useJUnitPlatform()
-            testClassesDirs = sourceSetContainer[integrationTest].output.classesDirs
-            classpath = sourceSetContainer[integrationTest].runtimeClasspath
-
-            jvmArgs("--enable-preview", "-Djava.awt.headless=true", "-Dtestfx.robot=glass", "-Dtestfx.headless=true", "-Dprism.order=sw")
-
-            if (isMac()) {
-                jvmArgs("-Dprism.verbose=true")
-            } else if (isWindows()) {
-                jvmArgs("-Dprism.text=t2k")
             }
         }
     }

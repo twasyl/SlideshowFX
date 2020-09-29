@@ -32,10 +32,10 @@ class CIEnvironment:
             return 'linux'
 
     def is_osx(self) -> bool:
-        return self.os_name == 'macos-latest'
+        return self.os_name.startswith('macos-')
 
     def is_windows(self) -> bool:
-        return self.os_name == 'windows-latest'
+        return self.os_name.startswith('windows-')
 
     def get_jvm_version(self, jdk_type: int) -> str:
         if jdk_type == self.build_jdk:
@@ -118,6 +118,7 @@ class CIEnvironment:
         gradle_properties = open(f'{self.gradle_user_home}{os.path.sep}gradle.properties', 'w')
         gradle_properties.write(f'''org.gradle.java.home={gradle_jdk}
 org.gradle.caching=true
+org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
 build_jdk={application_jdk}
 ''')
         gradle_properties.close()
@@ -152,6 +153,7 @@ application={self.get_jvm_version(self.application_jdk)}''')
 def usage():
     print('''Usage:
   -h, --help     displays the help
+  -j, --jvms     creates a file containing the JVMs versions to use
   -s, --setup    setup the build environment
   -r, --run      run a command, typically a build command''')
 
@@ -159,7 +161,7 @@ def usage():
 if __name__ == '__main__':
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hsg:", ['help', 'setup', 'gradle='])
+        opts, args = getopt.getopt(sys.argv[1:], "hjsg:", ['help', 'jvms', 'setup', 'gradle='])
         if len(opts) == 0:
             print('Error: at least one argument is necessary')
             usage()
@@ -169,6 +171,7 @@ if __name__ == '__main__':
         usage()
         sys.exit(1)
 
+    do_jvms = False
     do_setup = False
     do_gradle = False
 
@@ -176,6 +179,8 @@ if __name__ == '__main__':
         if opt in ('-h', '--help'):
             usage()
             sys.exit(0)
+        elif opt in ('-j', '--jvms'):
+            do_jvms = True
         elif opt in ('-s', '--setup'):
             do_setup = True
         elif opt in ('-g', '--gradle'):
@@ -186,6 +191,9 @@ if __name__ == '__main__':
 
     if not ci_env.check_prerequisites():
         sys.exit(3)
+
+    if do_jvms:
+        ci_env.create_jvms_list()
 
     if do_setup:
         print('Setting up the build environment')

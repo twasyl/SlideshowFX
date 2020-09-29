@@ -1,48 +1,24 @@
-name: CI
+name: SlideshowFX
 on:
   push:
     branches:
       - '*'
     tags:
       - 'v*'
+    paths-ignore:
+      - '.editorconfig'
+      - '.gitignore'
+      - 'examples/**'
+      - 'Dockerfile'
+      - 'LICENSE'
+      - 'README.md'
+      - 'src/**'
 
 env:
   PRODUCT_VERSION: "2020.1"
 
 jobs:
-  setup:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest,windows-latest,ubuntu-latest]
-    env:
-      OS_NAME: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-      - name: Cache JVM lists
-        uses: actions/cache@v2
-        with:
-          path: jvms.list
-          key: ${{ matrix.os }}-jvms-${{ hashFiles('jvms.list') }}
-      - name: Cache JDK installations
-        id: jdk
-        uses: actions/cache@v2
-        with:
-          path: "${{ env.HOME }}/.jvms"
-          key: ${{ matrix.os }}-jvms-${{ hashFiles('jvms.list') }}
-      - name: Cache gradle dependencies
-        uses: actions/cache@v2
-        with:
-          path: "${{ env.HOME }}/.gradle"
-          key: ${{ matrix.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-      - run: python .github/workflows/ci.py --setup --gradle "-q tasks"
-
   test:
-    needs: setup
     runs-on: ubuntu-latest
     env:
       OS_NAME: ubuntu-latest
@@ -57,6 +33,8 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.8'
+      - name: Listing JVMs to use
+        run: python .github/workflows/ci.py --jvms
       - name: Cache JDK installations
         uses: actions/cache@v2
         with:
@@ -70,9 +48,9 @@ jobs:
       - name: Run tests
         id: tests
         run: |
-          python .github/workflows/ci.py --setup --gradle "-q check sonarqube"
           echo ::set-output name=report_name::reports-$(echo -n $GITHUB_REF | sed -E "s/refs\/(heads|tags)\///g")-$(date +'%Y%m%dT%H%M%S')
           echo ::set-output name=execution_time::$(date +'%Y%m%dT%H%M%S')
+          python .github/workflows/ci.py --setup --gradle "-q check sonarqube"
       - uses: actions/upload-artifact@v2
         if: success() || failure()
         with:
@@ -80,7 +58,7 @@ jobs:
           path: "**/reports/"
 
   package:
-    needs: [setup,test]
+    needs: [test]
     runs-on: ${{ matrix.os }}
     if: success() && contains(github.ref, 'refs/tags/')
     strategy:
@@ -94,16 +72,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.8'
+      - name: Listing JVMs to use
+        run: python .github/workflows/ci.py --jvms
       - name: Cache JDK installations
         uses: actions/cache@v2
         with:
           path: "${{ env.HOME }}/.jvms"
-          key: ${{ matrix.os }}-jvms-${{ hashFiles('jvms.list') }}
+          key: ubuntu-latest-jvms-${{ hashFiles('jvms.list') }}
       - name: Cache gradle dependencies
         uses: actions/cache@v2
         with:
           path: "${{ env.HOME }}/.gradle"
-          key: ${{ matrix.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ubuntu-latest-gradle-${{ hashFiles('**/*.gradle*') }}
       - name: Package
         run: python .github/workflows/ci.py --setup --gradle "-q bundle :slideshowfx-setup:distZip"
       - uses: actions/upload-artifact@v2

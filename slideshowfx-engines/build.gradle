@@ -1,0 +1,27 @@
+plugins {
+    id 'java-library'
+    id 'gherkin'
+    id 'org.openjfx.javafxplugin'
+    id 'jacoco'
+    id 'org.sonarqube'
+}
+
+description = 'Module defining engines used by SlideshowFX'
+version = '1.2'
+
+dependencies {
+    implementation project(':slideshowfx-content-extension')
+    implementation project(':slideshowfx-global-configuration')
+    implementation project(':slideshowfx-plugin')
+    implementation project(':slideshowfx-utils')
+    implementation "org.freemarker:freemarker:${project.property('dependencies.freemarker.version')}"
+
+    testImplementation "org.mockito:mockito-core:${project.property('dependencies.mockito.version')}"
+
+    gherkinTestImplementation "io.vertx:vertx-core:${project.property('dependencies.vertx.version')}"
+    gherkinTestImplementation "io.vertx:vertx-web:${project.property('dependencies.vertx.version')}"
+}
+
+javafx {
+    modules('javafx.graphics', 'javafx.swing')
+}

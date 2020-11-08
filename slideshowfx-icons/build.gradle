@@ -1,0 +1,78 @@
+plugins {
+    id 'java-library'
+    id 'org.openjfx.javafxplugin'
+    id 'jacoco'
+    id 'org.sonarqube'
+}
+
+description = 'Module allowing to insert icons in the UI'
+version = '1.1-SNAPSHOT'
+
+dependencies {
+    testImplementation "org.testfx:testfx-core:${project.property('dependencies.testfx.version')}"
+    testImplementation "org.testfx:testfx-junit5:${project.property('dependencies.testfx.version')}"
+    testImplementation "org.testfx:openjfx-monocle:${project.property('dependencies.monocle.version')}"
+}
+
+javafx {
+    modules('javafx.graphics')
+}
+
+tasks.register("updateFontAwesome") {
+    doLast {
+        def fontawesomeVersion = project.findProperty('dependencies.fontawesome.version') as String
+        def fontaweomseDir = new File("$buildDir/tmp/fontawesome-update")
+        def fontawesomeWebArchive = new File("$fontaweomseDir/fontawesome-free-$fontawesomeVersion-web.zip")
+        def fontawesomeWebDir = new File("$fontaweomseDir/fontawesome-free-$fontawesomeVersion-web")
+        def fontawesomeDesktopArchive = new File("$fontaweomseDir/fontawesome-free-${fontawesomeVersion}-desktop.zip")
+        def fontawesomeDesktopDir = new File("$fontaweomseDir/fontawesome-free-$fontawesomeVersion-desktop")
+
+        if (!fontaweomseDir.exists()) {
+            fontaweomseDir.mkdirs()
+        }
+
+        new URL("https://use.fontawesome.com/releases/v$fontawesomeVersion/fontawesome-free-$fontawesomeVersion-web.zip")
+                .withInputStream {input -> fontawesomeWebArchive.withOutputStream {it << input }}
+
+        new URL("https://use.fontawesome.com/releases/v$fontawesomeVersion/fontawesome-free-$fontawesomeVersion-desktop.zip")
+                .withInputStream {input -> fontawesomeDesktopArchive.withOutputStream {it << input }}
+
+        copy {
+            from(zipTree(fontawesomeWebArchive))
+            into(fontaweomseDir)
+        }
+
+        copy {
+            from(zipTree(fontawesomeDesktopArchive))
+            into(fontaweomseDir)
+        }
+
+        fontawesomeWebArchive.delete()
+        fontawesomeDesktopArchive.delete()
+
+        def versionDir = file("$projectDir/src/main/resources/com/twasyl/slideshowfx/icons/fontawesome/${fontawesomeVersion.replace('.', '_')}")
+        versionDir.mkdir()
+
+        def fontsDir = file("$versionDir/fonts")
+        fontsDir.mkdir()
+
+        def jsDir = file("$versionDir/js")
+        jsDir.mkdir()
+
+        copy {
+            from(file("$fontawesomeWebDir/js/all.min.js"))
+            into(jsDir)
+        }
+
+        copy {
+            from(file("$fontawesomeDesktopDir/otfs"))
+            include("*.otf")
+            into(fontsDir)
+            rename("Font Awesome 5 Brands-Regular-400.otf", "fontawesome-brand.otf")
+            rename("Font Awesome 5 Free-Regular-400.otf", "fontawesome-regular.otf")
+            rename("Font Awesome 5 Free-Solid-900.otf", "fontawesome-solid.otf")
+        }
+
+        fontaweomseDir.delete()
+    }
+}

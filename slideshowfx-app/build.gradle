@@ -1,0 +1,268 @@
+plugins {
+    id 'java'
+    id 'org.openjfx.javafxplugin'
+    id 'jacoco'
+    id 'org.sonarqube'
+    id 'sfx-packager'
+}
+
+description = 'The SlideshowFX application'
+version = project.findProperty('productVersion') ?: System.getenv('PRODUCT_VERSION') ?: '2020.1'
+
+dependencies {
+    implementation project(':slideshowfx-content-extension')
+    implementation project(':slideshowfx-engines')
+    implementation project(':slideshowfx-global-configuration')
+    implementation project(':slideshowfx-hosting-connector')
+    implementation project(':slideshowfx-icons')
+    implementation project(':slideshowfx-logs')
+    implementation project(':slideshowfx-markup')
+    implementation project(':slideshowfx-plugin-manager')
+    implementation project(':slideshowfx-plugin')
+    implementation project(':slideshowfx-server')
+    implementation project(':slideshowfx-snippet-executor')
+    implementation project(':slideshowfx-style')
+    implementation project(':slideshowfx-ui-controls')
+    implementation project(':slideshowfx-utils')
+
+    implementation "com.google.zxing:javase:${project.property('dependencies.zxing.version')}"
+
+    testImplementation project(':slideshowfx-server')
+    testImplementation "org.mockito:mockito-core:${project.property('dependencies.mockito.version')}"
+}
+
+packaging {
+    outputDir = file("$buildDir/package")
+    executableBaseName = "SlideshowFX"
+
+    runtime.modules = ['java.desktop', 'java.logging', 'java.net.http', 'java.scripting', 'java.sql', 'java.xml', 'jdk.jsobject', 'jdk.unsupported', 'jdk.unsupported.desktop', 'jdk.xml.dom']
+    runtime.jlinkOptions = ['--no-header-files', '--no-man-pages', '--compress=0', '--strip-debug', '--strip-native-commands']
+
+    app.jvmOpts = ['-Xms512m',
+                   '-Xmx2g',
+                   '--enable-preview',
+                   '-Dfile.encoding=UTF-8',
+                   '-Duser.language=en',
+                   '-Djava.util.logging.config.file=@@LOGGING_CONFIGURATION_FILE@@',
+                   '-Djavafx.preloader=com.twasyl.slideshowfx.app.SlideshowFXPreloader',
+                   '--add-modules', 'ALL-MODULE-PATH']
+
+    app.module = 'slideshowfx.app'
+    app.mainClass = 'com.twasyl.slideshowfx.app.SlideshowFX'
+}
+
+javafx {
+    modules('javafx.controls', 'javafx.fxml', 'javafx.web')
+}
+
+processResources {
+    dependsOn ':slideshowfx-documentation:renderDocumentation'
+    doLast {
+        copy {
+            from(project(':slideshowfx-documentation').tasks.renderDocumentation.outputs)
+            into("${sourceSets.main.output.resourcesDir.absolutePath}/com/twasyl/slideshowfx/documentation/html")
+        }
+
+        if (plugins.hasPlugin(IdeaPlugin.class)) {
+            def out = plugins.getPlugin(IdeaPlugin.class).model.module.outputDir
+            copy {
+                from(project(':slideshowfx-documentation').tasks.renderDocumentation.outputs)
+                into("$out/com/twasyl/slideshowfx/documentation")
+            }
+        }
+    }
+}
+
+tasks.register('zipSlideContentEditor', Zip.class) {
+    archiveFileName = 'sfx-slide-content-editor.zip'
+    destinationDirectory = file("$buildDir/tmp")
+    from("$buildDir/tmp/sfx-slide-content-editor-update/sfx-slide-content-editor") {
+        into 'sfx-slide-content-editor'
+    }
+}
+
+tasks.register('createSlideContentEditor') {
+    finalizedBy = ['zipSlideContentEditor']
+
+    doLast {
+        def aceVersion = project.property('dependencies.ace.version') as String
+        def binaryDir = file("$buildDir/tmp/sfx-slide-content-editor-update")
+        def binary = file("$binaryDir/binary-${aceVersion}.zip")
+        def newEditorDir = file("$binaryDir/sfx-slide-content-editor")
+        def unpackedBinary = file("$binaryDir/ace-builds-$aceVersion")
+
+        if (!binaryDir.exists()) {
+            binaryDir.mkdirs()
+        }
+
+        new URL("https://github.com/ajaxorg/ace-builds/archive/v${aceVersion}.zip")
+                .withInputStream { input -> binary.withOutputStream { it << input } }
+
+        copy {
+            from(zipTree(binary))
+            into(binaryDir)
+        }
+
+        binary.delete()
+
+        if (newEditorDir.exists()) {
+            delete(newEditorDir)
+        }
+
+        copy {
+            from(fileTree("$unpackedBinary/src-min-noconflict"))
+            include('ace.js', 'snippets/asciidoc.js', 'snippets/html*.js', 'snippets/markdown.js', 'snippets/textile.js', 'ext-language_tools.js', 'ext-searchbox.js', 'ext-static_highlight.js', 'ext-whitespace.js', 'keybinding-*.js', 'mode-asciidoc.js', 'mode-html.js', 'mode-markdown.js', 'mode-textile.js', 'theme-tomorrow_night.js', 'theme-xcode.js', 'worker-*.js')
+            into(file("$newEditorDir/ace/$aceVersion"))
+        }
+
+        delete(unpackedBinary)
+
+        file("$newEditorDir/ace-file-editor.html").write("""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css" media="screen">
+        body {
+            overflow: hidden;
+        }
+
+        #editor {
+            margin: 0;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    </style>
+    <script type="text/javascript">
+        // Set the content of the editor. The content is given in Base64
+        function setContent(content) {
+            var editor = ace.edit('editor');
+            editor.setValue(decodeURIComponent(escape(window.atob(content))));
+            editor.clearSelection();
+            editor.resize();
+        }
+
+        // Insert the content where the cursor is
+        function appendContent(content) {
+            var editor = ace.edit('editor');
+            editor.insert(decodeURIComponent(escape(window.atob(content))));
+            editor.clearSelection();
+            editor.resize();
+        }
+
+        // Get the content of the editor. The content is returned in Base64
+        function getContent() {
+            var editor = ace.edit('editor');
+            return window.btoa(unescape(encodeURIComponent(editor.getValue())));
+        }
+
+        // Get the selected content of the editor. The content is returned in Base64
+        function getSelectedContent() {
+            var editor = ace.edit('editor');
+            return window.btoa(unescape(encodeURIComponent(editor.getCopyText())));
+        }
+
+        // Remove the selection
+        function removeSelection() {
+            var editor = ace.edit('editor');
+            editor.removeLines();
+        }
+
+        // Set the mode of this editor
+        function setMode(newMode) {
+            var editor = ace.edit('editor');
+            editor.getSession().setMode(newMode);
+        }
+
+        // Select all text in the editor
+        function selectAll() {
+            var editor = ace.edit('editor');
+            editor.selectAll();
+        }
+
+        // Request the focus in the editor
+        function requestEditorFocus() {
+            var editor = ace.edit('editor');
+            editor.focus();
+        }
+
+        // Change the font size of the editor. If the factor is greater than zero, the font
+        // is increased, if less than zero decreased, equal to zero nothing is done.
+        function changeFontSize(factor) {
+            var changeFontSizeBy = undefined;
+
+            if(factor > 0) changeFontSizeBy = 1;
+            else if(factor < 0) changeFontSizeBy = -1;
+
+            if(changeFontSizeBy !== undefined) {
+                var editor = ace.edit('editor');
+                var currentFontSize = editor.getFontSize();
+
+                editor.setFontSize(currentFontSize + changeFontSizeBy);
+            }
+        }
+        
+        // Change the theme of the editor.
+        function changeTheme(theme) {
+            var editor = ace.edit('editor');
+            editor.setTheme("ace/theme/" + theme);
+        }
+    </script>
+    <script src="ace/${aceVersion}/ace.js"></script>
+</head>
+<body>
+    <pre id='editor'></pre>
+
+    <script type="text/javascript">
+        var editor = ace.edit('editor');
+        editor.getSession().setUseWrapMode(true);
+        changeTheme('tomorrow_night');
+    </script>
+</body>
+</html>
+""")
+    }
+}
+
+jar {
+    manifest {
+        attributes += [
+                'Implementation-Title'    : 'SlideshowFX',
+                'Implementation-Version'  : project.version,
+                'Main-Class'              : 'com.twasyl.slideshowfx.app.SlideshowFX',
+                'JavaFX-Preloader-Class'  : 'com.twasyl.slideshowfx.app.SlideshowFXPreloader',
+                'JavaFX-Application-Class': 'com.twasyl.slideshowfx.app.SlideshowFX',
+                'JavaFX-Version'          : '15+'
+        ]
+    }
+}
+
+prepareResources {
+    dependsOn += [
+            ':slideshowfx-content-extension:jar',
+            ':slideshowfx-documentation:renderDocumentation',
+            ':slideshowfx-engines:jar',
+            ':slideshowfx-global-configuration:jar',
+            ':slideshowfx-hosting-connector:jar',
+            ':slideshowfx-icons:jar',
+            ':slideshowfx-logs:jar',
+            ':slideshowfx-markup:jar',
+            ':slideshowfx-plugin:jar',
+            ':slideshowfx-plugin-manager:jar',
+            ':slideshowfx-server:jar',
+            ':slideshowfx-snippet-executor:jar',
+            ':slideshowfx-style:jar',
+            ':slideshowfx-ui-controls:jar',
+            ':slideshowfx-utils:jar']
+}
+
+createPackage.dependsOn 'jar'
+build.dependsOn 'createPackage'
+
+test {
+    jacoco {
+        excludes = ['com.twasyl.slideshowfx.controllers.*', 'com.twasyl.slideshowfx.controls.*', 'com.twasyl.slideshowfx.app.*']
+    }
+}

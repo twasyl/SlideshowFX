@@ -1,5 +1,7 @@
 package com.twasyl.slideshowfx.gradle.plugins.sfxplugin.tasks;
 
+import com.twasyl.slideshowfx.gradle.plugins.DefaultSlideshowFXTask;
+import com.twasyl.slideshowfx.gradle.plugins.sfxplugin.extensions.SlideshowFXPluginExtension;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.TaskAction;
 
@@ -18,18 +20,22 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * @version 1.0
  * @since SlideshowFX @@NEXT-VERSION@@
  */
-public class InstallPlugin extends AbstractPluginTask {
+public class InstallPlugin extends DefaultSlideshowFXTask<SlideshowFXPluginExtension> {
+
+    public InstallPlugin() {
+        super(SlideshowFXPluginExtension.class);
+    }
 
     @TaskAction
     public void install() {
-        if (!pluginsDir.exists()) {
-            pluginsDir.mkdirs();
+        if (!this.extension.getPluginsDir().getAsFile().get().exists()) {
+            this.extension.getPluginsDir().getAsFile().get().mkdirs();
         }
 
         final FileCollection files = getProject().getTasks().getByName(BUNDLE_TASK_NAME).getOutputs().getFiles();
         if (!files.isEmpty()) {
             files.forEach(file -> {
-                final Path copy = new File(pluginsDir, file.getName()).toPath();
+                final Path copy = new File(this.extension.getPluginsDir().getAsFile().get(), file.getName()).toPath();
                 try {
                     Files.copy(file.toPath(), copy, REPLACE_EXISTING);
                 } catch (IOException e) {

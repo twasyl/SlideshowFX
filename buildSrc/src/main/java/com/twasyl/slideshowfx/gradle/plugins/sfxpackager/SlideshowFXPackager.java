@@ -7,6 +7,8 @@ import com.twasyl.slideshowfx.gradle.plugins.sfxpackager.tasks.PrepareResources;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
+import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME;
+
 /**
  * <p>Gradle plugin for creating a package for a JavaFX application.</p>
  * <h1>Tasks</h1>
@@ -30,12 +32,12 @@ public class SlideshowFXPackager implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        final PackageExtension packaging = project.getExtensions().create(PACKAGING_EXTENSION_NAME, PackageExtension.class, project);
+        project.getExtensions().create(PACKAGING_EXTENSION_NAME, PackageExtension.class);
 
-        final PrepareResources prepareResources = project.getTasks().create(PREPARE_RESOURCES_TASK_NAME, PrepareResources.class, packaging);
-        final CreateRuntime createRuntime = project.getTasks().create(CREATE_RUNTIME_TASK_NAME, CreateRuntime.class, packaging);
-        final CreatePackage createPackage = project.getTasks().create(CREATE_PACKAGE_TASK_NAME, CreatePackage.class, packaging);
+        final PrepareResources prepareResources = project.getTasks().create(PREPARE_RESOURCES_TASK_NAME, PrepareResources.class);
+        final CreateRuntime createRuntime = project.getTasks().create(CREATE_RUNTIME_TASK_NAME, CreateRuntime.class);
+        final CreatePackage createPackage = project.getTasks().create(CREATE_PACKAGE_TASK_NAME, CreatePackage.class);
 
-        createPackage.dependsOn(prepareResources, createRuntime);
+        createPackage.dependsOn(prepareResources, JAR_TASK_NAME, createRuntime);
     }
 }

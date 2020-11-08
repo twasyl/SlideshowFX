@@ -1,0 +1,30 @@
+plugins {
+    id 'sfx-plugin'
+    id 'org.openjfx.javafxplugin'
+    id 'jacoco'
+    id 'org.sonarqube'
+}
+
+description = 'Hosting connector allowing to open and save presentations from and to Google Drive'
+version = '1.4-SNAPSHOT'
+
+dependencies {
+    api project(':slideshowfx-plugin')
+
+    implementation project(':slideshowfx-engines')
+    implementation project(':slideshowfx-global-configuration')
+    implementation project(':slideshowfx-hosting-connector')
+
+    pluginDependencies "com.google.apis:google-api-services-drive:${project.property('dependencies.drive.version')}"
+    pluginDependencies "com.google.auth:google-auth-library-oauth2-http:0.20.0"
+}
+
+javafx {
+    modules('javafx.controls', 'javafx.graphics', 'javafx.web')
+}
+
+sfxPlugin {
+    hostingConnector = true
+    pluginName = 'Google Drive'
+    pluginDescription = 'Support for connecting to Google Drive'
+}

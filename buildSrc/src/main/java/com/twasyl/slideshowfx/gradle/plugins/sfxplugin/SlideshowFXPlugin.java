@@ -93,8 +93,8 @@ public class SlideshowFXPlugin implements Plugin<Project> {
     private void createAndUpdateTasks(Project project) {
         final TaskContainer tasks = project.getTasks();
 
-        final SlideshowFXPluginExtension sfxPlugin = project.getExtensions().create(SFX_PLUGIN_EXTENSION, SlideshowFXPluginExtension.class);
-        final Task prepareManifest = tasks.create(PREPARE_MANIFEST_TASK_NAME, PrepareManifest.class, sfxPlugin);
+        project.getExtensions().create(SFX_PLUGIN_EXTENSION, SlideshowFXPluginExtension.class);
+        final Task prepareManifest = tasks.create(PREPARE_MANIFEST_TASK_NAME, PrepareManifest.class);
         final Bundle bundle = tasks.create(BUNDLE_TASK_NAME, Bundle.class);
         final InstallPlugin installPlugin = tasks.create(INSTALL_PLUGIN_TASK_NAME, InstallPlugin.class);
         tasks.create(UNINSTALL_PLUGIN_TASK_NAME, UninstallPlugin.class);
@@ -111,13 +111,13 @@ public class SlideshowFXPlugin implements Plugin<Project> {
             final SlideshowFXPluginExtension extension = p.getExtensions().getByType(SlideshowFXPluginExtension.class);
             String dependentProject;
 
-            if (extension.isMarkupPlugin()) {
+            if (extension.getMarkupPlugin().get()) {
                 dependentProject = ":slideshowfx-markup";
-            } else if (extension.isContentExtension()) {
+            } else if (extension.getContentExtension().get()) {
                 dependentProject = ":slideshowfx-content-extension";
-            } else if (extension.isHostingConnector()) {
+            } else if (extension.getHostingConnector().get()) {
                 dependentProject = ":slideshowfx-hosting-connector";
-            } else if (extension.isSnippetExecutor()) {
+            } else if (extension.getSnippetExecutor().get()) {
                 dependentProject = ":slideshowfx-snippet-executor";
             } else {
                 dependentProject = null;

@@ -1,0 +1,140 @@
+import static com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin.SFX_PLUGIN_EXTENSION
+import static java.io.File.separator
+
+plugins {
+    id 'java'
+    id 'org.openjfx.javafxplugin'
+    id 'distribution'
+    id 'jacoco'
+    id 'org.sonarqube'
+    id 'sfx-packager'
+}
+
+description = 'Module for the installer of SlideshowFX'
+version = project.findProperty('productVersion') ?: System.getenv('PRODUCT_VERSION') ?: '2020.1'
+
+dependencies {
+    implementation project(':slideshowfx-global-configuration')
+    implementation project(':slideshowfx-icons')
+    implementation project(':slideshowfx-logs')
+    implementation project(':slideshowfx-plugin-manager')
+    implementation project(':slideshowfx-ui-controls')
+    implementation project(':slideshowfx-utils')
+}
+
+rootProject.subprojects.forEach {
+    if (it.name != project.name) {
+        project.evaluationDependsOn(it.path)
+    }
+}
+
+packaging {
+    def createPackage = project(':slideshowfx-app').tasks.createPackage
+    outputDir = file("$buildDir/package")
+    executableBaseName = 'SlideshowFXSetup'
+
+    runtime.modules = ['java.desktop', 'java.logging', 'java.scripting', 'java.xml', 'jdk.unsupported', 'jdk.unsupported.desktop']
+    runtime.jlinkOptions = ['--no-header-files', '--no-man-pages', '--compress=0', '--strip-debug', '--strip-native-commands']
+
+    app.jvmOpts = ['-Xms512m',
+                   '-Xmx1g',
+                   '--enable-preview',
+                   '-Dfile.encoding=UTF-8',
+                   '-Duser.language=en',
+                   '--add-modules', 'ALL-MODULE-PATH',
+                   '-Dsetup.application.name=SlideshowFX',
+                   "-Dsetup.application.version=${project.version}".toString(),
+                   "-Dsetup.application.artifact=\"\$APPDIR${separator}${createPackage.getPackage().name}\"".toString(),
+                   "-Dsetup.plugins.directory=\"\$APPDIR${separator}plugins\"".toString(),
+                   "-Dsetup.documentations.directory=\"\$APPDIR${separator}documentations\"".toString(),
+                   "-Dsetup.service.twitter.consumerKey=${System.getenv("TWITTER_CONSUMER_KEY")}".toString(),
+                   "-Dsetup.service.twitter.consumerSecret=${System.getenv("TWITTER_CONSUMER_SECRET")}".toString()
+    ]
+
+    app.module = 'slideshowfx.setup'
+    app.mainClass = 'com.twasyl.slideshowfx.setup.app.SlideshowFXSetup'
+
+    addResource(createPackage.outputs.files, createPackage.getPackage().name)
+
+    rootProject.subprojects.findAll { it.pluginManager.hasPlugin("sfx-plugin") }
+            .each {
+                def destination = it.extensions.findByName(SFX_PLUGIN_EXTENSION).getBundlePackageDestination()
+                if (destination != null) {
+                    def bundle = it.tasks.bundle
+                    if (bundle != null) {
+                        addResource(bundle.outputs.files, destination)
+                    }
+                }
+            }
+
+    def renderDocumentation = project(":slideshowfx-documentation").tasks.renderDocumentation
+    renderDocumentation.outputs.files.each { addResource(fileTree(it), "documentations") }
+}
+
+javafx {
+    modules('javafx.controls', 'javafx.fxml', 'javafx.graphics')
+}
+
+distributions {
+    main {
+        contents {
+            from tasks.createPackage.getPackage()
+        }
+    }
+}
+
+jar {
+    manifest {
+        attributes += [
+                'Implementation-Title'    : 'SlideshowFX-setup',
+                'Implementation-Version'  : project.version,
+                'Main-Class'              : 'com.twasyl.slideshowfx.setup.app.SlideshowFXSetup',
+                'JavaFX-Application-Class': 'com.twasyl.slideshowfx.setup.app.SlideshowFXSetup',
+                'JavaFX-Version'          : '15+'
+        ]
+    }
+}
+
+createPackage {
+    dependsOn += [
+            ':slideshowfx-app:createPackage',
+            ':slideshowfx-documentation:renderDocumentation',
+            // Content extensions
+            ":slideshowfx-alert-extension:bundle",
+            ":slideshowfx-code-extension:bundle",
+            ":slideshowfx-image-extension:bundle",
+            ":slideshowfx-link-extension:bundle",
+            ":slideshowfx-quiz-extension:bundle",
+            ":slideshowfx-quote-extension:bundle",
+            ":slideshowfx-sequence-diagram-extension:bundle",
+            ":slideshowfx-shape-extension:bundle",
+            ":slideshowfx-snippet-extension:bundle",
+            // Hosting connectors
+            ":slideshowfx-box-hosting-connector:bundle",
+            ":slideshowfx-drive-hosting-connector:bundle",
+            ":slideshowfx-dropbox-hosting-connector:bundle",
+            // Snippet executors
+            ":slideshowfx-go-executor:bundle",
+            ":slideshowfx-golo-executor:bundle",
+            ":slideshowfx-groovy-executor:bundle",
+            ":slideshowfx-java-executor:bundle",
+            ":slideshowfx-javascript-executor:bundle",
+            ":slideshowfx-kotlin-executor:bundle",
+            ":slideshowfx-ruby-executor:bundle",
+            ":slideshowfx-rust-executor:bundle",
+            ":slideshowfx-scala-executor:bundle",
+            // Markups
+            ":slideshowfx-asciidoctor:bundle",
+            ":slideshowfx-html:bundle",
+            ":slideshowfx-markdown:bundle",
+            ":slideshowfx-textile:bundle"]
+}
+
+distZip {
+    dependsOn createPackage
+    archiveFileName = "${tasks.createPackage.distributionBaseName()}.zip"
+}
+
+distTar {
+    enabled = false
+}

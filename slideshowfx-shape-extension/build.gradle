@@ -1,0 +1,77 @@
+plugins {
+    id 'sfx-plugin'
+    id 'org.openjfx.javafxplugin'
+    id 'jacoco'
+    id 'org.sonarqube'
+}
+
+description = 'Extension allowing to insert shapes inside a SlideshowFX presentation'
+version = '1.1-SNAPSHOT'
+
+dependencies {
+    api project(':slideshowfx-markup')
+    api project(':slideshowfx-plugin')
+    api project(':slideshowfx-ui-controls')
+
+    implementation project(':slideshowfx-icons')
+    implementation project(':slideshowfx-utils')
+
+    testImplementation "org.mockito:mockito-core:${project.property('dependencies.mockito.version')}"
+}
+
+javafx {
+    modules('javafx.controls', 'javafx.fxml', 'javafx.graphics')
+}
+
+sfxPlugin {
+    contentExtension = true
+    pluginName = 'Shape'
+    pluginDescription = 'Insert shapes in slides'
+    setupWizardIconName = 'STAR'
+}
+
+tasks.register('zipSnapSVGPackage', Zip) {
+    archiveFileName = 'snapsvg.zip'
+    destinationDirectory = file("$buildDir/tmp")
+    from("$buildDir/tmp/snapsvg-update/snapsvg") {
+        into 'snapsvg'
+    }
+}
+
+tasks.register('createSnapSVGPackage') {
+    finalizedBy = ['zipSnapSVGPackage']
+
+    doLast {
+        def snapSvgVersion = project.property('dependencies.snapsvg.version')
+        def binaryDir = new File("$buildDir/tmp/snapsvg-update")
+        def newPackageDir = new File("$binaryDir/snapsvg", snapSvgVersion)
+        def binary = new File("$binaryDir/Snap.svg-${snapSvgVersion}.zip")
+        def unpackedBinary = new File(binaryDir, "Snap.svg-$snapSvgVersion")
+
+        if (!binaryDir.exists()) {
+            binaryDir.mkdirs()
+        }
+
+        if (!newPackageDir.exists()) {
+            newPackageDir.mkdirs()
+        }
+
+        new URL("https://github.com/adobe-webplatform/Snap.svg/archive/v${snapSvgVersion}.zip")
+                .withInputStream { input -> binary.withOutputStream { it << input } }
+
+        copy {
+            from(zipTree(binary))
+            into(binaryDir)
+        }
+
+        binary.delete()
+
+        copy {
+            from(fileTree("$unpackedBinary/dist"))
+            include("snap.svg-min.js")
+            into(newPackageDir)
+        }
+
+        unpackedBinary.deleteRecursively()
+    }
+}

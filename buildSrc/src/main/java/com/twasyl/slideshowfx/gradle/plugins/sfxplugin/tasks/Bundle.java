@@ -1,5 +1,7 @@
 package com.twasyl.slideshowfx.gradle.plugins.sfxplugin.tasks;
 
+import com.twasyl.slideshowfx.gradle.plugins.DefaultSlideshowFXTask;
+import com.twasyl.slideshowfx.gradle.plugins.sfxplugin.extensions.SlideshowFXPluginExtension;
 import org.gradle.api.GradleException;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.tasks.OutputFile;
@@ -24,9 +26,10 @@ import static org.gradle.api.plugins.BasePlugin.BUILD_GROUP;
  * @version 1.0-SNAPSHOT
  * @since SlideshowFX @@NEXT-VERSION@@
  */
-public class Bundle extends AbstractPluginTask {
+public class Bundle extends DefaultSlideshowFXTask<SlideshowFXPluginExtension> {
 
     public Bundle() {
+        super(SlideshowFXPluginExtension.class);
         this.setGroup(BUILD_GROUP);
     }
 

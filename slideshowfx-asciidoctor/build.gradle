@@ -1,0 +1,25 @@
+plugins {
+    id 'sfx-plugin'
+    id 'org.openjfx.javafxplugin'
+    id 'jacoco'
+    id 'org.sonarqube'
+}
+
+description = "Extension allowing to define slide's content using the markdown syntax"
+version = '1.2-SNAPSHOT'
+
+dependencies {
+    implementation project(':slideshowfx-plugin')
+
+    pluginDependencies "org.asciidoctor:asciidoctorj:${project.property('dependencies.asciidoctorj.version')}"
+}
+
+javafx {
+    modules('javafx.graphics')
+}
+
+sfxPlugin {
+    markupPlugin = true
+    pluginName = 'Asciidoctor'
+    pluginDescription = "Define slide's content in Asciidoctor"
+}

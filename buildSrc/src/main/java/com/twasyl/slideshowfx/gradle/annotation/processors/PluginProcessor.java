@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import static javax.lang.model.SourceVersion.RELEASE_15;
+import static javax.lang.model.SourceVersion.RELEASE_14;
 import static javax.lang.model.element.ElementKind.CLASS;
 
 /**
@@ -24,7 +24,7 @@ import static javax.lang.model.element.ElementKind.CLASS;
  * @since SlideshowFX @@NEXT-VERSION@@
  */
 @SupportedAnnotationTypes("com.twasyl.slideshowfx.plugin.Plugin")
-@SupportedSourceVersion(RELEASE_15)
+@SupportedSourceVersion(RELEASE_14)
 @SupportedOptions(PluginProcessor.GENERATED_DIR_OPTION_NAME)
 public class PluginProcessor extends AbstractProcessor {
 

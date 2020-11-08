@@ -1,15 +1,15 @@
 package com.twasyl.slideshowfx.gradle.plugins.sfxpackager.tasks;
 
+import com.twasyl.slideshowfx.gradle.plugins.DefaultJvmSlideshowFXTask;
 import com.twasyl.slideshowfx.gradle.plugins.sfxpackager.extensions.PackageExtension;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.util.ArrayList;
 
-import static com.twasyl.slideshowfx.gradle.Utils.*;
+import static com.twasyl.slideshowfx.gradle.Utils.isMac;
+import static com.twasyl.slideshowfx.gradle.Utils.isWindows;
 import static com.twasyl.slideshowfx.gradle.plugins.sfxpackager.SlideshowFXPackager.CREATE_RUNTIME_TASK_NAME;
 import static com.twasyl.slideshowfx.gradle.plugins.sfxpackager.SlideshowFXPackager.PREPARE_RESOURCES_TASK_NAME;
 import static java.io.File.separatorChar;
@@ -22,12 +22,10 @@ import static org.gradle.api.plugins.BasePlugin.BUILD_GROUP;
  * @version 1.0-SNAPSHOT
  * @since SlideshowFX @@NEXT-VERSION@@
  */
-public class CreatePackage extends DefaultTask {
-    private PackageExtension packageExtension;
+public class CreatePackage extends DefaultJvmSlideshowFXTask<PackageExtension> {
 
-    @Inject
-    public CreatePackage(PackageExtension packageExtension) {
-        this.packageExtension = packageExtension;
+    public CreatePackage() {
+        super(PackageExtension.class);
         this.setGroup(BUILD_GROUP);
     }
 
@@ -38,7 +36,7 @@ public class CreatePackage extends DefaultTask {
         }
 
         final var cmd = new ArrayList<>();
-        cmd.add(getJavaBinary(getProject(), "jpackage"));
+        cmd.add(getJavaBinary("jpackage"));
 
         final String icon;
 
@@ -57,28 +55,28 @@ public class CreatePackage extends DefaultTask {
         cmd.add(new File(getProject().getProjectDir(), "src" + separatorChar + "assembly" + separatorChar + "javafx" + separatorChar + "package" + separatorChar + icon).getAbsolutePath());
 
         cmd.add("--dest");
-        cmd.add(this.packageExtension.outputDir.getAbsolutePath());
+        cmd.add(this.extension.outputDir.getAbsolutePath());
 
         cmd.add("--name");
-        cmd.add(this.packageExtension.executableBaseName);
+        cmd.add(this.extension.executableBaseName);
 
         final var createRuntimeTask = (CreateRuntime) getProject().getTasks().getByName(CREATE_RUNTIME_TASK_NAME);
         cmd.add("--runtime-image");
-        cmd.add(createRuntimeTask.getRuntimeDir().getAbsolutePath());
+        cmd.add(createRuntimeTask.getRuntimeDir());
 
         final var prepareResourcesTask = (PrepareResources) getProject().getTasks().getByName(PREPARE_RESOURCES_TASK_NAME);
         cmd.add("--module-path");
         cmd.add(prepareResourcesTask.getDependenciesDir().getAbsolutePath());
 
         cmd.add("--module");
-        cmd.add(this.packageExtension.app.module + "/" + this.packageExtension.app.mainClass);
+        cmd.add(this.extension.app.module + "/" + this.extension.app.mainClass);
 
-        this.packageExtension.app.jvmOpts.forEach(option -> {
+        this.extension.app.jvmOpts.forEach(option -> {
             cmd.add("--java-options");
             cmd.add(option);
         });
 
-        if (this.packageExtension.resources != null && !this.packageExtension.resources.isEmpty()) {
+        if (this.extension.resources != null && !this.extension.resources.isEmpty()) {
             cmd.add("--input");
             cmd.add(prepareResourcesTask.getResourcesDir().getAbsolutePath());
         }
@@ -89,7 +87,7 @@ public class CreatePackage extends DefaultTask {
     @OutputDirectory
     public File getPackage() {
         final String extension = isMac() ? ".app" : "";
-        return new File(this.packageExtension.outputDir, this.packageExtension.executableBaseName + extension);
+        return new File(this.extension.outputDir, this.extension.executableBaseName + extension);
     }
 
     public String distributionBaseName() {
@@ -102,6 +100,6 @@ public class CreatePackage extends DefaultTask {
             platform = "unix";
         }
 
-        return packageExtension.executableBaseName + "-" + packageExtension.project.getVersion() + "-" + platform;
+        return extension.executableBaseName + "-" + getProject().getVersion() + "-" + platform;
     }
 }

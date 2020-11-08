@@ -1,0 +1,26 @@
+plugins {
+    id 'sfx-plugin'
+    id 'org.openjfx.javafxplugin'
+    id 'jacoco'
+    id 'org.sonarqube'
+}
+
+description = "Extension allowing to define slide's content using the markdown syntax"
+version = '1.1-SNAPSHOT'
+
+dependencies {
+    implementation project(':slideshowfx-plugin')
+
+    pluginDependencies "com.atlassian.commonmark:commonmark:${project.property('dependencies.markdown.version')}"
+    pluginDependencies "com.atlassian.commonmark:commonmark-ext-gfm-tables:${project.property('dependencies.markdown.version')}"
+}
+
+javafx {
+    modules('javafx.graphics')
+}
+
+sfxPlugin {
+    markupPlugin = true
+    pluginName = 'markdown'
+    pluginDescription = "Define slide's content in markdown"
+}

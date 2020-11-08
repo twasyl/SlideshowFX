@@ -1,0 +1,30 @@
+import org.gradle.util.GradleVersion
+
+plugins {
+    id 'documentation'
+}
+
+description = 'SlideshowFX documentation to be included within the application and the setup package'
+version = '1.0'
+
+documentation {
+    properties.putAll([
+            'ace_version'                  : project.property('dependencies.ace.version'),
+            'asciidoctorj_version'         : project.property('dependencies.asciidoctorj.version'),
+            'box_version'                  : project.property('dependencies.box.version'),
+            'commonmark_version'           : project.property('dependencies.markdown.version'),
+            'drive_version'                : project.property('dependencies.drive.version'),
+            'dropbox_version'              : project.property('dependencies.dropbox.version'),
+            'fontawesome_version'          : project.property('dependencies.fontawesome.version'),
+            'freemarker_version'           : project.property('dependencies.freemarker.version'),
+            'gradle_version'               : GradleVersion.current().version,
+            'javafx_version'               : project.property('dependencies.javafx.version'),
+            'jdk_version'                  : project.property('toolchain.language.version'),
+            'jsoup_version'                : project.property('dependencies.jsoup.version'),
+            'slideshowfx_version'          : project.findProperty('productVersion') ?: System.getenv('PRODUCT_VERSION') ?: '2020.1',
+            'snapsvg_version'              : project.property('dependencies.snapsvg.version'),
+            'sweetalert_version'           : project.property('dependencies.sweetalert.version'),
+            'vertx_version'                : project.property('dependencies.vertx.version'),
+            'wikitext_textile_core_version': project.property('dependencies.wikitext.version'),
+            'zxing_jse_version'            : project.property('dependencies.zxing.version')])
+}

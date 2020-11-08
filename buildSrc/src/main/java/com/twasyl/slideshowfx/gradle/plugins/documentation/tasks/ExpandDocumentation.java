@@ -1,12 +1,13 @@
 package com.twasyl.slideshowfx.gradle.plugins.documentation.tasks;
 
+import com.twasyl.slideshowfx.gradle.plugins.DefaultSlideshowFXTask;
 import com.twasyl.slideshowfx.gradle.plugins.documentation.extensions.DocumentationExtension;
-import org.gradle.api.file.FileCollection;
-import org.gradle.api.tasks.Copy;
-import org.gradle.api.tasks.OutputFiles;
 import org.gradle.api.tasks.TaskAction;
 
-import javax.inject.Inject;
+import java.util.HashMap;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.gradle.api.plugins.BasePlugin.BUILD_GROUP;
 
 /**
  * Task expanding the documentation in order to replace variables with their values.
@@ -15,28 +16,23 @@ import javax.inject.Inject;
  * @version 1.0-SNAPSHOT
  * @since SlideshowFX @@NEXT-VERSION@@
  */
-public class ExpandDocumentation extends Copy {
-    private DocumentationExtension extension;
+public class ExpandDocumentation extends DefaultSlideshowFXTask<DocumentationExtension> {
 
-    @Inject
-    public ExpandDocumentation(final DocumentationExtension extension) {
+    public ExpandDocumentation() {
+        super(DocumentationExtension.class);
         this.setDescription("Expand the documentation by replacing variables with their values.");
-        this.setGroup("build");
+        this.setGroup(BUILD_GROUP);
 
-        this.extension = extension;
         this.getInputs().dir(this.extension.getDocsDir());
         this.getOutputs().dir(this.extension.getExpandDir());
-
-        from(this.extension.getDocsDir());
-        into(this.extension.getExpandDir());
-        include("*.md");
     }
 
-    @Override
     @TaskAction
-    protected void copy() {
-        this.expand(this.extension.getProperties());
-        this.into(this.extension.getExpandDir());
-        super.copy();
+    protected void expand() {
+        getProject().copy(copy -> copy.from(this.extension.getDocsDir())
+                .into(this.extension.getExpandDir())
+                .include("*.md")
+                .expand(new HashMap<>(this.extension.getProperties().get()))
+                .setFilteringCharset(UTF_8.displayName()));
     }
 }

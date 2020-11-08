@@ -1,0 +1,251 @@
+import com.twasyl.slideshowfx.gradle.plugins.gherkin.GherkinPlugin
+import com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin
+import org.openjfx.gradle.JavaFXPlugin
+import org.sonarqube.gradle.SonarQubePlugin
+import org.sonarqube.gradle.SonarQubeTask
+
+import static org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+plugins {
+    id 'org.sonarqube'
+    id 'build-dashboard'
+    id 'sfx-release'
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+subprojects {
+    def moduleName = project.name.replace("-", ".")
+
+    plugins.apply(IdeaPlugin.class)
+
+    plugins.withType(IdeaPlugin.class).configureEach {
+        def idea = it
+        idea.model.module {
+            outputDir = file("out${File.separator}production${File.separator}${moduleName}")
+            testOutputDir = file("out${File.separator}test${File.separator}${moduleName}")
+        }
+
+        tasks.register("ideaCleanOutput", Delete) {
+            enabled = idea.model.module.outputDir.exists() || idea.model.module.testOutputDir.exists()
+            delete = [idea.model.module.outputDir, idea.model.module.testOutputDir]
+        }
+    }
+
+    plugins.withType(JavaPlugin.class).configureEach {
+        project.extensions.getByType(JavaPluginExtension.class).toolchain {
+            languageVersion.set(JavaLanguageVersion.of(project.property('toolchain.language.version')))
+        }
+
+        def jvmArgsForTests = ['--enable-preview', '-Djava.awt.headless=true', '-Dtestfx.headless=true',
+                               '-Dprism.order=sw', '-Dtestfx.robot=glass']
+
+        if (com.twasyl.slideshowfx.gradle.Utils.isMac()) {
+            jvmArgsForTests.add('-Dprism.verbose=true')
+        } else {
+            jvmArgsForTests.add('-Dprism.text=t2k')
+        }
+
+        sourceSets {
+            main {
+                output.resourcesDir = "$buildDir/classes/java/main"
+            }
+
+            integrationTest {
+                compileClasspath += sourceSets.main.output
+                runtimeClasspath += sourceSets.main.output
+            }
+        }
+
+        configurations {
+            integrationTestImplementation.extendsFrom implementation
+            integrationTestRuntimeOnly.extendsFrom runtimeOnly
+        }
+
+        dependencies {
+            testImplementation "org.junit.jupiter:junit-jupiter-api:${project.property('dependencies.junit.version')}"
+            testImplementation "org.junit.jupiter:junit-jupiter-params:${project.property('dependencies.junit.version')}"
+            testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.property('dependencies.junit.version')}"
+
+            integrationTestImplementation "org.junit.jupiter:junit-jupiter-api:${project.property('dependencies.junit.version')}"
+            integrationTestImplementation "org.junit.jupiter:junit-jupiter-params:${project.property('dependencies.junit.version')}"
+            integrationTestRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.property('dependencies.junit.version')}"
+        }
+
+        tasks.withType(JavaCompile.class).configureEach {
+            inputs.property("moduleName", moduleName)
+            sourceCompatibility = project.property('toolchain.language.version')
+            targetCompatibility = project.property('toolchain.language.version')
+            modularity.inferModulePath.set(true)
+
+            options.compilerArgs.add('--enable-preview')
+        }
+
+        tasks.named("compileJava", JavaCompile.class).configure {
+            options.sourcepath = files(sourceSets.main.java.srcDirs, sourceSets.main.resources.srcDirs)
+        }
+
+        tasks.withType(Test.class).configureEach {
+            inputs.property("moduleName", moduleName)
+            useJUnitPlatform()
+            ignoreFailures = true
+
+            doFirst {
+                jvmArgs("--add-exports", "org.junit.platform.commons/org.junit.platform.commons.util=ALL-UNNAMED",
+                        "--add-exports", "org.junit.platform.commons/org.junit.platform.commons.logging=ALL-UNNAMED")
+                jvmArgs(jvmArgsForTests)
+            }
+        }
+
+        tasks.withType(Jar.class).configureEach {
+            inputs.property("moduleName", moduleName)
+            duplicatesStrategy = EXCLUDE
+            manifest {
+                attributes += ["Implementation-Vendor": "Thierry Wasylczenko"]
+            }
+        }
+
+        tasks.register("integrationTest", Test.class).configure {
+            dependsOn 'jar'
+            description = 'Runs integration tests.'
+            group = 'verification'
+            useJUnitPlatform()
+            testClassesDirs = sourceSets.integrationTest.output.classesDirs
+            classpath = sourceSets.integrationTest.runtimeClasspath
+
+            doFirst {
+                options {
+                    jvmArgs(jvmArgsForTests)
+                }
+            }
+        }
+
+        tasks.named("check").configure {
+            dependsOn(integrationTest)
+        }
+    }
+
+    plugins.withType(JavaTestFixturesPlugin.class).configureEach {
+        dependencies {
+            testFixturesImplementation "org.junit.jupiter:junit-jupiter-api:${project.property('dependencies.junit.version')}"
+            testFixturesImplementation "org.junit.jupiter:junit-jupiter-params:${project.property('dependencies.junit.version')}"
+            testFixturesRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.property('dependencies.junit.version')}"
+        }
+    }
+
+    plugins.withType(GherkinPlugin.class).configureEach {
+        dependencies {
+            gherkinTestImplementation "org.junit.jupiter:junit-jupiter-api:${project.property('dependencies.junit.version')}"
+            gherkinTestImplementation "org.junit.jupiter:junit-jupiter-params:${project.property('dependencies.junit.version')}"
+            gherkinTestImplementation "io.cucumber:cucumber-java:${project.property('dependencies.cucumber.version')}"
+        }
+
+        tasks.named("check").configure {
+            dependsOn 'gherkinTest'
+        }
+    }
+
+    plugins.withType(SlideshowFXPlugin.class).configureEach {
+        dependencies {
+            integrationTestImplementation project(':slideshowfx-plugin-manager')
+            integrationTestImplementation(testFixtures(project(':slideshowfx-plugin')))
+        }
+
+        tasks.named('integrationTest', Test.class).configure {
+            dependsOn 'bundle'
+        }
+    }
+
+    plugins.withType(JacocoPlugin.class).configureEach {
+        jacoco {
+            toolVersion = "0.8.6"
+        }
+
+        tasks.withType(JacocoReport).configureEach {
+            executionData.setFrom(fileTree("$buildDir/jacoco").include("*.exec"))
+
+            reports {
+                csv.enabled = false
+                html.enabled = true
+                xml.enabled = true
+            }
+
+            dependsOn integrationTest
+            if (plugins.hasPlugin(GherkinPlugin.class)) {
+                dependsOn gherkinTest
+            }
+        }
+
+        tasks.named("check").configure {
+            project.tasks.withType(JacocoReport).forEach {
+                dependsOn it
+            }
+        }
+    }
+
+    plugins.withType(JavaFXPlugin.class).configureEach {
+        javafx {
+            version = project.property('dependencies.javafx.version')
+        }
+    }
+
+    plugins.withType(SonarQubePlugin.class).configureEach {
+        def requiredSourceSets = [sourceSets.test, sourceSets.integrationTest]
+
+        if (plugins.hasPlugin(GherkinPlugin.class)) {
+            requiredSourceSets += sourceSets.gherkinTest
+        }
+
+        def testDirs = []
+        def jacocoReports = []
+        def junitReports = []
+
+        for (set in requiredSourceSets) {
+            testDirs.addAll(set.allSource.srcDirs.findAll { it.exists() })
+
+            def resultFile = file("$buildDir/reports/jacoco/${set.name}/jacocoTestReport.xml")
+            if (resultFile.exists()) {
+                jacocoReports.add(resultFile)
+            }
+
+            resultFile = file("$buildDir/reports/tests/${set.name}")
+            if (resultFile.exists()) {
+                junitReports.add(resultFile)
+            }
+        }
+
+        sonarqube {
+            properties {
+                property("sonar.tests", testDirs.joinToString(separator = ",") { it.absolutePath })
+                property("sonar.coverage.jacoco.xmlReportPaths", jacocoReports.joinToString(separator = ",") { it.absolutePath })
+                property("sonar.junit.reportPaths", junitReports.joinToString(separator = ",") { it.absolutePath })
+            }
+        }
+    }
+
+    sonarqube {
+        properties {
+            property("sonar.host.url", System.getProperty("sonar.host.url", System.getenv("SONAR_HOST_URL")))
+            property("sonar.login", System.getProperty("sonar.login", System.getenv("SONAR_LOGIN")))
+            property("sonar.projectKey", System.getProperty("sonar.projectKey", System.getenv("SONAR_PROJECT_KEY")))
+            property("sonar.organization", System.getProperty("sonar.organization", System.getenv("SONAR_ORGANIZATION")))
+            property("sonar.branch.name", System.getProperty("sonar.branch.name", System.getenv("SONAR_BRANCH")))
+            property("sonar.sourceEncoding", "UTF-8")
+        }
+    }
+
+    tasks.withType(SonarQubeTask.class).configureEach {
+        dependsOn(subprojects.filter { project -> project.pluginManager.hasPlugin("org.sonarqube") }
+                .map { project -> project.tasks.named("check") })
+    }
+}

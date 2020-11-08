@@ -1,0 +1,49 @@
+plugins {
+    id 'java-library'
+    id 'java-gradle-plugin'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation 'org.jsoup:jsoup:1.13.1'
+    implementation 'com.atlassian.commonmark:commonmark:0.15.1'
+    implementation 'com.atlassian.commonmark:commonmark-ext-gfm-tables:0.15.1'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(15)
+    }
+}
+
+gradlePlugin {
+    plugins {
+        slideshowFXPlugin {
+            id = 'sfx-plugin'
+            implementationClass = 'com.twasyl.slideshowfx.gradle.plugins.sfxplugin.SlideshowFXPlugin'
+        }
+
+        slideshowFXPackager {
+            id = 'sfx-packager'
+            implementationClass = 'com.twasyl.slideshowfx.gradle.plugins.sfxpackager.SlideshowFXPackager'
+        }
+
+        slideshowFXRelease {
+            id = 'sfx-release'
+            implementationClass = 'com.twasyl.slideshowfx.gradle.plugins.sfxrelease.SlideshowFXRelease'
+        }
+
+        gherkin {
+            id = 'gherkin'
+            implementationClass = 'com.twasyl.slideshowfx.gradle.plugins.gherkin.GherkinPlugin'
+        }
+
+        documentation {
+            id = 'documentation'
+            implementationClass = 'com.twasyl.slideshowfx.gradle.plugins.documentation.Documentation'
+        }
+    }
+}

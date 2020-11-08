@@ -1,0 +1,19 @@
+plugins {
+    id 'java-library'
+    id 'org.openjfx.javafxplugin'
+    id 'jacoco'
+    id 'org.sonarqube'
+}
+
+description = 'Module defining the style and themes to be used within the SlideshowFX app'
+version = '1.0-SNAPSHOT'
+
+dependencies {
+    testImplementation "org.testfx:testfx-core:${project.property('dependencies.testfx.version')}"
+    testImplementation "org.testfx:testfx-junit5:${project.property('dependencies.testfx.version')}"
+    testImplementation "org.testfx:openjfx-monocle:${project.property('dependencies.monocle.version')}"
+}
+
+javafx {
+    modules('javafx.graphics', 'javafx.controls')
+}

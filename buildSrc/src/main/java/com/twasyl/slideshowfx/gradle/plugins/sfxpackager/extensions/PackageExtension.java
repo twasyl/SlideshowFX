@@ -1,9 +1,7 @@
 package com.twasyl.slideshowfx.gradle.plugins.sfxpackager.extensions;
 
-import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,17 +27,11 @@ public class PackageExtension {
         public String mainClass;
     }
 
-    public Project project;
     public File outputDir;
     public String executableBaseName;
     public Runtime runtime = new Runtime();
     public Application app = new Application();
     public Map<FileCollection, String> resources = new HashMap<>();
-
-    @Inject
-    public PackageExtension(Project project) {
-        this.project = project;
-    }
 
     public PackageExtension addResource(FileCollection from, String into) {
         this.resources.put(from, into);

@@ -1,13 +1,12 @@
 package com.twasyl.slideshowfx.gradle.plugins.sfxpackager.tasks;
 
+import com.twasyl.slideshowfx.gradle.plugins.DefaultSlideshowFXTask;
 import com.twasyl.slideshowfx.gradle.plugins.sfxpackager.extensions.PackageExtension;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.jvm.tasks.Jar;
 
-import javax.inject.Inject;
 import java.io.File;
 
 import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME;
@@ -21,17 +20,14 @@ import static org.gradle.api.plugins.JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_
  * @version 1.0-SNAPSHOT
  * @since SlideshowFX @@NEXT-VERSION@@
  */
-public class PrepareResources extends DefaultTask {
-
-    private PackageExtension packageExtension;
+public class PrepareResources extends DefaultSlideshowFXTask<PackageExtension> {
     private File tmpDir;
     private File dependenciesDir;
     private File resourcesDir;
     private File configDir;
 
-    @Inject
-    public PrepareResources(final PackageExtension packageExtension) {
-        this.packageExtension = packageExtension;
+    public PrepareResources() {
+        super(PackageExtension.class);
         dependsOn(JAR_TASK_NAME);
     }
 
@@ -84,22 +80,18 @@ public class PrepareResources extends DefaultTask {
 
         final Configuration runtimeClasspath = getProject().getConfigurations().getByName(RUNTIME_CLASSPATH_CONFIGURATION_NAME);
         if (runtimeClasspath != null) {
-            runtimeClasspath.resolve().forEach(dependency -> {
-                getProject().copy(copySpec -> copySpec.from(dependency).into(getDependenciesDir()));
-            });
+            runtimeClasspath.resolve().forEach(dependency -> getProject().copy(copySpec -> copySpec.from(dependency).into(getDependenciesDir())));
         }
     }
 
     private void copyResources() {
-        if (this.packageExtension.resources != null && !this.packageExtension.resources.isEmpty()) {
+        if (this.extension.resources != null && !this.extension.resources.isEmpty()) {
 
             if (!this.getResourcesDir().exists()) {
                 this.getResourcesDir().mkdirs();
             }
 
-            this.packageExtension.resources.forEach((from, to) -> getProject().copy(spec -> {
-                spec.from(from).into(new File(this.getResourcesDir(), to));
-            }));
+            this.extension.resources.forEach((from, to) -> getProject().copy(spec -> spec.from(from).into(new File(this.getResourcesDir(), to))));
         }
     }
 }

@@ -1,11 +1,9 @@
 package com.twasyl.slideshowfx.gradle.plugins.sfxplugin.tasks;
 
+import com.twasyl.slideshowfx.gradle.plugins.DefaultSlideshowFXTask;
 import com.twasyl.slideshowfx.gradle.plugins.sfxplugin.extensions.SlideshowFXPluginExtension;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.jvm.tasks.Jar;
-
-import javax.inject.Inject;
 
 /**
  * Task defining the entries in the {@code MANIFEST.MF} file of the produced JAR file.
@@ -14,18 +12,15 @@ import javax.inject.Inject;
  * @version 1.0
  * @since SlideshowFX @@NEXT-VERSION@@
  */
-public class PrepareManifest extends DefaultTask {
+public class PrepareManifest extends DefaultSlideshowFXTask<SlideshowFXPluginExtension> {
 
-    private SlideshowFXPluginExtension sfxPlugin;
-
-    @Inject
-    public PrepareManifest(SlideshowFXPluginExtension sfxPlugin) {
-        this.sfxPlugin = sfxPlugin;
+    public PrepareManifest() {
+        super(SlideshowFXPluginExtension.class);
     }
 
     @TaskAction
     public void prepare() {
         final Jar jar = (Jar) getProject().getTasks().getByName("jar");
-        jar.getManifest().attributes(sfxPlugin.getBundle().buildManifestAttributes(getProject()));
+        jar.getManifest().attributes(this.extension.buildManifestAttributes(getProject()));
     }
 }

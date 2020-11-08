@@ -1,0 +1,78 @@
+pluginManagement {
+    plugins {
+        id('org.sonarqube') version '3.0'
+        id('org.openjfx.javafxplugin') version '0.0.9'
+    }
+}
+
+buildCache {
+    local {
+        directory = file("$rootDir/.gradle/build-cache")
+        removeUnusedEntriesAfterDays = 30
+    }
+}
+
+buildscript {
+    repositories {
+        maven {
+            setUrl('https://plugins.gradle.org/m2/')
+        }
+        jcenter()
+    }
+    dependencies {
+        classpath "org.openjfx:javafx-plugin:0.0.9"
+    }
+}
+
+rootProject.name = 'slideshowfx'
+
+include 'slideshowfx-app',
+        'slideshowfx-content-extension',
+        'slideshowfx-documentation',
+        'slideshowfx-engines',
+        'slideshowfx-global-configuration',
+        'slideshowfx-hosting-connector',
+        'slideshowfx-icons',
+        'slideshowfx-logs',
+        'slideshowfx-markup',
+        'slideshowfx-plugin',
+        'slideshowfx-plugin-manager',
+        'slideshowfx-server',
+        'slideshowfx-setup',
+        'slideshowfx-snippet-executor',
+        'slideshowfx-style',
+        'slideshowfx-ui-controls',
+        'slideshowfx-utils',
+
+        // Content extension plugin
+        'slideshowfx-alert-extension',
+        'slideshowfx-code-extension',
+        'slideshowfx-image-extension',
+        'slideshowfx-link-extension',
+        'slideshowfx-quiz-extension',
+        'slideshowfx-quote-extension',
+        'slideshowfx-sequence-diagram-extension',
+        'slideshowfx-shape-extension',
+        'slideshowfx-snippet-extension',
+
+// Hosting connector plugins
+        'slideshowfx-box-hosting-connector',
+        'slideshowfx-drive-hosting-connector',
+        'slideshowfx-dropbox-hosting-connector',
+
+        // Markup plugins
+        'slideshowfx-asciidoctor',
+        'slideshowfx-html',
+        'slideshowfx-markdown',
+        'slideshowfx-textile',
+
+        // Snippet executor plugins
+        'slideshowfx-go-executor',
+        'slideshowfx-golo-executor',
+        'slideshowfx-groovy-executor',
+        'slideshowfx-java-executor',
+        'slideshowfx-javascript-executor',
+        'slideshowfx-kotlin-executor',
+        'slideshowfx-ruby-executor',
+        'slideshowfx-rust-executor',
+        'slideshowfx-scala-executor'

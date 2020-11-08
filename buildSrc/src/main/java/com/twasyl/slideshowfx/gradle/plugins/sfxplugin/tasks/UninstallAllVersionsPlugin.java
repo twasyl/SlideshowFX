@@ -1,5 +1,7 @@
 package com.twasyl.slideshowfx.gradle.plugins.sfxplugin.tasks;
 
+import com.twasyl.slideshowfx.gradle.plugins.DefaultSlideshowFXTask;
+import com.twasyl.slideshowfx.gradle.plugins.sfxplugin.extensions.SlideshowFXPluginExtension;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.jvm.tasks.Jar;
 
@@ -13,13 +15,18 @@ import java.util.Arrays;
  * @version 1.0
  * @since SlideshowFX @@NEXT-VERSION@@
  */
-public class UninstallAllVersionsPlugin extends AbstractPluginTask {
+public class UninstallAllVersionsPlugin extends DefaultSlideshowFXTask<SlideshowFXPluginExtension> {
+
+    public UninstallAllVersionsPlugin() {
+        super(SlideshowFXPluginExtension.class);
+    }
 
     @TaskAction
     public void uninstall() {
         final Jar jar = (Jar) getProject().getTasks().getByName("jar");
         final FilenameFilter pluginFilenameFilter = (dir, name) -> name.startsWith(jar.getArchiveBaseName().get());
 
-        Arrays.stream(pluginsDir.listFiles(pluginFilenameFilter)).forEach(getProject()::delete);
+        Arrays.stream(this.extension.getPluginsDir().getAsFile().get().listFiles(pluginFilenameFilter))
+                .forEach(getProject()::delete);
     }
 }

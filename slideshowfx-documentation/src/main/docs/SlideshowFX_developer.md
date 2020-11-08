@@ -21,11 +21,14 @@ But SlideshowFX isn't just another simple presentation engine. It brings much mo
 |-----------|---------|----------|
 | OpenJDK | ${jdk_version} | |
 | OpenJFX | ${javafx_version} | |
-| asciidoctorj | ${asciidoctorj_version} | |
-| [Atlassian CommonMark](https://github.com/atlassian/commonmark-java) | ${commonmark_version} | Library used for the markdown support |
+| asciidoctorj | ${asciidoctorj_version} | Used by the `slideshowfx-asciidoctor` plugin |
+| [Atlassian CommonMark](https://github.com/atlassian/commonmark-java) | ${commonmark_version} | Used by the `slideshowfx-markdown` plugin |
+| [FontAwesome](https://fontawesome.com/) | ${fontawesome_version} | |
 | freemarker | ${freemarker_version} | |
 | jsoup | ${jsoup_version} | |
-| org.eclipse.mylyn.wikitext.textile.core | ${wikitext_textile_core_version} | Library used for textile support |
+| org.eclipse.mylyn.wikitext.textile.core | ${wikitext_textile_core_version} | Used by the `slideshowfx-textile` plugin |
+| [Snap.svg](http://snapsvg.io/) | ${snapsvg_version} | Used by the `slideshowfx-shape-extension` plugin |
+| [SweetAlert2](https://sweetalert2.github.io/) | ${sweetalert_version} | Used by the `slideshowfx-alert-extension` plugin |
 | vertx-core | ${vertx_version} | |
 | zxing-jse | ${zxing_jse_version} | |
 | [ACE](http://ace.c9.io/) | ${ace_version} | |
@@ -72,6 +75,7 @@ SlideshowFX contains the following modules:
 | `slideshowfx-javascript-executor` | Implementation of `slideshowfx-snippet-executor` for executing JavaScript code snippet in a presentation |
 | `slideshowfx-kotlin-executor` | Implementation of `slideshowfx-snippet-executor` for executing Kotlin code snippet in a presentation |
 | `slideshowfx-ruby-executor` | Implementation of `slideshowfx-snippet-executor` for executing Ruby code snippet in a presentation |
+| `slideshowfx-rust-executor` | Implementation of `slideshowfx-snippet-executor` for executing Rust code snippet in a presentation |
 | `slideshowfx-scala-executor` | Implementation of `slideshowfx-snippet-executor` for executing Scala code snippet in a presentation |
 
 ### Gradle
@@ -79,11 +83,6 @@ SlideshowFX contains the following modules:
 SlideshowFX uses [gradle](https://gradle.org/) as build system. The version used is `${gradle_version}`.
 
 #### Particularities
-
-##### Using dedicated JDK for the build
-
-It is possible to use a different JDK than the one gradle uses to build the project. In order to define it, the property `build_jdk` has to be defined and point to a valid (Open)JDK installation.
-This property can be defined in the `gradle.properties` file of the gradle installation (defaults to `\$user.home/.gradle/gradle.properties`).
 
 ##### Documentation
 
@@ -105,6 +104,7 @@ Custom gradle plugins have been developed for the project:
 |--------|----|-------------|
 | Documentation | `documentation` | Render Markdown documentations to HTML. |
 | Gherkin | `gherkin` | To be applied on projects using Gherkin tests. |
+| SlideshowFXRelease | `sfx-release` | To be applied on root project for preparing the release |
 | SlideshowFXPlugin | `sfx-plugin` | To be applied for projects representing a SlideshowFX plugin. |
 | SlideshowFXPackager | `sfx-packager` | To be applied on projects that are JavaFX application and that needs to be packaged as an application. |
 
@@ -140,6 +140,23 @@ Gradle plugin to be applied on projects using Gherkin tests.
 | Name | Description |
 |------|-------------|
 | `gherkinTestImplementation` | Contains the required dependencies to write the Gherkin tests |
+
+##### SlideshowFXRelease
+
+Gradle plugin prepare a release.
+
+###### Tasks
+
+| Name | Description |
+|------|-------------|
+| `updateProductVersionNumber` | Update the product version number in all relevant files |
+| `removeSnapshots` | Remove the -SNAPSHOT qualifier from versions from build scripts |
+
+###### Extensions
+
+| Name | Description |
+|------|-------------|
+| `release` | Allows to change the default behaviour of the plugin, like the next version token and the product version |
 
 ##### SlideshowFXPlugin
 
@@ -195,11 +212,11 @@ Some gradle tasks are provided to help the developer:
 |-----------|-------------|
 | `ideaCleanOutput` | removes all files produced by the IntelliJ compilation |
 | `removeSnapshots` | removes the `-SNAPSHOT` qualifier from projects' versions |
-| `updateProductVersionNumber` | updates the product version in source files when passing the `-PproductVersion=xxx` property on the command line |
-| `:slideshowfx-app:createSlideContentEditor` | allows to build the `sfx-slide-content-editor.zip` archive when passing the `-PaceVersion=xxx` property on the command line |
-| `:slideshowfx-alert-extension:createSweetAlertPackage` | allows to build the `sweetalert.zip` archive when passing the `-PsweetAlertVersion=xxx` property on the command line |
-| `:slideshowfx-icons:updateFontAwesome` | allows to update the FontAwesome version shipped with SlideshowFX when passing `-PfontAwesomeVersion=xxx` property on the command line |
-| `:slideshowfx-shape-extension:createSnapSVGPackage` | allows to build the `snapsvg.zip` archive when passing the `-PsnapSvgVersion=xxx` property on the command line |
+| `updateProductVersionNumber` | updates the product version in source files |
+| `:slideshowfx-app:createSlideContentEditor` | allows to build the `sfx-slide-content-editor.zip` archive |
+| `:slideshowfx-alert-extension:createSweetAlertPackage` | allows to build the `sweetalert.zip` archive |
+| `:slideshowfx-icons:updateFontAwesome` | allows to update the FontAwesome version shipped with SlideshowFX |
+| `:slideshowfx-shape-extension:createSnapSVGPackage` | allows to build the `snapsvg.zip` archive |
 
 ### Set up your environment
 

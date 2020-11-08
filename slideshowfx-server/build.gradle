@@ -1,0 +1,23 @@
+plugins {
+    id 'java-library'
+    id 'org.openjfx.javafxplugin'
+    id 'jacoco'
+    id 'org.sonarqube'
+}
+
+description = 'Module representing the server used within SlideshowFX'
+version = '1.2-SNAPSHOT'
+
+dependencies {
+    api "io.vertx:vertx-core:${project.property('dependencies.vertx.version')}"
+    api "io.vertx:vertx-web:${project.property('dependencies.vertx.version')}"
+
+    implementation project(':slideshowfx-engines')
+    implementation project(':slideshowfx-global-configuration')
+    implementation project(':slideshowfx-icons')
+    implementation project(':slideshowfx-utils')
+}
+
+javafx {
+    modules('javafx.graphics', 'javafx.web')
+}

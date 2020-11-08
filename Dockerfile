@@ -7,12 +7,12 @@ RUN apk update && \
 FROM curl-stage as main-jdk
 
 RUN mkdir -p /tmp/jdks/main && \
-    curl --silent -L https://download.java.net/java/GA/jdk15/779bf45e88a44cbd9ea6621d33e33db1/36/GPL/openjdk-15_linux-x64_bin.tar.gz | tar -xz --strip 1 -C /tmp/jdks/main
+    curl --silent -L https://download.java.net/java/GA/jdk14.0.2/205943a0976c4ed48cb16f1043c5c647/12/GPL/openjdk-14.0.2_linux-x64_bin.tar.gz | tar -xz --strip 1 -C /tmp/jdks/main
 
 FROM curl-stage as build-jdk
 
 RUN mkdir -p /tmp/jdks/build && \
-    curl --silent -L https://download.java.net/java/GA/jdk15/779bf45e88a44cbd9ea6621d33e33db1/36/GPL/openjdk-15_linux-x64_bin.tar.gz | tar -xz --strip 1 -C /tmp/jdks/build
+    curl --silent -L https://download.java.net/java/GA/jdk14.0.2/205943a0976c4ed48cb16f1043c5c647/12/GPL/openjdk-14.0.2_linux-x64_bin.tar.gz | tar -xz --strip 1 -C /tmp/jdks/build
 
 FROM ubuntu:18.04
 

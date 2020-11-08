@@ -1,17 +1,16 @@
 package com.twasyl.slideshowfx.gradle.plugins.documentation.tasks;
 
+import com.twasyl.slideshowfx.gradle.plugins.DefaultSlideshowFXTask;
 import com.twasyl.slideshowfx.gradle.plugins.documentation.extensions.DocumentationExtension;
 import com.twasyl.slideshowfx.gradle.plugins.documentation.internal.FontAwesomeExtension;
 import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.tasks.TaskAction;
 import org.jsoup.Jsoup;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -33,15 +32,12 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * @version 1.0-SNAPSHOT
  * @since SlideshowFX @@NEXT-VERSION@@
  */
-public class RenderDocumentation extends DefaultTask {
-    private final DocumentationExtension extension;
+public class RenderDocumentation extends DefaultSlideshowFXTask<DocumentationExtension> {
 
-    @Inject
-    public RenderDocumentation(final DocumentationExtension extension) {
+    public RenderDocumentation() {
+        super(DocumentationExtension.class);
         this.setDescription("Renders the Markdown documentation to HTML.");
         this.setGroup("build");
-
-        this.extension = extension;
 
         this.getInputs().dir(this.extension.getExpandDir());
 

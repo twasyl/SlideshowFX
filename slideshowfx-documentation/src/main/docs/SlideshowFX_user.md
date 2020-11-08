@@ -231,6 +231,7 @@ Code snippet executors allow inserting piece of code inside a presentation that 
 * JavaScript
 * Kotlin
 * Ruby
+* Rust
 * Scala
 
 ##### Configuration

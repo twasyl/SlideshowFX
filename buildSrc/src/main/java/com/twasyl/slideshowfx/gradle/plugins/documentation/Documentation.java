@@ -31,9 +31,9 @@ public class Documentation implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        final DocumentationExtension extension = project.getExtensions().create(DOCUMENTATION_EXTENSION_NAME, DocumentationExtension.class, project);
+        project.getExtensions().create(DOCUMENTATION_EXTENSION_NAME, DocumentationExtension.class, project);
 
-        final ExpandDocumentation expandDocumentation = project.getTasks().create(EXPAND_DOCUMENTATION_TASK_NAME, ExpandDocumentation.class, extension);
-        project.getTasks().create(RENDER_DOCUMENTATION_TASK_NAME, RenderDocumentation.class, extension).dependsOn(expandDocumentation);
+        final ExpandDocumentation expandDocumentation = project.getTasks().create(EXPAND_DOCUMENTATION_TASK_NAME, ExpandDocumentation.class);
+        project.getTasks().create(RENDER_DOCUMENTATION_TASK_NAME, RenderDocumentation.class).dependsOn(expandDocumentation);
     }
 }

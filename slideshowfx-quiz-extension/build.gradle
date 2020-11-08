@@ -1,0 +1,34 @@
+plugins {
+    id 'sfx-plugin'
+    id 'org.openjfx.javafxplugin'
+    id 'jacoco'
+    id 'org.sonarqube'
+}
+
+description = 'Extension allowing to insert quizs inside a SlideshowFX presentation'
+version = '1.2-SNAPSHOT'
+
+dependencies {
+    api project(':slideshowfx-markup')
+    api project(':slideshowfx-plugin')
+    api project(':slideshowfx-server')
+    api project(':slideshowfx-ui-controls')
+
+    implementation project(':slideshowfx-global-configuration')
+    implementation project(':slideshowfx-icons')
+
+    integrationTestImplementation "org.testfx:testfx-core:${project.property('dependencies.testfx.version')}"
+    integrationTestImplementation "org.testfx:testfx-junit5:${project.property('dependencies.testfx.version')}"
+    integrationTestImplementation "org.testfx:openjfx-monocle:${project.property('dependencies.monocle.version')}"
+}
+
+javafx {
+    modules('javafx.controls', 'javafx.fxml', 'javafx.graphics')
+}
+
+sfxPlugin {
+    contentExtension = true
+    pluginName = 'Quiz'
+    pluginDescription = 'Insert quiz in slides'
+    setupWizardIconName = 'QUESTION'
+}

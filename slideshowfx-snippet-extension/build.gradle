@@ -1,0 +1,35 @@
+plugins {
+    id 'sfx-plugin'
+    id 'org.openjfx.javafxplugin'
+    id 'jacoco'
+    id 'org.sonarqube'
+}
+
+description = 'Extension allowing to insert executable code snippets inside a SlideshowFX presentation'
+version = '1.3-SNAPSHOT'
+
+dependencies {
+    api project(':slideshowfx-markup')
+    api project(':slideshowfx-plugin')
+    api project(':slideshowfx-ui-controls')
+
+    implementation project(':slideshowfx-global-configuration')
+    implementation project(':slideshowfx-icons')
+    implementation project(':slideshowfx-plugin-manager')
+    implementation project(':slideshowfx-snippet-executor')
+
+    integrationTestImplementation "org.testfx:testfx-core:${project.property('dependencies.testfx.version')}"
+    integrationTestImplementation "org.testfx:testfx-junit5:${project.property('dependencies.testfx.version')}"
+    integrationTestImplementation "org.testfx:openjfx-monocle:${project.property('dependencies.monocle.version')}"
+}
+
+javafx {
+    modules('javafx.controls', 'javafx.fxml', 'javafx.graphics')
+}
+
+sfxPlugin {
+    contentExtension = true
+    pluginName = 'Executable snippet'
+    pluginDescription = 'Insert executable code snippets in presentations'
+    setupWizardIconName = 'TERMINAL'
+}

@@ -55,6 +55,7 @@ public class ExtendedTextField extends VBox {
         this.getStyleClass().add("extended-text-field");
 
         this.initializeFocusEvents();
+        this.initializeValidState();
         this.getChildren().addAll(this.uiLabel, this.textField);
     }
 
@@ -96,22 +97,30 @@ public class ExtendedTextField extends VBox {
 
     private void initializeFocusEvents() {
         this.textField.focusedProperty().addListener((focusedValue, oldFocus, newFocus) -> {
-            if (newFocus || (!newFocus && isTextEmpty())) {
+            if (Boolean.TRUE.equals(newFocus) || (Boolean.FALSE.equals(newFocus) && isTextEmpty())) {
                 this.animateLabel(newFocus);
 
-                if (!newFocus) {
+                if (Boolean.FALSE.equals(newFocus)) {
                     this.textField.pseudoClassStateChanged(ERROR, isMandatory());
                     this.showPromptText();
                 } else {
                     this.textField.pseudoClassStateChanged(ERROR, false);
                     this.hidePromptText();
                 }
-            } else if (!newFocus && !isTextEmpty()) {
+            } else if (Boolean.FALSE.equals(newFocus) && !isTextEmpty()) {
                 if (this.isMandatory() && this.getValidator() != null && !isValid()) {
                     this.textField.pseudoClassStateChanged(ERROR, true);
                 }
 
                 this.uiLabel.pseudoClassStateChanged(FOCUSED, newFocus);
+            }
+        });
+    }
+
+    private void initializeValidState() {
+        this.validator.addListener((value, oldValidator, newValidator) -> {
+            if (newValidator != null) {
+                ((SimpleBooleanProperty) this.valid).setValue(isValid());
             }
         });
     }
@@ -142,10 +151,7 @@ public class ExtendedTextField extends VBox {
             this.uiLabelAnimation.setToValue(0);
         }
 
-        this.uiLabelAnimation.setOnFinished(event -> {
-            this.uiLabel.pseudoClassStateChanged(FOCUSED, show);
-        });
-
+        this.uiLabelAnimation.setOnFinished(event -> this.uiLabel.pseudoClassStateChanged(FOCUSED, show));
         this.uiLabelAnimation.playFromStart();
     }
 
@@ -257,12 +263,12 @@ public class ExtendedTextField extends VBox {
             throw new IllegalArgumentException("No validator defined for the control");
         }
 
-        final boolean valid = this.getValidator().isValid(this.textField.getText());
-        if (!valid) {
+        final boolean isValueValid = this.getValidator().isValid(this.textField.getText());
+        if (!isValueValid) {
             this.textField.pseudoClassStateChanged(ERROR, true);
         }
 
-        return valid;
+        return isValueValid;
     }
 
     public ReadOnlyBooleanProperty validProperty() {

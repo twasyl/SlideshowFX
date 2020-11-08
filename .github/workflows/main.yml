@@ -16,7 +16,7 @@ on:
 
 env:
   PRODUCT_VERSION: "2020.1"
-  JAVA_TOOLCHAIN_VERSION: "jdk-15+36"
+  JAVA_TOOLCHAIN_VERSION: "jdk-14.0.2+12"
 
 jobs:
   test:
@@ -37,7 +37,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: '11'
+          java-version: '15'
       - name: Cache JDK installations
         uses: actions/cache@v2
         with:
@@ -81,6 +81,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.9'
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '15'
       - name: Cache gradle dependencies
         uses: actions/cache@v2
         with:

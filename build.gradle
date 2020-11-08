@@ -25,22 +25,9 @@ allprojects {
 }
 
 subprojects {
-    def moduleName = project.name.replace("-", ".")
-
     plugins.apply(IdeaPlugin.class)
 
-    plugins.withType(IdeaPlugin.class).configureEach {
-        def idea = it
-        idea.model.module {
-            outputDir = file("out${File.separator}production${File.separator}${moduleName}")
-            testOutputDir = file("out${File.separator}test${File.separator}${moduleName}")
-        }
-
-        tasks.register("ideaCleanOutput", Delete) {
-            enabled = idea.model.module.outputDir.exists() || idea.model.module.testOutputDir.exists()
-            delete = [idea.model.module.outputDir, idea.model.module.testOutputDir]
-        }
-    }
+    def moduleName = project.name.replace("-", ".")
 
     plugins.withType(JavaPlugin.class).configureEach {
         project.extensions.getByType(JavaPluginExtension.class).toolchain {
@@ -133,6 +120,21 @@ subprojects {
         tasks.named("check").configure {
             dependsOn(integrationTest)
         }
+
+        tasks.register("ideaCleanOutput", Delete) {
+            enabled = idea.module.outputDir.exists() || idea.module.testOutputDir.exists()
+            delete = [idea.module.outputDir, idea.module.testOutputDir]
+        }
+
+        idea {
+            module {
+                outputDir = file("out${File.separator}production${File.separator}${moduleName}")
+                testOutputDir = file("out${File.separator}test${File.separator}${moduleName}")
+
+                testSourceDirs += project.sourceSets.integrationTest.java.srcDirs
+                testResourceDirs += project.sourceSets.integrationTest.resources.srcDirs
+            }
+        }
     }
 
     plugins.withType(JavaTestFixturesPlugin.class).configureEach {
@@ -152,6 +154,13 @@ subprojects {
 
         tasks.named("check").configure {
             dependsOn 'gherkinTest'
+        }
+
+        idea {
+            module {
+                testSourceDirs += project.sourceSets.gherkinTest.java.srcDirs
+                testResourceDirs += project.sourceSets.gherkinTest.resources.srcDirs
+            }
         }
     }
 

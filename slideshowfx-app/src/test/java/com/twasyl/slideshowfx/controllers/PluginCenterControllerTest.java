@@ -57,7 +57,7 @@ public class PluginCenterControllerTest {
 //    public void fileSeemsInvalidWhenNoBundleName() throws FileNotFoundException {
 //        assertFalse(controller.fileSeemsValid(NO_BUNDLE_NAME_FILE));
 //    }
-
+//
 //    @Test
 //    public void fileSeemsInvalidWhenNoBundleVersion() throws FileNotFoundException {
 //        assertFalse(controller.fileSeemsValid(NO_BUNDLE_VERSION_FILE));

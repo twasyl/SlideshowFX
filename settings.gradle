@@ -5,6 +5,12 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    repositories {
+        jcenter()
+    }
+}
+
 buildCache {
     local {
         directory = file("$rootDir/.gradle/build-cache")

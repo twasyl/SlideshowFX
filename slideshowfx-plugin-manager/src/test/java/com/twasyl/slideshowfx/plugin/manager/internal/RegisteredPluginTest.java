@@ -1,8 +1,8 @@
 package com.twasyl.slideshowfx.plugin.manager.internal;
 
-import com.twasyl.slideshowfx.plugin.manager.PluginTestUtils;
 import com.twasyl.slideshowfx.plugin.AbstractPlugin;
 import com.twasyl.slideshowfx.plugin.IPlugin;
+import com.twasyl.slideshowfx.plugin.manager.PluginTestUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +11,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RegisteredPluginTest {
+class RegisteredPluginTest {
 
     @BeforeAll
     static void setup() {

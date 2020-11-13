@@ -10,7 +10,7 @@ import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PluginClassLoaderTest {
+class PluginClassLoaderTest {
     private static final File TMP_DIR = new File("build/tmp");
     private static PluginFile PLUGIN_FILE;
 

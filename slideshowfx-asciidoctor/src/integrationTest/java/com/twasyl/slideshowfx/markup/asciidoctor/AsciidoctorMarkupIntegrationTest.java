@@ -1,7 +1,7 @@
 package com.twasyl.slideshowfx.markup.asciidoctor;
 
 import com.twasyl.slideshowfx.markup.IMarkup;
-import com.twasyl.slideshowfx.plugin.BasePluginIntegrationTest;
+import com.twasyl.slideshowfx.plugin.manager.BasePluginIntegrationTest;
 import com.twasyl.slideshowfx.plugin.manager.PluginManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

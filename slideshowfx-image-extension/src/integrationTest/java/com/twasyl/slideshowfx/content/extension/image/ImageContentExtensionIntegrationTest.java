@@ -1,7 +1,7 @@
 package com.twasyl.slideshowfx.content.extension.image;
 
 import com.twasyl.slideshowfx.content.extension.IContentExtension;
-import com.twasyl.slideshowfx.plugin.BasePluginIntegrationTest;
+import com.twasyl.slideshowfx.plugin.manager.BasePluginIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

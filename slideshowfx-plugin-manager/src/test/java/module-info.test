@@ -1,4 +1,0 @@
---add-modules
-java.compiler
---add-reads
-slideshowfx.plugin.manager=java.compiler

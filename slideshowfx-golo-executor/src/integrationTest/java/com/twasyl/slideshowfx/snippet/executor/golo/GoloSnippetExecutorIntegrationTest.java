@@ -1,6 +1,6 @@
 package com.twasyl.slideshowfx.snippet.executor.golo;
 
-import com.twasyl.slideshowfx.plugin.BasePluginIntegrationTest;
+import com.twasyl.slideshowfx.plugin.manager.BasePluginIntegrationTest;
 import com.twasyl.slideshowfx.snippet.executor.ISnippetExecutor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

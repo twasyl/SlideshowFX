@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @version 1.0
  * @since SlideshowFX 1.0
  */
-public class PluginManagerTest {
+class PluginManagerTest {
 
     private static final File TMP_DIR = new File("build/tmp");
 
@@ -55,7 +55,7 @@ public class PluginManagerTest {
     }
 
     @Test
-    public void isMostRecent() throws IOException {
+    void isMostRecent() throws IOException {
         final String pluginTimestamp = System.currentTimeMillis() + "";
 
         final File dummyPlugin = createDummyPlugin(pluginTimestamp, pluginTimestamp, "1.0");
@@ -68,7 +68,7 @@ public class PluginManagerTest {
     }
 
     @Test
-    public void isNotMostRecent() throws IOException {
+    void isNotMostRecent() throws IOException {
         final String pluginTimestamp = System.currentTimeMillis() + "";
 
         final File version1_2 = createDummyPlugin(pluginTimestamp, pluginTimestamp, "1.2");
@@ -82,7 +82,7 @@ public class PluginManagerTest {
     }
 
     @Test
-    public void pluginIsInstalledAndStarted() throws IOException {
+    void pluginIsInstalledAndStarted() throws IOException {
         final File pluginFile = createDummyPlugin("my-plugin", "My plugin", "1.0");
         PluginManager.getInstance().installPlugin(pluginFile);
 
@@ -94,7 +94,7 @@ public class PluginManagerTest {
     }
 
     @Test
-    public void pluginIsDeployedBecauseMostRecent() throws IOException {
+    void pluginIsDeployedBecauseMostRecent() throws IOException {
         final String pluginTimestamp = System.currentTimeMillis() + "";
 
         final File version1_0 = createDummyPlugin(pluginTimestamp, pluginTimestamp, "1.0");
@@ -112,7 +112,7 @@ public class PluginManagerTest {
     }
 
     @Test
-    public void pluginIsNotDeployedBecauseTooOld() throws IOException {
+    void pluginIsNotDeployedBecauseTooOld() throws IOException {
         final String pluginTimestamp = System.currentTimeMillis() + "";
 
         final File version1_0 = createDummyPlugin(pluginTimestamp, pluginTimestamp, "1.0");
@@ -130,7 +130,7 @@ public class PluginManagerTest {
     }
 
     @Test
-    public void uninstallPlugin() throws IOException {
+    void uninstallPlugin() throws IOException {
         final File plugin01 = createDummyPlugin("plugin-01", "Plugin 01", "1.0");
         final File plugin02 = createDummyPlugin("plugin-02", "Plugin 02", "1.0");
 

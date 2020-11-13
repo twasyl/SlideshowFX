@@ -1,7 +1,7 @@
 package com.twasyl.slideshowfx.hosting.connector.dropbox;
 
 import com.twasyl.slideshowfx.hosting.connector.IHostingConnector;
-import com.twasyl.slideshowfx.plugin.BasePluginIntegrationTest;
+import com.twasyl.slideshowfx.plugin.manager.BasePluginIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

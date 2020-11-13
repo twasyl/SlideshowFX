@@ -3,6 +3,7 @@ package com.twasyl.slideshowfx.plugin.manager;
 import com.twasyl.slideshowfx.plugin.IPlugin;
 import com.twasyl.slideshowfx.plugin.manager.internal.PluginFile;
 
+import javax.lang.model.SourceVersion;
 import javax.tools.JavaCompiler;
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardJavaFileManager;
@@ -10,6 +11,8 @@ import javax.tools.ToolProvider;
 import java.io.*;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.jar.Attributes;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -26,6 +29,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class PluginTestUtils {
 
+    private PluginTestUtils() {
+    }
+
     private static class DummyPluginClass extends SimpleJavaFileObject {
         public DummyPluginClass() {
             super(URI.create("string:///com/twasyl/slideshowfx/dummy/plugin/Dummy.java"), SOURCE);
@@ -33,16 +39,18 @@ public class PluginTestUtils {
 
         @Override
         public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
-            return "package com.twasyl.slideshowfx.dummy.plugin;\n" +
-                    "\n" +
-                    "import com.twasyl.slideshowfx.plugin.AbstractPlugin;\n" +
-                    "\n" +
-                    "public class Dummy extends AbstractPlugin {\n" +
-                    "\n" +
-                    "\tpublic Dummy() {\n" +
-                    "\t\tsuper(\"Dummy\");\n" +
-                    "\t}\n" +
-                    "}";
+            return """
+                   package com.twasyl.slideshowfx.dummy.plugin;
+                   
+                   import com.twasyl.slideshowfx.plugin.AbstractPlugin;
+                   
+                   public class Dummy extends AbstractPlugin {
+                   
+                       public Dummy() {
+                           super("Dummy");
+                       }
+                   }
+                   """;
         }
     }
 
@@ -73,7 +81,6 @@ public class PluginTestUtils {
             jar.closeEntry();
             jar.flush();
             jar.close();
-            jarContent.close();
 
             plugin.putNextEntry(new ZipEntry(name + "-" + version + ".jar"));
             plugin.write(jarContent.toByteArray());
@@ -91,11 +98,14 @@ public class PluginTestUtils {
 
         if (!compiledClass.exists()) {
             final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            final Optional<SourceVersion> sourceVersion = compiler.getSourceVersions().stream().max(Comparator.naturalOrder());
+
             try (final StandardJavaFileManager manager = compiler.getStandardFileManager(null, null, null);
                  final var writer = new StringWriter()) {
-                final var task = compiler.getTask(writer, manager, null, Arrays.asList("--enable-preview", "-source", "15", "-d", "build/tmp/", "-cp", ".." + separator + "slideshowfx-plugin" + separator + "build" + separator + "classes" + separator + "java" + separator + "main"), null, singletonList(new DummyPluginClass()));
+                final var task = compiler.getTask(writer, manager, null,
+                                                  Arrays.asList("--enable-preview", "-source", sourceVersion.get().ordinal() + "", "-d", "build/tmp/", "-cp", ".." + separator + "slideshowfx-plugin" + separator + "build" + separator + "production" + separator + "slideshowfx.plugin"), null, singletonList(new DummyPluginClass()));
 
-                if (!task.call()) {
+                if (Boolean.FALSE.equals(task.call())) {
                     fail(writer.toString());
                 }
             } catch (IOException e) {

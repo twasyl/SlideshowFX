@@ -42,6 +42,6 @@ public class GherkinPlugin implements Plugin<Project> {
         final var configurations = project.getConfigurations();
 
         configurations.getByName(gherkinTest.getImplementationConfigurationName()).extendsFrom(configurations.getByName(main.getImplementationConfigurationName()));
-        configurations.getByName(GHERKIN_TEST_SOURCE_SET_NAME + "Runtime").extendsFrom(configurations.getByName(gherkinTest.getImplementationConfigurationName()));
+        configurations.getByName(GHERKIN_TEST_SOURCE_SET_NAME + "RuntimeOnly").extendsFrom(configurations.getByName(gherkinTest.getImplementationConfigurationName()));
     }
 }

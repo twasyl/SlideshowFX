@@ -19,6 +19,6 @@ module slideshowfx.server {
     requires slideshowfx.global.configuration;
     requires slideshowfx.icons;
     requires slideshowfx.utils;
-    requires vertx.core;
-    requires vertx.web;
+    requires io.vertx.core;
+    requires io.vertx.web;
 }

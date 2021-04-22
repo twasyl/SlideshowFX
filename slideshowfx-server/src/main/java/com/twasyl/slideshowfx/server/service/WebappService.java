@@ -66,7 +66,7 @@ public class WebappService extends AbstractSlideshowFXService {
 
                 writer.flush();
 
-                routingContext.response().setStatusCode(200).setChunked(true).write(writer.toString()).end();
+                routingContext.response().setStatusCode(200).setChunked(true).end(writer.toString());
             } catch (IOException e) {
                 LOGGER.log(WARNING, "Error when a client tried to access the chat", e);
 
@@ -96,7 +96,7 @@ public class WebappService extends AbstractSlideshowFXService {
                 }
 
                 routingContext.response().headers().set("Content-Type", "image/svg+xml");
-                routingContext.response().setChunked(true).write(buffer).end();
+                routingContext.response().setChunked(true).end(buffer);
             } catch (IOException e) {
                 LOGGER.log(WARNING, "Can not send check images", e);
             }
@@ -123,7 +123,7 @@ public class WebappService extends AbstractSlideshowFXService {
                     buffer.appendBytes(imageBuffer, 0, numberOfBytesRead);
                 }
 
-                routingContext.response().setChunked(true).write(buffer).end();
+                routingContext.response().setChunked(true).end(buffer);
             } catch (IOException e) {
                 LOGGER.log(WARNING, "Can not send the font awesome file", e);
             }
@@ -147,7 +147,7 @@ public class WebappService extends AbstractSlideshowFXService {
                     buffer.appendBytes(imageBuffer, 0, numberOfBytesRead);
                 }
 
-                request.response().setChunked(true).write(buffer).end();
+                request.response().setChunked(true).end(buffer);
             } catch (IOException e) {
                 LOGGER.log(WARNING, "Can not send the font awesome file", e);
             }

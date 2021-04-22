@@ -9,7 +9,7 @@ module slideshowfx.utils {
     exports com.twasyl.slideshowfx.utils.keys;
     exports com.twasyl.slideshowfx.utils.time;
 
-    requires com.fasterxml.jackson.databind;
+    requires com.fasterxml.jackson.core;
     requires freemarker;
     requires java.logging;
     requires javafx.controls;
@@ -17,5 +17,5 @@ module slideshowfx.utils {
     requires org.jsoup;
     requires slideshowfx.global.configuration;
     requires slideshowfx.style;
-    requires vertx.core;
+    requires io.vertx.core;
 }

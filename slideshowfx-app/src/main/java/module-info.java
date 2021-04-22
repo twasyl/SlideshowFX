@@ -31,7 +31,7 @@ module slideshowfx.app {
     requires slideshowfx.utils;
     requires slideshowfx.logs;
     requires slideshowfx.ui.controls;
-    requires vertx.core;
+    requires io.vertx.core;
 
     uses com.twasyl.slideshowfx.style.theme.Themes;
     uses com.twasyl.slideshowfx.style.Styles;

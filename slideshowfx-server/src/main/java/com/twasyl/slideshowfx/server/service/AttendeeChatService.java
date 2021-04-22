@@ -73,7 +73,7 @@ public class AttendeeChatService extends AbstractSlideshowFXService {
 
                 writer.flush();
 
-                request.response().putHeader("Content-Type", "application/javascript").setStatusCode(200).setChunked(true).write(Buffer.buffer(writer.toString())).end();
+                request.response().putHeader("Content-Type", "application/javascript").setStatusCode(200).setChunked(true).end(Buffer.buffer(writer.toString()));
             } catch (IOException e) {
                 LOGGER.log(WARNING, "Error when a client tried to access the chat", e);
 

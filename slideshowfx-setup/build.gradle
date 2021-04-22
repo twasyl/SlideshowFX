@@ -11,7 +11,7 @@ plugins {
 }
 
 description = 'Module for the installer of SlideshowFX'
-version = project.findProperty('productVersion') ?: System.getenv('PRODUCT_VERSION') ?: '2020.1'
+version = project.findProperty('productVersion') ?: System.getenv('PRODUCT_VERSION') ?: '2021.1'
 
 dependencies {
     implementation project(':slideshowfx-global-configuration')

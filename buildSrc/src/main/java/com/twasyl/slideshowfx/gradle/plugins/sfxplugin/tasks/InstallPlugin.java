@@ -28,8 +28,8 @@ public class InstallPlugin extends DefaultSlideshowFXTask<SlideshowFXPluginExten
 
     @TaskAction
     public void install() {
-        if (!this.extension.getPluginsDir().getAsFile().get().exists()) {
-            this.extension.getPluginsDir().getAsFile().get().mkdirs();
+        if (!this.extension.getPluginsDir().get().getAsFile().exists()) {
+            this.extension.getPluginsDir().get().getAsFile().mkdirs();
         }
 
         final FileCollection files = getProject().getTasks().getByName(BUNDLE_TASK_NAME).getOutputs().getFiles();

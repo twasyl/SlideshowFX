@@ -54,7 +54,7 @@ public class GherkinTask extends JavaExec implements Reporting<TestTaskReports> 
         final SourceSet gherkinTest = sourceSets.getByName(GHERKIN_TEST_SOURCE_SET_NAME);
 
         classpath(
-                getProject().getConfigurations().getByName(GHERKIN_TEST_SOURCE_SET_NAME + "Runtime"),
+                getProject().getConfigurations().getByName(GHERKIN_TEST_SOURCE_SET_NAME + "RuntimeClasspath"),
                 main.getOutput(),
                 main.getCompileClasspath(),
                 gherkinTest.getOutput());

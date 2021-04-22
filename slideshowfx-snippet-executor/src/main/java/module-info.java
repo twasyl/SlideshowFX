@@ -6,5 +6,5 @@ module slideshowfx.snippet.executor {
     requires javafx.graphics;
     requires slideshowfx.global.configuration;
     requires transitive slideshowfx.plugin;
-    requires vertx.core;
+    requires io.vertx.core;
 }

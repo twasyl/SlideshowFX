@@ -16,5 +16,5 @@ module slideshowfx.engines {
     requires slideshowfx.content.extension;
     requires slideshowfx.global.configuration;
     requires slideshowfx.utils;
-    requires vertx.core;
+    requires io.vertx.core;
 }

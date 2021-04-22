@@ -1,13 +1,13 @@
 pluginManagement {
     plugins {
-        id('org.sonarqube') version '3.0'
+        id('org.sonarqube') version '3.1.1'
         id('org.openjfx.javafxplugin') version '0.0.9'
     }
 }
 
 dependencyResolutionManagement {
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 
@@ -23,7 +23,7 @@ buildscript {
         maven {
             setUrl('https://plugins.gradle.org/m2/')
         }
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "org.openjfx:javafx-plugin:0.0.9"

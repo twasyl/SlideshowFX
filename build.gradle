@@ -8,7 +8,7 @@ import static org.gradle.api.file.DuplicatesStrategy.EXCLUDE
 
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 

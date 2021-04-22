@@ -4,6 +4,7 @@ import org.gradle.api.Project;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
+import org.gradle.api.provider.ProviderFactory;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -35,7 +36,7 @@ public class SlideshowFXPluginExtension {
     private final DirectoryProperty pluginsDir;
 
     @Inject
-    public SlideshowFXPluginExtension(final ObjectFactory objects) {
+    public SlideshowFXPluginExtension(final ObjectFactory objects, final ProviderFactory providers) {
         this.pluginName = objects.property(String.class).convention("");
         this.pluginDescription = objects.property(String.class).convention("");
         this.setupWizardIconName = objects.property(String.class).convention("");
@@ -44,8 +45,10 @@ public class SlideshowFXPluginExtension {
         this.snippetExecutor = objects.property(Boolean.class).convention(Boolean.FALSE);
         this.markupPlugin = objects.property(Boolean.class).convention(Boolean.FALSE);
 
-        final var sfx = new File(System.getProperty("user.home"), ".SlideshowFX");
-        this.sfxDir = objects.directoryProperty().convention(objects.directoryProperty().dir(sfx.getAbsolutePath()));
+        final var userHome = providers.systemProperty("user.home").forUseAtConfigurationTime();
+        final var sfx = objects.directoryProperty();
+        sfx.set(new File(userHome.get(), ".SlideshowFX"));
+        this.sfxDir = objects.directoryProperty().convention(sfx);
         this.pluginsDir = objects.directoryProperty().convention(sfxDir.dir("plugins"));
     }
 

@@ -53,8 +53,8 @@ subprojects {
             languageVersion.set(JavaLanguageVersion.of(project.property('toolchain.language.version')))
         }
 
-        def jvmArgsForTests = ['--enable-preview', '-Djava.awt.headless=true', '-Dtestfx.headless=true',
-                               '-Dprism.order=sw', '-Dtestfx.robot=glass']
+        def jvmArgsForTests = ['-Djava.awt.headless=true', '-Dtestfx.headless=true', '-Dprism.order=sw',
+                               '-Dtestfx.robot=glass']
 
         if (com.twasyl.slideshowfx.gradle.Utils.isMac()) {
             jvmArgsForTests.add('-Dprism.verbose=true')
@@ -94,8 +94,6 @@ subprojects {
             sourceCompatibility = project.property('toolchain.language.version')
             targetCompatibility = project.property('toolchain.language.version')
             modularity.inferModulePath = true
-
-            options.compilerArgs.add('--enable-preview')
         }
 
         tasks.named("compileJava", JavaCompile).configure {
@@ -187,7 +185,7 @@ subprojects {
 
     plugins.withType(JacocoPlugin).configureEach {
         jacoco {
-            toolVersion = "0.8.6"
+            toolVersion = "0.8.7"
         }
 
         tasks.withType(JacocoReport).configureEach {

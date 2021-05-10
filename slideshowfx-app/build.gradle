@@ -35,12 +35,11 @@ packaging {
     outputDir = file("$buildDir/package")
     executableBaseName = "SlideshowFX"
 
-    runtime.modules = ['java.desktop', 'java.logging', 'java.net.http', 'java.scripting', 'java.sql', 'java.xml', 'jdk.jsobject', 'jdk.unsupported', 'jdk.unsupported.desktop', 'jdk.xml.dom']
+    runtime.modules = ['java.desktop', 'java.logging', 'java.management', 'java.net.http', 'java.scripting', 'java.sql', 'java.xml', 'jdk.jsobject', 'jdk.unsupported', 'jdk.unsupported.desktop', 'jdk.xml.dom']
     runtime.jlinkOptions = ['--no-header-files', '--no-man-pages', '--compress=0', '--strip-debug', '--strip-native-commands']
 
     app.jvmOpts = ['-Xms512m',
                    '-Xmx2g',
-                   '--enable-preview',
                    '-Dfile.encoding=UTF-8',
                    '-Duser.language=en',
                    '-Djava.util.logging.config.file=@@LOGGING_CONFIGURATION_FILE@@',
@@ -60,7 +59,7 @@ processResources {
     doLast {
         copy {
             from(project(':slideshowfx-documentation').tasks.renderDocumentation.outputs)
-            into("${sourceSets.main.output.resourcesDir.absolutePath}/com/twasyl/slideshowfx/documentation/html")
+            into("${sourceSets.main.output.resourcesDir.absolutePath}/com/twasyl/slideshowfx/documentation")
         }
 
         if (plugins.hasPlugin(IdeaPlugin.class)) {

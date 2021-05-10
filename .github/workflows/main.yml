@@ -16,7 +16,7 @@ on:
 
 env:
   PRODUCT_VERSION: "2021.1"
-  JAVA_TOOLCHAIN_VERSION: "jdk-16+36"
+  JAVA_TOOLCHAIN_VERSION: "jdk-16.0.1+9"
 
 jobs:
   test:

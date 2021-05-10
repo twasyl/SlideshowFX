@@ -103,7 +103,7 @@ public class PluginTestUtils {
             try (final StandardJavaFileManager manager = compiler.getStandardFileManager(null, null, null);
                  final var writer = new StringWriter()) {
                 final var task = compiler.getTask(writer, manager, null,
-                                                  Arrays.asList("--enable-preview", "-source", sourceVersion.get().ordinal() + "", "-d", "build/tmp/", "-cp", ".." + separator + "slideshowfx-plugin" + separator + "build" + separator + "production" + separator + "slideshowfx.plugin"), null, singletonList(new DummyPluginClass()));
+                                                  Arrays.asList("-source", sourceVersion.get().ordinal() + "", "-d", "build/tmp/", "-cp", ".." + separator + "slideshowfx-plugin" + separator + "build" + separator + "production" + separator + "slideshowfx.plugin"), null, singletonList(new DummyPluginClass()));
 
                 if (Boolean.FALSE.equals(task.call())) {
                     fail(writer.toString());

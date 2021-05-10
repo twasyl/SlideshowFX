@@ -61,7 +61,7 @@ public class GherkinTask extends JavaExec implements Reporting<TestTaskReports> 
     }
 
     private void configureJvmArgs() {
-        jvmArgs("--enable-preview", "-Dcucumber.publish.quiet=true", "-Dcucumber.publish.enabled=false");
+        jvmArgs("-Dcucumber.publish.quiet=true", "-Dcucumber.publish.enabled=false");
     }
 
     private void adjustJvmArgsWhenJacocoEnabled() {

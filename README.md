@@ -37,7 +37,7 @@ With SlideshowFX, bring your presentation to the next level of interactivity.
 
 You can build SlideshowFX manually in order to test it. In order to do so, you will need:
 
-* A JDK 14;
+* A JDK 16;
 * The `JAVA_HOME` system variable set to point to your JDK installation.
 
 ## Building the application

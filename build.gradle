@@ -4,8 +4,6 @@ import org.openjfx.gradle.JavaFXPlugin
 import org.sonarqube.gradle.SonarQubePlugin
 import org.sonarqube.gradle.SonarQubeTask
 
-import java.util.stream.Collectors
-
 import static org.gradle.api.file.DuplicatesStrategy.EXCLUDE
 
 buildscript {
@@ -252,19 +250,19 @@ subprojects {
         }
     }
 
-    sonarqube {
-        properties {
-            property("sonar.host.url", System.getProperty("sonar.host.url", System.getenv("SONAR_HOST_URL")))
-            property("sonar.login", System.getProperty("sonar.login", System.getenv("SONAR_LOGIN")))
-            property("sonar.projectKey", System.getProperty("sonar.projectKey", System.getenv("SONAR_PROJECT_KEY")))
-            property("sonar.organization", System.getProperty("sonar.organization", System.getenv("SONAR_ORGANIZATION")))
-            property("sonar.branch.name", System.getProperty("sonar.branch.name", System.getenv("SONAR_BRANCH")))
-            property("sonar.sourceEncoding", "UTF-8")
-        }
-    }
-
     tasks.withType(SonarQubeTask).configureEach {
         dependsOn(subprojects.filter { project -> project.pluginManager.hasPlugin("org.sonarqube") }
                 .map { project -> project.tasks.named("check") })
+    }
+}
+
+sonarqube {
+    properties {
+        property("sonar.host.url", System.getProperty("sonar.host.url", System.getenv("SONAR_HOST_URL")))
+        property("sonar.login", System.getProperty("sonar.login", System.getenv("SONAR_LOGIN")))
+        property("sonar.projectKey", System.getProperty("sonar.projectKey", System.getenv("SONAR_PROJECT_KEY")))
+        property("sonar.organization", System.getProperty("sonar.organization", System.getenv("SONAR_ORGANIZATION")))
+        property("sonar.branch.name", System.getProperty("sonar.branch.name", System.getenv("SONAR_BRANCH")))
+        property("sonar.sourceEncoding", "UTF-8")
     }
 }

@@ -4,6 +4,8 @@ import org.openjfx.gradle.JavaFXPlugin
 import org.sonarqube.gradle.SonarQubePlugin
 import org.sonarqube.gradle.SonarQubeTask
 
+import java.util.stream.Collectors
+
 import static org.gradle.api.file.DuplicatesStrategy.EXCLUDE
 
 buildscript {
@@ -243,9 +245,9 @@ subprojects {
 
         sonarqube {
             properties {
-                property("sonar.tests", testDirs.join(",") { it.absolutePath })
-                property("sonar.coverage.jacoco.xmlReportPaths", jacocoReports.join(",") { it.absolutePath })
-                property("sonar.junit.reportPaths", junitReports.join(",") { it.absolutePath })
+                property("sonar.tests", testDirs.join(','))
+                property("sonar.coverage.jacoco.xmlReportPaths", jacocoReports.join(','))
+                property("sonar.junit.reportPaths", junitReports.join(','))
             }
         }
     }

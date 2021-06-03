@@ -22,11 +22,12 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,7 +72,7 @@ public class TwitterService extends AbstractSlideshowFXService {
 
     public TwitterService() {
         this.timestampInSeconds = System.currentTimeMillis() / 1000;
-        this.nonce = this.timestampInSeconds + (new Random()).nextInt();
+        this.nonce = this.timestampInSeconds + (new SecureRandom()).nextInt();
         this.loadTokens();
     }
 

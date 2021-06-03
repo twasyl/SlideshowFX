@@ -37,7 +37,7 @@ public class SlideshowFXServer {
 
     private static final Logger LOGGER = Logger.getLogger(SlideshowFXServer.class.getName());
 
-    private static volatile SlideshowFXServer singleton;
+    private static SlideshowFXServer singleton;
     private static final Object singletonLock = new Object();
 
     private Vertx vertx;
@@ -168,7 +168,7 @@ public class SlideshowFXServer {
     }
 
     private CompletableFuture<Void> deployService(final Class<? extends ISlideshowFXServices> service) {
-        final ServiceDeploymentHandler handler = new ServiceDeploymentHandler(service);
+        final var handler = new ServiceDeploymentHandler(service);
         this.vertx.deployVerticle(service.getName(), handler);
         return handler.future();
     }
@@ -220,10 +220,9 @@ public class SlideshowFXServer {
         final Wrapper<JsonObject> response = new Wrapper<>();
 
         try {
-            final JsonObject jsonRequest = new JsonObject(request);
-
-            final String service = jsonRequest.getString(JSON_KEY_SERVICE);
-            final JsonObject data = jsonRequest.getJsonObject(JSON_KEY_DATA);
+            final var jsonRequest = new JsonObject(request);
+            final var service = jsonRequest.getString(JSON_KEY_SERVICE);
+            final var data = jsonRequest.getJsonObject(JSON_KEY_DATA);
 
             if (service == null) throw new IllegalArgumentException("The service in the request must be present");
             if (service.trim().isEmpty())
@@ -231,8 +230,8 @@ public class SlideshowFXServer {
 
             if (data == null) throw new IllegalArgumentException("The data in the request must be present");
 
-            final Thread thread = new Thread(new Runnable() {
-                private Boolean continueProcess = false;
+            final var thread = new Thread(new Runnable() {
+                private boolean continueProcess = false;
 
                 @Override
                 public void run() {
@@ -270,7 +269,7 @@ public class SlideshowFXServer {
      * Build the {@link Router} that will handle shared routes.
      */
     private void buildRouter() {
-        final BodyHandler handler = BodyHandler.create();
+        final var handler = BodyHandler.create();
         handler.setMergeFormAttributes(false);
         router.route().handler(handler);
     }

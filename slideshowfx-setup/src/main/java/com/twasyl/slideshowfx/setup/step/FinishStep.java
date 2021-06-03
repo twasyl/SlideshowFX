@@ -83,13 +83,7 @@ public class FinishStep extends AbstractSetupStep<FinishViewController> {
             if (installationLocationStep != null) {
                 final File versionFolderSetup = installationLocationStep.getVersionFolderSetup();
                 final File applicationDir = new File(versionFolderSetup, SetupProperties.getInstance().getApplicationName());
-                ProcessBuilder process = null;
-
-                if (OSUtils.isMac()) {
-                    process = new ProcessBuilder("open", new File(applicationDir, SetupProperties.getInstance().getApplicationName() + ".app").getAbsolutePath());
-                } else if (OSUtils.isWindows()) {
-                    process = new ProcessBuilder(new File(applicationDir, SetupProperties.getInstance().getApplicationName() + ".exe").getAbsolutePath());
-                }
+                ProcessBuilder process = getProcessStartingApplication(applicationDir);
 
                 if (process != null) {
                     try {
@@ -97,6 +91,8 @@ public class FinishStep extends AbstractSetupStep<FinishViewController> {
                     } catch (IOException e) {
                         LOGGER.log(SEVERE, "Can not start application after installation", e);
                     }
+                } else {
+                    LOGGER.warning("The process for starting the application is null");
                 }
             }
         };
@@ -104,6 +100,20 @@ public class FinishStep extends AbstractSetupStep<FinishViewController> {
         final Thread daemon = new Thread(work);
         daemon.setDaemon(true);
         daemon.start();
+    }
+
+    private ProcessBuilder getProcessStartingApplication(File applicationDir) {
+        ProcessBuilder process = null;
+
+        if (OSUtils.isMac()) {
+            final var openExec = new File("/usr/bin/open");
+            if (openExec.exists() && openExec.canExecute()) {
+                process = new ProcessBuilder(openExec.getAbsolutePath(), new File(applicationDir, SetupProperties.getInstance().getApplicationName() + ".app").getAbsolutePath());
+            }
+        } else if (OSUtils.isWindows()) {
+            process = new ProcessBuilder(new File(applicationDir, SetupProperties.getInstance().getApplicationName() + ".exe").getAbsolutePath());
+        }
+        return process;
     }
 
     @Override

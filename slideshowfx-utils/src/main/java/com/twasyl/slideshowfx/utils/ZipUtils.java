@@ -40,7 +40,7 @@ public class ZipUtils {
         // Unzip
         LOGGER.log(FINE, "Extracting file {0}", archive.toURI().toASCIIString());
 
-        final FileInputStream inputStream = new FileInputStream(archive);
+        final var inputStream = new FileInputStream(archive);
         unzip(inputStream, destination);
     }
 
@@ -60,7 +60,7 @@ public class ZipUtils {
             throw new IOException("Can not create destination folder");
         }
 
-        final ZipInputStream zipReader = new ZipInputStream(archive);
+        final var zipReader = new ZipInputStream(archive);
         ZipEntry zipEntry;
         File extractedFile;
 
@@ -82,9 +82,9 @@ public class ZipUtils {
                     }
 
                     int length;
-                    final byte[] buffer = new byte[1024];
+                    final var buffer = new byte[1024];
 
-                    try (final FileOutputStream extractedFileOutputStream = new FileOutputStream(extractedFile)) {
+                    try (final var extractedFileOutputStream = new FileOutputStream(extractedFile)) {
 
                         while ((length = zipReader.read(buffer)) > 0) {
                             extractedFileOutputStream.write(buffer, 0, length);
@@ -117,15 +117,15 @@ public class ZipUtils {
         if (!fileToZip.exists()) throw new FileNotFoundException("The file to zip does not exist");
         if (destination == null) throw new NullPointerException("The destination can not be null");
 
-        final ListFilesFileVisitor visitor = new ListFilesFileVisitor();
+        final var visitor = new ListFilesFileVisitor();
         Files.walkFileTree(fileToZip.toPath(), visitor);
         final List<File> filesToZip = visitor.getFiles();
 
 
-        try (final ZipOutputStream zipOutput = new ZipOutputStream(new FileOutputStream(destination))) {
+        try (final var zipOutput = new ZipOutputStream(new FileOutputStream(destination))) {
             ZipEntry entry;
             String entryName;
-            final byte[] buffer = new byte[1024];
+            final var buffer = new byte[1024];
             int length;
 
             final String prefixToDelete;
@@ -139,7 +139,7 @@ public class ZipUtils {
                 LOGGER.fine("Compressing file: " + file.getAbsolutePath());
 
                 entryName = file.getAbsolutePath().substring(prefixToDelete.length(), file.getAbsolutePath().length());
-                entryName = entryName.replaceAll("\\\\", "/");
+                entryName = entryName.replace("\\\\", "/");
                 LOGGER.log(FINEST, "Entry name: {0}", entryName);
 
                 if (file.isDirectory()) {
@@ -149,7 +149,7 @@ public class ZipUtils {
                     entry = new ZipEntry(entryName);
                     zipOutput.putNextEntry(entry);
 
-                    try (final FileInputStream fileInput = new FileInputStream(file)) {
+                    try (final var fileInput = new FileInputStream(file)) {
                         while ((length = fileInput.read(buffer)) > 0) {
                             zipOutput.write(buffer, 0, length);
                         }

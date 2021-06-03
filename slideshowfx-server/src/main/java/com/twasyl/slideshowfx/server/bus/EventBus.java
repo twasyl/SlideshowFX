@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class EventBus {
 
-    private static volatile EventBus singleton = null;
+    private static EventBus singleton = null;
 
     private final Map<String, Set<Actor>> endPointsAndActorsMapping = new ConcurrentHashMap<>();
 
@@ -79,10 +79,7 @@ public class EventBus {
         checkEndPointIsValid(endPoint);
 
         final String trimmedEndPoint = endPoint.trim();
-        if (!endPointsAndActorsMapping.containsKey(trimmedEndPoint)) {
-            endPointsAndActorsMapping.put(trimmedEndPoint, new HashSet<>());
-        }
-
+        endPointsAndActorsMapping.computeIfAbsent(trimmedEndPoint, endpoint -> endPointsAndActorsMapping.put(endpoint, new HashSet<>()));
         this.endPointsAndActorsMapping.get(trimmedEndPoint).add(actor);
 
         return this;
@@ -144,8 +141,7 @@ public class EventBus {
             actors.forEach(actor -> {
                 if (actor.supportsMessage(message)) {
                     final Runnable runnable = () -> actor.onMessage(message);
-                    final Thread thread = new Thread(runnable);
-                    thread.start();
+                    new Thread(runnable).start();
                 }
             });
         }

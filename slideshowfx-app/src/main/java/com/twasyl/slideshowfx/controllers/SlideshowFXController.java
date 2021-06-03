@@ -62,7 +62,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -74,7 +73,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
@@ -168,9 +166,9 @@ public class SlideshowFXController implements ThemeAwareController {
      */
     @FXML
     private void loadTemplate(ActionEvent event) {
-        final FXMLLoader loader = new FXMLLoader();
+        final var loader = new FXMLLoader();
         try {
-            final Parent parent = loader.load(SlideshowFXController.class.getResourceAsStream("/com/twasyl/slideshowfx/fxml/TemplateChooser.fxml"));
+            final var parent = loader.<Parent>load(SlideshowFXController.class.getResourceAsStream("/com/twasyl/slideshowfx/fxml/TemplateChooser.fxml"));
             TemplateChooserController controller = loader.getController();
 
             final ButtonType answer = DialogHelper.showCancellableDialog("New presentation", parent);
@@ -180,7 +178,7 @@ public class SlideshowFXController implements ThemeAwareController {
                 final File chosenTemplate = controller.getChosenTemplate();
 
                 if (chosenTemplate != null) {
-                    final File copy = new File(GlobalConfiguration.getTemplateLibraryDirectory(), chosenTemplate.getName());
+                    final var copy = new File(GlobalConfiguration.getTemplateLibraryDirectory(), chosenTemplate.getName());
 
                     if (!copy.exists()) {
                         Files.copy(chosenTemplate.toPath(), copy.toPath());
@@ -213,16 +211,16 @@ public class SlideshowFXController implements ThemeAwareController {
     @FXML
     private void closePresentation(ActionEvent event) {
         if (this.openedPresentationsTabPane.getSelectionModel().getSelectedItem() != null) {
-            final Tab tab = this.openedPresentationsTabPane.getSelectionModel().getSelectedItem();
+            final var tab = this.openedPresentationsTabPane.getSelectionModel().getSelectedItem();
 
             // Fire a close request event on the tab if any EventHandler has been defined
             final EventType<Event> closeRequestEventType = Tab.TAB_CLOSE_REQUEST_EVENT;
-            final Event closeRequestEvent = new Event(closeRequestEventType);
+            final var closeRequestEvent = new Event(closeRequestEventType);
             Event.fireEvent(tab, closeRequestEvent);
 
             // Fire a closed event on the tab if any EventHandler has been defined
             final EventType<Event> closedEventType = Tab.CLOSED_EVENT;
-            final Event closedEvent = new Event(closedEventType);
+            final var closedEvent = new Event(closedEventType);
             Event.fireEvent(tab, closedEvent);
 
             this.openedPresentationsTabPane.getTabs().remove(tab);
@@ -278,8 +276,8 @@ public class SlideshowFXController implements ThemeAwareController {
      */
     @FXML
     private void dragDroppedOnUI(DragEvent dragEvent) {
-        Dragboard board = dragEvent.getDragboard();
-        boolean dragSuccess = false;
+        final var board = dragEvent.getDragboard();
+        var dragSuccess = false;
 
         if (board.hasFiles()) {
             final Optional<File> slideshowFXFile = board.getFiles().stream()
@@ -361,7 +359,7 @@ public class SlideshowFXController implements ThemeAwareController {
             final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
 
             if (presentation != null) {
-                final File presentationFile = presentation.getConfiguration().getPresentationFile();
+                final var presentationFile = presentation.getConfiguration().getPresentationFile();
 
                 if (presentationFile != null && presentationFile.exists()) {
                     try {
@@ -398,7 +396,7 @@ public class SlideshowFXController implements ThemeAwareController {
 
     @FXML
     private void takeTour(ActionEvent event) {
-        final Tour tour = new Tour(SlideshowFX.getStage().getScene());
+        final var tour = new Tour(SlideshowFX.getStage().getScene());
         tour.addStep(new Tour.Step("#menuBar", "The menu bar of SlideshowFX."))
                 .addStep(new Tour.Step("#toolBar", "The toolbar gives you access to most commons features of SlideshowFX."))
                 .addStep(new Tour.Step("#loadTemplate", "Create a new presentation from a template."))
@@ -441,7 +439,7 @@ public class SlideshowFXController implements ThemeAwareController {
     private void displayInternalBrowser(ActionEvent event) {
         try {
             final Parent browser = FXMLLoader.load(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/InternalBrowser.fxml"));
-            final Tab tab = new Tab("Internal browser", browser);
+            final var tab = new Tab("Internal browser", browser);
 
             this.openedPresentationsTabPane.getTabs().addAll(tab);
             this.openedPresentationsTabPane.getSelectionModel().select(tab);
@@ -454,7 +452,7 @@ public class SlideshowFXController implements ThemeAwareController {
     private void displayWebApplication(final ActionEvent event) {
         try {
             final Parent webapp = FXMLLoader.load(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/SlideshowFXWebApplication.fxml"));
-            final Tab tab = new Tab("Web application", webapp);
+            final var tab = new Tab("Web application", webapp);
 
             this.openedPresentationsTabPane.getTabs().addAll(tab);
             this.openedPresentationsTabPane.getSelectionModel().select(tab);
@@ -490,7 +488,7 @@ public class SlideshowFXController implements ThemeAwareController {
      */
     @FXML
     private void displayPluginCenter(final ActionEvent event) {
-        FXMLLoader loader = new FXMLLoader(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/PluginCenter.fxml"));
+        final var loader = new FXMLLoader(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/PluginCenter.fxml"));
         try {
             final Parent pluginCenter = loader.load();
             final PluginCenterController controller = loader.getController();
@@ -581,7 +579,7 @@ public class SlideshowFXController implements ThemeAwareController {
     @FXML
     private void saveAs(ActionEvent event) {
         File presentationArchive = null;
-        FileChooser chooser = new FileChooser();
+        final var chooser = new FileChooser();
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
         presentationArchive = chooser.showSaveDialog(SlideshowFX.getStage());
 
@@ -637,11 +635,11 @@ public class SlideshowFXController implements ThemeAwareController {
      */
     @FXML
     private void createTemplate(ActionEvent event) {
-        final TemplateEngine engine = new TemplateEngine();
+        final var engine = new TemplateEngine();
         engine.setWorkingDirectory(engine.generateWorkingDirectory());
 
         if (engine.getWorkingDirectory().mkdir()) {
-            final File templateConfigurationFile = new File(engine.getWorkingDirectory(), engine.getConfigurationFilename());
+            final var templateConfigurationFile = new File(engine.getWorkingDirectory(), engine.getConfigurationFilename());
 
             try {
                 Files.createFile(templateConfigurationFile.toPath());
@@ -660,12 +658,12 @@ public class SlideshowFXController implements ThemeAwareController {
      */
     @FXML
     private void openTemplate(ActionEvent event) {
-        final FileChooser chooser = new FileChooser();
+        final var chooser = new FileChooser();
         chooser.setSelectedExtensionFilter(SlideshowFXExtensionFilter.TEMPLATE_FILTER);
 
-        final File file = chooser.showOpenDialog(null);
+        final var file = chooser.showOpenDialog(null);
         if (file != null) {
-            final TemplateEngine engine = new TemplateEngine();
+            final var engine = new TemplateEngine();
             engine.setWorkingDirectory(engine.generateWorkingDirectory());
             engine.setArchive(file);
 
@@ -691,7 +689,7 @@ public class SlideshowFXController implements ThemeAwareController {
         final PresentationEngine presentation = Presentations.getCurrentDisplayedPresentation();
 
         if (presentation != null) {
-            final TemplateEngine engine = new TemplateEngine();
+            final var engine = new TemplateEngine();
             engine.setWorkingDirectory(presentation.getWorkingDirectory());
 
             this.showTemplateBuilder(engine);
@@ -716,7 +714,7 @@ public class SlideshowFXController implements ThemeAwareController {
      */
     @FXML
     private void showOptionsDialog(ActionEvent event) {
-        FXMLLoader loader = new FXMLLoader(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/OptionsView.fxml"));
+        final var loader = new FXMLLoader(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/OptionsView.fxml"));
         try {
             final Parent optionsView = loader.load();
             Themes.applyTheme(optionsView, GlobalConfiguration.getThemeName());
@@ -735,9 +733,9 @@ public class SlideshowFXController implements ThemeAwareController {
     /* All instance methods */
 
     private void displayOpenPresentationView() {
-        FileChooser chooser = new FileChooser();
+        final var chooser = new FileChooser();
         chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
-        File file = chooser.showOpenDialog(null);
+        final var file = chooser.showOpenDialog(null);
 
         if (file != null) {
             try {
@@ -787,14 +785,14 @@ public class SlideshowFXController implements ThemeAwareController {
                                 newState == Worker.State.SUCCEEDED) &&
                         loadingTask.getValue() != null) {
 
-                    final FXMLLoader loader = new FXMLLoader(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/PresentationView.fxml"));
+                    final var loader = new FXMLLoader(SlideshowFXController.class.getResource("/com/twasyl/slideshowfx/fxml/PresentationView.fxml"));
                     try {
-                        final Parent parent = loader.load();
+                        final var parent = loader.<Parent>load();
                         final PresentationViewController controller = loader.getController();
                         controller.definePresentation(loadingTask.getValue());
 
-                        final Tab tab = new Tab();
-                        final WildcardBinding presentationModifiedBinding = new WildcardBinding(controller.presentationModifiedProperty());
+                        final var tab = new Tab();
+                        final var presentationModifiedBinding = new WildcardBinding(controller.presentationModifiedProperty());
                         final StringExpression tabTitle = controller.getPresentationName().concat(presentationModifiedBinding);
                         tab.textProperty().bind(tabTitle);
                         tab.setUserData(controller);
@@ -806,7 +804,7 @@ public class SlideshowFXController implements ThemeAwareController {
 
                         this.updateSlideTemplatesSplitMenu();
 
-                        final AutoSavingService autoSavingService = new AutoSavingService(loadingTask.getValue());
+                        final var autoSavingService = new AutoSavingService(loadingTask.getValue());
                         if (GlobalConfiguration.isAutoSavingEnabled()) {
                             PlatformHelper.run(autoSavingService::start);
                         }
@@ -826,7 +824,7 @@ public class SlideshowFXController implements ThemeAwareController {
      * @param engine the engine used for the template builder that will be created.
      */
     private void showTemplateBuilder(final TemplateEngine engine) {
-        final TemplateBuilderStage stage = new TemplateBuilderStage(engine);
+        final var stage = new TemplateBuilderStage(engine);
         stage.setMaximized(true);
         stage.show();
     }
@@ -844,7 +842,7 @@ public class SlideshowFXController implements ThemeAwareController {
 
             if (templates != null) {
                 templates.forEach(template -> {
-                    final MenuItem item = new MenuItem();
+                    final var item = new MenuItem();
                     item.setText(template.getName());
                     item.setUserData(template);
                     item.setOnAction(addSlideActionEvent);
@@ -876,11 +874,11 @@ public class SlideshowFXController implements ThemeAwareController {
             File presentationArchive;
 
             if (!presentation.isPresentationAlreadySaved()) {
-                FileChooser chooser = new FileChooser();
+                final var chooser = new FileChooser();
                 chooser.getExtensionFilters().add(SlideshowFXExtensionFilter.PRESENTATION_FILES);
                 presentationArchive = chooser.showSaveDialog(SlideshowFX.getStage());
 
-                final AutoSavingService autoSavingService = new AutoSavingService(presentation);
+                final var autoSavingService = new AutoSavingService(presentation);
                 if (GlobalConfiguration.isAutoSavingEnabled()) {
                     PlatformHelper.run(autoSavingService::start);
                 }
@@ -919,6 +917,7 @@ public class SlideshowFXController implements ThemeAwareController {
                 try {
                     saveTask.get();
                 } catch (Exception e) {
+                    Thread.currentThread().interrupt();
                     LOGGER.log(SEVERE, "Can not wait for the presentation to be saved", e);
                 } finally {
                     PlatformHelper.run(() -> SlideshowFX.getStage().getScene().setCursor(Cursor.DEFAULT));
@@ -934,7 +933,7 @@ public class SlideshowFXController implements ThemeAwareController {
      */
     private void startServer() {
         FontAwesome icon;
-        final Tooltip tooltip = new Tooltip();
+        final var tooltip = new Tooltip();
         final PseudoClass stateToEnable;
         final PseudoClass stateToDisable;
 
@@ -954,7 +953,7 @@ public class SlideshowFXController implements ThemeAwareController {
                 ip = NetworkUtils.getIP();
             }
 
-            int port = 80;
+            var port = 80;
             if (this.serverPort.getText() != null && !this.serverPort.getText().isEmpty()) {
                 try {
                     port = Integer.parseInt(this.serverPort.getText());
@@ -1024,20 +1023,20 @@ public class SlideshowFXController implements ThemeAwareController {
                 .forEach(this.openRecentMenu.getItems()::add);
 
         if (this.openRecentMenu.getItems().isEmpty()) {
-            final MenuItem none = new MenuItem("None");
+            final var none = new MenuItem("None");
             none.setDisable(true);
             this.openRecentMenu.getItems().add(none);
         }
     }
 
     private MenuItem createRecentPresentationMenuItem(final RecentPresentation recentPresentation) {
-        final MenuItem item = new MenuItem(recentPresentation.getAbsolutePath());
+        final var item = new MenuItem(recentPresentation.getAbsolutePath());
         item.setOnAction(event -> {
             try {
                 this.openTemplateOrPresentation(recentPresentation);
             } catch (IllegalAccessException | FileNotFoundException e) {
                 DialogHelper.showError("Error", "Can not open presentation " + recentPresentation.getAbsolutePath());
-                LOGGER.log(WARNING, "Can not open presentation " + recentPresentation.getAbsolutePath(), e);
+                LOGGER.log(WARNING, e, () -> "Can not open presentation " + recentPresentation.getAbsolutePath());
             }
         });
 
@@ -1052,7 +1051,7 @@ public class SlideshowFXController implements ThemeAwareController {
      * @return A MenuItem for the {@code hostingConnector}
      */
     private MenuItem createUploaderMenuItem(final IHostingConnector hostingConnector) {
-        final MenuItem uploaderMenuItem = new MenuItem(hostingConnector.getName());
+        final var uploaderMenuItem = new MenuItem(hostingConnector.getName());
         uploaderMenuItem.setUserData(hostingConnector);
 
         uploaderMenuItem.setOnAction(event -> PlatformHelper.run(() -> {
@@ -1072,7 +1071,7 @@ public class SlideshowFXController implements ThemeAwareController {
                     destination = hostingConnector.chooseFile(true, false);
 
                     if (destination != null) {
-                        final UploadPresentationTask task = new UploadPresentationTask(Presentations.getCurrentDisplayedPresentation(),
+                        final var task = new UploadPresentationTask(Presentations.getCurrentDisplayedPresentation(),
                                 hostingConnector, destination);
                         TaskDAO.getInstance().startTask(task);
                     }
@@ -1096,7 +1095,7 @@ public class SlideshowFXController implements ThemeAwareController {
      * @return A MenuItem for the {@code hostingConnector}
      */
     private MenuItem createDownloaderMenuItem(final IHostingConnector hostingConnector) {
-        final MenuItem downloaderMenuItem = new MenuItem(hostingConnector.getName());
+        final var downloaderMenuItem = new MenuItem(hostingConnector.getName());
         downloaderMenuItem.setUserData(hostingConnector);
 
         downloaderMenuItem.setOnAction(event -> PlatformHelper.run(() -> {
@@ -1116,14 +1115,13 @@ public class SlideshowFXController implements ThemeAwareController {
 
                     if (presentationFile != null) {
                         // Prompts the user where the file should be downloaded
-                        final DirectoryChooser chooser = new DirectoryChooser();
+                        final var chooser = new DirectoryChooser();
                         chooser.setTitle("Choose directory");
 
                         final File directory = chooser.showDialog(null);
 
                         if (directory != null) {
-                            final DownloadPresentationTask task = new DownloadPresentationTask(
-                                    hostingConnector, directory, presentationFile);
+                            final var task = new DownloadPresentationTask(hostingConnector, directory, presentationFile);
                             task.stateProperty().addListener((value, oldState, newState) -> {
                                 if (newState == Worker.State.SUCCEEDED && task.getValue() != null) {
                                     ButtonType response = DialogHelper.showConfirmationAlert("Open file?", String.format("Do you want to open '%1$s' ?", task.getValue()));
@@ -1161,7 +1159,7 @@ public class SlideshowFXController implements ThemeAwareController {
     private PresentationViewController getCurrentPresentationView() {
         PresentationViewController view = null;
 
-        final Tab selectedTab = this.openedPresentationsTabPane.getSelectionModel().getSelectedItem();
+        final var selectedTab = this.openedPresentationsTabPane.getSelectionModel().getSelectedItem();
 
         if (selectedTab != null) {
             final Object userData = selectedTab.getUserData();
@@ -1190,11 +1188,11 @@ public class SlideshowFXController implements ThemeAwareController {
                     && presentation.getConfiguration().getPresentationFile() != null
                     && presentation.getConfiguration().getPresentationFile().exists()) {
 
-                final Context context = new Context();
+                final var context = new Context();
                 context.setStartAtSlideId(currentSlideId);
                 context.setPresentation(presentation);
 
-                final SlideshowStage stage = new SlideshowStage(context);
+                final var stage = new SlideshowStage(context);
                 stage.onClose(() -> {
                     final String slideId = stage.getDisplayedSlideId();
                     view.goToSlide(slideId);
@@ -1226,14 +1224,13 @@ public class SlideshowFXController implements ThemeAwareController {
                     }
                 };
 
-                final RecentPresentationsView root = new RecentPresentationsView(presentationOpener);
-
+                final var recentPresentationsView = new RecentPresentationsView(presentationOpener);
                 recentPresentations.stream()
                         .filter(RecentPresentation::exists)
-                        .forEach(root::addRecentPresentation);
+                        .forEach(recentPresentationsView::addRecentPresentation);
 
-                initializeRecentPresentationsStage(root);
-                root.requestFocus();
+                initializeRecentPresentationsStage(recentPresentationsView);
+                recentPresentationsView.requestFocus();
             }
         } else {
             this.recentPresentationsStage.requestFocus();
@@ -1241,7 +1238,7 @@ public class SlideshowFXController implements ThemeAwareController {
     }
 
     private void initializeRecentPresentationsStage(RecentPresentationsView view) {
-        final Scene scene = new Scene(view);
+        final var scene = new Scene(view);
         this.recentPresentationsStage = new Stage(StageStyle.UNDECORATED);
         this.recentPresentationsStage.setTitle("Recent presentations");
         this.recentPresentationsStage.setScene(scene);
@@ -1265,7 +1262,7 @@ public class SlideshowFXController implements ThemeAwareController {
         // We use reflection to disable all elements present in the list
         final Consumer<Object> disableElementLambda = element -> {
             try {
-                final Method setDisable = element.getClass().getMethod("setDisable", boolean.class);
+                final var setDisable = element.getClass().getMethod("setDisable", boolean.class);
                 setDisable.invoke(element, true);
             } catch (NoSuchMethodException e) {
                 LOGGER.log(Level.FINE, "No setDisableMethod found", e);
@@ -1294,7 +1291,7 @@ public class SlideshowFXController implements ThemeAwareController {
                     if (SlideshowFX.getStage().titleProperty().isBound())
                         SlideshowFX.getStage().titleProperty().unbind();
 
-                    final WildcardBinding presentationModifiedBinding = new WildcardBinding(view.presentationModifiedProperty());
+                    final var presentationModifiedBinding = new WildcardBinding(view.presentationModifiedProperty());
                     final StringExpression title = new SimpleStringProperty("SlideshowFX - ")
                             .concat(view.getPresentationName())
                             .concat(presentationModifiedBinding);
@@ -1312,7 +1309,7 @@ public class SlideshowFXController implements ThemeAwareController {
             }
         });
 
-        this.openedPresentationsTabPane.getTabs().addListener((ListChangeListener) change -> {
+        this.openedPresentationsTabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
             final StackPane header = (StackPane) this.openedPresentationsTabPane.lookup(".tab-header-area");
 
             if (header != null) {
@@ -1323,7 +1320,7 @@ public class SlideshowFXController implements ThemeAwareController {
 
         // Define global shortcuts of the application
         this.root.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            boolean consumed = false;
+            var consumed = false;
 
             if (event.isShortcutDown()) {
                 if (isShortcutSequence("R", event)) {
